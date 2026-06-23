@@ -34,6 +34,24 @@ yarn-error.log*
 .env*
 !.env.example
 
+# local databases, generated exports, and private payload samples
+*.db
+*.sqlite
+*.sqlite3
+*.dump
+*.bak
+*.backup
+private/
+local/
+tmp/
+
+# hardware and deployment secrets
+*.key
+*.crt
+*.p12
+*.mobileprovision
+secrets/
+
 # vercel
 .vercel
 
