@@ -1,29 +1,30 @@
-# Contributing
+# Panduan Kontribusi
 
-This repository is currently in the foundation scaffold phase.
+Repositori ini sedang berada pada fase fondasi. Kontribusi perlu menjaga struktur tetap rapi, aman, dan mudah dilanjutkan.
 
-## Working Rules
+## Aturan Kerja
 
-- Keep public repository content free from real credentials, private telemetry, network details, and organization-specific deployment data.
-- Use dummy data or simulator payloads for examples.
-- Prefer small, reviewable commits.
-- Keep domain logic testable and separate from UI code.
-- Document assumptions when real hardware or deployment details are not yet confirmed.
+- Jangan melakukan commit kredensial, API key, token, password, atau konfigurasi produksi.
+- Gunakan data dummy atau payload simulator untuk contoh.
+- Pisahkan logika domain dari komponen UI.
+- Tulis asumsi teknis jika detail perangkat atau deployment belum final.
+- Gunakan commit kecil dan mudah ditinjau.
+- Jalankan pengecekan lokal sebelum push.
 
-## Commit Style
+## Gaya Commit
 
-Use concise conventional-style commit messages:
+Gunakan format commit yang singkat dan konsisten:
 
 ```text
-docs(readme): improve repository overview
-chore(repo): add project structure scaffold
-feat(domain): add tank volume calculation
-test(domain): cover runtime status thresholds
+docs(readme): revisi dokumentasi repositori
+chore(repo): rapikan struktur folder
+feat(domain): tambah perhitungan volume tangki
+test(domain): tambah test status runtime
 ```
 
-## Local Checks
+## Pengecekan Lokal
 
-Before pushing implementation changes, run:
+Sebelum push perubahan implementasi, jalankan:
 
 ```powershell
 pnpm check

@@ -1,24 +1,25 @@
-# Security Policy
+# Kebijakan Keamanan
 
-## Public-Safe Repository Rule
+## Aturan Repositori Publik
 
-Do not commit:
+Jangan melakukan commit:
 
-- real API keys;
-- database credentials;
-- device secrets;
-- WiFi credentials;
-- private telemetry;
-- production domains or network addresses;
-- deployment tokens;
-- private hardware configuration.
+- API key asli;
+- kredensial database;
+- rahasia perangkat;
+- kredensial WiFi;
+- telemetri nyata;
+- alamat jaringan internal;
+- domain produksi;
+- token deployment;
+- konfigurasi perangkat keras privat.
 
-Use `.env.example` for placeholder names only. Store real values in local environment files or the target deployment secret manager.
+Gunakan `.env.example` hanya untuk nama variabel dan nilai contoh. Nilai asli harus disimpan di environment lokal atau pengelola rahasia deployment.
 
-## Reporting Issues
+## Pelaporan Masalah Keamanan
 
-If you find a security issue, do not open a public issue containing secrets or exploit details. Contact the repository maintainer privately and include only the minimum information required to reproduce the concern.
+Jika menemukan masalah keamanan, jangan membuka issue publik yang berisi rahasia, payload sensitif, atau detail eksploitasi. Hubungi pemelihara secara privat dan berikan informasi secukupnya untuk reproduksi.
 
-## Supported Branch
+## Branch yang Didukung
 
-Security fixes should target the active `main` branch until release branches exist.
+Perbaikan keamanan diarahkan ke branch aktif `main` sampai repositori memiliki branch rilis khusus.

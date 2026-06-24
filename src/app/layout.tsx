@@ -1,21 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Solar Tank Monitoring System",
   description:
-    "A public-safe full-stack scaffold for fuel tank telemetry monitoring.",
+    "Fondasi aplikasi monitoring telemetri tangki bahan bakar.",
 };
 
 export default function RootLayout({
@@ -24,10 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="id" className="h-full antialiased">
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

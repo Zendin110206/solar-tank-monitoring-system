@@ -1,163 +1,197 @@
 # Solar Tank Monitoring System
 
-![Project Status](https://img.shields.io/badge/status-foundation_scaffold-blue)
-![Stack](https://img.shields.io/badge/stack-Next.js%20%7C%20TypeScript%20%7C%20Telemetry-111827)
-![License](https://img.shields.io/badge/license-MIT-green)
+![Status](https://img.shields.io/badge/status-fondasi_repositori-blue)
+![Teknologi](https://img.shields.io/badge/teknologi-Next.js%20%7C%20TypeScript%20%7C%20Telemetri-111827)
+![Lisensi](https://img.shields.io/badge/lisensi-MIT-green)
 
-Solar Tank Monitoring System is a portfolio-grade full-stack application scaffold for monitoring fuel tank telemetry, estimated remaining volume, runtime availability, and operational status from IoT-style device data.
+Solar Tank Monitoring System adalah fondasi aplikasi web untuk memantau data tangki bahan bakar berbasis telemetri. Aplikasi ini dirancang untuk menampilkan estimasi volume, persentase isi tangki, estimasi durasi operasional, status risiko, dan riwayat pembacaan dari perangkat IoT atau simulator.
 
-The repository is currently focused on building a clean, maintainable project foundation before implementation work begins. The structure is prepared for a future dashboard, telemetry ingestion API, tank-volume calculation module, simulator, alerting workflow, and deployment documentation.
+Repositori ini sedang berada pada tahap pematangan struktur. Fokus saat ini adalah menyiapkan fondasi proyek yang rapi, mudah dipelihara, aman untuk repositori publik, dan siap dikembangkan bertahap menjadi sistem monitoring yang lebih lengkap.
 
-## Project Status
+## Status Proyek
 
-Current phase:
-
-```text
-Repository foundation and public-safe project structure.
-```
-
-The repository currently contains:
-
-- a Next.js application scaffold;
-- public-safe repository documentation;
-- a mature folder structure for future dashboard, telemetry, device, tank, simulator, deployment, and firmware work;
-- empty documentation and source placeholders for the next implementation phase.
-
-The repository does not yet contain a production monitoring system, real device integration, real tank data, real credentials, or organization-specific deployment details.
-
-## Project Goal
-
-The long-term goal is to provide a practical monitoring platform for fuel tank operations:
-
-1. devices or simulators send telemetry readings;
-2. the application validates and normalizes incoming payloads;
-3. tank geometry and calibration settings convert sensor distance into fuel volume;
-4. runtime estimates are calculated from remaining volume and configured consumption rate;
-5. dashboard views show current level, status, history, and operational signals;
-6. future alerting can notify users when runtime or data freshness enters a risky state.
-
-## Product Principle
+Tahap saat ini:
 
 ```text
-Telemetry informs, operators decide.
+Fondasi repositori dan struktur proyek.
 ```
 
-The system should support operational awareness. It should not claim production readiness, site safety, or measurement accuracy before real hardware calibration, domain review, deployment review, and safety validation are completed.
+Yang sudah tersedia:
 
-## Current Scope
+- kerangka aplikasi Next.js;
+- struktur folder untuk dashboard, telemetri, perhitungan tangki, simulator, deployment, firmware, database, dan pengujian;
+- README dan dokumen repositori dasar dalam Bahasa Indonesia;
+- aturan dasar agar repositori publik tidak memuat data sensitif;
+- placeholder folder untuk fase implementasi berikutnya.
 
-This repository is intentionally public-safe and implementation-ready. It is prepared for:
+Yang belum tersedia:
 
-- local development with dummy data;
-- simulator-driven telemetry during early development;
-- configurable tank geometry;
-- dashboard-first monitoring workflows;
-- clean API contracts for future IoT ingestion;
-- documentation suitable for reviewers and collaborators.
+- dashboard monitoring final;
+- integrasi perangkat fisik;
+- database produksi;
+- autentikasi final;
+- simulator telemetri;
+- API penerimaan telemetri yang sudah aktif;
+- konfigurasi deployment produksi.
 
-This repository intentionally excludes:
+## Tujuan Proyek
 
-- real customer or organization names;
-- private network information;
-- real domain configuration;
-- API keys, database credentials, device secrets, or WiFi credentials;
-- copied private deployment folders or artifacts;
-- hardware claims that have not been validated.
+Tujuan jangka panjang proyek ini adalah menyediakan sistem monitoring tangki bahan bakar yang bisa membantu pengguna operasional melihat kondisi persediaan secara lebih cepat dan terstruktur.
 
-## Design Lessons Applied
+Alur yang ingin dibangun:
 
-The repository structure is informed by an existing field-monitoring prototype audit. The following lessons are applied without copying private source code or credentials:
+1. perangkat atau simulator mengirim data telemetri;
+2. aplikasi menerima dan memvalidasi data;
+3. data mentah dinormalisasi menjadi format yang konsisten;
+4. konfigurasi bentuk dan dimensi tangki digunakan untuk menghitung volume;
+5. volume dikonversi menjadi estimasi durasi operasional;
+6. dashboard menampilkan status, riwayat, dan indikator risiko;
+7. sistem dapat dikembangkan menuju notifikasi dan deployment internal.
 
-- devices should push telemetry to an API instead of requiring a public website to pull data from a local network device;
-- server-side validation should own ingestion, normalization, persistence, and response shaping;
-- tank formula logic should be isolated and testable because rectangular tanks, vertical cylinders, and horizontal cylinders use different calculations;
-- payload adapters should support evolving firmware formats without forcing dashboard code to understand every raw payload shape;
-- dummy data and simulators should unblock development before hardware access is finalized;
-- deployment concerns should be documented separately from domain logic;
-- secrets must never be committed.
+## Prinsip Produk
 
-## Planned Product Surface
+```text
+Data membantu pemantauan, keputusan tetap berada pada operator.
+```
 
-### Operations Dashboard
+Aplikasi ini dibuat untuk membantu membaca kondisi operasional. Aplikasi tidak boleh diklaim siap produksi sebelum perangkat, rumus, kalibrasi, keamanan, jaringan, dan prosedur operasional benar-benar divalidasi.
 
-Planned responsibilities:
+## Ruang Lingkup Saat Ini
 
-- show all monitored sites or tanks;
-- highlight latest volume, level percentage, estimated runtime, and data freshness;
-- separate healthy, warning, and critical states;
-- support search, filtering, and fast scanning.
+Repositori ini disiapkan untuk:
 
-### Tank Detail View
+- pengembangan lokal dengan data dummy;
+- simulasi pengiriman telemetri;
+- perhitungan volume berdasarkan konfigurasi tangki;
+- dashboard monitoring berbasis web;
+- kontrak API yang jelas untuk perangkat atau simulator;
+- dokumentasi yang mudah dipahami oleh pengembang berikutnya.
 
-Planned responsibilities:
+Repositori ini tidak memuat:
 
-- show one tank/device in detail;
-- display current telemetry;
-- show historical volume and percentage trend;
-- expose device metadata and calibration assumptions;
-- show the latest accepted payload timestamp.
+- kredensial asli;
+- data telemetri nyata;
+- konfigurasi jaringan internal;
+- alamat domain produksi;
+- API key perangkat;
+- password database;
+- file deployment privat;
+- klaim bahwa sistem sudah siap dipakai di lapangan.
 
-### Telemetry Ingestion API
+## Pelajaran Desain yang Diterapkan
 
-Planned responsibilities:
+Struktur repositori ini disusun berdasarkan kebutuhan umum sistem monitoring berbasis perangkat lapangan. Beberapa prinsip desain yang dipakai:
 
-- accept device or simulator payloads;
-- validate required headers or device credentials;
-- normalize raw payload fields;
-- store raw and normalized readings;
-- return clear success and error responses.
+- perangkat mengirim data ke server, bukan dashboard menarik data langsung dari perangkat lokal;
+- server bertanggung jawab menerima, memvalidasi, menormalisasi, dan menyimpan data;
+- rumus perhitungan tangki dipisahkan dari tampilan agar mudah diuji;
+- format payload dari perangkat bisa berubah, sehingga diperlukan lapisan normalisasi;
+- simulator diperlukan agar pengembangan tidak berhenti saat perangkat fisik belum tersedia;
+- konfigurasi deployment dipisahkan dari logika aplikasi;
+- repositori publik tidak boleh memuat rahasia atau data internal.
+
+## Prinsip Pemeliharaan dan Skalabilitas
+
+Proyek ini disiapkan agar tidak berhenti sebagai demo satu kali pakai. Struktur dan dokumentasinya diarahkan supaya pengembang berikutnya bisa memahami alur sistem, menambah fitur, dan mengganti detail teknis tanpa membongkar seluruh kode.
+
+Prinsip pemeliharaan yang dipakai:
+
+- logika perhitungan tangki ditempatkan di modul tersendiri agar bisa diuji tanpa membuka halaman dashboard;
+- komponen antarmuka dipisahkan dari proses pengambilan dan pengolahan data;
+- kontrak API ditulis sejak awal agar perangkat, simulator, dan dashboard memiliki kesepakatan format data yang sama;
+- konfigurasi lokasi, perangkat, tangki, ambang status, dan konsumsi bahan bakar disiapkan sebagai data konfigurasi, bukan nilai yang tersebar acak di banyak file;
+- simulator tetap disediakan agar pengembangan bisa berjalan walaupun perangkat fisik belum tersambung;
+- dokumentasi keputusan teknis disimpan di `docs/decision-log.md` agar alasan perubahan tetap bisa dilacak;
+- data contoh harus aman untuk publik dan tidak boleh menyerupai kredensial, alamat jaringan internal, atau data produksi;
+- setiap fitur penting perlu memiliki jalur pengujian, minimal untuk rumus volume, estimasi durasi operasional, klasifikasi status, validasi payload, dan normalisasi data.
+
+Dengan pola ini, proyek bisa berkembang bertahap dari data dummy, simulator lokal, API penerimaan data, dashboard operasional, sampai deployment internal tanpa harus mengganti arah arsitektur di tengah jalan.
+
+## Rencana Fitur Utama
+
+### Dashboard Operasional
+
+Dashboard dirancang untuk:
+
+- menampilkan daftar lokasi, perangkat, atau tangki;
+- menampilkan volume terbaru;
+- menampilkan persentase isi tangki;
+- menampilkan estimasi durasi operasional;
+- menampilkan status aman, waspada, atau kritis;
+- membantu pengguna memindai kondisi banyak tangki dengan cepat.
+
+### Halaman Detail Tangki
+
+Halaman detail dirancang untuk:
+
+- menampilkan satu tangki secara lebih lengkap;
+- menampilkan telemetri terbaru;
+- menampilkan grafik riwayat volume dan persentase;
+- menampilkan konfigurasi tangki;
+- menampilkan waktu pembacaan terakhir.
+
+### API Penerimaan Telemetri
+
+API penerimaan telemetri dirancang untuk:
+
+- menerima data dari perangkat atau simulator;
+- memvalidasi payload;
+- memvalidasi identitas perangkat;
+- menormalisasi bagian data telemetri;
+- menyimpan data mentah dan data hasil normalisasi;
+- memberi respons yang jelas saat data diterima atau ditolak.
 
 ### Simulator
 
-Planned responsibilities:
+Simulator dirancang untuk:
 
-- generate realistic dummy telemetry;
-- simulate decreasing fuel level;
-- simulate refuel events;
-- simulate stale or offline device behavior;
-- allow dashboard development without physical hardware.
+- menghasilkan data dummy;
+- mensimulasikan konsumsi bahan bakar;
+- mensimulasikan pengisian ulang;
+- mensimulasikan perangkat offline atau data stale;
+- membantu pengembangan dashboard tanpa menunggu perangkat fisik.
 
-### Alerting and Status Rules
+### Status dan Peringatan
 
-Planned responsibilities:
+Status sistem dirancang untuk:
 
-- derive status from estimated runtime;
-- derive freshness status from last telemetry timestamp;
-- support threshold changes per site or device;
-- prepare future notification integration.
+- menghitung estimasi durasi operasional;
+- membedakan status aman, waspada, dan kritis;
+- membedakan data terbaru dan data yang sudah terlalu lama;
+- menjadi dasar fitur notifikasi di tahap berikutnya.
 
-## Architecture
+## Arsitektur Tingkat Tinggi
 
-Planned high-level flow:
+Alur utama yang direncanakan:
 
 ```text
-IoT Device or Local Simulator
-  -> Telemetry Ingestion API
-  -> Payload Validation
-  -> Payload Normalization
-  -> Storage Layer
-  -> Dashboard Queries
-  -> Web Dashboard and Charts
+Perangkat IoT atau Simulator
+  -> API Penerimaan Telemetri
+  -> Validasi Payload
+  -> Normalisasi Data
+  -> Penyimpanan
+  -> Pembacaan Data Dashboard
+  -> Tampilan Web dan Grafik
 ```
 
-The frontend should not read sensors directly. Devices or simulators send telemetry to the server, and the dashboard reads clean data from application APIs.
+Dashboard tidak membaca sensor secara langsung. Perangkat atau simulator mengirim data ke API, kemudian dashboard membaca data yang sudah dibersihkan dari server.
 
-## Stack
+## Teknologi yang Digunakan
 
-Current scaffold:
+Teknologi saat ini:
 
-- Next.js 16 with App Router
-- React 19
-- TypeScript
-- Tailwind CSS 4
-- Recharts for future dashboard visualization
-- lucide-react for interface icons
-- Vitest for future domain logic tests
-- pnpm for package management
+- Next.js 16 dengan App Router;
+- React 19;
+- TypeScript;
+- Tailwind CSS 4;
+- Recharts untuk visualisasi data;
+- lucide-react untuk ikon antarmuka;
+- Vitest untuk pengujian logika;
+- pnpm sebagai pengelola paket.
 
-Planned additions are expected to be introduced only when implementation work needs them.
+Paket baru hanya akan ditambahkan jika benar-benar dibutuhkan pada fase implementasi.
 
-## Repository Structure
+## Struktur Repositori
 
 ```text
 .
@@ -216,47 +250,10 @@ Planned additions are expected to be introduced only when implementation work ne
 │   │   ├── sites/
 │   │   └── tanks/
 │   ├── components/
-│   │   ├── charts/
-│   │   ├── dashboard/
-│   │   ├── forms/
-│   │   ├── layout/
-│   │   ├── maps/
-│   │   ├── status/
-│   │   ├── tanks/
-│   │   ├── telemetry/
-│   │   └── ui/
 │   ├── data/
-│   │   ├── fixtures/
-│   │   ├── mock/
-│   │   └── seed/
 │   ├── features/
-│   │   ├── alerts/
-│   │   ├── auth/
-│   │   ├── dashboard/
-│   │   ├── devices/
-│   │   ├── ingestion/
-│   │   ├── maps/
-│   │   ├── runtime/
-│   │   ├── simulator/
-│   │   ├── tanks/
-│   │   └── telemetry/
 │   ├── lib/
-│   │   ├── calculations/
-│   │   ├── config/
-│   │   ├── constants/
-│   │   ├── dates/
-│   │   ├── db/
-│   │   ├── domain/
-│   │   ├── errors/
-│   │   ├── ingestion/
-│   │   ├── security/
-│   │   ├── telemetry/
-│   │   └── validation/
 │   ├── server/
-│   │   ├── actions/
-│   │   ├── repositories/
-│   │   ├── services/
-│   │   └── use-cases/
 │   └── types/
 ├── tests/
 │   ├── e2e/
@@ -271,162 +268,183 @@ Planned additions are expected to be introduced only when implementation work ne
 └── README.md
 ```
 
-## Local Setup
+## Penjelasan Folder Penting
 
-Install dependencies:
+| Folder | Fungsi |
+|---|---|
+| `src/app` | Route Next.js, termasuk halaman dashboard dan API route |
+| `src/components` | Komponen UI yang bisa digunakan ulang |
+| `src/features` | Modul fitur seperti telemetri, tangki, simulator, runtime, dan alert |
+| `src/lib` | Helper, perhitungan, validasi, konfigurasi, dan logika domain |
+| `src/server` | Service, repositori data, dan use-case server-side |
+| `src/data` | Data dummy, fixture, dan seed lokal |
+| `tests` | Pengujian unit, pengujian integrasi, dan pengujian e2e |
+| `docs` | Dokumentasi teknis dan operasional |
+| `examples` | Contoh payload, curl, dan API client |
+| `firmware` | Catatan dan contoh firmware yang aman untuk publik |
+| `deploy` | Catatan deployment untuk berbagai target |
+| `database` | Migration dan seed database |
+
+## Menjalankan di Lokal
+
+Pasang paket:
 
 ```powershell
 pnpm install
 ```
 
-Run the local development server:
+Jalankan server pengembangan:
 
 ```powershell
 pnpm dev
 ```
 
-Open:
+Buka aplikasi:
 
 ```text
 http://localhost:3000
 ```
 
-Run linting:
+Jalankan lint:
 
 ```powershell
 pnpm lint
 ```
 
-Run type checking:
+Jalankan pengecekan tipe:
 
 ```powershell
 pnpm typecheck
 ```
 
-Run tests:
+Jalankan pengujian:
 
 ```powershell
 pnpm test
 ```
 
-Run the full local verification command:
+Jalankan semua pengecekan lokal:
 
 ```powershell
 pnpm check
 ```
 
-Build the app:
+Buat build aplikasi:
 
 ```powershell
 pnpm build
 ```
 
-## Environment Variables
+## Variabel Lingkungan
 
-Copy the example environment file before introducing local runtime values:
+Salin file contoh variabel lingkungan:
 
 ```powershell
 Copy-Item .env.example .env.local
 ```
 
-The repository must only contain public-safe example values. Real credentials, device keys, database URLs, API keys, and deployment secrets must stay outside Git.
+File `.env.example` hanya berisi contoh nama variabel. Nilai asli untuk database, API key, token, dan rahasia deployment tidak boleh disimpan di Git.
 
-## Scripts
+## Skrip
 
-| Script | Purpose |
+| Skrip | Fungsi |
 |---|---|
-| `pnpm dev` | Start the Next.js development server |
-| `pnpm build` | Build the application |
-| `pnpm start` | Start the production build locally |
-| `pnpm lint` | Run ESLint |
-| `pnpm typecheck` | Run TypeScript type checking |
-| `pnpm test` | Run Vitest in non-watch mode |
-| `pnpm test:watch` | Run Vitest in watch mode |
-| `pnpm check` | Run typecheck, lint, tests, and build |
+| `pnpm dev` | Menjalankan server pengembangan |
+| `pnpm build` | Membuat production build |
+| `pnpm start` | Menjalankan hasil production build secara lokal |
+| `pnpm lint` | Menjalankan ESLint |
+| `pnpm typecheck` | Menjalankan pengecekan tipe TypeScript |
+| `pnpm test` | Menjalankan pengujian dengan Vitest |
+| `pnpm test:watch` | Menjalankan pengujian Vitest dalam mode pantau |
+| `pnpm check` | Menjalankan typecheck, lint, test, dan build |
 
-## Documentation Map
+## Peta Dokumentasi
 
-The documentation folder is scaffolded for the next implementation phase:
+| Dokumen | Isi yang direncanakan |
+|---|---|
+| `docs/architecture.md` | Arsitektur sistem dan batas runtime |
+| `docs/api-contract.md` | Kontrak permintaan dan respons API |
+| `docs/data-model.md` | Model data perangkat, tangki, telemetri, dan status |
+| `docs/device-ingestion.md` | Format payload perangkat dan aturan penerimaan data |
+| `docs/domain-model.md` | Perhitungan volume, runtime, dan status |
+| `docs/deployment.md` | Catatan deployment lokal, demo, dan self-hosted |
+| `docs/safety-and-limitations.md` | Batasan, kalibrasi, dan keselamatan |
+| `docs/roadmap.md` | Rencana pengembangan bertahap |
+| `docs/reviewer-quickstart.md` | Panduan cepat untuk reviewer |
+| `docs/decision-log.md` | Catatan keputusan engineering |
+| `docs/development-log.md` | Catatan perkembangan implementasi |
+| `docs/system-boundaries.md` | Batas hal yang masuk dan tidak masuk repositori |
 
-- `docs/architecture.md` - system architecture and runtime boundaries;
-- `docs/api-contract.md` - planned API request and response contracts;
-- `docs/data-model.md` - device, tank, telemetry, and status entities;
-- `docs/device-ingestion.md` - device/simulator payload shape and ingestion rules;
-- `docs/domain-model.md` - tank geometry, runtime, and status calculations;
-- `docs/deployment.md` - local, demo, and self-hosted deployment notes;
-- `docs/safety-and-limitations.md` - safety, calibration, and claim boundaries;
-- `docs/roadmap.md` - staged project plan;
-- `docs/reviewer-quickstart.md` - future reviewer guide;
-- `docs/decision-log.md` - engineering decisions and tradeoffs;
-- `docs/development-log.md` - implementation progress log;
-- `docs/system-boundaries.md` - what belongs in this repo and what does not.
+## Roadmap Pengembangan
 
-## Development Roadmap
+### Fase 1 - Fondasi Repositori
 
-### Phase 1 - Repository Foundation
+- Merapikan README.
+- Menyiapkan struktur folder.
+- Menyiapkan dokumen repositori dasar.
+- Menetapkan batas aman untuk repositori publik.
 
-- Replace the default framework README.
-- Establish project-safe documentation and folder structure.
-- Define public-safe boundaries and repository conventions.
+### Fase 2 - Logika Domain
 
-### Phase 2 - Domain Logic
+- Membuat fungsi perhitungan volume tangki.
+- Membuat estimasi durasi operasional.
+- Membuat klasifikasi status.
+- Menulis pengujian unit untuk logika kritis.
 
-- Add tank geometry calculation helpers.
-- Add runtime estimation and status classification.
-- Add tests for critical calculation behavior.
+### Fase 3 - Dashboard Dummy
 
-### Phase 3 - Dummy Dashboard
+- Menambahkan data dummy.
+- Mengganti halaman starter menjadi dashboard awal.
+- Menampilkan status, volume, runtime, dan riwayat sederhana.
 
-- Add dummy devices and tanks.
-- Replace the starter page with an operations dashboard.
-- Add current status, runtime, and history UI.
+### Fase 4 - Simulator Telemetri
 
-### Phase 4 - Telemetry Simulator
+- Membuat generator data telemetri lokal.
+- Mensimulasikan konsumsi normal.
+- Mensimulasikan pengisian ulang.
+- Mensimulasikan kondisi offline atau data stale.
 
-- Add a local telemetry generator.
-- Simulate normal consumption, refuel, stale data, and offline states.
-- Use simulator data to validate dashboard workflows.
+### Fase 5 - API Penerimaan Telemetri
 
-### Phase 5 - Ingestion API
+- Membuat endpoint penerimaan telemetri.
+- Menambahkan validasi payload.
+- Menambahkan normalisasi bagian data.
+- Menyimpan data mentah dan data hasil normalisasi.
 
-- Add telemetry ingestion endpoint.
-- Add payload validation and normalization.
-- Store raw and normalized readings.
+### Fase 6 - Kesiapan Deployment
 
-### Phase 6 - Deployment Readiness
+- Menulis catatan deployment demo.
+- Menulis catatan deployment self-hosted.
+- Menambahkan checklist keamanan.
+- Menambahkan checklist operasional.
 
-- Document self-hosted and demo deployment options.
-- Add deployment checks.
-- Add security review checklist.
+## Batasan dan Keselamatan
 
-## Safety and Limitations
+Repositori ini belum siap produksi.
 
-This repository is not production-ready.
+Sebelum dipakai untuk perangkat dan tangki nyata, perlu validasi:
 
-Before real-world fuel tank use, the following must be validated:
+- pemasangan perangkat;
+- karakteristik sensor;
+- bentuk dan dimensi tangki;
+- metode kalibrasi;
+- toleransi kesalahan pengukuran;
+- kebijakan jaringan;
+- autentikasi dan otorisasi;
+- backup data;
+- monitoring server;
+- prosedur operasional.
 
-- hardware mounting and site safety;
-- sensor suitability for the actual tank environment;
-- tank dimensions and geometry;
-- calibration method;
-- measurement error tolerance;
-- network and deployment policy;
-- authentication and authorization;
-- backup and monitoring requirements;
-- operator review and approval.
+Demo publik tidak boleh memakai telemetri nyata, kredensial, detail lokasi sensitif, alamat jaringan internal, atau konfigurasi produksi.
 
-No public demo should contain real private telemetry, site details, credentials, network addresses, or sensitive deployment information.
-
-## Maintainer
-
-Primary author:
+## Pemelihara
 
 ```text
 Muhammad Zaenal Abidin Abdurrahman
 ```
 
-Contributor and collaboration credits can be updated when implementation scope and roles are confirmed.
+Informasi kontributor lain dapat ditambahkan setelah ruang lingkup dan peran kontribusi disepakati.
 
-## License
+## Lisensi
 
-This project is released under the MIT License. See `LICENSE` for details.
+Proyek ini menggunakan lisensi MIT. Lihat `LICENSE` untuk detail.
