@@ -14,13 +14,97 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #ffffff;
+    --foreground: #171717;
   }
+}
+
+html {
+  scroll-behavior: smooth;
+  background: #ffffff;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+::selection {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+@keyframes soft-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soft-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) rotate(var(--float-rotate, 0deg));
+  }
+
+  50% {
+    transform: translate3d(0, -10px, 0) rotate(var(--float-rotate, 0deg));
+  }
+}
+
+@keyframes scroll-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .animate-soft-fade {
+    animation: soft-fade-up 700ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .animate-soft-float {
+    animation: soft-float 7s ease-in-out infinite;
+  }
+
+  @supports (animation-timeline: view()) {
+    .reveal-on-scroll {
+      animation: scroll-reveal both;
+      animation-range: entry 12% cover 34%;
+      animation-timeline: view();
+    }
+
+    .reveal-on-scroll-slow {
+      animation: scroll-reveal both;
+      animation-range: entry 8% cover 46%;
+      animation-timeline: view();
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
 }
