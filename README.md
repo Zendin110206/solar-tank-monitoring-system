@@ -437,13 +437,14 @@ Sebelum dipakai untuk perangkat dan tangki nyata, perlu validasi:
 
 Demo publik tidak boleh memakai telemetri nyata, kredensial, detail lokasi sensitif, alamat jaringan internal, atau konfigurasi produksi.
 
-## Pemelihara
+## Pemelihara dan Kontributor
 
-```text
-Muhammad Zaenal Abidin Abdurrahman
-```
+| Nama | Peran | Profil |
+|---|---|---|
+| Muhammad Zaenal Abidin Abdurrahman | Pengelola proyek dan pengembangan awal sistem monitoring | - |
+| Yattaqi Muazirul Mulki | Kolaborator pengembangan aplikasi | [ukiirving](https://github.com/ukiirving) |
 
-Informasi kontributor lain dapat ditambahkan setelah ruang lingkup dan peran kontribusi disepakati.
+Peran kontribusi dapat disesuaikan mengikuti kebutuhan pengembangan proyek.
 
 ## Lisensi
 
