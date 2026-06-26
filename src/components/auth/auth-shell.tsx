@@ -295,12 +295,6 @@ export default function AuthShell({
           </div>
 
           <MonitoringVisual contextNote={contextNote} />
-
-          <div className="relative z-10 mt-8 flex items-center justify-between gap-5 border-t border-zinc-200 pt-5 text-xs text-zinc-500">
-            <span>Sensor dan simulator</span>
-            <span className="h-px flex-1 bg-zinc-200" />
-            <span>Data operasional terpusat</span>
-          </div>
         </aside>
       </section>
     </main>

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  ArrowLeft,
   ArrowRight,
   Clock3,
   Fuel,
@@ -93,7 +92,7 @@ export default function ContactPage() {
       <header className="sticky top-0 z-50 border-b border-zinc-100 bg-white/90 backdrop-blur-xl">
         <div className="mx-auto flex h-20 max-w-[1480px] items-center justify-between gap-5 px-5 sm:px-8 lg:px-12">
           <Link
-            aria-label="Kembali ke beranda SolarTank"
+            aria-label="Buka beranda SolarTank"
             className="flex items-center gap-3"
             href="/"
           >
@@ -139,7 +138,7 @@ export default function ContactPage() {
       </header>
 
       {/* Contact hero and form */}
-      <section className="relative px-5 py-16 sm:px-8 lg:px-12 lg:py-24">
+      <section className="relative px-5 pb-16 pt-8 sm:px-8 sm:pt-10 lg:px-12 lg:pb-24 lg:pt-12">
         <div
           aria-hidden="true"
           className="absolute inset-0 opacity-70"
@@ -153,15 +152,7 @@ export default function ContactPage() {
 
         <div className="relative mx-auto grid max-w-[1280px] gap-12 lg:grid-cols-[0.88fr_1.12fr] lg:items-center">
           <div className="animate-soft-fade">
-            <Link
-              className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-3.5 py-2 text-sm font-semibold text-zinc-700 shadow-sm transition hover:border-red-200 hover:text-red-600"
-              href="/"
-            >
-              <ArrowLeft aria-hidden="true" className="size-4" />
-              Kembali ke beranda
-            </Link>
-
-            <div className="mt-12 inline-flex items-center gap-2 rounded-full bg-red-600 px-5 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white shadow-xl shadow-red-600/25">
+            <div className="inline-flex items-center gap-2 rounded-full bg-red-600 px-5 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white shadow-xl shadow-red-600/25">
               <LifeBuoy aria-hidden="true" className="size-4" />
               Kontak Operasional
             </div>
