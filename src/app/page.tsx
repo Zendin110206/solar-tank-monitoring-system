@@ -143,13 +143,13 @@ export default function Home() {
 
         <div className="hidden items-center gap-3 text-sm font-medium sm:flex">
           <a
-            href="/dashboard"
+            href="/login"
             className="hidden text-zinc-800 transition hover:text-red-600 sm:inline"
           >
             Masuk
           </a>
           <a
-            href="#daftar"
+            href="/register"
             className="rounded-lg border border-zinc-300 px-5 py-3 text-zinc-900 transition hover:border-red-500 hover:text-red-600"
           >
             Daftar
@@ -307,13 +307,13 @@ export default function Home() {
 
           <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row">
             <a
-              href="#daftar"
+              href="/register"
               className="w-full sm:w-auto rounded-lg bg-blue-600 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700"
             >
               Daftar sekarang
             </a>
             <a
-              href="/dashboard"
+              href="/login"
               className="w-full sm:w-auto rounded-lg border border-zinc-300 bg-white px-8 py-4 text-base font-semibold text-zinc-900 transition hover:border-red-500 hover:text-red-600"
             >
               Masuk
@@ -831,7 +831,7 @@ export default function Home() {
             estimasi runtime genset dalam satu dashboard terpusat.
           </p>
           <a
-            href="/dashboard"
+            href="/login"
             className="w-full rounded-lg bg-blue-600 px-8 py-4 text-center text-base font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 sm:w-auto"
           >
             Masuk ke dashboard sekarang
