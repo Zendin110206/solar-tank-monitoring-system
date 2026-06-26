@@ -34,7 +34,7 @@ Pekerjaan:
 Catatan:
 
 ```text
-Halaman ini masih memakai data dummy frontend dan belum fetch API penuh.
+Halaman awal memakai data contoh agar layout dan istilah operasional bisa divalidasi sebelum API ingest dibuat.
 ```
 
 ## 2026-06-25 - Domain Monitoring

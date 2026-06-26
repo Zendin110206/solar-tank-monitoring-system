@@ -81,7 +81,7 @@ Response sukses berisi:
 - parameter sensor;
 - data terakhir;
 - riwayat ringkas;
-- titik lokasi dummy.
+- titik lokasi contoh.
 
 Jika `tankId` tidak ditemukan:
 

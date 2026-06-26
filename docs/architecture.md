@@ -24,8 +24,8 @@ Dashboard tidak membaca sensor secara langsung. Device atau simulator yang mengi
 | Komponen | Lokasi | Status |
 |---|---|---|
 | Landing page | `src/app/page.tsx` | Ada |
-| Dashboard awal | `src/app/dashboard/page.tsx` | Ada, masih frontend dummy |
-| Detail tangki | `src/app/dashboard/tanks/[tankId]/page.tsx` | Ada, masih frontend dummy |
+| Dashboard awal | `src/app/dashboard/page.tsx` | Ada, membaca memory store lokal |
+| Detail tangki | `src/app/dashboard/tanks/[tankId]/page.tsx` | Ada, membaca memory store lokal |
 | API overview | `src/app/api/dashboard/overview/route.ts` | Ada |
 | API detail tangki | `src/app/api/tanks/[tankId]/route.ts` | Ada |
 | API history tangki | `src/app/api/tanks/[tankId]/readings/route.ts` | Ada |
@@ -67,7 +67,7 @@ yang terjadi:
 2. Simulator POST ke /api/ingest.
 3. API membaca header X-Device-Id.
 4. API membaca X-Api-Key.
-5. API mencari device di data dummy.
+5. API mencari device di data contoh.
 6. Payload dinormalisasi.
 7. Reading disimpan di memory store.
 8. Response HTTP 201 dikirim.
@@ -83,11 +83,11 @@ GET /api/tanks/[tankId]
 GET /api/tanks/[tankId]/readings
 ```
 
-Saat dev server restart, memory store kembali ke data dummy awal.
+Saat dev server restart, memory store kembali ke data contoh awal.
 
-## Data Dummy vs Data Real
+## Data Contoh vs Data Real
 
-Data dummy dipakai untuk:
+Data contoh dipakai untuk:
 
 - membangun UI;
 - menguji status;

@@ -40,7 +40,7 @@ Alasan:
 Keputusan:
 
 ```text
-Semua data awal memakai dummy.
+Semua data awal memakai data contoh.
 ```
 
 Alasan:

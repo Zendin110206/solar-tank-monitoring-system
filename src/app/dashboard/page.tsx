@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 import {
   Activity,
   AlertTriangle,
@@ -19,13 +20,16 @@ import {
 import {
   buildDashboardOverview,
   type DashboardMonitoringSite as MonitoringSite,
+  type DashboardOverview,
   type DashboardSiteStatus as SiteStatus,
 } from "@/features/monitoring/lib/dashboard-view-model";
+
+import { getMonitoringReadings } from "@/features/monitoring/lib/telemetry-store";
 
 export const metadata: Metadata = {
   title: "Dashboard Monitoring Solar | SolarTank",
   description:
-    "Dashboard awal untuk memantau volume tangki solar, runtime genset, status perangkat, dan lokasi STO berbasis data dummy.",
+    "Dashboard awal untuk memantau volume tangki solar, runtime genset, status perangkat, dan lokasi STO berbasis simulator serta API lokal.",
 };
 
 const statusMeta: Record<
@@ -68,42 +72,38 @@ const statusMeta: Record<
   },
 };
 
-const dashboardOverview = buildDashboardOverview();
-const monitoredSites = dashboardOverview.rows;
-const latestSite = dashboardOverview.latestRow;
-const prioritySites = dashboardOverview.priorityRows;
-const trendBars = dashboardOverview.trendBars;
-
-const summaryCards = [
-  {
-    label: "STO terpantau",
-    value: String(dashboardOverview.summary.totalSites),
-    note: `${dashboardOverview.summary.totalTanks} tangki dummy`,
-    icon: MapPin,
-    tone: "bg-cyan-50 text-cyan-700 ring-cyan-100",
-  },
-  {
-    label: "Tangki kritis",
-    value: String(dashboardOverview.summary.criticalTanks),
-    note: "berdasarkan runtime, level, dan device",
-    icon: AlertTriangle,
-    tone: "bg-red-50 text-red-700 ring-red-100",
-  },
-  {
-    label: "Perangkat online",
-    value: String(dashboardOverview.summary.onlineDevices),
-    note: `${dashboardOverview.summary.delayedDevices} terlambat, ${dashboardOverview.summary.offlineDevices} offline`,
-    icon: Wifi,
-    tone: "bg-emerald-50 text-emerald-700 ring-emerald-100",
-  },
-  {
-    label: "Rata-rata update",
-    value: dashboardOverview.summary.averageIntervalLabel,
-    note: "target dapat diatur per device",
-    icon: Clock,
-    tone: "bg-zinc-100 text-zinc-700 ring-zinc-200",
-  },
-];
+function buildSummaryCards(dashboardOverview: DashboardOverview) {
+  return [
+    {
+      label: "STO terpantau",
+      value: String(dashboardOverview.summary.totalSites),
+      note: `${dashboardOverview.summary.totalTanks} tangki terpantau`,
+      icon: MapPin,
+      tone: "bg-cyan-50 text-cyan-700 ring-cyan-100",
+    },
+    {
+      label: "Tangki kritis",
+      value: String(dashboardOverview.summary.criticalTanks),
+      note: "berdasarkan runtime, level, dan device",
+      icon: AlertTriangle,
+      tone: "bg-red-50 text-red-700 ring-red-100",
+    },
+    {
+      label: "Perangkat online",
+      value: String(dashboardOverview.summary.onlineDevices),
+      note: `${dashboardOverview.summary.delayedDevices} terlambat, ${dashboardOverview.summary.offlineDevices} offline`,
+      icon: Wifi,
+      tone: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+    },
+    {
+      label: "Rata-rata update",
+      value: dashboardOverview.summary.averageIntervalLabel,
+      note: "target dapat diatur per device",
+      icon: Clock,
+      tone: "bg-zinc-100 text-zinc-700 ring-zinc-200",
+    },
+  ];
+}
 
 const runtimeBands = [
   { label: "Kritis", range: "< 13 jam", width: "24%", tone: "bg-red-500" },
@@ -217,7 +217,19 @@ function LocationMarker({ site }: { site: MonitoringSite }) {
   );
 }
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  await connection();
+
+  const dashboardOverview = buildDashboardOverview({
+    now: new Date(),
+    readings: getMonitoringReadings(),
+  });
+  const monitoredSites = dashboardOverview.rows;
+  const latestSite = dashboardOverview.latestRow;
+  const prioritySites = dashboardOverview.priorityRows;
+  const trendBars = dashboardOverview.trendBars;
+  const summaryCards = buildSummaryCards(dashboardOverview);
+
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#f5faf8] text-zinc-950">
       {/* Dashboard Header */}
@@ -290,10 +302,10 @@ export default function DashboardPage() {
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600 ring-1 ring-red-100">
-                  Data mock
+                  Data simulator/API
                 </span>
                 <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
-                  domain dahulu
+                  memory store lokal
                 </span>
               </div>
               <h1 className="mt-3 max-w-full text-[2rem] font-semibold leading-[1.08] tracking-normal text-zinc-950 sm:text-4xl">
@@ -301,8 +313,8 @@ export default function DashboardPage() {
               </h1>
               <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-500 sm:text-base">
                 Tampilan awal untuk membaca volume, estimasi runtime genset,
-                status perangkat, dan titik lokasi manual sebelum backend serta
-                sensor asli disambungkan.
+                status perangkat, dan titik lokasi manual sebelum database
+                permanen serta sensor asli disambungkan.
               </p>
             </div>
 
@@ -317,7 +329,7 @@ export default function DashboardPage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400">
                   Sumber data
                 </p>
-                <p className="mt-1 text-lg font-semibold">Mock domain</p>
+                <p className="mt-1 text-lg font-semibold">Memory/API</p>
               </div>
             </div>
           </div>
@@ -365,7 +377,7 @@ export default function DashboardPage() {
                 <SectionHeader
                   label="Peta monitoring"
                   title="Lokasi STO berdasarkan input manual"
-                  description="Titik di peta ini masih dummy. Nantinya koordinat dapat diisi manual karena perangkat tidak memakai modul GPS."
+                  description="Titik peta memakai koordinat contoh yang nantinya dapat diisi manual karena perangkat tidak memakai modul GPS."
                 />
 
                 <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-zinc-600">
@@ -535,7 +547,7 @@ export default function DashboardPage() {
                   <SectionHeader
                     label="Tren volume"
                     title="Pergerakan stok 24 jam"
-                    description="Grafik dummy ini meniru data history yang nantinya berasal dari database."
+                    description="Grafik ini membaca seri pembacaan dari memory store lokal dan disiapkan untuk riwayat database."
                   />
                   <span className="w-fit rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100">
                     data stabil
@@ -620,7 +632,8 @@ export default function DashboardPage() {
                   <p className="mt-2 text-sm leading-6 text-zinc-500">
                     {formatLiter(latestSite.volumeLiter)} liter tersedia.
                     Runtime estimasi {latestSite.runtimeHour} jam dengan asumsi
-                    konsumsi dummy {latestSite.consumptionLiterPerHour} L/jam.
+                    konsumsi konfigurasi {latestSite.consumptionLiterPerHour}{" "}
+                    L/jam.
                   </p>
                 </div>
               </div>
@@ -688,15 +701,19 @@ export default function DashboardPage() {
               <SectionHeader
                 label="Alur data"
                 title="Siap disambung bertahap"
-                description="Frontend ini dibuat agar nanti mudah diganti dari dummy ke API."
+                description="Dashboard sekarang membaca memory store dan endpoint API lokal sebelum masuk ke database permanen."
               />
 
               <div className="mt-6 space-y-3">
                 {[
-                  [Database, "Dummy data", "dashboard bisa dibangun dulu"],
+                  [Database, "Memory store", "menerima data dari simulator"],
                   [Activity, "API /ingest", "menerima payload simulator"],
                   [Gauge, "Runtime", "status dihitung dari volume"],
-                  [Droplets, "History", "grafik berasal dari database"],
+                  [
+                    Droplets,
+                    "History",
+                    "riwayat sementara dari memory store",
+                  ],
                 ].map(([Icon, title, body]) => (
                   <div
                     key={title as string}
@@ -729,7 +746,7 @@ export default function DashboardPage() {
             <SectionHeader
               label="Log perangkat"
               title="Daftar monitoring tangki"
-              description="Tabel ini masih memakai data dummy agar layout, status, dan pola informasi bisa matang sebelum backend dibuat."
+              description="Tabel ini membaca data monitoring dari memory store lokal yang juga dipakai endpoint API."
             />
             <Link
               href={`/dashboard/tanks/${latestSite.tankId}`}

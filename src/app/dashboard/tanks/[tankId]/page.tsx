@@ -1,6 +1,7 @@
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { connection } from "next/server";
 import { notFound } from "next/navigation";
 import {
   Activity,
@@ -22,6 +23,15 @@ import {
   Zap,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { mockTanks } from "@/features/monitoring/data/mock-tanks";
+import {
+  buildTankDetail,
+  type NearbyTankSite,
+  type TankDetailStatus,
+  type TankDetailView,
+  type TankReadingPoint,
+} from "@/features/monitoring/lib/tank-detail-view-model";
+import { getMonitoringReadings } from "@/features/monitoring/lib/telemetry-store";
 
 export const metadata: Metadata = {
   title: "Detail Tangki Solar | SolarTank",
@@ -29,7 +39,7 @@ export const metadata: Metadata = {
     "Halaman detail frontend untuk membaca kondisi satu tangki solar, visual isi tangki, parameter perangkat, dan riwayat pembacaan.",
 };
 
-type TankStatus = "online" | "warning" | "critical" | "offline";
+type TankStatus = TankDetailStatus;
 
 type ReadingPoint = {
   time: string;
@@ -75,8 +85,8 @@ type TankDetail = {
   consumptionLiterPerHour: number;
   sensorDistanceCm: number;
   fuelHeightCm: number;
-  diameterCm: number;
-  lengthCm: number;
+  diameterCm: number | null;
+  lengthCm: number | null;
   sensorMountHeightCm: number;
   deviceId: string;
   deviceLabel: string;
@@ -84,8 +94,8 @@ type TankDetail = {
   lastUpdateLabel: string;
   measuredAtLabel: string;
   receivedAtLabel: string;
-  rssiDbm: number;
-  batteryVolt: number;
+  rssiDbm: number | null;
+  batteryVolt: number | null;
   coordinateLabel: string;
   markerLeft: string;
   markerTop: string;
@@ -94,7 +104,7 @@ type TankDetail = {
     H_cm: number;
     volume: number;
     percent: number;
-    wifi_rssi: number;
+    wifi_rssi: number | null;
   };
   readings: ReadingPoint[];
   nearbySites: NearbySite[];
@@ -145,194 +155,80 @@ const statusMeta: Record<
   },
 };
 
-const tanks: TankDetail[] = [
-  {
-    id: "tank-tph-main",
-    siteCode: "TPH",
-    siteName: "STO TPH",
-    areaLabel: "Area Pasuruan - data dummy",
-    tankName: "Tangki Utama",
-    status: "online",
-    statusNote: "Pembacaan terbaru masih segar dan level solar berada di zona aman.",
-    fillPercent: 78,
-    volumeLiter: 3900,
-    capacityLiter: 5000,
-    runtimeHour: 156,
-    consumptionLiterPerHour: 25,
-    sensorDistanceCm: 35,
-    fuelHeightCm: 115,
-    diameterCm: 150,
-    lengthCm: 283,
-    sensorMountHeightCm: 150,
-    deviceId: "demo-tph-01",
-    deviceLabel: "NodeMCU ultrasonic dummy",
-    expectedIntervalMin: 5,
-    lastUpdateLabel: "2 menit lalu",
-    measuredAtLabel: "25 Jun 2026, 14:43 WIB",
-    receivedAtLabel: "25 Jun 2026, 14:43:08 WIB",
-    rssiDbm: -61,
-    batteryVolt: 3.85,
-    coordinateLabel: "-7.64, 112.90 (dummy)",
-    markerLeft: "58%",
-    markerTop: "44%",
-    rawPayload: {
-      distance: 35,
-      H_cm: 115,
-      volume: 3900,
-      percent: 78,
-      wifi_rssi: -61,
-    },
-    readings: [
-      { time: "06:00", percent: 84, volumeLiter: 4200, distanceCm: 24 },
-      { time: "08:00", percent: 83, volumeLiter: 4150, distanceCm: 26 },
-      { time: "10:00", percent: 82, volumeLiter: 4100, distanceCm: 28 },
-      { time: "12:00", percent: 80, volumeLiter: 4000, distanceCm: 31 },
-      { time: "14:00", percent: 78, volumeLiter: 3900, distanceCm: 35 },
-      { time: "16:00", percent: 77, volumeLiter: 3850, distanceCm: 37 },
-      { time: "18:00", percent: 75, volumeLiter: 3750, distanceCm: 41 },
-      { time: "20:00", percent: 74, volumeLiter: 3700, distanceCm: 43 },
-    ],
-    nearbySites: [
-      {
-        code: "TPH",
-        name: "STO TPH",
-        status: "online",
-        left: "58%",
-        top: "44%",
-        runtimeHour: 156,
-      },
-      {
-        code: "NJA",
-        name: "STO NJA",
-        status: "warning",
-        left: "34%",
-        top: "38%",
-        runtimeHour: 15,
-      },
-      {
-        code: "JTO",
-        name: "STO JTO",
-        status: "critical",
-        left: "45%",
-        top: "66%",
-        runtimeHour: 7,
-      },
-      {
-        code: "SKP",
-        name: "STO SKP",
-        status: "offline",
-        left: "75%",
-        top: "58%",
-        runtimeHour: 31,
-      },
-    ],
-  },
-  {
-    id: "tank-nja-main",
-    siteCode: "NJA",
-    siteName: "STO NJA",
-    areaLabel: "Area Pasuruan - data dummy",
-    tankName: "Tangki Utama",
-    status: "warning",
-    statusNote: "Runtime masuk zona waspada sehingga perlu dipantau lebih sering.",
-    fillPercent: 42,
-    volumeLiter: 2100,
-    capacityLiter: 5000,
-    runtimeHour: 15,
-    consumptionLiterPerHour: 140,
-    sensorDistanceCm: 88,
-    fuelHeightCm: 62,
-    diameterCm: 150,
-    lengthCm: 283,
-    sensorMountHeightCm: 150,
-    deviceId: "demo-nja-01",
-    deviceLabel: "NodeMCU ultrasonic dummy",
-    expectedIntervalMin: 5,
-    lastUpdateLabel: "5 menit lalu",
-    measuredAtLabel: "25 Jun 2026, 14:40 WIB",
-    receivedAtLabel: "25 Jun 2026, 14:40:11 WIB",
-    rssiDbm: -69,
-    batteryVolt: 3.76,
-    coordinateLabel: "-7.67, 112.88 (dummy)",
-    markerLeft: "34%",
-    markerTop: "38%",
-    rawPayload: {
-      distance: 88,
-      H_cm: 62,
-      volume: 2100,
-      percent: 42,
-      wifi_rssi: -69,
-    },
-    readings: [
-      { time: "06:00", percent: 50, volumeLiter: 2500, distanceCm: 75 },
-      { time: "08:00", percent: 49, volumeLiter: 2450, distanceCm: 77 },
-      { time: "10:00", percent: 47, volumeLiter: 2350, distanceCm: 80 },
-      { time: "12:00", percent: 45, volumeLiter: 2250, distanceCm: 83 },
-      { time: "14:00", percent: 42, volumeLiter: 2100, distanceCm: 88 },
-    ],
-    nearbySites: [],
-  },
-  {
-    id: "tank-jto-main",
-    siteCode: "JTO",
-    siteName: "STO JTO",
-    areaLabel: "Area Pasuruan - data dummy",
-    tankName: "Tangki Utama",
-    status: "critical",
-    statusNote: "Estimasi runtime rendah dan harus masuk daftar tindak lanjut utama.",
-    fillPercent: 19,
-    volumeLiter: 950,
-    capacityLiter: 5000,
-    runtimeHour: 7,
-    consumptionLiterPerHour: 135,
-    sensorDistanceCm: 122,
-    fuelHeightCm: 28,
-    diameterCm: 150,
-    lengthCm: 283,
-    sensorMountHeightCm: 150,
-    deviceId: "demo-jto-01",
-    deviceLabel: "NodeMCU ultrasonic dummy",
-    expectedIntervalMin: 5,
-    lastUpdateLabel: "1 menit lalu",
-    measuredAtLabel: "25 Jun 2026, 14:44 WIB",
-    receivedAtLabel: "25 Jun 2026, 14:44:09 WIB",
-    rssiDbm: -58,
-    batteryVolt: 3.81,
-    coordinateLabel: "-7.69, 112.92 (dummy)",
-    markerLeft: "45%",
-    markerTop: "66%",
-    rawPayload: {
-      distance: 122,
-      H_cm: 28,
-      volume: 950,
-      percent: 19,
-      wifi_rssi: -58,
-    },
-    readings: [
-      { time: "06:00", percent: 29, volumeLiter: 1450, distanceCm: 106 },
-      { time: "08:00", percent: 27, volumeLiter: 1350, distanceCm: 109 },
-      { time: "10:00", percent: 24, volumeLiter: 1200, distanceCm: 114 },
-      { time: "12:00", percent: 21, volumeLiter: 1050, distanceCm: 119 },
-      { time: "14:00", percent: 19, volumeLiter: 950, distanceCm: 122 },
-    ],
-    nearbySites: [],
-  },
-];
-
-const selectedDefaultNearbySites = tanks[0].nearbySites;
-
 function formatLiter(value: number) {
   return new Intl.NumberFormat("id-ID").format(value);
 }
 
-function getTank(tankId: string) {
-  return tanks.find((tank) => tank.id === tankId);
-}
-
 export function generateStaticParams() {
-  return tanks.map((tank) => ({
+  return mockTanks.map((tank) => ({
     tankId: tank.id,
   }));
+}
+
+function formatMeasurement(value: number | null, unit: string) {
+  return value === null ? "-" : `${value} ${unit}`;
+}
+
+function toReadingPoint(reading: TankReadingPoint): ReadingPoint {
+  return {
+    time: reading.timeLabel,
+    percent: reading.fillPercent,
+    volumeLiter: reading.volumeLiter,
+    distanceCm: reading.sensorDistanceCm,
+  };
+}
+
+function toNearbySite(site: NearbyTankSite): NearbySite {
+  return {
+    code: site.code,
+    name: site.name,
+    status: site.status,
+    left: site.left,
+    top: site.top,
+    runtimeHour: site.runtimeHour,
+  };
+}
+
+function toTankDetail(view: TankDetailView): TankDetail {
+  return {
+    id: view.id,
+    siteCode: view.siteCode,
+    siteName: view.siteName,
+    areaLabel: view.areaLabel,
+    tankName: view.tankName,
+    status: view.status,
+    statusNote: view.statusNote,
+    fillPercent: view.fillPercent,
+    volumeLiter: view.volumeLiter,
+    capacityLiter: view.capacityLiter,
+    runtimeHour: view.runtimeHour,
+    consumptionLiterPerHour: view.consumptionLiterPerHour,
+    sensorDistanceCm: view.sensorDistanceCm,
+    fuelHeightCm: view.fuelHeightCm,
+    diameterCm: view.diameterCm,
+    lengthCm: view.lengthCm,
+    sensorMountHeightCm: view.sensorMountHeightCm,
+    deviceId: view.deviceCode,
+    deviceLabel: view.deviceLabel,
+    expectedIntervalMin: view.expectedIntervalMin,
+    lastUpdateLabel: view.lastUpdateLabel,
+    measuredAtLabel: view.measuredAtLabel,
+    receivedAtLabel: view.receivedAtLabel,
+    rssiDbm: view.rssiDbm,
+    batteryVolt: view.batteryVolt,
+    coordinateLabel: view.coordinate.label,
+    markerLeft: view.coordinate.markerLeft,
+    markerTop: view.coordinate.markerTop,
+    rawPayload: {
+      distance: view.rawPayloadPreview.distance,
+      H_cm: view.rawPayloadPreview.H_cm,
+      volume: view.rawPayloadPreview.volume,
+      percent: view.rawPayloadPreview.percent,
+      wifi_rssi: view.rawPayloadPreview.wifi_rssi,
+    },
+    readings: view.readings.map(toReadingPoint),
+    nearbySites: view.nearbySites.map(toNearbySite),
+  };
 }
 
 function StatusBadge({ status }: { status: TankStatus }) {
@@ -419,7 +315,7 @@ function TankVisual({ tank }: { tank: TankDetail }) {
         <SectionHeading
           label="Visual tangki"
           title="Silinder horizontal"
-          description="Model tampilan ini mengikuti skenario tangki tidur. Angka masih dummy dan nanti diganti dari konfigurasi lapangan."
+          description="Model tampilan ini mengikuti skenario tangki tidur. Angka berasal dari data simulator/API lokal dan nantinya diganti konfigurasi lapangan."
         />
         <StatusBadge status={tank.status} />
       </div>
@@ -464,7 +360,9 @@ function TankVisual({ tank }: { tank: TankDetail }) {
 
             <div className="mt-4 grid grid-cols-3 gap-2 text-xs font-medium text-zinc-500">
               <span>0%</span>
-              <span className="text-center">kapasitas {formatLiter(tank.capacityLiter)} L</span>
+              <span className="text-center">
+                kapasitas {formatLiter(tank.capacityLiter)} L
+              </span>
               <span className="text-right">100%</span>
             </div>
           </div>
@@ -486,14 +384,14 @@ function TankVisual({ tank }: { tank: TankDetail }) {
             },
             {
               label: "Panjang tangki",
-              value: `${tank.lengthCm} cm`,
-              note: "konfigurasi dummy",
+              value: formatMeasurement(tank.lengthCm, "cm"),
+              note: "konfigurasi tangki",
               icon: Settings,
             },
             {
               label: "Diameter tangki",
-              value: `${tank.diameterCm} cm`,
-              note: "konfigurasi dummy",
+              value: formatMeasurement(tank.diameterCm, "cm"),
+              note: "konfigurasi tangki",
               icon: Gauge,
             },
           ].map((item) => {
@@ -533,11 +431,14 @@ function TrendChart({ readings }: { readings: ReadingPoint[] }) {
   return (
     <div className="mt-6 rounded-lg border border-zinc-200 bg-zinc-50 p-5">
       <div className="flex h-64 items-end gap-3">
-        {readings.map((reading) => {
+        {readings.map((reading, index) => {
           const height = Math.max((reading.percent / maxPercent) * 100, 8);
 
           return (
-            <div key={reading.time} className="flex h-full flex-1 flex-col justify-end gap-2">
+            <div
+              key={`${reading.time}-${reading.percent}-${index}`}
+              className="flex h-full flex-1 flex-col justify-end gap-2"
+            >
               <div className="relative flex flex-1 items-end">
                 <div
                   className={`w-full rounded-t-lg transition duration-500 ${
@@ -594,15 +495,13 @@ function NearbyMarker({ site }: { site: NearbySite }) {
 }
 
 function LocationPanel({ tank }: { tank: TankDetail }) {
-  const sites =
-    tank.nearbySites.length > 0 ? tank.nearbySites : selectedDefaultNearbySites;
-
+  const sites = tank.nearbySites;
   return (
     <article className="animate-soft-fade overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
       <div className="flex flex-col gap-4 border-b border-zinc-200 p-5 sm:flex-row sm:items-start sm:justify-between">
         <SectionHeading
           label="Lokasi manual"
-          title="Titik STO pada peta dummy"
+          title="Titik STO pada peta manual"
           description="Koordinat ditampilkan sebagai input manual agar tidak bergantung pada modul GPS."
         />
         <span className="w-fit rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
@@ -706,7 +605,9 @@ function ParameterList({ items }: { items: ParameterItem[] }) {
                 <Icon className="size-5" aria-hidden="true" />
               </span>
               <div>
-                <p className="text-xs font-medium text-zinc-400">{item.label}</p>
+                <p className="text-xs font-medium text-zinc-400">
+                  {item.label}
+                </p>
                 <p className="mt-1 text-lg font-semibold text-zinc-950">
                   {item.value}
                 </p>
@@ -734,8 +635,11 @@ function ReadingTable({ tank }: { tank: TankDetail }) {
           </tr>
         </thead>
         <tbody>
-          {tank.readings.map((reading) => (
-            <tr key={reading.time} className="bg-zinc-50">
+          {tank.readings.map((reading, index) => (
+            <tr
+              key={`${reading.time}-${reading.volumeLiter}-${index}`}
+              className="bg-zinc-50"
+            >
               <td className="rounded-l-lg px-4 py-4 font-semibold text-zinc-950">
                 {reading.time}
               </td>
@@ -781,18 +685,26 @@ export default async function TankDetailPage({
   params: Promise<{ tankId: string }>;
 }) {
   const { tankId } = await params;
-  const tank = getTank(tankId);
 
-  if (!tank) {
+  await connection();
+
+  const tankView = buildTankDetail(tankId, {
+    now: new Date(),
+    readings: getMonitoringReadings(),
+  });
+
+  if (!tankView) {
     notFound();
   }
+
+  const tank = toTankDetail(tankView);
 
   const status = statusMeta[tank.status];
   const metrics = [
     {
       label: "Volume saat ini",
       value: `${formatLiter(tank.volumeLiter)} L`,
-      note: `${tank.fillPercent}% dari kapasitas dummy ${formatLiter(tank.capacityLiter)} L`,
+      note: `${tank.fillPercent}% dari kapasitas konfigurasi ${formatLiter(tank.capacityLiter)} L`,
       icon: Fuel,
       tone: "bg-cyan-50 text-cyan-700 ring-cyan-100",
     },
@@ -812,8 +724,8 @@ export default async function TankDetailPage({
     },
     {
       label: "Sinyal RSSI",
-      value: `${tank.rssiDbm} dBm`,
-      note: "nilai dummy dari payload perangkat",
+      value: formatMeasurement(tank.rssiDbm, "dBm"),
+      note: "nilai dari payload perangkat jika tersedia",
       icon: Radio,
       tone: "bg-zinc-100 text-zinc-700 ring-zinc-200",
     },
@@ -833,8 +745,8 @@ export default async function TankDetailPage({
     },
     {
       label: "Tegangan",
-      value: `${tank.batteryVolt} V`,
-      note: "dummy untuk menyiapkan monitoring health perangkat",
+      value: formatMeasurement(tank.batteryVolt, "V"),
+      note: "nilai dari payload perangkat jika tersedia",
       icon: Battery,
     },
     {
@@ -906,8 +818,11 @@ export default async function TankDetailPage({
 
           <div className="ml-auto flex items-center gap-3">
             <div className="hidden items-center gap-2 text-sm text-zinc-500 md:flex">
-              <ShieldCheck className="size-4 text-emerald-600" aria-hidden="true" />
-              <span>Frontend dummy</span>
+              <ShieldCheck
+                className="size-4 text-emerald-600"
+                aria-hidden="true"
+              />
+              <span>Data live lokal</span>
             </div>
             <div className="hidden sm:block">
               <StatusBadge status={tank.status} />
@@ -936,7 +851,7 @@ export default async function TankDetailPage({
                   detail tangki
                 </span>
                 <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
-                  data dummy
+                  data simulator/API
                 </span>
               </div>
 
@@ -945,7 +860,8 @@ export default async function TankDetailPage({
               </h1>
               <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-500 sm:text-base">
                 Detail ini menampilkan isi tangki, parameter sensor, estimasi
-                runtime, riwayat 24 jam, dan posisi STO berbasis koordinat manual.
+                runtime, riwayat pembacaan, dan posisi STO berbasis koordinat
+                manual.
               </p>
             </div>
 
@@ -960,7 +876,9 @@ export default async function TankDetailPage({
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400">
                   Update
                 </p>
-                <p className="mt-1 text-lg font-semibold">{tank.lastUpdateLabel}</p>
+                <p className="mt-1 text-lg font-semibold">
+                  {tank.lastUpdateLabel}
+                </p>
               </div>
               <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400">
@@ -995,10 +913,10 @@ export default async function TankDetailPage({
                 <SectionHeading
                   label="Riwayat"
                   title="Pembacaan 24 jam"
-                  description="Grafik ini masih dari data dummy, tetapi strukturnya mengikuti kebutuhan endpoint history nanti."
+                  description="Grafik ini membaca riwayat dari memory store/API lokal dan strukturnya sudah mengikuti endpoint history."
                 />
                 <span className="block max-w-full truncate rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100 sm:w-fit">
-                  /history/{tank.deviceId}?limit=1000
+                  {`/api/tanks/${tank.id}/readings?range=24h`}
                 </span>
               </div>
               <TrendChart readings={tank.readings} />
@@ -1018,7 +936,7 @@ export default async function TankDetailPage({
                 <SectionHeading
                   label="Perangkat"
                   title="Status sensor"
-                  description="Informasi ini disiapkan untuk health check perangkat saat API sudah aktif."
+                  description="Informasi ini disiapkan untuk health check perangkat saat data real mulai masuk."
                 />
                 <StatusBadge status={tank.status} />
               </div>
@@ -1045,7 +963,9 @@ export default async function TankDetailPage({
                       ) : null}
                     </div>
                     <div className="pb-2">
-                      <p className="font-semibold text-zinc-950">{item.label}</p>
+                      <p className="font-semibold text-zinc-950">
+                        {item.label}
+                      </p>
                       <p className="mt-1 text-xl font-semibold text-zinc-950">
                         {item.value}
                       </p>
@@ -1075,7 +995,10 @@ export default async function TankDetailPage({
                   ["raw.H_cm", `${tank.rawPayload.H_cm} cm`],
                   ["raw.volume", `${formatLiter(tank.rawPayload.volume)} L`],
                   ["raw.percent", `${tank.rawPayload.percent}%`],
-                  ["raw.wifi_rssi", `${tank.rawPayload.wifi_rssi} dBm`],
+                  [
+                    "raw.wifi_rssi",
+                    formatMeasurement(tank.rawPayload.wifi_rssi, "dBm"),
+                  ],
                 ].map(([key, value]) => (
                   <div
                     key={key}
@@ -1108,7 +1031,7 @@ export default async function TankDetailPage({
               <SectionHeading
                 label="Validasi"
                 title="Hal yang nanti diganti data asli"
-                description="Bagian ini menjaga dummy tetap jelas sebelum perangkat dan backend disambungkan."
+                description="Bagian ini menjaga batas data simulator tetap jelas sebelum perangkat asli dan database permanen disambungkan."
               />
 
               <div className="mt-6 space-y-3">

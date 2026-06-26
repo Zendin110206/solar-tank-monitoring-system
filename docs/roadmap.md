@@ -42,7 +42,7 @@ Isi:
 Catatan:
 
 ```text
-UI masih memakai data dummy di sisi frontend. Tahap berikutnya adalah fetch API.
+UI dashboard dan detail sudah membaca memory store lokal yang sama dengan endpoint API. Tahap berikutnya adalah storage permanen.
 ```
 
 ## Fase 4 - Domain Logic dan Test
@@ -71,17 +71,17 @@ Isi:
 - verifikasi payload masuk;
 - history bertambah.
 
-## Fase 6 - Sambungkan UI ke API
+## Fase 6 - Sambungkan UI ke Memory Store/API Lokal
 
-Status: berikutnya.
+Status: selesai untuk versi awal.
 
-Target:
+Isi:
 
-- dashboard membaca `GET /api/dashboard/overview`;
-- detail membaca `GET /api/tanks/[tankId]`;
-- grafik membaca `GET /api/tanks/[tankId]/readings`;
-- UI berubah saat simulator mengirim data;
-- state loading dan error dibuat rapi.
+- dashboard membaca data terbaru dari memory store;
+- detail membaca data terbaru dari memory store;
+- grafik memakai riwayat yang sama dengan endpoint readings;
+- UI berubah saat simulator mengirim data lalu halaman dirender ulang;
+- endpoint API tetap tersedia untuk kontrak integrasi.
 
 ## Fase 7 - Storage Permanen
 
@@ -91,7 +91,7 @@ Target:
 - simpan reading permanen;
 - siapkan migration;
 - siapkan seed data;
-- pisahkan data dummy dan data storage;
+- pisahkan data contoh dan data storage;
 - tambah test integrasi dasar.
 
 ## Fase 8 - Auth dan Role

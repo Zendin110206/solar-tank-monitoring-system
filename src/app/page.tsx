@@ -649,9 +649,9 @@ export default function Home() {
                   Siap simulator dan perangkat
                 </h3>
                 <p className="mt-4 text-base leading-7 text-zinc-600">
-                  Pengembangan tetap bisa berjalan dari data dummy atau
+                  Pengembangan tetap bisa berjalan dari data contoh dan
                   simulator, lalu disambungkan bertahap ke pembacaan perangkat
-                  yang sudah mengirim payload ke endpoint API.
+                  yang mengirim payload ke endpoint API.
                 </p>
               </div>
             </article>

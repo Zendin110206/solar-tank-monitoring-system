@@ -18,7 +18,7 @@ Yang sudah tersedia:
 - landing page berbahasa Indonesia;
 - halaman dashboard awal;
 - halaman detail tangki awal;
-- data dummy untuk lokasi, tangki, perangkat, dan pembacaan;
+- data contoh untuk lokasi, tangki, perangkat, dan pembacaan;
 - fungsi domain untuk volume, runtime, status, dan normalisasi payload;
 - unit test untuk logika domain dan telemetry store;
 - API baca:
@@ -28,6 +28,7 @@ Yang sudah tersedia:
 - API ingest:
   - `POST /api/ingest`
 - memory store lokal untuk menerima data simulator selama dev server hidup;
+- dashboard dan detail membaca memory store lokal yang sama dengan endpoint API;
 - simulator terminal:
   - `pnpm simulate:device`
 - dokumentasi teknis dan operasional di folder `docs/`;
@@ -181,7 +182,7 @@ Penjelasan folder utama:
 | Folder | Fungsi |
 |---|---|
 | `src/app` | Halaman Next.js dan API route |
-| `src/features/monitoring/data` | Data dummy yang aman untuk pengembangan |
+| `src/features/monitoring/data` | Data contoh yang aman untuk pengembangan |
 | `src/features/monitoring/lib` | Logika domain, normalisasi, view model, dan memory store |
 | `src/features/monitoring/tests` | Unit test untuk logika monitoring |
 | `scripts` | Alat bantu development, termasuk simulator device |

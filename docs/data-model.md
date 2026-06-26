@@ -40,7 +40,7 @@ Field penting:
 | `code` | kode pendek lokasi |
 | `name` | nama lokasi |
 | `areaLabel` | label area |
-| `coordinate` | koordinat manual dummy |
+| `coordinate` | koordinat manual contoh |
 | `markerLeft` / `markerTop` | posisi marker pada peta ilustratif |
 
 ## Tank

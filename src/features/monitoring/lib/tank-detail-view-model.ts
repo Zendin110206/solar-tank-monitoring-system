@@ -318,7 +318,7 @@ function toReadingPoint(reading: Reading): TankReadingPoint {
 
 function getCoordinateLabel(site: Site): string {
   if (typeof site.latitude === "number" && typeof site.longitude === "number") {
-    return `${site.latitude.toFixed(4)}, ${site.longitude.toFixed(4)} (manual dummy)`;
+    return `${site.latitude.toFixed(4)}, ${site.longitude.toFixed(4)} (koordinat contoh)`;
   }
 
   return "koordinat manual belum diisi";
