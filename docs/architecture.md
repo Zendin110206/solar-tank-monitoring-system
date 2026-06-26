@@ -24,6 +24,8 @@ Dashboard tidak membaca sensor secara langsung. Device atau simulator yang mengi
 | Komponen | Lokasi | Status |
 |---|---|---|
 | Landing page | `src/app/page.tsx` | Ada |
+| Login | `src/app/login/page.tsx` | Ada, frontend-only |
+| Pengajuan akses | `src/app/register/page.tsx` | Ada, frontend-only |
 | Dashboard awal | `src/app/dashboard/page.tsx` | Ada, membaca memory store lokal |
 | Detail tangki | `src/app/dashboard/tanks/[tankId]/page.tsx` | Ada, membaca memory store lokal |
 | API overview | `src/app/api/dashboard/overview/route.ts` | Ada |
@@ -39,6 +41,7 @@ Dashboard tidak membaca sensor secara langsung. Device atau simulator yang mengi
 Frontend bertugas:
 
 - menampilkan halaman;
+- menyiapkan tampilan login dan pengajuan akses;
 - menampilkan status dan angka yang sudah rapi;
 - memberi pengalaman baca yang mudah;
 - tidak menghitung hal operasional penting secara tersebar.
@@ -50,6 +53,7 @@ Backend/API bertugas:
 - memvalidasi key;
 - menormalisasi payload;
 - menyediakan data siap baca untuk dashboard;
+- nanti menangani autentikasi dan persetujuan akses pengguna;
 - nanti menyimpan data ke database.
 
 ## Alur Ingest

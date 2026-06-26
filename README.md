@@ -16,6 +16,7 @@ Repositori sudah melewati tahap fondasi awal dan sekarang berada pada tahap prot
 Yang sudah tersedia:
 
 - landing page berbahasa Indonesia;
+- halaman login dan pengajuan akses frontend-only;
 - halaman dashboard awal;
 - halaman detail tangki awal;
 - data contoh untuk lokasi, tangki, perangkat, dan pembacaan;
@@ -38,6 +39,7 @@ Yang belum tersedia:
 
 - database permanen;
 - autentikasi pengguna final;
+- proses pembuatan akun sungguhan;
 - role admin, operator, atau viewer;
 - integrasi perangkat fisik;
 - deployment produksi;
@@ -220,6 +222,8 @@ Halaman penting:
 | Halaman | Fungsi |
 |---|---|
 | `/` | Landing page |
+| `/login` | Tampilan masuk frontend-only |
+| `/register` | Tampilan pengajuan akses frontend-only |
 | `/dashboard` | Dashboard awal |
 | `/dashboard/tanks/tank-tph-main` | Detail tangki contoh |
 

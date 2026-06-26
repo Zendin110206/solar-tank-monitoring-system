@@ -82,6 +82,7 @@ History harus bertambah setelah simulator mengirim data.
 ## 7. Hal yang Perlu Dipahami Reviewer
 
 - UI dashboard/detail membaca memory store lokal yang sama dengan endpoint API.
+- Halaman login/register baru bersifat frontend-only dan belum membuat sesi pengguna.
 - API sudah bisa menerima data simulator.
 - Memory store hilang ketika server restart.
 - Data real belum digunakan.
