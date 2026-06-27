@@ -47,6 +47,7 @@ export type Device = {
   code: string;
   label: string;
   expectedReportIntervalSec: number;
+  apiKeyHash?: string | null;
   isActive: boolean;
 };
 

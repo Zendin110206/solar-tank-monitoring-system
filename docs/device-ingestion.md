@@ -32,14 +32,25 @@ Header wajib:
 ```http
 Content-Type: application/json
 X-Device-Id: demo-tph-01
-X-Api-Key: local-development-key
+X-Api-Key: demo-tph-key
 ```
 
 Alternatif:
 
 ```http
-X-Device-Key: local-development-key
+X-Device-Key: demo-tph-key
 ```
+
+Key demo yang tersedia:
+
+| Device | Key demo |
+|---|---|
+| `demo-tph-01` | `demo-tph-key` |
+| `demo-nja-01` | `demo-nja-key` |
+| `demo-jto-01` | `demo-jto-key` |
+| `demo-skp-01` | `demo-skp-key` |
+
+Fallback `local-development-key` masih bisa dipakai untuk latihan awal jika `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK` tidak dimatikan. Untuk mode yang lebih dekat pilot, gunakan key per device dan set fallback global ke `false`.
 
 ## Payload yang Didukung
 
@@ -82,11 +93,11 @@ API mengecek:
 - payload berupa JSON object;
 - device terdaftar;
 - device aktif;
-- key cocok;
+- key cocok dengan hash key device atau fallback development yang masih diizinkan;
 - device di payload tidak bertentangan dengan header;
 - tangki untuk device ditemukan.
 
-Jika semua lolos, payload dinormalisasi dan disimpan di memory store.
+Jika semua lolos, payload dinormalisasi dan disimpan ke storage aktif. Default development memakai memory store. Mode MySQL dapat diaktifkan lewat `SOLAR_TANK_STORAGE_DRIVER="mysql"`.
 
 ## Simulator
 
@@ -135,6 +146,7 @@ Sebelum perangkat nyata dipakai, perlu dikunci:
 - metode kalibrasi;
 - apakah hitung volume dilakukan di device atau server;
 - jaringan dan target deployment.
+- cara rotasi key jika device diganti atau key bocor.
 
 ## Catatan Keamanan
 
@@ -142,8 +154,8 @@ Jangan menaruh key production di kode.
 
 Untuk production nanti:
 
-- simpan key di environment;
-- hash key di database;
+- jangan gunakan fallback global;
+- simpan hash key per device di database;
 - gunakan HTTPS;
 - beri rate limit;
 - catat audit log;

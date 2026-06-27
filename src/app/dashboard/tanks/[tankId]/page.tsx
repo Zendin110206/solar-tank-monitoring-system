@@ -18,11 +18,11 @@ import {
   Radio,
   Ruler,
   Settings,
-  ShieldCheck,
   Wifi,
   Zap,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { LiveRefreshControl } from "@/features/monitoring/components/live-refresh-control";
 import { mockTanks } from "@/features/monitoring/data/mock-tanks";
 import {
   buildTankDetail,
@@ -31,13 +31,16 @@ import {
   type TankDetailView,
   type TankReadingPoint,
 } from "@/features/monitoring/lib/tank-detail-view-model";
-import { getMonitoringReadings } from "@/features/monitoring/lib/telemetry-store";
+import { listMonitoringReadings } from "@/features/monitoring/lib/monitoring-storage";
+import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/lib/refresh-interval";
 
 export const metadata: Metadata = {
   title: "Detail Tangki Solar | SolarTank",
   description:
     "Halaman detail frontend untuk membaca kondisi satu tangki solar, visual isi tangki, parameter perangkat, dan riwayat pembacaan.",
 };
+
+export const runtime = "nodejs";
 
 type TankStatus = TankDetailStatus;
 
@@ -690,7 +693,7 @@ export default async function TankDetailPage({
 
   const tankView = buildTankDetail(tankId, {
     now: new Date(),
-    readings: getMonitoringReadings(),
+    readings: await listMonitoringReadings(),
   });
 
   if (!tankView) {
@@ -698,6 +701,7 @@ export default async function TankDetailPage({
   }
 
   const tank = toTankDetail(tankView);
+  const refreshIntervalMs = getMonitoringRefreshIntervalMs();
 
   const status = statusMeta[tank.status];
   const metrics = [
@@ -817,13 +821,11 @@ export default async function TankDetailPage({
           </nav>
 
           <div className="ml-auto flex items-center gap-3">
-            <div className="hidden items-center gap-2 text-sm text-zinc-500 md:flex">
-              <ShieldCheck
-                className="size-4 text-emerald-600"
-                aria-hidden="true"
-              />
-              <span>Data live lokal</span>
-            </div>
+            <LiveRefreshControl
+              intervalMs={refreshIntervalMs}
+              lastSyncedLabel={`Update ${tank.lastUpdateLabel}`}
+              className="hidden md:inline-flex"
+            />
             <div className="hidden sm:block">
               <StatusBadge status={tank.status} />
             </div>
@@ -913,7 +915,7 @@ export default async function TankDetailPage({
                 <SectionHeading
                   label="Riwayat"
                   title="Pembacaan 24 jam"
-                  description="Grafik ini membaca riwayat dari memory store/API lokal dan strukturnya sudah mengikuti endpoint history."
+                  description="Grafik ini membaca riwayat dari storage/API lokal dan strukturnya sudah mengikuti endpoint history."
                 />
                 <span className="block max-w-full truncate rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100 sm:w-fit">
                   {`/api/tanks/${tank.id}/readings?range=24h`}
@@ -1031,7 +1033,7 @@ export default async function TankDetailPage({
               <SectionHeading
                 label="Validasi"
                 title="Hal yang nanti diganti data asli"
-                description="Bagian ini menjaga batas data simulator tetap jelas sebelum perangkat asli dan database permanen disambungkan."
+                description="Bagian ini menjaga batas data simulator tetap jelas sebelum perangkat asli dan database production disambungkan."
               />
 
               <div className="mt-6 space-y-3">

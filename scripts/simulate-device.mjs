@@ -2,14 +2,18 @@
 
 import process from "node:process";
 
-const DEFAULT_DEVICE_KEY =
-  process.env.SOLAR_TANK_LOCAL_DEVICE_KEY?.trim() || "local-development-key";
+const DEMO_DEVICE_KEYS = new Map([
+  ["demo-tph-01", "demo-tph-key"],
+  ["demo-nja-01", "demo-nja-key"],
+  ["demo-jto-01", "demo-jto-key"],
+  ["demo-skp-01", "demo-skp-key"],
+]);
 
 const DEFAULT_OPTIONS = {
   baseUrl: "http://localhost:3000",
   endpointPath: "/api/ingest",
   device: "demo-tph-01",
-  deviceKey: DEFAULT_DEVICE_KEY,
+  deviceKey: process.env.SOLAR_TANK_DEVICE_KEY?.trim() || "",
   intervalMs: 5000,
   startPercent: 84,
   stepPercent: 1.5,
@@ -49,7 +53,7 @@ Opsi:
   --base-url <url>             Default: http://localhost:3000
   --endpoint <path>            Default: /api/ingest
   --device <id>                Default: demo-tph-01
-  --key <key>                  Default: env SOLAR_TANK_LOCAL_DEVICE_KEY atau local-development-key
+  --key <key>                  Default: env SOLAR_TANK_DEVICE_KEY, key demo device, atau fallback lokal
   --interval-ms <angka>        Default: 5000
   --start-percent <angka>      Default: 84
   --step-percent <angka>       Default: 1.5
@@ -151,12 +155,19 @@ function parseArgs(argv) {
 }
 
 function normalizeOptions(options) {
+  const device = String(options.device).trim();
+  const deviceKey =
+    String(options.deviceKey).trim() ||
+    DEMO_DEVICE_KEYS.get(device) ||
+    process.env.SOLAR_TANK_LOCAL_DEVICE_KEY?.trim() ||
+    "local-development-key";
+
   const normalized = {
     ...options,
     baseUrl: normalizeBaseUrl(options.baseUrl),
     endpointPath: normalizeEndpointPath(options.endpointPath),
-    device: String(options.device).trim(),
-    deviceKey: String(options.deviceKey).trim(),
+    device,
+    deviceKey,
     intervalMs: toNumber(options.intervalMs, "--interval-ms", { min: 500 }),
     startPercent: toNumber(options.startPercent, "--start-percent", {
       min: 0,

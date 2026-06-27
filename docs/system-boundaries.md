@@ -14,6 +14,9 @@ Yang masuk:
 - API ingest lokal;
 - normalisasi payload;
 - simulator terminal;
+- memory store development;
+- fondasi MySQL reading;
+- validasi key per device untuk data dummy;
 - unit test;
 - dokumentasi Bahasa Indonesia.
 
@@ -21,7 +24,7 @@ Yang masuk:
 
 Yang belum masuk:
 
-- database production;
+- database production lengkap;
 - auth final;
 - role user;
 - firmware final;
@@ -90,3 +93,24 @@ Artinya:
 - tidak cocok untuk production.
 
 Storage final harus memakai database.
+
+## Batas MySQL Saat Ini
+
+Fondasi MySQL yang ada saat ini belum berarti seluruh sistem sudah siap production.
+
+Yang sudah masuk:
+
+- migration tabel monitoring;
+- seed demo;
+- penyimpanan reading;
+- query riwayat terbaru.
+
+Yang belum final:
+
+- registry device operasional;
+- rotasi key;
+- backup dan restore;
+- audit log;
+- rate limit;
+- aturan akses user;
+- pemisahan data dummy dan data real untuk mode pilot.

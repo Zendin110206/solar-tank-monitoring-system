@@ -93,6 +93,37 @@ Pekerjaan:
 - issue template ditambahkan;
 - placeholder `.gitkeep` dibersihkan.
 
+## 2026-06-26 - Persistent Storage Foundation
+
+Pekerjaan:
+
+- migration MySQL untuk site, tank, device, dan reading;
+- seed demo MySQL;
+- repository MySQL untuk reading;
+- storage facade untuk memilih memory atau MySQL;
+- query reading terbaru memakai `ORDER BY received_at DESC LIMIT ?`;
+- fallback memory tetap tersedia untuk development.
+
+## 2026-06-26 - Auto-refresh Dashboard dan Detail
+
+Pekerjaan:
+
+- komponen refresh manual;
+- pause/resume auto-refresh;
+- auto-refresh berhenti saat tab tidak aktif;
+- interval default 20 detik lewat env;
+- jam dashboard real-time sebagai client component kecil.
+
+## 2026-06-26 - Device Key Per Device
+
+Pekerjaan:
+
+- hash key per device dummy;
+- validasi key ingest memakai hash;
+- fallback global tetap tersedia untuk development;
+- simulator memakai key demo sesuai device;
+- test device key ditambahkan.
+
 ## Status Verifikasi Terakhir
 
 Perintah:

@@ -11,7 +11,7 @@ Repositori ini menggunakan Bahasa Indonesia agar mudah dibaca oleh pengguna oper
 
 ## Status Saat Ini
 
-Repositori sudah melewati tahap fondasi awal dan sekarang berada pada tahap prototipe frontend serta alur data lokal.
+Repositori sudah melewati tahap fondasi awal dan sekarang berada pada tahap prototipe aplikasi monitoring dengan alur data lokal, API ingest, simulator, auto-refresh dashboard, dan fondasi penyimpanan MySQL opsional.
 
 Yang sudah tersedia:
 
@@ -20,6 +20,7 @@ Yang sudah tersedia:
 - halaman dashboard awal;
 - halaman detail tangki awal;
 - data contoh untuk lokasi, tangki, perangkat, dan pembacaan;
+- timestamp data contoh memory mode digeser relatif ke waktu server start agar demo awal tetap mudah dibaca;
 - fungsi domain untuk volume, runtime, status, dan normalisasi payload;
 - unit test untuk logika domain dan telemetry store;
 - API baca:
@@ -29,7 +30,11 @@ Yang sudah tersedia:
 - API ingest:
   - `POST /api/ingest`
 - memory store lokal untuk menerima data simulator selama dev server hidup;
-- dashboard dan detail membaca memory store lokal yang sama dengan endpoint API;
+- fondasi MySQL untuk menyimpan reading secara permanen pada mode pengembangan lanjutan;
+- dashboard dan detail membaca storage aktif yang sama dengan endpoint API;
+- auto-refresh ringan pada dashboard dan detail, dengan tombol refresh manual serta pause/resume;
+- validasi key per device memakai hash pada data dummy;
+- fallback key global hanya untuk development lokal;
 - simulator terminal:
   - `pnpm simulate:device`
 - dokumentasi teknis dan operasional di folder `docs/`;
@@ -37,7 +42,6 @@ Yang sudah tersedia:
 
 Yang belum tersedia:
 
-- database permanen;
 - autentikasi pengguna final;
 - proses pembuatan akun sungguhan;
 - role admin, operator, atau viewer;
@@ -45,12 +49,13 @@ Yang belum tersedia:
 - deployment produksi;
 - kalibrasi tangki nyata;
 - notifikasi;
-- dashboard yang membaca API secara penuh di sisi UI.
+- registry site, tank, device, dan device key yang sepenuhnya berasal dari database;
+- rate limit dan audit log untuk endpoint ingest.
 
 Catatan penting:
 
 ```text
-Saat ini API sudah bisa menerima data simulator, tetapi halaman dashboard/detail masih dalam fase frontend awal. Penyambungan penuh UI ke API menjadi tahap berikutnya.
+Saat ini dashboard dan detail sudah membaca storage aktif lewat layer aplikasi. Mode default tetap `memory` agar mudah dicoba. Mode `mysql` sudah tersedia untuk latihan persistent storage, tetapi belum boleh dianggap production-ready karena registry device dan pengelolaan user belum final.
 ```
 
 ## Tujuan Produk
@@ -81,7 +86,7 @@ Perangkat atau simulator
   -> POST /api/ingest
   -> validasi device dan key
   -> normalisasi payload
-  -> memory store lokal
+  -> storage aktif: memory atau MySQL
   -> API dashboard/detail
   -> tampilan web
 ```
@@ -92,7 +97,7 @@ Penjelasan singkat:
 2. Device mengirim data ke API, bukan langsung ke dashboard.
 3. API mengecek identitas device dan key.
 4. Data mentah diubah menjadi format yang konsisten.
-5. Data disimpan sementara di memory store.
+5. Data disimpan ke storage aktif. Default development memakai memory; mode MySQL bisa diaktifkan lewat env.
 6. Endpoint baca mengambil data terbaru dan riwayat.
 7. Dashboard menampilkan status yang lebih mudah dipahami.
 
@@ -126,11 +131,11 @@ pnpm simulate:device --critical --once
 | Bagian | Teknologi |
 |---|---|
 | Framework aplikasi | Next.js 16 App Router |
-| UI | React 19, Tailwind CSS 4, lucide-react, Recharts |
+| UI | React 19, Tailwind CSS 4, lucide-react |
 | Bahasa | TypeScript |
 | Test | Vitest |
 | Package manager | pnpm |
-| Storage saat ini | Memory store lokal |
+| Storage saat ini | Memory store lokal, dengan opsi MySQL untuk reading |
 | Simulator | Node.js script tanpa dependency tambahan |
 
 ## Struktur Repositori
@@ -155,6 +160,9 @@ Struktur aktif saat ini:
 │   ├── roadmap.md
 │   ├── safety-and-limitations.md
 │   └── system-boundaries.md
+├── database/
+│   ├── migrations/
+│   └── seeds/
 ├── scripts/
 │   └── simulate-device.mjs
 ├── src/
@@ -166,6 +174,7 @@ Struktur aktif saat ini:
 │   │   └── page.tsx
 │   └── features/
 │       └── monitoring/
+│           ├── components/
 │           ├── data/
 │           ├── lib/
 │           ├── tests/
@@ -184,9 +193,11 @@ Penjelasan folder utama:
 | Folder | Fungsi |
 |---|---|
 | `src/app` | Halaman Next.js dan API route |
+| `src/features/monitoring/components` | Komponen client kecil untuk refresh dan jam real-time |
 | `src/features/monitoring/data` | Data contoh yang aman untuk pengembangan |
-| `src/features/monitoring/lib` | Logika domain, normalisasi, view model, dan memory store |
+| `src/features/monitoring/lib` | Logika domain, normalisasi, view model, storage facade, memory store, dan repository MySQL |
 | `src/features/monitoring/tests` | Unit test untuk logika monitoring |
+| `database` | Migration dan seed MySQL untuk latihan persistent storage |
 | `scripts` | Alat bantu development, termasuk simulator device |
 | `docs` | Dokumentasi arsitektur, API, domain, roadmap, dan batasan |
 | `.github` | CI dan template issue |
@@ -195,9 +206,24 @@ Penjelasan folder utama:
 
 Prasyarat:
 
+- Git;
 - Node.js 20 atau lebih baru;
 - pnpm 9.x;
 - PowerShell, Git Bash, atau terminal lain.
+
+Jika `pnpm` belum tersedia, aktifkan lewat Corepack:
+
+```powershell
+corepack enable
+corepack prepare pnpm@9.15.3 --activate
+```
+
+Clone repository:
+
+```powershell
+git clone https://github.com/Zendin110206/solar-tank-monitoring-system.git
+cd solar-tank-monitoring-system
+```
 
 Install dependency:
 
@@ -275,7 +301,7 @@ Kirim payload manual:
 curl.exe -X POST http://localhost:3000/api/ingest `
   -H "Content-Type: application/json" `
   -H "X-Device-Id: demo-tph-01" `
-  -H "X-Api-Key: local-development-key" `
+  -H "X-Api-Key: demo-tph-key" `
   -d "{\"device\":\"demo-tph-01\",\"ts\":0,\"distance\":40.5,\"voltage\":3.86,\"raw\":{\"H_cm\":109.5,\"volume\":3650,\"percent\":73,\"wifi_rssi\":-55}}"
 ```
 
@@ -307,15 +333,46 @@ Variabel yang relevan saat ini:
 |---|---|
 | `NEXT_PUBLIC_APP_NAME` | Nama aplikasi |
 | `NEXT_PUBLIC_APP_ENV` | Label environment |
-| `SOLAR_TANK_LOCAL_DEVICE_KEY` | Key lokal untuk `POST /api/ingest` dan simulator |
+| `NEXT_PUBLIC_MONITORING_REFRESH_INTERVAL_MS` | Interval auto-refresh dashboard/detail. Default `20000` ms |
+| `SOLAR_TANK_STORAGE_DRIVER` | Pilih `memory` atau `mysql`. Default aman untuk development adalah `memory` |
+| `MYSQL_DATABASE_URL` | Connection string MySQL, hanya dipakai ketika storage driver `mysql` |
+| `SOLAR_TANK_LOCAL_DEVICE_KEY` | Key fallback global untuk development lokal |
+| `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK` | Set `false` untuk menolak fallback global dan memakai key per device |
+| `SOLAR_TANK_DEVICE_KEY` | Override key simulator untuk satu device jika dibutuhkan |
 
-Jika `SOLAR_TANK_LOCAL_DEVICE_KEY` tidak diisi, sistem memakai key lokal development:
+Simulator otomatis memakai key demo sesuai device dummy. Contoh:
 
 ```text
-local-development-key
+demo-tph-01 -> demo-tph-key
+demo-nja-01 -> demo-nja-key
+demo-jto-01 -> demo-jto-key
+demo-skp-01 -> demo-skp-key
 ```
 
-Key tersebut hanya untuk development. Jangan gunakan untuk production.
+`local-development-key` tetap tersedia sebagai fallback development jika `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK` tidak dimatikan. Jangan gunakan fallback global untuk pilot atau production.
+
+## Mode MySQL Opsional
+
+Mode default tetap `memory`, sehingga aplikasi bisa langsung dicoba tanpa database.
+
+Jika ingin latihan data reading yang tidak hilang saat server restart:
+
+1. Buat database MySQL lokal.
+2. Jalankan SQL di `database/migrations/001_create_monitoring_core_mysql.sql`.
+3. Jalankan SQL di `database/seeds/001_seed_demo_monitoring_reference_mysql.sql`.
+4. Isi `.env.local`:
+
+```env
+SOLAR_TANK_STORAGE_DRIVER="mysql"
+MYSQL_DATABASE_URL="mysql://solar_tank_app:password@127.0.0.1:3306/solar_tank_monitoring"
+SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK="false"
+```
+
+Catatan:
+
+- fondasi MySQL saat ini memfokuskan penyimpanan reading;
+- registry site, tank, device, dan rotasi key database masih tahap berikutnya;
+- jangan masukkan password database asli ke Git.
 
 ## Peta Dokumentasi
 
@@ -381,6 +438,9 @@ Sebelum dipakai dengan perangkat dan tangki nyata, perlu validasi:
 - akses user dan role;
 - deployment server;
 - backup database;
+- rate limit dan audit log endpoint ingest;
+- rotasi key per device;
+- cara menonaktifkan fallback data dummy;
 - prosedur keselamatan lapangan.
 
 ## Pemelihara dan Kontributor

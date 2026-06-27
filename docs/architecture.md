@@ -12,7 +12,7 @@ Alur sederhananya:
 Device atau simulator
   -> API ingest
   -> normalisasi data
-  -> penyimpanan sementara
+  -> storage aktif
   -> API baca
   -> dashboard web
 ```
@@ -26,13 +26,18 @@ Dashboard tidak membaca sensor secara langsung. Device atau simulator yang mengi
 | Landing page | `src/app/page.tsx` | Ada |
 | Login | `src/app/login/page.tsx` | Ada, frontend-only |
 | Pengajuan akses | `src/app/register/page.tsx` | Ada, frontend-only |
-| Dashboard awal | `src/app/dashboard/page.tsx` | Ada, membaca memory store lokal |
-| Detail tangki | `src/app/dashboard/tanks/[tankId]/page.tsx` | Ada, membaca memory store lokal |
+| Dashboard awal | `src/app/dashboard/page.tsx` | Ada, membaca storage aktif |
+| Detail tangki | `src/app/dashboard/tanks/[tankId]/page.tsx` | Ada, membaca storage aktif |
 | API overview | `src/app/api/dashboard/overview/route.ts` | Ada |
 | API detail tangki | `src/app/api/tanks/[tankId]/route.ts` | Ada |
 | API history tangki | `src/app/api/tanks/[tankId]/readings/route.ts` | Ada |
 | API ingest | `src/app/api/ingest/route.ts` | Ada |
-| Memory store | `src/features/monitoring/lib/telemetry-store.ts` | Ada |
+| Memory store | `src/features/monitoring/lib/telemetry-store.ts` | Ada, fallback development |
+| MySQL reading repository | `src/features/monitoring/lib/mysql-reading-repository.ts` | Ada, opsional |
+| Storage facade | `src/features/monitoring/lib/monitoring-storage.ts` | Ada |
+| Device key validation | `src/features/monitoring/lib/device-key.ts` | Ada |
+| Auto-refresh UI | `src/features/monitoring/components/live-refresh-control.tsx` | Ada |
+| Jam real-time | `src/features/monitoring/components/live-clock.tsx` | Ada |
 | Simulator | `scripts/simulate-device.mjs` | Ada |
 | Unit test | `src/features/monitoring/tests` | Ada |
 
@@ -73,13 +78,13 @@ yang terjadi:
 4. API membaca X-Api-Key.
 5. API mencari device di data contoh.
 6. Payload dinormalisasi.
-7. Reading disimpan di memory store.
+7. Reading disimpan ke storage aktif, yaitu memory atau MySQL.
 8. Response HTTP 201 dikirim.
 ```
 
 ## Alur Baca
 
-Endpoint baca mengambil data dari memory store:
+Endpoint baca mengambil data dari storage aktif:
 
 ```text
 GET /api/dashboard/overview
@@ -87,7 +92,7 @@ GET /api/tanks/[tankId]
 GET /api/tanks/[tankId]/readings
 ```
 
-Saat dev server restart, memory store kembali ke data contoh awal.
+Saat dev server restart, memory store kembali ke data contoh awal yang waktunya digeser relatif ke waktu server start. Ini membuat demo awal tetap terbaca tanpa memakai data real. Jika mode MySQL aktif, reading disimpan di database selama database tetap tersedia.
 
 ## Data Contoh vs Data Real
 
@@ -112,22 +117,23 @@ Sebelum data real masuk, perlu validasi:
 
 ## Target Arsitektur Berikutnya
 
-Tahap berikutnya:
+Kondisi setelah Batch 7-9:
 
 ```text
 UI dashboard/detail
-  -> fetch API
-  -> membaca data dari endpoint
-  -> berubah saat simulator mengirim data
+  -> storage facade
+  -> memory store atau MySQL reading repository
+  -> berubah saat simulator mengirim data dan halaman di-refresh
 ```
 
 Setelah itu:
 
 ```text
-memory store
-  -> database lokal atau Postgres
-  -> history lebih stabil
-  -> siap deployment demo
+device registry dan user auth
+  -> database
+  -> role access
+  -> rate limit
+  -> audit log
 ```
 
 ## Prinsip Desain
@@ -137,3 +143,4 @@ memory store
 - Jangan menyimpan credential di repo.
 - Jangan mengklaim production-ready sebelum deployment dan kalibrasi divalidasi.
 - Buat dokumentasi cukup jelas agar kontributor baru bisa melanjutkan.
+- Jangan menjadikan seluruh dashboard sebagai Client Component; gunakan client kecil hanya untuk interaksi seperti refresh dan jam.

@@ -19,21 +19,23 @@ Yang sudah ada:
 
 - data dummy;
 - API ingest lokal;
-- validasi key sederhana;
+- validasi key per device dengan hash pada data dummy;
 - memory store;
+- fondasi MySQL untuk reading;
 - simulator;
 - test domain.
 
 Yang belum ada:
 
-- database permanen;
+- database production lengkap dengan backup;
 - auth user final;
 - role access;
 - rate limit;
 - audit log;
 - backup;
 - monitoring server;
-- integrasi hardware real.
+- integrasi hardware real;
+- registry device yang sepenuhnya dikelola database.
 
 ## Batas Data
 
@@ -109,6 +111,7 @@ Checklist minimum:
 - rate limit;
 - role user;
 - audit log;
+- rotasi key device;
 - dokumentasi operasional;
 - uji perangkat di lingkungan aman;
 - validasi akurasi volume.

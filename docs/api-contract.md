@@ -46,6 +46,14 @@ Response sukses:
       "criticalTanks": 1
     },
     "rows": []
+  },
+  "meta": {
+    "storage": {
+      "configuredDriver": "mysql",
+      "activeDriver": "mysql",
+      "isFallback": false,
+      "label": "Database MySQL"
+    }
   }
 }
 ```
@@ -53,7 +61,7 @@ Response sukses:
 Catatan:
 
 ```text
-Isi response bisa berkembang mengikuti kebutuhan UI.
+Field data berisi isi dashboard. Field meta.storage membantu melihat apakah data sedang dibaca dari MySQL, memory lokal, atau fallback memory karena MySQL kosong.
 ```
 
 ## GET /api/tanks/[tankId]
@@ -140,10 +148,16 @@ Header wajib:
 ```http
 Content-Type: application/json
 X-Device-Id: demo-tph-01
-X-Api-Key: local-development-key
+X-Api-Key: demo-tph-key
 ```
 
 `X-Device-Key` juga diterima sebagai alternatif `X-Api-Key`.
+
+Catatan key:
+
+- setiap device dummy memiliki key demo sendiri;
+- fallback `local-development-key` hanya untuk development lokal;
+- untuk mode yang lebih dekat pilot, set `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK="false"`.
 
 Payload contoh:
 
@@ -168,7 +182,7 @@ Contoh curl:
 curl.exe -X POST http://localhost:3000/api/ingest `
   -H "Content-Type: application/json" `
   -H "X-Device-Id: demo-tph-01" `
-  -H "X-Api-Key: local-development-key" `
+  -H "X-Api-Key: demo-tph-key" `
   -d "{\"device\":\"demo-tph-01\",\"ts\":0,\"distance\":40.5,\"voltage\":3.86,\"raw\":{\"H_cm\":109.5,\"volume\":3650,\"percent\":73,\"wifi_rssi\":-55}}"
 ```
 
@@ -187,6 +201,13 @@ Response sukses:
   }
 }
 ```
+
+Nilai `storage` bisa berisi:
+
+| Nilai | Arti |
+|---|---|
+| `memory` | Reading disimpan sementara di memory store development |
+| `mysql` | Reading disimpan ke MySQL sesuai `MYSQL_DATABASE_URL` |
 
 ## Error yang Mungkin Muncul
 
@@ -210,11 +231,12 @@ Contoh response error:
 
 Kontrak API ini masih untuk prototipe lokal.
 
-Sebelum production, perlu ditambah:
+Sebelum production, perlu ditambah atau dimatangkan:
 
 - autentikasi user;
 - rate limit;
-- database;
+- registry site/tank/device dari database;
 - validasi schema lebih ketat;
 - audit log;
+- rotasi key device;
 - versioning API jika device sudah banyak.

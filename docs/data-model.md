@@ -77,6 +77,7 @@ Field penting:
 | `tankId` | tangki yang dipantau |
 | `label` | nama device |
 | `expectedReportIntervalSec` | interval kirim yang diharapkan |
+| `apiKeyHash` | hash key device untuk validasi ingest |
 | `isActive` | device aktif atau tidak |
 
 Contoh device aktif:
@@ -126,14 +127,25 @@ Jenis status:
 
 ## Catatan Penyimpanan Saat Ini
 
-Saat ini data disimpan di memory store.
+Saat ini aplikasi memiliki dua mode penyimpanan reading:
+
+| Mode | Fungsi |
+|---|---|
+| `memory` | Default development, data hilang saat server restart |
+| `mysql` | Reading disimpan ke MySQL lewat repository opsional |
 
 Karakteristik memory store:
 
 - cepat untuk development;
 - tidak butuh database;
+- saat server start, data demo digeser relatif ke waktu berjalan agar status awal tidak basi;
 - hilang saat dev server restart;
 - tidak cocok untuk production;
 - cocok untuk membuktikan alur simulator dan API.
 
-Target berikutnya adalah mengganti penyimpanan sementara dengan database.
+Karakteristik MySQL saat ini:
+
+- sudah memiliki migration dan seed demo;
+- menyimpan reading dari endpoint ingest;
+- query mengambil data terbaru terlebih dahulu, lalu dibalik untuk grafik;
+- belum menjadi production database penuh karena registry site, tank, device, rotasi key, user, role, audit log, dan backup belum final.

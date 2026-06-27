@@ -46,4 +46,38 @@ describe("dashboard overview view model", () => {
     expect(overview.healthSegments).toHaveLength(4);
     expect(overview.trendBars).toHaveLength(9);
   });
+
+  it("uses the newest received reading for the detail overview card", () => {
+    const overview = buildDashboardOverview({
+      now: new Date("2026-06-25T08:10:00.000Z"),
+      readings: [
+        {
+          id: "reading-old-tph",
+          deviceId: "device-tph-main",
+          tankId: "tank-tph-main",
+          measuredAt: "2026-06-25T07:30:00.000Z",
+          receivedAt: "2026-06-25T07:30:03.000Z",
+          sensorDistanceCm: 40,
+          fuelHeightCm: 110,
+          volumeLiter: 3600,
+          fillPercent: 72,
+          runtimeHour: 144,
+        },
+        {
+          id: "reading-new-jto",
+          deviceId: "device-jto-main",
+          tankId: "tank-jto-main",
+          measuredAt: "2026-06-25T08:00:00.000Z",
+          receivedAt: "2026-06-25T08:00:05.000Z",
+          sensorDistanceCm: 130,
+          fuelHeightCm: 20,
+          volumeLiter: 700,
+          fillPercent: 14,
+          runtimeHour: 28,
+        },
+      ],
+    });
+
+    expect(overview.latestRow.code).toBe("JTO");
+  });
 });

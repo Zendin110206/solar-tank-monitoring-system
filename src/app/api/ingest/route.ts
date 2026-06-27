@@ -1,7 +1,7 @@
 import {
   getLocalDeviceKey,
   ingestTelemetry,
-} from "@/features/monitoring/lib/telemetry-store";
+} from "@/features/monitoring/lib/ingest-telemetry";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const result = ingestTelemetry({
+  const result = await ingestTelemetry({
     deviceIdentifier: request.headers.get("x-device-id"),
     deviceKey:
       request.headers.get("x-api-key") ?? request.headers.get("x-device-key"),

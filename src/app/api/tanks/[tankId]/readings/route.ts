@@ -1,7 +1,8 @@
 import { buildTankReadings } from "@/features/monitoring/lib/tank-detail-view-model";
-import { getMonitoringReadings } from "@/features/monitoring/lib/telemetry-store";
+import { listMonitoringReadings } from "@/features/monitoring/lib/monitoring-storage";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
 
 export async function GET(
   request: Request,
@@ -12,7 +13,7 @@ export async function GET(
   const range = url.searchParams.get("range") ?? "24h";
   const readings = buildTankReadings(tankId, {
     now: new Date(),
-    readings: getMonitoringReadings(),
+    readings: await listMonitoringReadings(),
   });
 
   if (readings.length === 0) {

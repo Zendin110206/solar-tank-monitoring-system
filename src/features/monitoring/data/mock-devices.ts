@@ -8,6 +8,8 @@ export const mockDevices: Device[] = [
     code: "demo-tph-01",
     label: "NodeMCU Ultrasonic Demo",
     expectedReportIntervalSec: 300,
+    apiKeyHash:
+      "sha256:749a381823e9c3e494badf95003e255a389eb65b1f894a058a54f27b1834d1f4",
     isActive: true,
   },
   {
@@ -17,6 +19,8 @@ export const mockDevices: Device[] = [
     code: "demo-nja-01",
     label: "NodeMCU Ultrasonic Demo",
     expectedReportIntervalSec: 300,
+    apiKeyHash:
+      "sha256:b700ffe64480089f21b90066d3900ce529d9ddfc5f7b4ac4804dc2c9876188aa",
     isActive: true,
   },
   {
@@ -26,6 +30,8 @@ export const mockDevices: Device[] = [
     code: "demo-jto-01",
     label: "NodeMCU Ultrasonic Demo",
     expectedReportIntervalSec: 300,
+    apiKeyHash:
+      "sha256:625067fdabde596e7fc076429db5d271e54b97ca690fefe188d9e81eaeb54688",
     isActive: true,
   },
   {
@@ -35,6 +41,8 @@ export const mockDevices: Device[] = [
     code: "demo-skp-01",
     label: "NodeMCU Ultrasonic Demo",
     expectedReportIntervalSec: 300,
+    apiKeyHash:
+      "sha256:075c5a726900bd6bcaf8c5695a87a0928fa7f283a39bd735706011232ed9544b",
     isActive: true,
   },
 ];

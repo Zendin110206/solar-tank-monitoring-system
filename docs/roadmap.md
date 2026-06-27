@@ -42,7 +42,7 @@ Isi:
 Catatan:
 
 ```text
-UI dashboard dan detail sudah membaca memory store lokal yang sama dengan endpoint API. Tahap berikutnya adalah storage permanen.
+UI dashboard dan detail sudah membaca storage aktif yang sama dengan endpoint API. Tahap berikutnya adalah mematangkan registry database, auth, dan batas mode production.
 ```
 
 ## Fase 4 - Domain Logic dan Test
@@ -71,28 +71,37 @@ Isi:
 - verifikasi payload masuk;
 - history bertambah.
 
-## Fase 6 - Sambungkan UI ke Memory Store/API Lokal
+## Fase 6 - Sambungkan UI ke Storage Aktif/API Lokal
 
 Status: selesai untuk versi awal.
 
 Isi:
 
-- dashboard membaca data terbaru dari memory store;
-- detail membaca data terbaru dari memory store;
+- dashboard membaca data terbaru dari storage aktif;
+- detail membaca data terbaru dari storage aktif;
 - grafik memakai riwayat yang sama dengan endpoint readings;
 - UI berubah saat simulator mengirim data lalu halaman dirender ulang;
 - endpoint API tetap tersedia untuk kontrak integrasi.
 
 ## Fase 7 - Storage Permanen
 
-Target:
+Status: fondasi reading selesai, belum production.
 
-- pilih database lokal atau Postgres;
-- simpan reading permanen;
-- siapkan migration;
-- siapkan seed data;
-- pisahkan data contoh dan data storage;
-- tambah test integrasi dasar.
+Sudah ada:
+
+- migration MySQL;
+- seed demo MySQL;
+- repository reading MySQL;
+- storage facade `memory` atau `mysql`;
+- query mengambil data terbaru terlebih dahulu.
+
+Yang belum selesai:
+
+- registry site, tank, device dari database;
+- rotasi key device;
+- backup database;
+- test integrasi database nyata;
+- aturan mematikan seluruh fallback dummy pada mode pilot/production.
 
 ## Fase 8 - Auth dan Role
 
@@ -114,6 +123,10 @@ Target:
 - uji di lingkungan aman;
 - validasi akurasi sensor;
 - dokumentasi provisioning device.
+
+Catatan:
+
+Endpoint ingest dan key per device sudah disiapkan untuk latihan, tetapi perangkat fisik tetap harus menunggu validasi payload, jaringan, keamanan, dan safety lapangan.
 
 ## Fase 10 - Deployment Demo atau Pilot
 

@@ -35,6 +35,7 @@ export type DashboardMonitoringSite = {
   fillPercent: number;
   volumeLiter: number;
   runtimeHour: number;
+  lastReceivedAt: string;
   updateLabel: string;
   deviceId: string;
   signal: string;
@@ -265,6 +266,7 @@ export function buildDashboardOverview({
       fillPercent: reading.fillPercent,
       volumeLiter: reading.volumeLiter,
       runtimeHour: reading.runtimeHour,
+      lastReceivedAt: reading.receivedAt,
       updateLabel: formatAgeLabel(reading.receivedAt, now),
       deviceId: device.code,
       signal:
@@ -295,7 +297,11 @@ export function buildDashboardOverview({
         a.runtimeHour - b.runtimeHour,
     );
 
-  const latestRow = rows[0];
+  const latestRow = [...rows].sort(
+    (a, b) =>
+      new Date(b.lastReceivedAt).getTime() -
+      new Date(a.lastReceivedAt).getTime(),
+  )[0];
   const onlineDevices = rows.filter(
     (row) => row.deviceStatus === "online",
   ).length;

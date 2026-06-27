@@ -11,6 +11,8 @@ Yang sudah aman dilakukan:
 - menjalankan aplikasi lokal;
 - menjalankan simulator lokal;
 - menguji API lokal;
+- menguji mode memory store;
+- menyiapkan migration dan seed MySQL untuk latihan persistent storage;
 - menjalankan `pnpm check`;
 - membangun production build lokal.
 
@@ -43,6 +45,8 @@ Build lokal:
 pnpm build
 pnpm start
 ```
+
+Jika ingin mencoba storage MySQL lokal, jalankan migration dan seed di folder `database/`, lalu isi `.env.local` dengan `SOLAR_TANK_STORAGE_DRIVER="mysql"` dan `MYSQL_DATABASE_URL`.
 
 ## Opsi Deployment Demo
 
@@ -101,7 +105,12 @@ Variabel saat ini:
 ```text
 NEXT_PUBLIC_APP_NAME
 NEXT_PUBLIC_APP_ENV
+NEXT_PUBLIC_MONITORING_REFRESH_INTERVAL_MS
+SOLAR_TANK_STORAGE_DRIVER
 SOLAR_TANK_LOCAL_DEVICE_KEY
+SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK
+SOLAR_TANK_DEVICE_KEY
+MYSQL_DATABASE_URL
 ```
 
 ## Checklist Sebelum Production
@@ -109,10 +118,12 @@ SOLAR_TANK_LOCAL_DEVICE_KEY
 - Database sudah tersedia.
 - Secret tidak ada di Git.
 - API key device tidak memakai dummy key.
+- Fallback global device key dimatikan.
 - HTTPS aktif.
 - Endpoint ingest punya rate limit.
 - User login dan role sudah jelas.
 - Backup database disiapkan.
+- Registry site, tank, device, dan key berasal dari database yang dikelola.
 - Rumus volume sudah dikalibrasi.
 - Device fisik diuji aman.
 - Data yang ditampilkan sudah disetujui.
@@ -123,4 +134,4 @@ Memory store saat ini hanya untuk development.
 
 Jika server restart, data hasil simulator hilang.
 
-Untuk deployment yang perlu history, storage harus diganti database.
+Untuk deployment yang perlu history, storage harus memakai database. Fondasi MySQL sudah tersedia untuk reading, tetapi belum menggantikan kebutuhan auth, rate limit, audit log, backup, dan device registry production.

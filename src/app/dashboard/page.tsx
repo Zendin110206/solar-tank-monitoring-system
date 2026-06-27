@@ -13,10 +13,11 @@ import {
   Gauge,
   MapPin,
   Search,
-  ShieldCheck,
   Wifi,
 } from "lucide-react";
 
+import { LiveClock } from "@/features/monitoring/components/live-clock";
+import { LiveRefreshControl } from "@/features/monitoring/components/live-refresh-control";
 import {
   buildDashboardOverview,
   type DashboardMonitoringSite as MonitoringSite,
@@ -24,13 +25,16 @@ import {
   type DashboardSiteStatus as SiteStatus,
 } from "@/features/monitoring/lib/dashboard-view-model";
 
-import { getMonitoringReadings } from "@/features/monitoring/lib/telemetry-store";
+import { listMonitoringReadingsWithSource } from "@/features/monitoring/lib/monitoring-storage";
+import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/lib/refresh-interval";
 
 export const metadata: Metadata = {
   title: "Dashboard Monitoring Solar | SolarTank",
   description:
     "Dashboard awal untuk memantau volume tangki solar, runtime genset, status perangkat, dan lokasi STO berbasis simulator serta API lokal.",
 };
+
+export const runtime = "nodejs";
 
 const statusMeta: Record<
   SiteStatus,
@@ -131,6 +135,20 @@ function formatLiter(value: number) {
   return new Intl.NumberFormat("id-ID").format(value);
 }
 
+function formatJakartaTime(value: Date) {
+  const time = new Intl.DateTimeFormat("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+    timeZone: "Asia/Jakarta",
+  })
+    .format(value)
+    .replaceAll(".", ":");
+
+  return `${time} WIB`;
+}
+
 function StatusBadge({ status }: { status: SiteStatus }) {
   const meta = statusMeta[status];
 
@@ -220,15 +238,27 @@ function LocationMarker({ site }: { site: MonitoringSite }) {
 export default async function DashboardPage() {
   await connection();
 
+  const now = new Date();
+  const refreshIntervalMs = getMonitoringRefreshIntervalMs();
+  const monitoringReadingsResult = await listMonitoringReadingsWithSource();
   const dashboardOverview = buildDashboardOverview({
-    now: new Date(),
-    readings: getMonitoringReadings(),
+    now,
+    readings: monitoringReadingsResult.readings,
   });
+  const storageSource = monitoringReadingsResult.source;
+  const storageBadgeLabel =
+    storageSource.activeDriver === "mysql"
+      ? "database MySQL"
+      : storageSource.isFallback
+        ? "fallback memory"
+        : "memory lokal";
+
   const monitoredSites = dashboardOverview.rows;
   const latestSite = dashboardOverview.latestRow;
   const prioritySites = dashboardOverview.priorityRows;
   const trendBars = dashboardOverview.trendBars;
   const summaryCards = buildSummaryCards(dashboardOverview);
+  const localTimeLabel = formatJakartaTime(now);
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#f5faf8] text-zinc-950">
@@ -270,13 +300,11 @@ export default async function DashboardPage() {
           </div>
 
           <div className="ml-auto flex items-center gap-3 xl:ml-0">
-            <div className="hidden items-center gap-2 text-sm text-zinc-500 md:flex">
-              <ShieldCheck
-                className="size-4 text-emerald-600"
-                aria-hidden="true"
-              />
-              <span>{dashboardOverview.summary.syncLabel}</span>
-            </div>
+            <LiveRefreshControl
+              intervalMs={refreshIntervalMs}
+              lastSyncedLabel={dashboardOverview.summary.syncLabel}
+              className="hidden md:inline-flex"
+            />
             <button
               type="button"
               className="relative hidden size-10 place-items-center rounded-full border border-zinc-200 bg-white text-zinc-700 shadow-sm transition hover:border-red-200 hover:text-red-600 sm:grid"
@@ -305,7 +333,7 @@ export default async function DashboardPage() {
                   Data simulator/API
                 </span>
                 <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
-                  memory store lokal
+                  {storageBadgeLabel}
                 </span>
               </div>
               <h1 className="mt-3 max-w-full text-[2rem] font-semibold leading-[1.08] tracking-normal text-zinc-950 sm:text-4xl">
@@ -314,22 +342,26 @@ export default async function DashboardPage() {
               <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-500 sm:text-base">
                 Tampilan awal untuk membaca volume, estimasi runtime genset,
                 status perangkat, dan titik lokasi manual sebelum database
-                permanen serta sensor asli disambungkan.
+                production serta sensor asli disambungkan.
               </p>
             </div>
 
             <div className="grid gap-2 text-sm sm:grid-cols-2 lg:w-[28rem]">
               <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400">
-                  Local time
+                  Waktu lokal
                 </p>
-                <p className="mt-1 text-lg font-semibold">14:45 WIB</p>
+                <p className="mt-1 text-lg font-semibold">
+                  <LiveClock initialTimeLabel={localTimeLabel} />
+                </p>
               </div>
               <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400">
                   Sumber data
                 </p>
-                <p className="mt-1 text-lg font-semibold">Memory/API</p>
+                <p className="mt-1 text-lg font-semibold">
+                  {storageSource.label}
+                </p>
               </div>
             </div>
           </div>
@@ -547,7 +579,7 @@ export default async function DashboardPage() {
                   <SectionHeader
                     label="Tren volume"
                     title="Pergerakan stok 24 jam"
-                    description="Grafik ini membaca seri pembacaan dari memory store lokal dan disiapkan untuk riwayat database."
+                    description="Grafik ini membaca seri pembacaan dari storage aktif dan disiapkan untuk riwayat database."
                   />
                   <span className="w-fit rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100">
                     data stabil
@@ -701,19 +733,15 @@ export default async function DashboardPage() {
               <SectionHeader
                 label="Alur data"
                 title="Siap disambung bertahap"
-                description="Dashboard sekarang membaca memory store dan endpoint API lokal sebelum masuk ke database permanen."
+                description="Dashboard membaca storage aktif dan endpoint API lokal, dengan memory sebagai fallback dan MySQL sebagai arah penyimpanan jangka panjang."
               />
 
               <div className="mt-6 space-y-3">
                 {[
-                  [Database, "Memory store", "menerima data dari simulator"],
+                  [Database, "Storage aktif", "memory fallback atau MySQL"],
                   [Activity, "API /ingest", "menerima payload simulator"],
                   [Gauge, "Runtime", "status dihitung dari volume"],
-                  [
-                    Droplets,
-                    "History",
-                    "riwayat sementara dari memory store",
-                  ],
+                  [Droplets, "History", "riwayat dari storage aktif"],
                 ].map(([Icon, title, body]) => (
                   <div
                     key={title as string}
@@ -746,7 +774,7 @@ export default async function DashboardPage() {
             <SectionHeader
               label="Log perangkat"
               title="Daftar monitoring tangki"
-              description="Tabel ini membaca data monitoring dari memory store lokal yang juga dipakai endpoint API."
+              description="Tabel ini membaca data monitoring dari storage aktif yang juga dipakai endpoint API."
             />
             <Link
               href={`/dashboard/tanks/${latestSite.tankId}`}

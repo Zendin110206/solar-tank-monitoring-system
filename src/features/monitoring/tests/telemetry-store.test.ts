@@ -2,19 +2,23 @@ import { afterEach, describe, expect, it } from "vitest";
 import { mockReadings } from "../data/mock-readings";
 import {
   getMonitoringReadings,
-  ingestTelemetry,
   resetMonitoringReadings,
 } from "../lib/telemetry-store";
+import { ingestTelemetry } from "../lib/ingest-telemetry";
+import {
+  listMonitoringReadings,
+  listMonitoringReadingsWithSource,
+} from "../lib/monitoring-storage";
 
 describe("telemetry store", () => {
   afterEach(() => {
     resetMonitoringReadings();
   });
 
-  it("stores a normalized CAT payload in memory", () => {
+  it("stores a normalized CAT payload in memory", async () => {
     resetMonitoringReadings();
 
-    const result = ingestTelemetry({
+    const result = await ingestTelemetry({
       deviceIdentifier: "demo-tph-01",
       deviceKey: "local-development-key",
       payload: {
@@ -42,6 +46,7 @@ describe("telemetry store", () => {
     expect(result.data.tankId).toBe("tank-tph-main");
     expect(result.data.volumeLiter).toBe(4200);
     expect(result.data.fillPercent).toBe(84);
+    expect(result.data.storage).toBe("memory");
 
     const readings = getMonitoringReadings();
     const storedReading = readings.find(
@@ -53,8 +58,8 @@ describe("telemetry store", () => {
     expect(storedReading?.tankId).toBe("tank-tph-main");
   });
 
-  it("rejects requests without device identity", () => {
-    const result = ingestTelemetry({
+  it("rejects requests without device identity", async () => {
+    const result = await ingestTelemetry({
       deviceKey: "local-development-key",
       payload: {},
     });
@@ -65,8 +70,8 @@ describe("telemetry store", () => {
     });
   });
 
-  it("rejects requests with invalid device key", () => {
-    const result = ingestTelemetry({
+  it("rejects requests with invalid device key", async () => {
+    const result = await ingestTelemetry({
       deviceIdentifier: "demo-tph-01",
       deviceKey: "wrong-key",
       payload: {
@@ -80,8 +85,51 @@ describe("telemetry store", () => {
     });
   });
 
-  it("rejects payloads with a different device identity", () => {
-    const result = ingestTelemetry({
+  it("accepts the registered demo key when global fallback is disabled", async () => {
+    const result = await ingestTelemetry({
+      deviceIdentifier: "demo-tph-01",
+      deviceKey: "demo-tph-key",
+      allowGlobalDeviceKeyFallback: false,
+      payload: {
+        device: "demo-tph-01",
+        distance: 30,
+        raw: {
+          H_cm: 120,
+          volume: 4100,
+          percent: 82,
+        },
+      },
+      receivedAt: new Date("2026-06-26T03:00:00.000Z"),
+    });
+
+    expect(result.ok).toBe(true);
+
+    if (!result.ok) {
+      throw new Error(result.error);
+    }
+
+    expect(result.data.deviceId).toBe("demo-tph-01");
+    expect(result.data.volumeLiter).toBe(4100);
+  });
+
+  it("rejects the global local key when global fallback is disabled", async () => {
+    const result = await ingestTelemetry({
+      deviceIdentifier: "demo-tph-01",
+      deviceKey: "local-development-key",
+      allowGlobalDeviceKeyFallback: false,
+      payload: {
+        device: "demo-tph-01",
+      },
+    });
+
+    expect(result).toMatchObject({
+      ok: false,
+      status: 401,
+    });
+  });
+
+  it("rejects payloads with a different device identity", async () => {
+    const result = await ingestTelemetry({
       deviceIdentifier: "demo-tph-01",
       deviceKey: "local-development-key",
       payload: {
@@ -92,6 +140,29 @@ describe("telemetry store", () => {
     expect(result).toMatchObject({
       ok: false,
       status: 400,
+    });
+  });
+
+  it("lists readings through the async storage facade in memory mode", async () => {
+    resetMonitoringReadings();
+
+    const readings = await listMonitoringReadings();
+
+    expect(readings).toHaveLength(mockReadings.length);
+    expect(readings[0]?.tankId).toBe(mockReadings[0]?.tankId);
+  });
+
+  it("reports the active storage source for dashboard diagnostics", async () => {
+    resetMonitoringReadings();
+
+    const result = await listMonitoringReadingsWithSource();
+
+    expect(result.readings).toHaveLength(mockReadings.length);
+    expect(result.source).toMatchObject({
+      configuredDriver: "memory",
+      activeDriver: "memory",
+      isFallback: false,
+      label: "Memory lokal",
     });
   });
 });
