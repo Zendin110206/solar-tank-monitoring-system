@@ -56,7 +56,7 @@ function createStorageSource({
       configuredDriver,
       activeDriver,
       isFallback: true,
-      label: "Memory fallback (MySQL kosong)",
+      label: "Memory fallback",
     };
   }
 
@@ -82,17 +82,6 @@ export async function listMonitoringReadingsWithSource(): Promise<ListMonitoring
   }
 
   const mysqlReadings = await listMonitoringReadingsFromMysql();
-
-  if (mysqlReadings.length === 0) {
-    return {
-      readings: getMonitoringReadings(),
-      source: createStorageSource({
-        configuredDriver,
-        activeDriver: "memory",
-        isFallback: true,
-      }),
-    };
-  }
 
   return {
     readings: mysqlReadings,

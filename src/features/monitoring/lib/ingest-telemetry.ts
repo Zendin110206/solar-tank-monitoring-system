@@ -1,5 +1,8 @@
-import { mockDevices } from "../data/mock-devices";
-import { mockTanks } from "../data/mock-tanks";
+import {
+  getMonitoringReferenceData,
+  type MonitoringReferenceData,
+} from "./monitoring-registry";
+
 import type {
   CatTelemetryPayload,
   Device,
@@ -63,16 +66,19 @@ function isRecord(value: unknown): value is CatTelemetryPayload {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function findDeviceByIdentifier(identifier: string): Device | null {
+function findDeviceByIdentifier(
+  identifier: string,
+  devices: Device[],
+): Device | null {
   return (
-    mockDevices.find(
+    devices.find(
       (device) => device.id === identifier || device.code === identifier,
     ) ?? null
   );
 }
 
-function findTankByDevice(device: Device): Tank | null {
-  return mockTanks.find((tank) => tank.id === device.tankId) ?? null;
+function findTankByDevice(device: Device, tanks: Tank[]): Tank | null {
+  return tanks.find((tank) => tank.id === device.tankId) ?? null;
 }
 
 function readPayloadDeviceIdentifier(
@@ -141,7 +147,23 @@ export async function ingestTelemetry({
     };
   }
 
-  const device = findDeviceByIdentifier(cleanDeviceIdentifier);
+  let referenceData: MonitoringReferenceData;
+
+  try {
+    referenceData = await getMonitoringReferenceData();
+  } catch {
+    return {
+      ok: false,
+      status: 500,
+      error:
+        "Registry site/tangki/device belum bisa dibaca dari storage aktif.",
+    };
+  }
+
+  const device = findDeviceByIdentifier(
+    cleanDeviceIdentifier,
+    referenceData.devices,
+  );
 
   if (!device) {
     return {
@@ -187,7 +209,7 @@ export async function ingestTelemetry({
     };
   }
 
-  const tank = findTankByDevice(device);
+  const tank = findTankByDevice(device, referenceData.tanks);
 
   if (!tank) {
     return {

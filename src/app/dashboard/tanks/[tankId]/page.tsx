@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { LiveRefreshControl } from "@/features/monitoring/components/live-refresh-control";
-import { mockTanks } from "@/features/monitoring/data/mock-tanks";
+import { getMonitoringReferenceData } from "@/features/monitoring/lib/monitoring-registry";
 import {
   buildTankDetail,
   type NearbyTankSite,
@@ -65,6 +65,7 @@ type ParameterItem = {
 };
 
 type NearbySite = {
+  tankId: string;
   code: string;
   name: string;
   status: TankStatus;
@@ -75,6 +76,7 @@ type NearbySite = {
 
 type TankDetail = {
   id: string;
+  hasReading: boolean;
   siteCode: string;
   siteName: string;
   areaLabel: string;
@@ -162,12 +164,6 @@ function formatLiter(value: number) {
   return new Intl.NumberFormat("id-ID").format(value);
 }
 
-export function generateStaticParams() {
-  return mockTanks.map((tank) => ({
-    tankId: tank.id,
-  }));
-}
-
 function formatMeasurement(value: number | null, unit: string) {
   return value === null ? "-" : `${value} ${unit}`;
 }
@@ -183,6 +179,7 @@ function toReadingPoint(reading: TankReadingPoint): ReadingPoint {
 
 function toNearbySite(site: NearbyTankSite): NearbySite {
   return {
+    tankId: site.tankId,
     code: site.code,
     name: site.name,
     status: site.status,
@@ -195,6 +192,7 @@ function toNearbySite(site: NearbyTankSite): NearbySite {
 function toTankDetail(view: TankDetailView): TankDetail {
   return {
     id: view.id,
+    hasReading: view.hasReading,
     siteCode: view.siteCode,
     siteName: view.siteName,
     areaLabel: view.areaLabel,
@@ -306,10 +304,10 @@ function MetricCard({
 
 function TankVisual({ tank }: { tank: TankDetail }) {
   const fillStyle = {
-    width: `${tank.fillPercent}%`,
+    width: `${tank.hasReading ? tank.fillPercent : 0}%`,
   } satisfies CSSProperties;
   const sensorLineStyle = {
-    left: `${Math.min(Math.max(tank.fillPercent, 8), 92)}%`,
+    left: `${Math.min(Math.max(tank.hasReading ? tank.fillPercent : 0, 8), 92)}%`,
   } satisfies CSSProperties;
 
   return (
@@ -331,7 +329,7 @@ function TankVisual({ tank }: { tank: TankDetail }) {
           </div>
 
           <div className="absolute right-6 top-5 rounded-full bg-cyan-50 px-3 py-2 text-xs font-semibold text-cyan-700 ring-1 ring-cyan-100">
-            Isi {tank.fillPercent}%
+            {tank.hasReading ? `Isi ${tank.fillPercent}%` : "belum ada data"}
           </div>
 
           <div className="absolute inset-x-6 bottom-16">
@@ -375,14 +373,18 @@ function TankVisual({ tank }: { tank: TankDetail }) {
           {[
             {
               label: "Jarak sensor",
-              value: `${tank.sensorDistanceCm} cm`,
-              note: "distance dari payload",
+              value: tank.hasReading ? `${tank.sensorDistanceCm} cm` : "-",
+              note: tank.hasReading
+                ? "distance dari payload"
+                : "menunggu payload perangkat",
               icon: Ruler,
             },
             {
               label: "Tinggi solar",
-              value: `${tank.fuelHeightCm} cm`,
-              note: "raw.H_cm setelah normalisasi",
+              value: tank.hasReading ? `${tank.fuelHeightCm} cm` : "-",
+              note: tank.hasReading
+                ? "raw.H_cm setelah normalisasi"
+                : "menunggu pembacaan sensor",
               icon: Droplets,
             },
             {
@@ -431,6 +433,22 @@ function TankVisual({ tank }: { tank: TankDetail }) {
 function TrendChart({ readings }: { readings: ReadingPoint[] }) {
   const maxPercent = 100;
 
+  if (readings.length === 0) {
+    return (
+      <div className="mt-6 grid min-h-64 place-items-center rounded-lg border border-dashed border-zinc-200 bg-zinc-50 p-5 text-center">
+        <div>
+          <p className="text-sm font-semibold text-zinc-950">
+            Belum ada riwayat pembacaan
+          </p>
+          <p className="mt-2 max-w-md text-sm leading-6 text-zinc-500">
+            Tangki sudah terdaftar, tetapi perangkat belum mengirim data yang
+            bisa digambar sebagai tren.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-6 rounded-lg border border-zinc-200 bg-zinc-50 p-5">
       <div className="flex h-64 items-end gap-3">
@@ -474,13 +492,13 @@ function NearbyMarker({ site }: { site: NearbySite }) {
 
   return (
     <div className="group absolute z-20" style={markerStyle}>
-      <button
-        type="button"
+      <Link
+        href={`/dashboard/tanks/${site.tankId}`}
         className={`grid size-8 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white shadow-lg shadow-zinc-400/20 ring-4 transition duration-300 hover:scale-110 focus:outline-none focus:ring-4 ${meta.ring}`}
-        aria-label={`${site.name}, ${meta.label}`}
+        aria-label={`Buka detail ${site.name}, ${meta.label}`}
       >
         <span className={`size-3.5 rounded-full ${meta.dot}`} />
-      </button>
+      </Link>
       <div className="pointer-events-none absolute left-1/2 top-7 hidden w-52 -translate-x-1/2 rounded-lg border border-zinc-200 bg-white p-3 text-left shadow-2xl shadow-zinc-300/50 group-hover:block group-focus-within:block">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -581,7 +599,7 @@ function LocationPanel({ tank }: { tank: TankDetail }) {
         ))}
 
         <div
-          className="absolute z-30 -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-600 p-1 ring-8 ring-red-100"
+          className="pointer-events-none absolute z-30 -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-600 p-1 ring-8 ring-red-100"
           style={{ left: tank.markerLeft, top: tank.markerTop }}
           aria-hidden="true"
         >
@@ -638,44 +656,55 @@ function ReadingTable({ tank }: { tank: TankDetail }) {
           </tr>
         </thead>
         <tbody>
-          {tank.readings.map((reading, index) => (
-            <tr
-              key={`${reading.time}-${reading.volumeLiter}-${index}`}
-              className="bg-zinc-50"
-            >
-              <td className="rounded-l-lg px-4 py-4 font-semibold text-zinc-950">
-                {reading.time}
-              </td>
-              <td className="px-4 py-4">
-                <div className="flex items-center gap-3">
-                  <div className="h-2 w-24 overflow-hidden rounded-full bg-zinc-200">
-                    <span
-                      className={`block h-full rounded-full ${
-                        reading.percent < 25
-                          ? "bg-red-500"
-                          : reading.percent < 45
-                            ? "bg-amber-500"
-                            : "bg-cyan-500"
-                      }`}
-                      style={{ width: `${reading.percent}%` }}
-                    />
-                  </div>
-                  <span className="font-semibold">{reading.percent}%</span>
-                </div>
-              </td>
-              <td className="px-4 py-4 font-semibold">
-                {formatLiter(reading.volumeLiter)} L
-              </td>
-              <td className="px-4 py-4 text-zinc-600">
-                {reading.distanceCm} cm
-              </td>
-              <td className="rounded-r-lg px-4 py-4">
-                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100">
-                  diterima
-                </span>
+          {tank.readings.length === 0 ? (
+            <tr className="bg-zinc-50">
+              <td
+                colSpan={5}
+                className="rounded-lg px-4 py-8 text-center text-sm text-zinc-500"
+              >
+                Belum ada pembacaan tersimpan untuk tangki ini.
               </td>
             </tr>
-          ))}
+          ) : (
+            tank.readings.map((reading, index) => (
+              <tr
+                key={`${reading.time}-${reading.volumeLiter}-${index}`}
+                className="bg-zinc-50"
+              >
+                <td className="rounded-l-lg px-4 py-4 font-semibold text-zinc-950">
+                  {reading.time}
+                </td>
+                <td className="px-4 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-2 w-24 overflow-hidden rounded-full bg-zinc-200">
+                      <span
+                        className={`block h-full rounded-full ${
+                          reading.percent < 25
+                            ? "bg-red-500"
+                            : reading.percent < 45
+                              ? "bg-amber-500"
+                              : "bg-cyan-500"
+                        }`}
+                        style={{ width: `${reading.percent}%` }}
+                      />
+                    </div>
+                    <span className="font-semibold">{reading.percent}%</span>
+                  </div>
+                </td>
+                <td className="px-4 py-4 font-semibold">
+                  {formatLiter(reading.volumeLiter)} L
+                </td>
+                <td className="px-4 py-4 text-zinc-600">
+                  {reading.distanceCm} cm
+                </td>
+                <td className="rounded-r-lg px-4 py-4">
+                  <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100">
+                    diterima
+                  </span>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>
@@ -691,9 +720,17 @@ export default async function TankDetailPage({
 
   await connection();
 
+  const now = new Date();
+  const [readings, referenceData] = await Promise.all([
+    listMonitoringReadings(),
+    getMonitoringReferenceData(),
+  ]);
   const tankView = buildTankDetail(tankId, {
-    now: new Date(),
-    readings: await listMonitoringReadings(),
+    now,
+    sites: referenceData.sites,
+    tanks: referenceData.tanks,
+    devices: referenceData.devices,
+    readings,
   });
 
   if (!tankView) {
@@ -707,15 +744,19 @@ export default async function TankDetailPage({
   const metrics = [
     {
       label: "Volume saat ini",
-      value: `${formatLiter(tank.volumeLiter)} L`,
-      note: `${tank.fillPercent}% dari kapasitas konfigurasi ${formatLiter(tank.capacityLiter)} L`,
+      value: tank.hasReading ? `${formatLiter(tank.volumeLiter)} L` : "-",
+      note: tank.hasReading
+        ? `${tank.fillPercent}% dari kapasitas konfigurasi ${formatLiter(tank.capacityLiter)} L`
+        : `menunggu pembacaan pertama dari perangkat, kapasitas konfigurasi ${formatLiter(tank.capacityLiter)} L`,
       icon: Fuel,
       tone: "bg-cyan-50 text-cyan-700 ring-cyan-100",
     },
     {
       label: "Estimasi runtime",
-      value: `${tank.runtimeHour} jam`,
-      note: `berdasarkan konsumsi ${tank.consumptionLiterPerHour} L/jam`,
+      value: tank.hasReading ? `${tank.runtimeHour} jam` : "-",
+      note: tank.hasReading
+        ? `berdasarkan konsumsi ${tank.consumptionLiterPerHour} L/jam`
+        : `akan dihitung setelah volume terbaca, konsumsi konfigurasi ${tank.consumptionLiterPerHour} L/jam`,
       icon: Clock,
       tone: "bg-emerald-50 text-emerald-700 ring-emerald-100",
     },
@@ -763,23 +804,33 @@ export default async function TankDetailPage({
   const dataFlow: TimelineItem[] = [
     {
       label: "Sensor membaca jarak",
-      value: `${tank.sensorDistanceCm} cm`,
-      detail: "jarak dari sensor ke permukaan solar",
+      value: tank.hasReading ? `${tank.sensorDistanceCm} cm` : "-",
+      detail: tank.hasReading
+        ? "jarak dari sensor ke permukaan solar"
+        : "belum ada jarak sensor yang diterima",
     },
     {
       label: "Tinggi solar dihitung",
-      value: `${tank.fuelHeightCm} cm`,
-      detail: "nilai ter-normalisasi dari raw.H_cm",
+      value: tank.hasReading ? `${tank.fuelHeightCm} cm` : "-",
+      detail: tank.hasReading
+        ? "nilai ter-normalisasi dari raw.H_cm"
+        : "tinggi solar belum dihitung sebelum data masuk",
     },
     {
       label: "Volume dan persen",
-      value: `${formatLiter(tank.volumeLiter)} L / ${tank.fillPercent}%`,
-      detail: "angka siap dipakai UI dan status",
+      value: tank.hasReading
+        ? `${formatLiter(tank.volumeLiter)} L / ${tank.fillPercent}%`
+        : "-",
+      detail: tank.hasReading
+        ? "angka siap dipakai UI dan status"
+        : "dashboard tetap menampilkan STO sambil menunggu data pertama",
     },
     {
       label: "Runtime operasional",
-      value: `${tank.runtimeHour} jam`,
-      detail: "perkiraan durasi genset dari konsumsi per jam",
+      value: tank.hasReading ? `${tank.runtimeHour} jam` : "-",
+      detail: tank.hasReading
+        ? "perkiraan durasi genset dari konsumsi per jam"
+        : "runtime baru valid setelah volume solar tersedia",
     },
   ];
 
@@ -993,13 +1044,29 @@ export default async function TankDetailPage({
 
               <div className="mt-6 space-y-3">
                 {[
-                  ["distance", `${tank.rawPayload.distance} cm`],
-                  ["raw.H_cm", `${tank.rawPayload.H_cm} cm`],
-                  ["raw.volume", `${formatLiter(tank.rawPayload.volume)} L`],
-                  ["raw.percent", `${tank.rawPayload.percent}%`],
+                  [
+                    "distance",
+                    tank.hasReading ? `${tank.rawPayload.distance} cm` : "-",
+                  ],
+                  [
+                    "raw.H_cm",
+                    tank.hasReading ? `${tank.rawPayload.H_cm} cm` : "-",
+                  ],
+                  [
+                    "raw.volume",
+                    tank.hasReading
+                      ? `${formatLiter(tank.rawPayload.volume)} L`
+                      : "-",
+                  ],
+                  [
+                    "raw.percent",
+                    tank.hasReading ? `${tank.rawPayload.percent}%` : "-",
+                  ],
                   [
                     "raw.wifi_rssi",
-                    formatMeasurement(tank.rawPayload.wifi_rssi, "dBm"),
+                    tank.hasReading
+                      ? formatMeasurement(tank.rawPayload.wifi_rssi, "dBm")
+                      : "-",
                   ],
                 ].map(([key, value]) => (
                   <div

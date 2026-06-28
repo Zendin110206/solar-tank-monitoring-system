@@ -1,12 +1,8 @@
-import mysql, { type Pool, type RowDataPacket } from "mysql2/promise";
-
+import { type RowDataPacket } from "mysql2/promise";
+import { getMysqlPool } from "./mysql-connection";
 import type { Reading } from "../types/monitoring";
 
 const DEFAULT_MYSQL_READINGS_LIMIT = 1000;
-
-type MysqlPoolGlobal = typeof globalThis & {
-  __solarTankMysqlPool?: Pool;
-};
 
 type ReadingRow = RowDataPacket & {
   id: string;
@@ -23,30 +19,6 @@ type ReadingRow = RowDataPacket & {
   rssi_dbm: number | string | null;
   raw_payload: unknown;
 };
-
-const mysqlGlobal = globalThis as MysqlPoolGlobal;
-
-function getMysqlDatabaseUrl(): string {
-  const value = process.env.MYSQL_DATABASE_URL?.trim();
-
-  if (!value) {
-    throw new Error(
-      "MYSQL_DATABASE_URL wajib diisi ketika SOLAR_TANK_STORAGE_DRIVER=mysql.",
-    );
-  }
-
-  return value;
-}
-
-function getMysqlPool(): Pool {
-  mysqlGlobal.__solarTankMysqlPool ??= mysql.createPool({
-    uri: getMysqlDatabaseUrl(),
-    connectionLimit: 10,
-    timezone: "Z",
-  });
-
-  return mysqlGlobal.__solarTankMysqlPool;
-}
 
 function toIsoString(value: Date | string): string {
   return new Date(value).toISOString();

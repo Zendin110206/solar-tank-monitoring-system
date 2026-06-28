@@ -55,6 +55,7 @@ export type NearbyTankSite = {
 
 export type TankDetailView = {
   id: string;
+  hasReading: boolean;
   siteCode: string;
   siteName: string;
   areaLabel: string;
@@ -120,7 +121,7 @@ type TankBundle = {
   site: Site;
   tank: Tank;
   device: Device;
-  latestReading: Reading;
+  latestReading: Reading | null;
 };
 
 const DEFAULT_NOW = new Date("2026-06-25T07:45:00.000Z");
@@ -169,7 +170,7 @@ function findTankBundle(
   const device = devices.find((item) => item.tankId === tank.id);
   const latestReading = getLatestReading(readings, tank.id);
 
-  if (!site || !device || !latestReading) {
+  if (!site || !device) {
     return null;
   }
 
@@ -264,15 +265,21 @@ function toTankDetailStatus(
 
 function buildStatusNote({
   status,
+  hasReading,
   fillPercent,
   runtimeHour,
   deviceStatus,
 }: {
   status: TankDetailStatus;
+  hasReading: boolean;
   fillPercent: number;
   runtimeHour: number;
   deviceStatus: DeviceStatus;
 }): string {
+  if (!hasReading) {
+    return "Belum ada pembacaan dari perangkat. Detail tetap ditampilkan agar lokasi bisa dicek dan disiapkan sebelum data pertama masuk.";
+  }
+
   if (status === "offline") {
     return "Perangkat belum mengirim data dalam rentang yang diharapkan.";
   }
@@ -326,9 +333,13 @@ function getCoordinateLabel(site: Site): string {
 
 function buildReadingSeries(
   tank: Tank,
-  latestReading: Reading,
+  latestReading: Reading | null,
   readings: Reading[],
 ): TankReadingPoint[] {
+  if (!latestReading) {
+    return [];
+  }
+
   const tankReadings = readings
     .filter((reading) => reading.tankId === tank.id)
     .sort(
@@ -406,13 +417,21 @@ function buildNearbySites(
       }
 
       const { site, device, latestReading } = bundle;
-      const runtimeStatus = getRuntimeStatus(latestReading.runtimeHour);
-      const levelStatus = getLevelStatus(latestReading.fillPercent);
-      const deviceStatus = getDeviceStatus({
-        lastReceivedAt: latestReading.receivedAt,
-        now: input.now,
-        expectedReportIntervalSec: device.expectedReportIntervalSec,
-      });
+      const fillPercent = latestReading?.fillPercent ?? 0;
+      const runtimeHour = latestReading?.runtimeHour ?? 0;
+      const runtimeStatus = latestReading
+        ? getRuntimeStatus(latestReading.runtimeHour)
+        : getRuntimeStatus(null);
+      const levelStatus = latestReading
+        ? getLevelStatus(latestReading.fillPercent)
+        : "low";
+      const deviceStatus = latestReading
+        ? getDeviceStatus({
+            lastReceivedAt: latestReading.receivedAt,
+            now: input.now,
+            expectedReportIntervalSec: device.expectedReportIntervalSec,
+          })
+        : "offline";
       const operationalStatus = getOperationalStatus({
         runtimeStatus,
         levelStatus,
@@ -430,9 +449,11 @@ function buildNearbySites(
           status,
           left: position.left,
           top: position.top,
-          runtimeHour: latestReading.runtimeHour,
-          fillPercent: latestReading.fillPercent,
-          updateLabel: formatAgeLabel(latestReading.receivedAt, input.now),
+          runtimeHour,
+          fillPercent,
+          updateLabel: latestReading
+            ? formatAgeLabel(latestReading.receivedAt, input.now)
+            : "belum ada data",
         },
       ];
     })
@@ -462,13 +483,24 @@ export function buildTankDetail(
   }
 
   const { site, tank, device, latestReading } = bundle;
-  const runtimeStatus = getRuntimeStatus(latestReading.runtimeHour);
-  const levelStatus = getLevelStatus(latestReading.fillPercent);
-  const deviceStatus = getDeviceStatus({
-    lastReceivedAt: latestReading.receivedAt,
-    now,
-    expectedReportIntervalSec: device.expectedReportIntervalSec,
-  });
+  const hasReading = Boolean(latestReading);
+  const fillPercent = latestReading?.fillPercent ?? 0;
+  const volumeLiter = latestReading?.volumeLiter ?? 0;
+  const runtimeHour = latestReading?.runtimeHour ?? 0;
+  const sensorDistanceCm =
+    latestReading?.sensorDistanceCm ?? tank.sensorMountHeightCm;
+  const fuelHeightCm = latestReading?.fuelHeightCm ?? 0;
+  const runtimeStatus = latestReading
+    ? getRuntimeStatus(latestReading.runtimeHour)
+    : getRuntimeStatus(null);
+  const levelStatus = latestReading ? getLevelStatus(fillPercent) : "low";
+  const deviceStatus = latestReading
+    ? getDeviceStatus({
+        lastReceivedAt: latestReading.receivedAt,
+        now,
+        expectedReportIntervalSec: device.expectedReportIntervalSec,
+      })
+    : "offline";
   const operationalStatus = getOperationalStatus({
     runtimeStatus,
     levelStatus,
@@ -479,6 +511,7 @@ export function buildTankDetail(
 
   return {
     id: tank.id,
+    hasReading,
     siteCode: site.code,
     siteName: site.name,
     areaLabel: site.areaLabel,
@@ -486,9 +519,10 @@ export function buildTankDetail(
     status,
     statusLabel: statusLabels[status],
     statusNote: buildStatusNote({
+      hasReading,
       status,
-      fillPercent: latestReading.fillPercent,
-      runtimeHour: latestReading.runtimeHour,
+      fillPercent,
+      runtimeHour,
       deviceStatus,
     }),
     statuses: {
@@ -497,13 +531,13 @@ export function buildTankDetail(
       deviceStatus,
       operationalStatus,
     },
-    fillPercent: latestReading.fillPercent,
-    volumeLiter: latestReading.volumeLiter,
+    fillPercent,
+    volumeLiter,
     capacityLiter: tank.capacityLiter,
-    runtimeHour: latestReading.runtimeHour,
+    runtimeHour,
     consumptionLiterPerHour: tank.consumptionLiterPerHour,
-    sensorDistanceCm: latestReading.sensorDistanceCm,
-    fuelHeightCm: latestReading.fuelHeightCm,
+    sensorDistanceCm,
+    fuelHeightCm,
     diameterCm: tank.diameterCm ?? null,
     lengthCm: tank.lengthCm ?? null,
     sensorMountHeightCm: tank.sensorMountHeightCm,
@@ -512,13 +546,19 @@ export function buildTankDetail(
     deviceLabel: device.label,
     expectedIntervalSec: device.expectedReportIntervalSec,
     expectedIntervalMin: roundTo(device.expectedReportIntervalSec / 60, 2),
-    lastUpdateLabel: formatAgeLabel(latestReading.receivedAt, now),
-    measuredAt: latestReading.measuredAt,
-    measuredAtLabel: formatDateTimeLabel(latestReading.measuredAt),
-    receivedAt: latestReading.receivedAt,
-    receivedAtLabel: formatDateTimeLabel(latestReading.receivedAt),
-    rssiDbm: latestReading.rssiDbm ?? null,
-    batteryVolt: latestReading.batteryVolt ?? null,
+    lastUpdateLabel: latestReading
+      ? formatAgeLabel(latestReading.receivedAt, now)
+      : "belum ada data",
+    measuredAt: latestReading?.measuredAt ?? "",
+    measuredAtLabel: latestReading
+      ? formatDateTimeLabel(latestReading.measuredAt)
+      : "belum ada data",
+    receivedAt: latestReading?.receivedAt ?? "",
+    receivedAtLabel: latestReading
+      ? formatDateTimeLabel(latestReading.receivedAt)
+      : "belum ada data",
+    rssiDbm: latestReading?.rssiDbm ?? null,
+    batteryVolt: latestReading?.batteryVolt ?? null,
     coordinate: {
       latitude: site.latitude ?? null,
       longitude: site.longitude ?? null,
@@ -527,11 +567,11 @@ export function buildTankDetail(
       markerTop: position.top,
     },
     rawPayloadPreview: {
-      distance: latestReading.sensorDistanceCm,
-      H_cm: latestReading.fuelHeightCm,
-      volume: latestReading.volumeLiter,
-      percent: latestReading.fillPercent,
-      wifi_rssi: latestReading.rssiDbm ?? null,
+      distance: sensorDistanceCm,
+      H_cm: fuelHeightCm,
+      volume: volumeLiter,
+      percent: fillPercent,
+      wifi_rssi: latestReading?.rssiDbm ?? null,
     },
     readings: buildReadingSeries(tank, latestReading, readings),
     nearbySites: buildNearbySites(tank.id, {

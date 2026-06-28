@@ -38,4 +38,22 @@ describe("tank detail view model", () => {
     expect(detail?.status).toBe("offline");
     expect(detail?.statuses.deviceStatus).toBe("offline");
   });
+
+  it("keeps registered tank detail reachable before the first reading arrives", () => {
+    const detail = buildTankDetail("tank-nja-main", {
+      now,
+      readings: [],
+    });
+
+    expect(detail).not.toBeNull();
+    expect(detail).toMatchObject({
+      siteCode: "NJA",
+      status: "offline",
+      fillPercent: 0,
+      volumeLiter: 0,
+      lastUpdateLabel: "belum ada data",
+      receivedAtLabel: "belum ada data",
+      readings: [],
+    });
+  });
 });

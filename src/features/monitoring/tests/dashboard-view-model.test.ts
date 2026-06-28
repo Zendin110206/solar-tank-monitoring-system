@@ -80,4 +80,34 @@ describe("dashboard overview view model", () => {
 
     expect(overview.latestRow.code).toBe("JTO");
   });
+
+  it("keeps registered tanks visible even before their first reading arrives", () => {
+    const overview = buildDashboardOverview({
+      now: new Date("2026-06-25T08:10:00.000Z"),
+      readings: [
+        {
+          id: "reading-new-tph",
+          deviceId: "device-tph-main",
+          tankId: "tank-tph-main",
+          measuredAt: "2026-06-25T08:00:00.000Z",
+          receivedAt: "2026-06-25T08:00:05.000Z",
+          sensorDistanceCm: 40,
+          fuelHeightCm: 110,
+          volumeLiter: 3600,
+          fillPercent: 72,
+          runtimeHour: 144,
+        },
+      ],
+    });
+
+    const noDataSite = overview.rows.find((row) => row.code === "NJA");
+
+    expect(overview.rows).toHaveLength(4);
+    expect(noDataSite).toMatchObject({
+      status: "offline",
+      fillPercent: 0,
+      volumeLiter: 0,
+      updateLabel: "belum ada data",
+    });
+  });
 });

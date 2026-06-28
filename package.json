@@ -12,6 +12,9 @@
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest --passWithNoTests",
     "simulate:device": "node scripts/simulate-device.mjs",
+    "db:migrate:mysql": "node scripts/apply-mysql-schema.mjs database/migrations/001_create_monitoring_core_mysql.sql",
+    "db:seed:mysql": "node scripts/apply-mysql-schema.mjs database/seeds/001_seed_demo_monitoring_reference_mysql.sql",
+    "db:setup:mysql": "pnpm db:migrate:mysql && pnpm db:seed:mysql",
     "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
   },
   "dependencies": {
@@ -22,6 +25,7 @@
     "react-dom": "19.2.4"
   },
   "devDependencies": {
+    "@next/env": "^16.2.9",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

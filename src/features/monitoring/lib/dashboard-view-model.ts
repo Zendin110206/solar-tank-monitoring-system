@@ -140,6 +140,11 @@ function formatAgeLabel(receivedAt: string, now: Date): string {
     : `${ageHour} jam lalu`;
 }
 
+function getReceivedTime(receivedAt: string): number {
+  const receivedTime = new Date(receivedAt).getTime();
+  return Number.isFinite(receivedTime) ? receivedTime : -Infinity;
+}
+
 function formatIntervalLabel(seconds: number): string {
   if (seconds < 60) {
     return `${Math.round(seconds)} dtk`;
@@ -169,10 +174,15 @@ function toDashboardStatus(
 
 function buildStatusNote(row: {
   status: DashboardSiteStatus;
+  hasReading: boolean;
   fillPercent: number;
   runtimeHour: number;
   deviceStatus: DeviceStatus;
 }): string {
+  if (!row.hasReading) {
+    return "Belum ada pembacaan dari perangkat. Lokasi perlu dicek setelah perangkat aktif.";
+  }
+
   if (row.status === "offline") {
     return "Perangkat belum mengirim data dalam rentang yang diharapkan.";
   }
@@ -233,17 +243,24 @@ export function buildDashboardOverview({
     const device = devices.find((item) => item.tankId === tank.id);
     const reading = getLatestReading(readings, tank.id);
 
-    if (!site || !device || !reading) {
+    if (!site || !device) {
       return [];
     }
 
-    const runtimeStatus = getRuntimeStatus(reading.runtimeHour);
-    const levelStatus = getLevelStatus(reading.fillPercent);
-    const deviceStatus = getDeviceStatus({
-      lastReceivedAt: reading.receivedAt,
-      now,
-      expectedReportIntervalSec: device.expectedReportIntervalSec,
-    });
+    const fillPercent = reading?.fillPercent ?? 0;
+    const volumeLiter = reading?.volumeLiter ?? 0;
+    const runtimeHour = reading?.runtimeHour ?? 0;
+    const runtimeStatus = reading
+      ? getRuntimeStatus(reading.runtimeHour)
+      : getRuntimeStatus(null);
+    const levelStatus = reading ? getLevelStatus(reading.fillPercent) : "low";
+    const deviceStatus = reading
+      ? getDeviceStatus({
+          lastReceivedAt: reading.receivedAt,
+          now,
+          expectedReportIntervalSec: device.expectedReportIntervalSec,
+        })
+      : "offline";
     const operationalStatus = getOperationalStatus({
       runtimeStatus,
       levelStatus,
@@ -263,14 +280,16 @@ export function buildDashboardOverview({
       deviceStatus,
       runtimeStatus,
       operationalStatus,
-      fillPercent: reading.fillPercent,
-      volumeLiter: reading.volumeLiter,
-      runtimeHour: reading.runtimeHour,
-      lastReceivedAt: reading.receivedAt,
-      updateLabel: formatAgeLabel(reading.receivedAt, now),
+      fillPercent,
+      volumeLiter,
+      runtimeHour,
+      lastReceivedAt: reading?.receivedAt ?? "",
+      updateLabel: reading
+        ? formatAgeLabel(reading.receivedAt, now)
+        : "belum ada data",
       deviceId: device.code,
       signal:
-        typeof reading.rssiDbm === "number" ? `${reading.rssiDbm} dBm` : "-",
+        typeof reading?.rssiDbm === "number" ? `${reading.rssiDbm} dBm` : "-",
       left: position.left,
       top: position.top,
       note: "",
@@ -280,7 +299,10 @@ export function buildDashboardOverview({
     return [
       {
         ...row,
-        note: buildStatusNote(row),
+        note: buildStatusNote({
+          ...row,
+          hasReading: Boolean(reading),
+        }),
       },
     ];
   });
@@ -298,9 +320,7 @@ export function buildDashboardOverview({
     );
 
   const latestRow = [...rows].sort(
-    (a, b) =>
-      new Date(b.lastReceivedAt).getTime() -
-      new Date(a.lastReceivedAt).getTime(),
+    (a, b) => getReceivedTime(b.lastReceivedAt) - getReceivedTime(a.lastReceivedAt),
   )[0];
   const onlineDevices = rows.filter(
     (row) => row.deviceStatus === "online",
@@ -329,7 +349,10 @@ export function buildDashboardOverview({
     delayedDevices,
     offlineDevices,
     averageIntervalLabel: formatIntervalLabel(averageIntervalSec),
-    syncLabel: `Sinkron ${latestRow.updateLabel}`,
+    syncLabel:
+      latestRow.lastReceivedAt === ""
+        ? "Belum ada data"
+        : `Sinkron ${latestRow.updateLabel}`,
   };
 
   return {

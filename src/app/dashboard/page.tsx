@@ -1,3 +1,4 @@
+import { getMonitoringReferenceDataWithSource } from "@/features/monitoring/lib/monitoring-registry";
 import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -193,13 +194,13 @@ function LocationMarker({ site }: { site: MonitoringSite }) {
 
   return (
     <div className="group absolute z-20" style={markerStyle}>
-      <button
-        type="button"
+      <Link
+        href={`/dashboard/tanks/${site.tankId}`}
         className={`relative grid size-8 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white shadow-lg shadow-zinc-400/20 ring-4 transition duration-300 hover:scale-110 focus:outline-none focus:ring-4 ${meta.ring}`}
-        aria-label={`${site.name}, status ${meta.label}`}
+        aria-label={`Buka detail ${site.name}, status ${meta.label}`}
       >
         <span className={`size-3.5 rounded-full ${meta.dot}`} />
-      </button>
+      </Link>
 
       <div className="pointer-events-none absolute left-1/2 top-7 hidden w-64 -translate-x-1/2 rounded-lg border border-zinc-200 bg-white p-4 text-left shadow-2xl shadow-zinc-300/50 group-hover:block group-focus-within:block">
         <div className="flex items-start justify-between gap-3">
@@ -240,18 +241,24 @@ export default async function DashboardPage() {
 
   const now = new Date();
   const refreshIntervalMs = getMonitoringRefreshIntervalMs();
-  const monitoringReadingsResult = await listMonitoringReadingsWithSource();
+  const [monitoringReadingsResult, monitoringReferenceResult] =
+    await Promise.all([
+      listMonitoringReadingsWithSource(),
+      getMonitoringReferenceDataWithSource(),
+    ]);
   const dashboardOverview = buildDashboardOverview({
     now,
+    sites: monitoringReferenceResult.reference.sites,
+    tanks: monitoringReferenceResult.reference.tanks,
+    devices: monitoringReferenceResult.reference.devices,
     readings: monitoringReadingsResult.readings,
   });
   const storageSource = monitoringReadingsResult.source;
+  const registrySource = monitoringReferenceResult.source;
   const storageBadgeLabel =
     storageSource.activeDriver === "mysql"
       ? "database MySQL"
-      : storageSource.isFallback
-        ? "fallback memory"
-        : "memory lokal";
+      : "memory lokal";
 
   const monitoredSites = dashboardOverview.rows;
   const latestSite = dashboardOverview.latestRow;
@@ -360,7 +367,7 @@ export default async function DashboardPage() {
                   Sumber data
                 </p>
                 <p className="mt-1 text-lg font-semibold">
-                  {storageSource.label}
+                  {storageSource.label} / {registrySource.label}
                 </p>
               </div>
             </div>
@@ -733,12 +740,12 @@ export default async function DashboardPage() {
               <SectionHeader
                 label="Alur data"
                 title="Siap disambung bertahap"
-                description="Dashboard membaca storage aktif dan endpoint API lokal, dengan memory sebagai fallback dan MySQL sebagai arah penyimpanan jangka panjang."
+                description="Dashboard membaca storage aktif dan endpoint API lokal, dengan memory untuk development dan MySQL sebagai arah penyimpanan jangka panjang."
               />
 
               <div className="mt-6 space-y-3">
                 {[
-                  [Database, "Storage aktif", "memory fallback atau MySQL"],
+                  [Database, "Storage aktif", "memory lokal atau MySQL"],
                   [Activity, "API /ingest", "menerima payload simulator"],
                   [Gauge, "Runtime", "status dihitung dari volume"],
                   [Droplets, "History", "riwayat dari storage aktif"],
@@ -793,12 +800,13 @@ export default async function DashboardPage() {
                   <th className="px-4 py-2 font-semibold">Volume</th>
                   <th className="px-4 py-2 font-semibold">Isi</th>
                   <th className="px-4 py-2 font-semibold">Runtime</th>
-                  <th className="px-4 py-2 font-semibold">Device</th>
-                  <th className="px-4 py-2 font-semibold">Update</th>
-                  <th className="px-4 py-2 font-semibold">Status</th>
-                </tr>
-              </thead>
-              <tbody>
+                <th className="px-4 py-2 font-semibold">Device</th>
+                <th className="px-4 py-2 font-semibold">Update</th>
+                <th className="px-4 py-2 font-semibold">Status</th>
+                <th className="px-4 py-2 font-semibold">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
                 {monitoredSites.map((site) => (
                   <tr key={site.code} className="bg-zinc-50">
                     <td className="rounded-l-lg px-4 py-4">
@@ -808,7 +816,12 @@ export default async function DashboardPage() {
                         />
                         <div>
                           <p className="font-semibold text-zinc-950">
-                            {site.name}
+                            <Link
+                              href={`/dashboard/tanks/${site.tankId}`}
+                              className="transition hover:text-red-600"
+                            >
+                              {site.name}
+                            </Link>
                           </p>
                           <p className="mt-1 text-xs text-zinc-500">
                             {site.areaLabel}
@@ -844,8 +857,16 @@ export default async function DashboardPage() {
                     <td className="px-4 py-4 text-zinc-600">
                       {site.updateLabel}
                     </td>
-                    <td className="rounded-r-lg px-4 py-4">
+                    <td className="px-4 py-4">
                       <StatusBadge status={site.status} />
+                    </td>
+                    <td className="rounded-r-lg px-4 py-4">
+                      <Link
+                        href={`/dashboard/tanks/${site.tankId}`}
+                        className="inline-flex items-center rounded-lg bg-white px-3 py-2 text-xs font-semibold text-zinc-700 ring-1 ring-zinc-200 transition hover:bg-blue-600 hover:text-white hover:ring-blue-600"
+                      >
+                        Detail
+                      </Link>
                     </td>
                   </tr>
                 ))}
