@@ -101,7 +101,7 @@ Yang belum selesai:
 - rotasi key device;
 - backup database;
 - test integrasi database nyata;
-- aturan mematikan seluruh fallback dummy pada mode pilot/production.
+- audit berkala agar data dummy tetap hanya aktif di mode development lokal.
 
 ## Fase 8 - Auth dan Role
 

@@ -102,7 +102,7 @@ Pekerjaan:
 - repository MySQL untuk reading;
 - storage facade untuk memilih memory atau MySQL;
 - query reading terbaru memakai `ORDER BY received_at DESC LIMIT ?`;
-- fallback memory tetap tersedia untuk development.
+- memory store tetap tersedia untuk development lokal, tetapi mode MySQL tidak menampilkan data dummy ketika tabel reading kosong.
 
 ## 2026-06-26 - Auto-refresh Dashboard dan Detail
 
@@ -123,6 +123,31 @@ Pekerjaan:
 - fallback global tetap tersedia untuk development;
 - simulator memakai key demo sesuai device;
 - test device key ditambahkan.
+
+## 2026-06-27 - Deployment Readiness
+
+Pekerjaan:
+
+- menambahkan `GET /api/health` untuk mengecek aplikasi hidup tanpa menyentuh database;
+- menambahkan `GET /api/ready` untuk mengecek kesiapan storage aktif;
+- menambahkan probe MySQL langsung agar readiness tidak tertutup fallback memory;
+- menambahkan error boundary dashboard dan detail tangki;
+- memperjelas pesan error bahwa perubahan `.env.local` perlu restart dev server;
+- menambahkan test deployment probes;
+- menyinkronkan README, kontrak API, deployment, arsitektur, dan quickstart reviewer.
+
+## 2026-06-28 - Cloud MySQL dan Navigasi Detail STO
+
+Pekerjaan:
+
+- memisahkan registry site, tangki, device, dan hash key ke repository MySQL;
+- membuat dashboard, detail, dan API membaca registry aktif dari memory atau MySQL;
+- menambahkan script `pnpm db:migrate:mysql`, `pnpm db:seed:mysql`, dan `pnpm db:setup:mysql`;
+- menambahkan konfigurasi `MYSQL_CONNECTION_LIMIT`, `MYSQL_SSL_MODE`, dan `MYSQL_SSL_CA` untuk deployment cloud MySQL;
+- menjaga query reading MySQL mengambil data terbaru dahulu dengan `ORDER BY received_at DESC LIMIT ?`, lalu dibalik di aplikasi agar grafik tetap kronologis;
+- membuat marker STO dan tabel dashboard bisa membuka halaman detail tangki terkait;
+- membuat marker lokasi di halaman detail bisa pindah ke detail STO lain;
+- menghapus payload sementara dari working tree agar tidak ikut commit.
 
 ## Status Verifikasi Terakhir
 

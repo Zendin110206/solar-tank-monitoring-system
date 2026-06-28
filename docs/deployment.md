@@ -11,8 +11,11 @@ Yang sudah aman dilakukan:
 - menjalankan aplikasi lokal;
 - menjalankan simulator lokal;
 - menguji API lokal;
+- mengecek aplikasi hidup lewat `/api/health`;
+- mengecek kesiapan storage aktif lewat `/api/ready`;
 - menguji mode memory store;
-- menyiapkan migration dan seed MySQL untuk latihan persistent storage;
+- menyiapkan migration dan seed MySQL untuk latihan registry monitoring dan persistent storage;
+- menjalankan setup MySQL lewat `pnpm db:setup:mysql`;
 - menjalankan `pnpm check`;
 - membangun production build lokal.
 
@@ -39,6 +42,28 @@ Buka:
 http://localhost:3000
 ```
 
+Cek aplikasi hidup:
+
+```powershell
+curl.exe http://localhost:3000/api/health
+```
+
+Cek storage aktif:
+
+```powershell
+curl.exe http://localhost:3000/api/ready
+```
+
+Perbedaan penting:
+
+```text
+/api/health hanya membuktikan aplikasi hidup.
+/api/ready membuktikan storage aktif siap.
+```
+
+Jika `/api/health` sukses tetapi `/api/ready` gagal, biasanya masalah ada pada
+database, connection string, SSL, allowlist, atau jaringan.
+
 Build lokal:
 
 ```powershell
@@ -46,7 +71,10 @@ pnpm build
 pnpm start
 ```
 
-Jika ingin mencoba storage MySQL lokal, jalankan migration dan seed di folder `database/`, lalu isi `.env.local` dengan `SOLAR_TANK_STORAGE_DRIVER="mysql"` dan `MYSQL_DATABASE_URL`.
+Jika ingin mencoba storage MySQL lokal atau cloud, isi `.env.local` dengan `MYSQL_DATABASE_URL`, jalankan `pnpm db:setup:mysql`, lalu set `SOLAR_TANK_STORAGE_DRIVER="mysql"`.
+
+Setelah mengubah `.env.local`, restart `pnpm dev`. Perubahan environment tidak
+selalu terbaca hanya dengan menekan tombol refresh dashboard.
 
 ## Opsi Deployment Demo
 
@@ -71,6 +99,7 @@ Batasan:
 - tidak otomatis cocok untuk perangkat lapangan;
 - memory store tidak stabil di serverless;
 - perlu database jika ingin history bertahan.
+- `/api/ready` harus sukses sebelum URL demo dianggap siap dipakai reviewer.
 
 ## Opsi Deployment Self-hosted
 
@@ -79,7 +108,7 @@ Untuk penggunaan internal atau pilot yang lebih serius, arah yang lebih sehat:
 ```text
 Next.js app
   -> reverse proxy
-  -> database
+  -> MySQL database
   -> backup
   -> monitoring server
 ```
@@ -87,12 +116,13 @@ Next.js app
 Komponen yang mungkin dibutuhkan:
 
 - Node.js runtime;
-- PostgreSQL atau database lain;
+- MySQL database;
 - Nginx atau Caddy;
 - HTTPS;
 - environment variable;
 - backup terjadwal;
 - log aplikasi.
+- health check dan readiness check untuk dipantau dari luar aplikasi.
 
 ## Environment Variable
 
@@ -111,6 +141,9 @@ SOLAR_TANK_LOCAL_DEVICE_KEY
 SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK
 SOLAR_TANK_DEVICE_KEY
 MYSQL_DATABASE_URL
+MYSQL_CONNECTION_LIMIT
+MYSQL_SSL_MODE
+MYSQL_SSL_CA
 ```
 
 ## Checklist Sebelum Production
@@ -127,6 +160,8 @@ MYSQL_DATABASE_URL
 - Rumus volume sudah dikalibrasi.
 - Device fisik diuji aman.
 - Data yang ditampilkan sudah disetujui.
+- `/api/health` mengembalikan HTTP 200.
+- `/api/ready` mengembalikan HTTP 200 untuk storage production/pilot.
 
 ## Catatan Penting
 
@@ -134,4 +169,4 @@ Memory store saat ini hanya untuk development.
 
 Jika server restart, data hasil simulator hilang.
 
-Untuk deployment yang perlu history, storage harus memakai database. Fondasi MySQL sudah tersedia untuk reading, tetapi belum menggantikan kebutuhan auth, rate limit, audit log, backup, dan device registry production.
+Untuk deployment yang perlu history, storage harus memakai database. Fondasi MySQL sudah tersedia untuk registry monitoring dan reading, tetapi belum menggantikan kebutuhan auth, rate limit, audit log, backup, rotasi key, dan prosedur production.

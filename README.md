@@ -24,14 +24,17 @@ Yang sudah tersedia:
 - fungsi domain untuk volume, runtime, status, dan normalisasi payload;
 - unit test untuk logika domain dan telemetry store;
 - API baca:
+  - `GET /api/health`
+  - `GET /api/ready`
   - `GET /api/dashboard/overview`
   - `GET /api/tanks/[tankId]`
   - `GET /api/tanks/[tankId]/readings`
 - API ingest:
   - `POST /api/ingest`
 - memory store lokal untuk menerima data simulator selama dev server hidup;
-- fondasi MySQL untuk menyimpan reading secara permanen pada mode pengembangan lanjutan;
+- fondasi MySQL untuk registry site/tangki/device dan penyimpanan reading pada mode pengembangan lanjutan;
 - dashboard dan detail membaca storage aktif yang sama dengan endpoint API;
+- health check dan readiness check untuk membedakan aplikasi hidup dengan storage benar-benar siap;
 - auto-refresh ringan pada dashboard dan detail, dengan tombol refresh manual serta pause/resume;
 - validasi key per device memakai hash pada data dummy;
 - fallback key global hanya untuk development lokal;
@@ -49,13 +52,12 @@ Yang belum tersedia:
 - deployment produksi;
 - kalibrasi tangki nyata;
 - notifikasi;
-- registry site, tank, device, dan device key yang sepenuhnya berasal dari database;
 - rate limit dan audit log untuk endpoint ingest.
 
 Catatan penting:
 
 ```text
-Saat ini dashboard dan detail sudah membaca storage aktif lewat layer aplikasi. Mode default tetap `memory` agar mudah dicoba. Mode `mysql` sudah tersedia untuk latihan persistent storage, tetapi belum boleh dianggap production-ready karena registry device dan pengelolaan user belum final.
+Saat ini dashboard dan detail sudah membaca storage aktif lewat layer aplikasi. Mode default tetap `memory` agar mudah dicoba. Mode `mysql` sudah tersedia untuk latihan persistent storage dan registry monitoring, tetapi belum boleh dianggap production-ready karena autentikasi, rate limit, audit log, backup, dan prosedur operasional belum final.
 ```
 
 ## Tujuan Produk
@@ -135,7 +137,7 @@ pnpm simulate:device --critical --once
 | Bahasa | TypeScript |
 | Test | Vitest |
 | Package manager | pnpm |
-| Storage saat ini | Memory store lokal, dengan opsi MySQL untuk reading |
+| Storage saat ini | Memory store lokal, dengan opsi MySQL untuk registry monitoring dan reading |
 | Simulator | Node.js script tanpa dependency tambahan |
 
 ## Struktur Repositori
@@ -164,6 +166,7 @@ Struktur aktif saat ini:
 │   ├── migrations/
 │   └── seeds/
 ├── scripts/
+│   ├── apply-mysql-schema.mjs
 │   └── simulate-device.mjs
 ├── src/
 │   ├── app/
@@ -198,7 +201,7 @@ Penjelasan folder utama:
 | `src/features/monitoring/lib` | Logika domain, normalisasi, view model, storage facade, memory store, dan repository MySQL |
 | `src/features/monitoring/tests` | Unit test untuk logika monitoring |
 | `database` | Migration dan seed MySQL untuk latihan persistent storage |
-| `scripts` | Alat bantu development, termasuk simulator device |
+| `scripts` | Alat bantu development, termasuk simulator device dan setup schema MySQL |
 | `docs` | Dokumentasi arsitektur, API, domain, roadmap, dan batasan |
 | `.github` | CI dan template issue |
 
@@ -283,6 +286,25 @@ Ctrl + C
 
 ## Mengecek API Secara Manual
 
+Cek aplikasi hidup tanpa menyentuh database:
+
+```powershell
+curl.exe http://localhost:3000/api/health
+```
+
+Cek storage aktif siap dipakai dashboard:
+
+```powershell
+curl.exe http://localhost:3000/api/ready
+```
+
+Catatan:
+
+```text
+/api/health menjawab apakah aplikasi hidup.
+/api/ready menjawab apakah storage aktif siap. Jika mode mysql dan database gagal, endpoint ini mengembalikan HTTP 503.
+```
+
 Cek detail tangki:
 
 ```powershell
@@ -317,6 +339,9 @@ curl.exe -X POST http://localhost:3000/api/ingest `
 | `pnpm test` | Menjalankan unit test |
 | `pnpm test:watch` | Menjalankan test dalam mode watch |
 | `pnpm simulate:device` | Menjalankan simulator device |
+| `pnpm db:migrate:mysql` | Menjalankan migration MySQL dari folder `database/migrations` |
+| `pnpm db:seed:mysql` | Mengisi data contoh site, tangki, dan device ke MySQL |
+| `pnpm db:setup:mysql` | Menjalankan migration lalu seed MySQL |
 | `pnpm check` | Menjalankan typecheck, lint, test, dan build |
 
 ## Variabel Lingkungan
@@ -339,6 +364,9 @@ Variabel yang relevan saat ini:
 | `SOLAR_TANK_LOCAL_DEVICE_KEY` | Key fallback global untuk development lokal |
 | `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK` | Set `false` untuk menolak fallback global dan memakai key per device |
 | `SOLAR_TANK_DEVICE_KEY` | Override key simulator untuk satu device jika dibutuhkan |
+| `MYSQL_CONNECTION_LIMIT` | Batas koneksi pool MySQL. Untuk serverless awal gunakan nilai kecil seperti `1` atau `2` |
+| `MYSQL_SSL_MODE` | Gunakan `required` jika provider MySQL cloud mewajibkan TLS |
+| `MYSQL_SSL_CA` | CA certificate dari provider MySQL jika diperlukan |
 
 Simulator otomatis memakai key demo sesuai device dummy. Contoh:
 
@@ -355,23 +383,37 @@ demo-skp-01 -> demo-skp-key
 
 Mode default tetap `memory`, sehingga aplikasi bisa langsung dicoba tanpa database.
 
-Jika ingin latihan data reading yang tidak hilang saat server restart:
+Jika ingin latihan data registry dan reading yang tidak hilang saat server restart:
 
 1. Buat database MySQL lokal.
-2. Jalankan SQL di `database/migrations/001_create_monitoring_core_mysql.sql`.
-3. Jalankan SQL di `database/seeds/001_seed_demo_monitoring_reference_mysql.sql`.
-4. Isi `.env.local`:
+2. Isi `.env.local` dengan `MYSQL_DATABASE_URL`.
+3. Jalankan setup database:
+
+```powershell
+pnpm db:setup:mysql
+```
+
+4. Isi atau pastikan `.env.local`:
 
 ```env
 SOLAR_TANK_STORAGE_DRIVER="mysql"
 MYSQL_DATABASE_URL="mysql://solar_tank_app:password@127.0.0.1:3306/solar_tank_monitoring"
+MYSQL_CONNECTION_LIMIT="2"
+MYSQL_SSL_MODE="disabled"
 SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK="false"
 ```
 
+Untuk cloud MySQL yang mewajibkan TLS, gunakan `MYSQL_SSL_MODE="required"`.
+Jika provider memberi CA certificate, isi `MYSQL_SSL_CA`.
+
+Setelah mengubah `.env.local`, hentikan lalu jalankan ulang `pnpm dev`.
+Tombol refresh di dashboard hanya mencoba mengambil data ulang dari proses server
+yang sedang berjalan; tombol itu tidak memuat ulang perubahan env.
+
 Catatan:
 
-- fondasi MySQL saat ini memfokuskan penyimpanan reading;
-- registry site, tank, device, dan rotasi key database masih tahap berikutnya;
+- mode MySQL membaca registry site, tank, device, dan hash key dari database;
+- rotasi key dan halaman manajemen registry masih tahap berikutnya;
 - jangan masukkan password database asli ke Git.
 
 ## Peta Dokumentasi
