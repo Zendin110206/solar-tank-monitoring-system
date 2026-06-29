@@ -11,7 +11,7 @@ Repositori ini menggunakan Bahasa Indonesia agar mudah dibaca oleh pengguna oper
 
 ## Status Saat Ini
 
-Repositori sudah melewati tahap fondasi awal dan sekarang berada pada tahap prototipe aplikasi monitoring dengan alur data lokal, API ingest, simulator, auto-refresh dashboard, dan fondasi penyimpanan MySQL opsional.
+Repositori sudah melewati tahap fondasi awal dan sekarang berada pada tahap prototipe aplikasi monitoring dengan alur data lokal, API ingest, simulator, auto-refresh dashboard, fondasi penyimpanan MySQL, registry MySQL, dan alat bantu pilot 5 STO.
 
 Yang sudah tersedia:
 
@@ -38,6 +38,12 @@ Yang sudah tersedia:
 - auto-refresh ringan pada dashboard dan detail, dengan tombol refresh manual serta pause/resume;
 - validasi key per device memakai hash pada data dummy;
 - fallback key global hanya untuk development lokal;
+- normalisasi payload real-format dari device, termasuk config tangki dari payload;
+- review config payload vs registry agar mismatch tidak diam-diam dianggap benar;
+- alat bantu pilot:
+  - `pnpm pilot:hash-key`
+  - `pnpm pilot:registry`
+  - `pnpm pilot:smoke`
 - simulator terminal:
   - `pnpm simulate:device`
 - dokumentasi teknis dan operasional di folder `docs/`;
@@ -48,7 +54,6 @@ Yang belum tersedia:
 - autentikasi pengguna final;
 - proses pembuatan akun sungguhan;
 - role admin, operator, atau viewer;
-- integrasi perangkat fisik;
 - deployment produksi;
 - kalibrasi tangki nyata;
 - notifikasi;
@@ -158,6 +163,7 @@ Struktur aktif saat ini:
 │   ├── development-log.md
 │   ├── device-ingestion.md
 │   ├── domain-model.md
+│   ├── pilot-readiness.md
 │   ├── reviewer-quickstart.md
 │   ├── roadmap.md
 │   ├── safety-and-limitations.md
@@ -165,9 +171,14 @@ Struktur aktif saat ini:
 ├── database/
 │   ├── migrations/
 │   └── seeds/
+├── config/
+│   └── pilot-registry.example.json
 ├── scripts/
 │   ├── apply-mysql-schema.mjs
-│   └── simulate-device.mjs
+│   ├── apply-pilot-registry.mjs
+│   ├── generate-device-key.mjs
+│   ├── simulate-device.mjs
+│   └── smoke-pilot-ingest.mjs
 ├── src/
 │   ├── app/
 │   │   ├── api/
@@ -201,7 +212,8 @@ Penjelasan folder utama:
 | `src/features/monitoring/lib` | Logika domain, normalisasi, view model, storage facade, memory store, dan repository MySQL |
 | `src/features/monitoring/tests` | Unit test untuk logika monitoring |
 | `database` | Migration dan seed MySQL untuk latihan persistent storage |
-| `scripts` | Alat bantu development, termasuk simulator device dan setup schema MySQL |
+| `config` | Template public-safe untuk registry pilot. File real `.local.json` tidak boleh di-commit |
+| `scripts` | Alat bantu development dan pilot, termasuk simulator, setup schema MySQL, registry pilot, hash key, dan smoke ingest |
 | `docs` | Dokumentasi arsitektur, API, domain, roadmap, dan batasan |
 | `.github` | CI dan template issue |
 
@@ -339,6 +351,9 @@ curl.exe -X POST http://localhost:3000/api/ingest `
 | `pnpm test` | Menjalankan unit test |
 | `pnpm test:watch` | Menjalankan test dalam mode watch |
 | `pnpm simulate:device` | Menjalankan simulator device |
+| `pnpm pilot:hash-key` | Membuat key baru dan hash `sha256:...` untuk device pilot |
+| `pnpm pilot:registry` | Memvalidasi dan apply registry pilot lokal ke MySQL |
+| `pnpm pilot:smoke` | Mengirim payload real-format ke `/api/ingest` untuk uji pilot |
 | `pnpm db:migrate:mysql` | Menjalankan migration MySQL dari folder `database/migrations` |
 | `pnpm db:seed:mysql` | Mengisi data contoh site, tangki, dan device ke MySQL |
 | `pnpm db:setup:mysql` | Menjalankan migration lalu seed MySQL |
@@ -367,6 +382,11 @@ Variabel yang relevan saat ini:
 | `MYSQL_CONNECTION_LIMIT` | Batas koneksi pool MySQL. Untuk serverless awal gunakan nilai kecil seperti `1` atau `2` |
 | `MYSQL_SSL_MODE` | Gunakan `required` jika provider MySQL cloud mewajibkan TLS |
 | `MYSQL_SSL_CA` | CA certificate dari provider MySQL jika diperlukan |
+| `PILOT_REGISTRY_FILE` | Path file registry pilot lokal untuk script `pnpm pilot:registry` |
+| `PILOT_API_BASE_URL` | Base URL target smoke test, misalnya URL Vercel |
+| `PILOT_DEVICE_ID` | Device ID yang dipakai smoke test |
+| `PILOT_DEVICE_KEY` | Key asli device untuk smoke test. Jangan commit |
+| `PILOT_EXPECT_STORAGE` | Storage yang diharapkan saat smoke test. Default `mysql` |
 
 Simulator otomatis memakai key demo sesuai device dummy. Contoh:
 
@@ -416,6 +436,37 @@ Catatan:
 - rotasi key dan halaman manajemen registry masih tahap berikutnya;
 - jangan masukkan password database asli ke Git.
 
+## Pilot 5 STO
+
+Untuk mencoba data yang lebih dekat ke lapangan, gunakan alur pilot.
+
+Langkah ringkas:
+
+```powershell
+pnpm db:migrate:mysql
+pnpm pilot:hash-key
+Copy-Item config/pilot-registry.example.json config/pilot-registry.local.json
+# edit config/pilot-registry.local.json sampai koordinat dan hash device sudah real/approved
+pnpm pilot:registry -- --dry-run
+pnpm pilot:registry
+pnpm pilot:smoke
+```
+
+Penjelasan lengkap ada di:
+
+```text
+docs/pilot-readiness.md
+```
+
+Catatan penting:
+
+- `config/pilot-registry.local.json` berisi data real/approved dan tidak boleh di-commit;
+- `config/pilot-registry.example.json` hanya template aman, bukan data final lapangan;
+- key asli device tidak boleh masuk repo;
+- registry pilot wajib memakai koordinat yang sudah boleh dipakai;
+- fallback global key harus dimatikan untuk pilot;
+- jika smoke test sukses tetapi `needsReview=true`, cek config tangki di payload vs registry.
+
 ## Peta Dokumentasi
 
 | Dokumen | Isi |
@@ -427,6 +478,7 @@ Catatan:
 | `docs/data-model.md` | Entitas data utama |
 | `docs/domain-model.md` | Rumus volume, persen, runtime, dan status |
 | `docs/deployment.md` | Catatan deployment lokal, demo, dan self-hosted |
+| `docs/pilot-readiness.md` | Panduan pilot 5 STO dengan registry real, hash key, dan smoke test |
 | `docs/roadmap.md` | Rencana pengembangan bertahap |
 | `docs/safety-and-limitations.md` | Batasan dan keselamatan |
 | `docs/system-boundaries.md` | Hal yang masuk dan tidak masuk repo publik |

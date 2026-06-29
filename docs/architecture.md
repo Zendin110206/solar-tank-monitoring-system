@@ -40,9 +40,12 @@ Dashboard tidak membaca sensor secara langsung. Device atau simulator yang mengi
 | Storage facade | `src/features/monitoring/lib/monitoring-storage.ts` | Ada |
 | Monitoring registry | `src/features/monitoring/lib/monitoring-registry.ts` | Ada, memilih registry memory atau MySQL |
 | Device key validation | `src/features/monitoring/lib/device-key.ts` | Ada |
+| Payload config review | `src/features/monitoring/lib/reading-tank-config.ts` | Ada, membandingkan config payload vs registry |
 | Auto-refresh UI | `src/features/monitoring/components/live-refresh-control.tsx` | Ada |
 | Jam real-time | `src/features/monitoring/components/live-clock.tsx` | Ada |
 | Simulator | `scripts/simulate-device.mjs` | Ada |
+| Pilot registry apply | `scripts/apply-pilot-registry.mjs` | Ada, membaca file lokal yang tidak di-commit |
+| Pilot smoke ingest | `scripts/smoke-pilot-ingest.mjs` | Ada, mengirim payload real-format |
 | Unit test | `src/features/monitoring/tests` | Ada |
 
 ## Batas Frontend dan Backend
@@ -63,6 +66,9 @@ Backend/API bertugas:
 - memvalidasi device;
 - memvalidasi key;
 - menormalisasi payload;
+- membaca config tangki dari payload sebagai snapshot;
+- membandingkan snapshot payload dengan registry resmi;
+- memberi status review jika config payload dan registry berbeda;
 - menyediakan data siap baca untuk dashboard;
 - membaca registry site, tangki, device, dan hash key dari memory atau MySQL sesuai mode storage;
 - nanti menangani autentikasi dan persetujuan akses pengguna;
@@ -120,7 +126,13 @@ Data contoh dipakai untuk:
 - menguji simulator;
 - menghindari penggunaan data sensitif.
 
-Data real belum dipakai.
+Alat pilot sudah tersedia untuk memakai data real yang sudah disetujui. Data real tidak boleh ditaruh di repo. Registry real harus disimpan di file lokal seperti:
+
+```text
+config/pilot-registry.local.json
+```
+
+File lokal itu diabaikan Git.
 
 Sebelum data real masuk, perlu validasi:
 
@@ -131,16 +143,40 @@ Sebelum data real masuk, perlu validasi:
 - format payload final;
 - deployment target.
 
+## Alur Pilot 5 STO
+
+Alur pilot yang disiapkan:
+
+```text
+config/pilot-registry.local.json
+  -> pnpm pilot:registry
+  -> MySQL registry
+  -> device real atau pnpm pilot:smoke
+  -> POST /api/ingest
+  -> MySQL readings
+  -> dashboard/detail
+```
+
+Registry pilot wajib memakai:
+
+- minimal 5 site;
+- koordinat yang sudah disetujui;
+- hash key device, bukan key asli;
+- dimensi tangki yang sudah dicek;
+- fallback global key dimatikan.
+
 ## Target Arsitektur Berikutnya
 
-Kondisi setelah Batch 12:
+Kondisi setelah Batch 14:
 
 ```text
 UI dashboard/detail
   -> storage facade
   -> monitoring registry memory atau MySQL
   -> memory store atau MySQL reading repository
-  -> berubah saat simulator mengirim data dan halaman di-refresh
+  -> pilot registry lokal dapat diaplikasikan ke MySQL
+  -> smoke payload real-format dapat dikirim ke API ingest
+  -> berubah saat device/smoke mengirim data dan halaman di-refresh
 ```
 
 Setelah itu:

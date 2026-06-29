@@ -149,6 +149,25 @@ Pekerjaan:
 - membuat marker lokasi di halaman detail bisa pindah ke detail STO lain;
 - menghapus payload sementara dari working tree agar tidak ikut commit.
 
+## 2026-06-30 - Payload Real Device dan Pilot Readiness
+
+Pekerjaan:
+
+- menambahkan review config payload vs registry agar sistem tidak diam-diam percaya config dari device jika berbeda jauh;
+- menambahkan sumber data pembacaan seperti volume dari device atau backend;
+- menambahkan panel review config di detail tangki;
+- menambahkan `config/pilot-registry.example.json` sebagai template public-safe;
+- menambahkan `pnpm pilot:hash-key` untuk membuat key dan hash device;
+- menambahkan `pnpm pilot:registry` untuk validasi dan apply registry pilot lokal ke MySQL;
+- menambahkan `pnpm pilot:smoke` untuk mengirim payload real-format ke `/api/ingest`;
+- menambahkan dokumentasi `docs/pilot-readiness.md`.
+
+Catatan:
+
+```text
+Data real, key asli, koordinat sensitif, dan file registry lokal tidak boleh di-commit. Jalur pilot memakai file .local.json yang diabaikan Git.
+```
+
 ## Status Verifikasi Terakhir
 
 Perintah:

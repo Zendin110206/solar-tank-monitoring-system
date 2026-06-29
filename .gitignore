@@ -41,6 +41,9 @@ yarn-error.log*
 *.dump
 *.bak
 *.backup
+config/*.local.json
+config/*.private.json
+!config/*.example.json
 private/
 local/
 tmp/

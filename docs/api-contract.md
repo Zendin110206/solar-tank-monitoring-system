@@ -252,7 +252,7 @@ Response sukses:
 Fungsi:
 
 ```text
-Menerima payload dari device atau simulator.
+Menerima payload dari device, simulator, atau smoke test pilot.
 ```
 
 Header wajib:
@@ -288,6 +288,29 @@ Payload contoh:
 }
 ```
 
+Payload pilot real-format juga didukung. Payload ini dapat membawa config tangki dari device:
+
+```json
+{
+  "device": "pilot-tph-01",
+  "tank_shape": "rectangular",
+  "capacity_liter": 540,
+  "length_cm": 150,
+  "width_cm": 60,
+  "height_cm": 60,
+  "sensor_mount_height_cm": 60,
+  "consumption_liter_per_hour": 25,
+  "distance": 10.2,
+  "voltage": 3.7,
+  "raw": {
+    "local_H_cm": 49.8,
+    "local_volume_l": 448.2,
+    "local_percent": 83,
+    "wifi_rssi": -54
+  }
+}
+```
+
 Contoh curl:
 
 ```powershell
@@ -309,7 +332,10 @@ Response sukses:
     "volumeLiter": 3650,
     "fillPercent": 73,
     "runtimeHour": 146,
-    "storage": "memory"
+    "storage": "memory",
+    "configStatus": "no_payload_config",
+    "needsReview": false,
+    "warnings": []
   }
 }
 ```
@@ -320,6 +346,16 @@ Nilai `storage` bisa berisi:
 |---|---|
 | `memory` | Reading disimpan sementara di memory store development |
 | `mysql` | Reading disimpan ke MySQL sesuai `MYSQL_DATABASE_URL` |
+
+Nilai `configStatus` membantu melihat apakah config payload cocok dengan registry:
+
+| Nilai | Arti |
+|---|---|
+| `no_payload_config` | Payload tidak membawa config tangki |
+| `config_match` | Config payload dan registry cocok |
+| `config_minor_difference` | Ada beda kecil yang perlu diketahui |
+| `config_mismatch` | Ada beda besar dan perlu review |
+| `invalid_payload_config` | Config payload tidak valid |
 
 ## Error yang Mungkin Muncul
 

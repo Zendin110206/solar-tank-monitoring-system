@@ -1,0 +1,152 @@
+{
+  "schemaVersion": 1,
+  "name": "Contoh registry pilot 5 STO",
+  "description": "Salin file ini menjadi config/pilot-registry.local.json, lalu ganti koordinat, kode device, dan hash key memakai data yang sudah disetujui. File .local.json tidak boleh di-commit.",
+  "sites": [
+    {
+      "id": "site-tph",
+      "code": "TPH",
+      "name": "STO TPH",
+      "areaLabel": "Pilot Pasuruan",
+      "latitude": -7.6500000,
+      "longitude": 112.9000000,
+      "coordinateStatus": "review-required",
+      "tank": {
+        "id": "tank-tph-main",
+        "name": "Tangki utama",
+        "shape": "rectangular",
+        "capacityLiter": 540,
+        "lengthCm": 150,
+        "widthCm": 60,
+        "heightCm": 60,
+        "sensorMountHeightCm": 60,
+        "lowLevelPercent": 30,
+        "criticalLevelPercent": 15,
+        "consumptionLiterPerHour": 25
+      },
+      "device": {
+        "id": "device-tph-main",
+        "code": "pilot-tph-01",
+        "label": "NodeMCU Ultrasonic Pilot TPH",
+        "expectedReportIntervalSec": 300,
+        "apiKeyHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "id": "site-nja",
+      "code": "NJA",
+      "name": "STO NJA",
+      "areaLabel": "Pilot Pasuruan",
+      "latitude": -7.6800000,
+      "longitude": 112.8600000,
+      "coordinateStatus": "review-required",
+      "tank": {
+        "id": "tank-nja-main",
+        "name": "Tangki utama",
+        "shape": "rectangular",
+        "capacityLiter": 540,
+        "lengthCm": 150,
+        "widthCm": 60,
+        "heightCm": 60,
+        "sensorMountHeightCm": 60,
+        "lowLevelPercent": 30,
+        "criticalLevelPercent": 15,
+        "consumptionLiterPerHour": 25
+      },
+      "device": {
+        "id": "device-nja-main",
+        "code": "pilot-nja-01",
+        "label": "NodeMCU Ultrasonic Pilot NJA",
+        "expectedReportIntervalSec": 300,
+        "apiKeyHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "id": "site-jto",
+      "code": "JTO",
+      "name": "STO JTO",
+      "areaLabel": "Pilot Pasuruan",
+      "latitude": -7.7200000,
+      "longitude": 112.8800000,
+      "coordinateStatus": "review-required",
+      "tank": {
+        "id": "tank-jto-main",
+        "name": "Tangki utama",
+        "shape": "rectangular",
+        "capacityLiter": 540,
+        "lengthCm": 150,
+        "widthCm": 60,
+        "heightCm": 60,
+        "sensorMountHeightCm": 60,
+        "lowLevelPercent": 30,
+        "criticalLevelPercent": 15,
+        "consumptionLiterPerHour": 25
+      },
+      "device": {
+        "id": "device-jto-main",
+        "code": "pilot-jto-01",
+        "label": "NodeMCU Ultrasonic Pilot JTO",
+        "expectedReportIntervalSec": 300,
+        "apiKeyHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "id": "site-skp",
+      "code": "SKP",
+      "name": "STO SKP",
+      "areaLabel": "Pilot Pasuruan",
+      "latitude": -7.7000000,
+      "longitude": 112.9400000,
+      "coordinateStatus": "review-required",
+      "tank": {
+        "id": "tank-skp-main",
+        "name": "Tangki utama",
+        "shape": "rectangular",
+        "capacityLiter": 540,
+        "lengthCm": 150,
+        "widthCm": 60,
+        "heightCm": 60,
+        "sensorMountHeightCm": 60,
+        "lowLevelPercent": 30,
+        "criticalLevelPercent": 15,
+        "consumptionLiterPerHour": 25
+      },
+      "device": {
+        "id": "device-skp-main",
+        "code": "pilot-skp-01",
+        "label": "NodeMCU Ultrasonic Pilot SKP",
+        "expectedReportIntervalSec": 300,
+        "apiKeyHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    },
+    {
+      "id": "site-psn",
+      "code": "PSN",
+      "name": "STO PSN",
+      "areaLabel": "Pilot Pasuruan",
+      "latitude": -7.6400000,
+      "longitude": 112.9100000,
+      "coordinateStatus": "review-required",
+      "tank": {
+        "id": "tank-psn-main",
+        "name": "Tangki utama",
+        "shape": "rectangular",
+        "capacityLiter": 540,
+        "lengthCm": 150,
+        "widthCm": 60,
+        "heightCm": 60,
+        "sensorMountHeightCm": 60,
+        "lowLevelPercent": 30,
+        "criticalLevelPercent": 15,
+        "consumptionLiterPerHour": 25
+      },
+      "device": {
+        "id": "device-psn-main",
+        "code": "pilot-psn-01",
+        "label": "NodeMCU Ultrasonic Pilot PSN",
+        "expectedReportIntervalSec": 300,
+        "apiKeyHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+      }
+    }
+  ]
+}

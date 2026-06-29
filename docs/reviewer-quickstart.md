@@ -122,13 +122,15 @@ History harus bertambah setelah simulator mengirim data.
 - `/api/health` hanya mengecek aplikasi hidup.
 - `/api/ready` mengecek apakah storage aktif siap dipakai.
 - Mode MySQL membaca registry site, tangki, device, dan hash key dari database.
+- Registry pilot bisa disiapkan lewat `pnpm pilot:registry`, tetapi file real harus lokal dan tidak boleh masuk Git.
+- Smoke test payload real-format bisa dikirim lewat `pnpm pilot:smoke`.
 - Halaman login/register baru bersifat frontend-only dan belum membuat sesi pengguna.
 - API sudah bisa menerima data simulator.
 - Saat server baru berjalan, memory mode menyiapkan data demo dengan timestamp relatif agar dashboard tidak langsung terlihat basi.
 - Memory store hilang ketika server restart.
 - MySQL mode tersedia untuk latihan persistent reading, tetapi belum berarti production-ready.
 - Key per device sudah divalidasi memakai hash pada data dummy.
-- Data real belum digunakan.
+- Data real hanya boleh dipakai lewat file lokal/env yang tidak di-commit.
 - Repo tidak boleh memuat credential atau data internal.
 
 ## 9. Coba Mode MySQL Jika Database Tersedia
@@ -164,7 +166,47 @@ Setelah mengubah `.env.local`, restart `pnpm dev`, lalu cek:
 curl.exe http://localhost:3000/api/ready
 ```
 
-## 10. Jika Ada Error
+## 10. Coba Alur Pilot Jika Data Sudah Disetujui
+
+Bagian ini hanya untuk reviewer yang memang punya data pilot yang boleh dipakai.
+Jangan memakai koordinat, key, atau connection string asli di file yang akan
+di-commit.
+
+```powershell
+pnpm db:migrate:mysql
+pnpm pilot:hash-key
+Copy-Item config/pilot-registry.example.json config/pilot-registry.local.json
+```
+
+Setelah itu edit `config/pilot-registry.local.json`:
+
+- isi 5 STO yang disetujui;
+- ganti `coordinateStatus` menjadi `approved`;
+- isi hash key device dari `pnpm pilot:hash-key`;
+- pastikan kapasitas dan dimensi tangki sesuai data yang dipakai.
+
+Validasi tanpa menulis database:
+
+```powershell
+pnpm pilot:registry -- --dry-run
+```
+
+Jika sudah sukses:
+
+```powershell
+pnpm pilot:registry
+```
+
+Smoke test:
+
+```powershell
+$env:PILOT_API_BASE_URL="http://localhost:3000"
+$env:PILOT_DEVICE_ID="pilot-tph-01"
+$env:PILOT_DEVICE_KEY="key-asli-device"
+pnpm pilot:smoke
+```
+
+## 11. Jika Ada Error
 
 Jika `pnpm simulate:device` gagal:
 

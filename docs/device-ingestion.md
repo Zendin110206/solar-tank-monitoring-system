@@ -17,7 +17,7 @@ jarak sensor
   -> status
 ```
 
-Pada fase prototipe, simulator bisa langsung mengirim `raw.volume` dan `raw.percent` agar alur API mudah diuji.
+Pada fase prototipe, simulator bisa langsung mengirim `raw.volume` dan `raw.percent` agar alur API mudah diuji. Untuk pilot, device atau smoke test dapat mengirim payload real-format yang membawa config tangki seperti bentuk, kapasitas, dimensi, dan konsumsi per jam.
 
 ## Endpoint
 
@@ -84,6 +84,36 @@ Penjelasan:
 | `raw.percent` | persen isi |
 | `raw.wifi_rssi` | sinyal WiFi |
 
+Payload real-format untuk pilot:
+
+```json
+{
+  "device": "pilot-tph-01",
+  "ts": 1780000000,
+  "tank_shape": "rectangular",
+  "capacity_liter": 540,
+  "length_cm": 150,
+  "width_cm": 60,
+  "height_cm": 60,
+  "sensor_mount_height_cm": 60,
+  "low_level_percent": 30,
+  "critical_level_percent": 15,
+  "consumption_liter_per_hour": 25,
+  "distance": 10.2,
+  "distance_cm": 10.2,
+  "voltage": 3.7,
+  "rssi": -54,
+  "raw": {
+    "local_H_cm": 49.8,
+    "local_volume_l": 448.2,
+    "local_percent": 83,
+    "wifi_rssi": -54
+  }
+}
+```
+
+API tetap memakai registry sebagai identitas resmi site/tangki/device. Config dari payload dibaca sebagai snapshot. Jika snapshot payload berbeda jauh dari registry, response ingest membawa `needsReview=true` dan dashboard/detail menampilkan status review.
+
 ## Validasi yang Dilakukan
 
 API mengecek:
@@ -96,6 +126,7 @@ API mengecek:
 - key cocok dengan hash key device atau fallback development yang masih diizinkan;
 - device di payload tidak bertentangan dengan header;
 - tangki untuk device ditemukan.
+- config payload tidak dipakai diam-diam tanpa review jika berbeda jauh dari registry.
 
 Jika semua lolos, payload dinormalisasi dan disimpan ke storage aktif. Default development memakai memory store. Mode MySQL dapat diaktifkan lewat `SOLAR_TANK_STORAGE_DRIVER="mysql"`.
 
@@ -124,6 +155,32 @@ Kirim device tertentu:
 ```powershell
 pnpm simulate:device --device demo-nja-01 --once
 ```
+
+## Smoke Test Pilot
+
+Untuk menguji payload real-format tanpa menunggu device fisik:
+
+```powershell
+$env:PILOT_API_BASE_URL="https://solar-tank-monitoring-system.vercel.app"
+$env:PILOT_DEVICE_ID="pilot-tph-01"
+$env:PILOT_DEVICE_KEY="key-asli-device"
+pnpm pilot:smoke
+```
+
+Jika ingin melihat payload tanpa mengirim:
+
+```powershell
+pnpm pilot:smoke -- --dry-run
+```
+
+Jika smoke test gagal:
+
+| Status | Arti |
+|---|---|
+| `401` | key salah atau hash di registry tidak cocok |
+| `404` | device belum ada di registry aktif |
+| `503` | storage MySQL belum siap |
+| `needsReview=true` | payload masuk, tetapi config payload berbeda dari registry |
 
 ## Device Dummy yang Tersedia
 
