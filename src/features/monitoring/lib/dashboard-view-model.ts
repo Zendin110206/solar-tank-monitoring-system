@@ -18,6 +18,7 @@ import {
   getOperationalStatus,
   getRuntimeStatus,
 } from "./status";
+import { buildMapPositionsFromCoordinates } from "./map-position";
 
 export type DashboardSiteStatus = "online" | "warning" | "critical" | "offline";
 
@@ -94,13 +95,6 @@ type BuildDashboardOverviewInput = {
 };
 
 const DEFAULT_NOW = new Date("2026-06-25T07:45:00.000Z");
-
-const mapPositions: Record<string, { left: string; top: string }> = {
-  "site-tph": { left: "56%", top: "36%" },
-  "site-nja": { left: "33%", top: "42%" },
-  "site-jto": { left: "44%", top: "61%" },
-  "site-skp": { left: "74%", top: "55%" },
-};
 
 function getLatestReading(readings: Reading[], tankId: string): Reading | null {
   const tankReadings = readings
@@ -238,6 +232,7 @@ export function buildDashboardOverview({
   devices = mockDevices,
   readings = mockReadings,
 }: BuildDashboardOverviewInput = {}): DashboardOverview {
+  const mapPositions = buildMapPositionsFromCoordinates(sites);
   const rows = tanks.flatMap((tank): DashboardMonitoringSite[] => {
     const site = sites.find((item) => item.id === tank.siteId);
     const device = devices.find((item) => item.tankId === tank.id);

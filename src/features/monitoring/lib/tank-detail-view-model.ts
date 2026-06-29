@@ -25,6 +25,7 @@ import {
   calculateTankVolumeLiter,
   getMaxFuelHeightCm,
 } from "./tank-volume";
+import { buildMapPositionsFromCoordinates } from "./map-position";
 
 export type TankDetailStatus = "online" | "warning" | "critical" | "offline";
 
@@ -72,13 +73,19 @@ export type TankDetailView = {
   fillPercent: number;
   volumeLiter: number;
   capacityLiter: number;
+  shape: Tank["shape"];
+  shapeLabel: string;
   runtimeHour: number;
   consumptionLiterPerHour: number;
   sensorDistanceCm: number;
   fuelHeightCm: number;
   diameterCm: number | null;
   lengthCm: number | null;
+  heightCm: number | null;
+  widthCm: number | null;
   sensorMountHeightCm: number;
+  lowLevelPercent: number;
+  criticalLevelPercent: number;
   deviceId: string;
   deviceCode: string;
   deviceLabel: string;
@@ -126,19 +133,18 @@ type TankBundle = {
 
 const DEFAULT_NOW = new Date("2026-06-25T07:45:00.000Z");
 
-const mapPositions: Record<string, { left: string; top: string }> = {
-  "site-tph": { left: "58%", top: "44%" },
-  "site-nja": { left: "34%", top: "38%" },
-  "site-jto": { left: "45%", top: "66%" },
-  "site-skp": { left: "75%", top: "58%" },
-};
-
 const statusLabels: Record<TankDetailStatus, string> = {
   online: "Online",
   warning: "Waspada",
   critical: "Kritis",
   offline: "Offline",
 };
+
+function getTankShapeLabel(shape: Tank["shape"]): string {
+  return shape === "rectangular"
+    ? "Tangki balok"
+    : "Tangki silinder horizontal";
+}
 
 function getLatestReading(readings: Reading[], tankId: string): Reading | null {
   const tankReadings = readings
@@ -325,7 +331,7 @@ function toReadingPoint(reading: Reading): TankReadingPoint {
 
 function getCoordinateLabel(site: Site): string {
   if (typeof site.latitude === "number" && typeof site.longitude === "number") {
-    return `${site.latitude.toFixed(4)}, ${site.longitude.toFixed(4)} (koordinat contoh)`;
+    return `${site.latitude.toFixed(4)}, ${site.longitude.toFixed(4)} (koordinat manual)`;
   }
 
   return "koordinat manual belum diisi";
@@ -407,6 +413,9 @@ function buildNearbySites(
   input: Required<Pick<BuildTankDetailInput, "now">> & BuildTankDetailInput,
 ): NearbyTankSite[] {
   const tanks = input.tanks ?? mockTanks;
+  const mapPositions = buildMapPositionsFromCoordinates(
+    input.sites ?? mockSites,
+  );
 
   return tanks
     .flatMap((tank): NearbyTankSite[] => {
@@ -507,6 +516,9 @@ export function buildTankDetail(
     deviceStatus,
   });
   const status = toTankDetailStatus(deviceStatus, operationalStatus);
+  const mapPositions = buildMapPositionsFromCoordinates(
+    input.sites ?? mockSites,
+  );
   const position = mapPositions[site.id] ?? { left: "50%", top: "50%" };
 
   return {
@@ -534,13 +546,19 @@ export function buildTankDetail(
     fillPercent,
     volumeLiter,
     capacityLiter: tank.capacityLiter,
+    shape: tank.shape,
+    shapeLabel: getTankShapeLabel(tank.shape),
     runtimeHour,
     consumptionLiterPerHour: tank.consumptionLiterPerHour,
     sensorDistanceCm,
     fuelHeightCm,
     diameterCm: tank.diameterCm ?? null,
     lengthCm: tank.lengthCm ?? null,
+    heightCm: tank.heightCm ?? null,
+    widthCm: tank.widthCm ?? null,
     sensorMountHeightCm: tank.sensorMountHeightCm,
+    lowLevelPercent: tank.lowLevelPercent,
+    criticalLevelPercent: tank.criticalLevelPercent,
     deviceId: device.id,
     deviceCode: device.code,
     deviceLabel: device.label,

@@ -13,6 +13,17 @@ export const mockDevices: Device[] = [
     isActive: true,
   },
   {
+    id: "device-psn-main",
+    siteId: "site-psn",
+    tankId: "tank-psn-main",
+    code: "demo-psn-01",
+    label: "NodeMCU Ultrasonic Demo",
+    expectedReportIntervalSec: 300,
+    apiKeyHash:
+      "sha256:89e3d6fef81054bd1948dee958084e69a7120e43587c7ae0244ba2f5b8354ef1",
+    isActive: true,
+  },
+  {
     id: "device-nja-main",
     siteId: "site-nja",
     tankId: "tank-nja-main",

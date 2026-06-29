@@ -296,6 +296,12 @@ export default async function DashboardPage() {
             <a href="#prioritas" className="transition hover:text-red-600">
               Prioritas
             </a>
+            <Link
+              href="/dashboard/locations"
+              className="transition hover:text-red-600"
+            >
+              Konfigurasi Lokasi
+            </Link>
             <a href="#log" className="transition hover:text-red-600">
               Log Perangkat
             </a>
@@ -416,7 +422,7 @@ export default async function DashboardPage() {
                 <SectionHeader
                   label="Peta monitoring"
                   title="Lokasi STO berdasarkan input manual"
-                  description="Titik peta memakai koordinat contoh yang nantinya dapat diisi manual karena perangkat tidak memakai modul GPS."
+                  description="Titik peta diproyeksikan dari latitude dan longitude manual karena perangkat tidak memakai modul GPS."
                 />
 
                 <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-zinc-600">
@@ -469,7 +475,7 @@ export default async function DashboardPage() {
 
                 <div className="absolute bottom-5 left-6 z-10 rounded-lg border border-zinc-200 bg-white/90 px-4 py-3 shadow-lg shadow-zinc-300/30 backdrop-blur">
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400">
-                    Area demo
+                    Area monitoring
                   </p>
                   <p className="mt-1 text-lg font-semibold">Pasuruan Raya</p>
                 </div>

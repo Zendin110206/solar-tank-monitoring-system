@@ -7,9 +7,10 @@ describe("dashboard overview view model", () => {
       now: new Date("2026-06-25T07:45:00.000Z"),
     });
 
-    expect(overview.summary.totalSites).toBe(4);
-    expect(overview.summary.totalTanks).toBe(4);
-    expect(overview.rows).toHaveLength(4);
+    expect(overview.summary.totalSites).toBe(5);
+    expect(overview.summary.totalTanks).toBe(5);
+    expect(overview.rows).toHaveLength(5);
+    expect(overview.rows.some((row) => row.code === "PSN")).toBe(true);
   });
 
   it("calculates status from runtime, level, and device freshness", () => {
@@ -102,7 +103,7 @@ describe("dashboard overview view model", () => {
 
     const noDataSite = overview.rows.find((row) => row.code === "NJA");
 
-    expect(overview.rows).toHaveLength(4);
+    expect(overview.rows).toHaveLength(5);
     expect(noDataSite).toMatchObject({
       status: "offline",
       fillPercent: 0,
