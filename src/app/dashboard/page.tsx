@@ -32,7 +32,7 @@ import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/lib/refres
 export const metadata: Metadata = {
   title: "Dashboard Monitoring Solar | SolarTank",
   description:
-    "Dashboard awal untuk memantau volume tangki solar, runtime genset, status perangkat, dan lokasi STO berbasis simulator serta API lokal.",
+    "Dashboard untuk memantau volume tangki solar, runtime genset, status perangkat, dan lokasi STO berbasis data monitoring.",
 };
 
 export const runtime = "nodejs";
@@ -343,19 +343,18 @@ export default async function DashboardPage() {
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600 ring-1 ring-red-100">
-                  Data simulator/API
+                  Data monitoring
                 </span>
                 <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
                   {storageBadgeLabel}
                 </span>
               </div>
-              <h1 className="mt-3 max-w-full text-[2rem] font-semibold leading-[1.08] tracking-normal text-zinc-950 sm:text-4xl">
+              <h1 className="mt-3 max-w-full break-words text-[1.85rem] font-semibold leading-[1.08] tracking-normal text-zinc-950 sm:text-4xl">
                 Monitoring tangki solar STO
               </h1>
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-500 sm:text-base">
+              <p className="mt-2 max-w-3xl break-words text-sm leading-6 text-zinc-500 sm:text-base">
                 Tampilan awal untuk membaca volume, estimasi runtime genset,
-                status perangkat, dan titik lokasi manual sebelum database
-                production serta sensor asli disambungkan.
+                status perangkat, dan titik lokasi manual dari storage aktif.
               </p>
             </div>
 
@@ -752,7 +751,7 @@ export default async function DashboardPage() {
               <div className="mt-6 space-y-3">
                 {[
                   [Database, "Storage aktif", "memory lokal atau MySQL"],
-                  [Activity, "API /ingest", "menerima payload simulator"],
+                  [Activity, "API /ingest", "menerima payload perangkat"],
                   [Gauge, "Runtime", "status dihitung dari volume"],
                   [Droplets, "History", "riwayat dari storage aktif"],
                 ].map(([Icon, title, body]) => (

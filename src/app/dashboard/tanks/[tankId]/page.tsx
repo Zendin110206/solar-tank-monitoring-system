@@ -1263,7 +1263,7 @@ export default async function TankDetailPage({
                   detail tangki
                 </span>
                 <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
-                  data simulator/API
+                  data monitoring
                 </span>
               </div>
 
@@ -1465,7 +1465,7 @@ export default async function TankDetailPage({
               <SectionHeading
                 label="Validasi"
                 title="Hal yang nanti diganti data asli"
-                description="Bagian ini menjaga batas data simulator tetap jelas sebelum perangkat asli dan database production disambungkan."
+                description="Bagian ini menampilkan payload terakhir sebagai bahan audit pembacaan perangkat dan proses normalisasi data."
               />
 
               <div className="mt-6 space-y-3">

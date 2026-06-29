@@ -14,7 +14,7 @@ import { TankConfigDraftPanel } from "@/features/monitoring/components/tank-conf
 export const metadata: Metadata = {
   title: "Konfigurasi Lokasi & Device | SolarTank",
   description:
-    "Halaman frontend-only untuk rancangan penambahan STO, registrasi device, koordinat manual, dan konfigurasi fisik tangki SolarTank.",
+    "Persiapan konfigurasi STO, registrasi device, koordinat manual, dan konfigurasi fisik tangki SolarTank.",
 };
 
 const preparationItems = [
@@ -37,7 +37,7 @@ const preparationItems = [
 
 export default function DashboardLocationsPage() {
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#f5faf8] text-zinc-950">
+    <main className="min-h-screen w-full overflow-x-hidden bg-[#f5faf8] text-zinc-950">
       {/* Configuration Header */}
       <header className="sticky top-0 z-50 overflow-hidden border-b border-zinc-200/70 bg-white/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-[1540px] items-center gap-4 px-4 sm:px-6 lg:px-8">
@@ -70,7 +70,7 @@ export default function DashboardLocationsPage() {
 
           <div className="ml-auto flex items-center gap-3">
             <span className="hidden rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 ring-1 ring-blue-100 sm:inline-flex">
-              frontend-only
+              mode persiapan
             </span>
             <div className="grid size-10 place-items-center rounded-full bg-red-600 text-sm font-semibold text-white">
               ZA
@@ -83,7 +83,7 @@ export default function DashboardLocationsPage() {
         {/* Configuration Toolbar */}
         <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
           <div className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr] xl:items-center">
-            <div>
+            <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <Link
                   href="/dashboard"
@@ -97,13 +97,13 @@ export default function DashboardLocationsPage() {
                 </span>
               </div>
 
-              <h1 className="mt-4 max-w-4xl text-[2rem] font-semibold leading-[1.08] tracking-normal text-zinc-950 sm:text-4xl lg:text-5xl">
-                Tambah STO dan device pemantau
+              <h1 className="mt-4 max-w-4xl break-words text-[1.75rem] font-semibold leading-[1.08] tracking-normal text-zinc-950 sm:text-4xl lg:text-5xl">
+                Persiapan data STO dan device pemantau
               </h1>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-500 sm:text-base">
-                Halaman ini memisahkan rancangan input lokasi dari dashboard
-                monitoring agar dashboard tetap fokus ke status operasional,
-                peta, dan log perangkat.
+              <p className="mt-3 max-w-3xl break-words text-sm leading-6 text-zinc-500 sm:text-base">
+                Halaman ini menyiapkan data lokasi, koordinat manual, device,
+                dan konfigurasi tangki agar alur monitoring bisa disambungkan
+                bertahap tanpa mengganggu dashboard operasional.
               </p>
             </div>
 
@@ -144,12 +144,12 @@ export default function DashboardLocationsPage() {
               </span>
               <div>
                 <p className="text-sm font-semibold text-zinc-950">
-                  Batas aman scope frontend
+                  Batas perubahan data
                 </p>
                 <p className="mt-2 text-sm leading-6 text-zinc-500">
-                  Form ini belum menyimpan ke database, belum membuat API baru,
-                  dan belum mengubah perhitungan monitoring. Data final akan
-                  disambungkan setelah backend manajemen lokasi siap.
+                  Data pada halaman ini belum mengubah registry monitoring.
+                  Penyimpanan ke database akan diaktifkan setelah modul
+                  manajemen lokasi dan hak akses siap.
                 </p>
               </div>
             </div>
@@ -166,8 +166,8 @@ export default function DashboardLocationsPage() {
                 </p>
                 <p className="mt-2 text-sm leading-6 text-zinc-500">
                   Field sudah mengikuti kebutuhan STO, device, koordinat
-                  manual, dan konfigurasi tangki agar integrasi backend nanti
-                  tidak perlu mengubah alur tampilan besar-besaran.
+                  manual, dan konfigurasi tangki agar integrasi penyimpanan
+                  nanti tidak perlu mengubah alur tampilan besar-besaran.
                 </p>
               </div>
             </div>

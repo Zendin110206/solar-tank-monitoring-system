@@ -99,9 +99,9 @@ export function TankConfigDraftPanel() {
             Form tambah STO dan registrasi device
           </h2>
           <p className="mt-2 text-sm leading-6 text-zinc-500">
-            Panel ini frontend-only untuk menyiapkan alur penambahan lokasi
-            manual, titik latitude/longitude, device pemantau, tipe tangki,
-            dimensi fisik, batas level, dan konsumsi operasional.
+            Panel ini menyiapkan alur penambahan lokasi manual, titik
+            latitude/longitude, device pemantau, tipe tangki, dimensi fisik,
+            batas level, dan konsumsi operasional.
           </p>
 
           <div className="mt-5 rounded-lg border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-800">
@@ -112,9 +112,9 @@ export function TankConfigDraftPanel() {
           </div>
 
           <div className="mt-4 rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-sm leading-6 text-zinc-600">
-            Satu STO baru selalu dibuat bersama satu device awal supaya tim
-            operasional tidak perlu mendaftarkan perangkat di halaman terpisah.
-            Penyimpanan sungguhan tetap menunggu backend manajemen lokasi.
+            Satu STO baru disiapkan bersama satu device awal supaya tim
+            operasional tidak perlu memisahkan data lokasi dan data perangkat.
+            Penyimpanan ke database akan diaktifkan pada modul manajemen lokasi.
           </div>
         </div>
 
@@ -174,11 +174,12 @@ export function TankConfigDraftPanel() {
 
           <div className="mt-5 flex flex-col gap-3 rounded-lg border border-zinc-200 bg-white p-4 text-sm leading-6 text-zinc-600 sm:flex-row sm:items-center sm:justify-between">
             <span>
-              Form ini belum mengirim data ke backend dan belum membuat device
-              sungguhan. Validasi final tetap menunggu modul manajemen lokasi.
+              Form ini dipakai untuk menyamakan field konfigurasi sebelum
+              penyimpanan registry diaktifkan. Validasi akhir tetap mengikuti
+              modul manajemen lokasi.
             </span>
             <span className="w-fit rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600 ring-1 ring-red-100">
-              frontend-only
+              mode persiapan
             </span>
           </div>
         </div>
