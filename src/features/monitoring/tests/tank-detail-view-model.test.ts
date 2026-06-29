@@ -56,4 +56,71 @@ describe("tank detail view model", () => {
       readings: [],
     });
   });
+
+  it("surfaces config mismatch review when latest payload conflicts with registry", () => {
+    const detail = buildTankDetail("tank-tph-main", {
+      now: new Date("2026-06-28T05:18:12.000Z"),
+      readings: [
+        {
+          id: "reading-real-device",
+          deviceId: "device-tph-main",
+          tankId: "tank-tph-main",
+          measuredAt: "2026-06-28T05:17:57.000Z",
+          receivedAt: "2026-06-28T05:18:00.000Z",
+          sensorDistanceCm: 10.2,
+          fuelHeightCm: 49.8,
+          volumeLiter: 448.2,
+          fillPercent: 83,
+          runtimeHour: 17.93,
+          batteryVolt: 3.7,
+          rssiDbm: -54,
+          rawPayload: {
+            tank_shape: "rectangular",
+            capacity_liter: 540,
+            length_cm: 150,
+            width_cm: 60,
+            height_cm: 60,
+            sensor_mount_height_cm: 60,
+            low_level_percent: 30,
+            critical_level_percent: 15,
+            consumption_liter_per_hour: 25,
+            raw: {
+              local_H_cm: 49.8,
+              local_volume_l: 448.2,
+              local_percent: 83,
+            },
+          },
+        },
+      ],
+    });
+
+    expect(detail).toMatchObject({
+      capacityLiter: 540,
+      shape: "rectangular",
+      shapeLabel: "Tangki balok",
+      lengthCm: 150,
+      widthCm: 60,
+      heightCm: 60,
+      sensorMountHeightCm: 60,
+      consumptionLiterPerHour: 25,
+      volumeLiter: 448.2,
+      fillPercent: 83,
+      runtimeHour: 17.93,
+      status: "warning",
+      configReview: {
+        status: "config_mismatch",
+        needsReview: true,
+      },
+      dataSources: {
+        volumeSource: "device",
+        fillPercentSource: "device",
+      },
+    });
+    expect(detail?.configReview.reasons).toEqual(
+      expect.arrayContaining([
+        "Bentuk tangki payload berbeda dari registry resmi.",
+        "Kapasitas tangki payload berbeda 89.2% dari registry.",
+      ]),
+    );
+  });
 });

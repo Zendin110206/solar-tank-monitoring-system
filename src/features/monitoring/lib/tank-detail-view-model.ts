@@ -8,12 +8,19 @@ import type {
   LevelStatus,
   OperationalStatus,
   Reading,
+  ReadingQuality,
   RuntimeStatus,
   Site,
   Tank,
+  TankConfigReview,
 } from "../types/monitoring";
 import { clampNumber, roundTo } from "./number";
 import { calculateRuntimeHours } from "./runtime";
+import {
+  compareRegistryVsPayloadConfig,
+  pickPayloadNumber,
+  resolveTankFromPayloadConfig,
+} from "./reading-tank-config";
 import {
   getDeviceStatus,
   getLevelStatus,
@@ -112,6 +119,8 @@ export type TankDetailView = {
     percent: number;
     wifi_rssi: number | null;
   };
+  dataSources: ReadingQuality;
+  configReview: TankConfigReview;
   readings: TankReadingPoint[];
   nearbySites: NearbyTankSite[];
 };
@@ -267,6 +276,86 @@ function toTankDetailStatus(
   }
 
   return "online";
+}
+
+function toReviewAwareStatus(
+  baseStatus: TankDetailStatus,
+  configReview: TankConfigReview,
+): TankDetailStatus {
+  if (configReview.needsReview && baseStatus === "online") {
+    return "warning";
+  }
+
+  return baseStatus;
+}
+
+function hasPayloadNumber(payload: unknown, paths: string[]): boolean {
+  return pickPayloadNumber(payload, paths) !== null;
+}
+
+function buildFallbackReadingQuality(
+  reading: Reading | null,
+  configReview: TankConfigReview,
+): ReadingQuality {
+  const payload = reading?.rawPayload;
+
+  return {
+    measuredAtSource: payload ? "unknown" : "server",
+    fuelHeightSource:
+      payload &&
+      hasPayloadNumber(payload, [
+        "local_H_cm",
+        "fuel_height_cm",
+        "fuelHeightCm",
+        "h_cm",
+        "H_cm",
+        "local_result.fuel_height_cm",
+        "local_result.fuelHeightCm",
+        "raw.local_H_cm",
+        "raw.fuel_height_cm",
+        "raw.fuelHeightCm",
+        "raw.h_cm",
+        "raw.H_cm",
+      ])
+        ? "device"
+        : "backend",
+    volumeSource:
+      payload &&
+      hasPayloadNumber(payload, [
+        "local_volume_l",
+        "volume_liter",
+        "volume_l",
+        "volume",
+        "local_result.volume_liter",
+        "local_result.volumeLiter",
+        "raw.local_volume_l",
+        "raw.volume_liter",
+        "raw.volume_l",
+        "raw.volume",
+      ])
+        ? "device"
+        : "backend",
+    fillPercentSource:
+      payload &&
+      hasPayloadNumber(payload, [
+        "local_percent",
+        "fill_percent",
+        "percent",
+        "local_result.fill_percent",
+        "local_result.fillPercent",
+        "raw.local_percent",
+        "raw.fill_percent",
+        "raw.percent",
+      ])
+        ? "device"
+        : "backend",
+    runtimeSource: "backend",
+    configSource: configReview.configSource,
+    configStatus: configReview.status,
+    needsReview: configReview.needsReview,
+    warnings: configReview.reasons,
+    configMismatchReasons: configReview.reasons,
+  };
 }
 
 function buildStatusNote({
@@ -425,7 +514,10 @@ function buildNearbySites(
         return [];
       }
 
-      const { site, device, latestReading } = bundle;
+      const { site, tank: bundleTank, device, latestReading } = bundle;
+      const configReview = latestReading?.rawPayload
+        ? compareRegistryVsPayloadConfig(bundleTank, latestReading.rawPayload)
+        : compareRegistryVsPayloadConfig(bundleTank, null);
       const fillPercent = latestReading?.fillPercent ?? 0;
       const runtimeHour = latestReading?.runtimeHour ?? 0;
       const runtimeStatus = latestReading
@@ -446,7 +538,10 @@ function buildNearbySites(
         levelStatus,
         deviceStatus,
       });
-      const status = toTankDetailStatus(deviceStatus, operationalStatus);
+      const status = toReviewAwareStatus(
+        toTankDetailStatus(deviceStatus, operationalStatus),
+        configReview,
+      );
       const position = mapPositions[site.id] ?? { left: "50%", top: "50%" };
 
       return [
@@ -492,12 +587,20 @@ export function buildTankDetail(
   }
 
   const { site, tank, device, latestReading } = bundle;
+  const configReview = latestReading?.rawPayload
+    ? compareRegistryVsPayloadConfig(tank, latestReading.rawPayload)
+    : compareRegistryVsPayloadConfig(tank, null);
+  const displayTank = latestReading?.rawPayload
+    ? resolveTankFromPayloadConfig(latestReading.rawPayload, tank)
+    : tank;
+  const dataSources =
+    latestReading?.quality ?? buildFallbackReadingQuality(latestReading, configReview);
   const hasReading = Boolean(latestReading);
   const fillPercent = latestReading?.fillPercent ?? 0;
   const volumeLiter = latestReading?.volumeLiter ?? 0;
   const runtimeHour = latestReading?.runtimeHour ?? 0;
   const sensorDistanceCm =
-    latestReading?.sensorDistanceCm ?? tank.sensorMountHeightCm;
+    latestReading?.sensorDistanceCm ?? displayTank.sensorMountHeightCm;
   const fuelHeightCm = latestReading?.fuelHeightCm ?? 0;
   const runtimeStatus = latestReading
     ? getRuntimeStatus(latestReading.runtimeHour)
@@ -515,7 +618,10 @@ export function buildTankDetail(
     levelStatus,
     deviceStatus,
   });
-  const status = toTankDetailStatus(deviceStatus, operationalStatus);
+  const status = toReviewAwareStatus(
+    toTankDetailStatus(deviceStatus, operationalStatus),
+    configReview,
+  );
   const mapPositions = buildMapPositionsFromCoordinates(
     input.sites ?? mockSites,
   );
@@ -545,20 +651,20 @@ export function buildTankDetail(
     },
     fillPercent,
     volumeLiter,
-    capacityLiter: tank.capacityLiter,
-    shape: tank.shape,
-    shapeLabel: getTankShapeLabel(tank.shape),
+    capacityLiter: displayTank.capacityLiter,
+    shape: displayTank.shape,
+    shapeLabel: getTankShapeLabel(displayTank.shape),
     runtimeHour,
-    consumptionLiterPerHour: tank.consumptionLiterPerHour,
+    consumptionLiterPerHour: displayTank.consumptionLiterPerHour,
     sensorDistanceCm,
     fuelHeightCm,
-    diameterCm: tank.diameterCm ?? null,
-    lengthCm: tank.lengthCm ?? null,
-    heightCm: tank.heightCm ?? null,
-    widthCm: tank.widthCm ?? null,
-    sensorMountHeightCm: tank.sensorMountHeightCm,
-    lowLevelPercent: tank.lowLevelPercent,
-    criticalLevelPercent: tank.criticalLevelPercent,
+    diameterCm: displayTank.diameterCm ?? null,
+    lengthCm: displayTank.lengthCm ?? null,
+    heightCm: displayTank.heightCm ?? null,
+    widthCm: displayTank.widthCm ?? null,
+    sensorMountHeightCm: displayTank.sensorMountHeightCm,
+    lowLevelPercent: displayTank.lowLevelPercent,
+    criticalLevelPercent: displayTank.criticalLevelPercent,
     deviceId: device.id,
     deviceCode: device.code,
     deviceLabel: device.label,
@@ -591,7 +697,9 @@ export function buildTankDetail(
       percent: fillPercent,
       wifi_rssi: latestReading?.rssiDbm ?? null,
     },
-    readings: buildReadingSeries(tank, latestReading, readings),
+    dataSources,
+    configReview,
+    readings: buildReadingSeries(displayTank, latestReading, readings),
     nearbySites: buildNearbySites(tank.id, {
       ...input,
       now,

@@ -111,4 +111,44 @@ describe("dashboard overview view model", () => {
       updateLabel: "belum ada data",
     });
   });
+
+  it("marks dashboard row as warning when payload config needs review", () => {
+    const overview = buildDashboardOverview({
+      now: new Date("2026-06-28T05:18:12.000Z"),
+      readings: [
+        {
+          id: "reading-config-mismatch",
+          deviceId: "device-tph-main",
+          tankId: "tank-tph-main",
+          measuredAt: "2026-06-28T05:17:57.000Z",
+          receivedAt: "2026-06-28T05:18:00.000Z",
+          sensorDistanceCm: 10.2,
+          fuelHeightCm: 49.8,
+          volumeLiter: 448.2,
+          fillPercent: 83,
+          runtimeHour: 17.93,
+          rawPayload: {
+            tank_shape: "rectangular",
+            capacity_liter: 540,
+            length_cm: 150,
+            width_cm: 60,
+            height_cm: 60,
+            sensor_mount_height_cm: 60,
+            consumption_liter_per_hour: 25,
+          },
+        },
+      ],
+    });
+
+    const tph = overview.rows.find((row) => row.code === "TPH");
+
+    expect(tph).toMatchObject({
+      status: "warning",
+      configStatus: "config_mismatch",
+      configNeedsReview: true,
+      configSummary: "Config mismatch perlu review",
+      consumptionLiterPerHour: 25,
+    });
+    expect(tph?.note).toContain("Config mismatch perlu review");
+  });
 });

@@ -74,4 +74,142 @@ describe("normalizeCatPayload", () => {
 
     expect(reading.deviceId).toBe("demo-fallback-01");
   });
+
+  it("accepts real device payload with matching rectangular config snapshot", () => {
+    const tank = mockTanks.find((item) => item.id === "tank-psn-main");
+
+    if (!tank) {
+      throw new Error("Expected PSN tank mock data.");
+    }
+
+    const reading = normalizeCatPayload({
+      payload: {
+        device: "demo-psn-01",
+        measuredAt: "2026-06-28T05:17:57.000Z",
+        tank_shape: "rectangular",
+        capacity_liter: 540,
+        length_cm: 150,
+        width_cm: 60,
+        height_cm: 60,
+        sensor_mount_height_cm: 60,
+        low_level_percent: 30,
+        critical_level_percent: 15,
+        consumption_liter_per_hour: 25,
+        distance: 10.2,
+        distance_cm: 10.2,
+        dist: 10.2,
+        dist_cm: 10.2,
+        voltage: 3.7,
+        rssi: -54,
+        wifi_rssi: -54,
+        ip: "192.168.1.173",
+        lat: -7.65,
+        lng: 112.9,
+        tank: {
+          shape: "rectangular",
+          capacity_liter: 540,
+          length_cm: 150,
+          width_cm: 60,
+          height_cm: 60,
+          sensor_mount_height_cm: 60,
+        },
+        raw: {
+          local_H_cm: 49.8,
+          local_volume_l: 448.2,
+          local_percent: 83,
+          wifi_rssi: -54,
+          ip: "192.168.1.173",
+        },
+      },
+      tank,
+      receivedAt: new Date("2026-06-28T05:18:00.000Z"),
+      readingId: "reading-real-device",
+    });
+
+    expect(reading).toMatchObject({
+      id: "reading-real-device",
+      deviceId: "demo-psn-01",
+      tankId: "tank-psn-main",
+      measuredAt: "2026-06-28T05:17:57.000Z",
+      receivedAt: "2026-06-28T05:18:00.000Z",
+      sensorDistanceCm: 10.2,
+      fuelHeightCm: 49.8,
+      volumeLiter: 448.2,
+      fillPercent: 83,
+      runtimeHour: 17.93,
+      batteryVolt: 3.7,
+      rssiDbm: -54,
+    });
+    expect(reading.quality).toMatchObject({
+      measuredAtSource: "device",
+      fuelHeightSource: "device",
+      volumeSource: "device",
+      fillPercentSource: "device",
+      runtimeSource: "backend",
+      configSource: "payload",
+      configStatus: "normal",
+      needsReview: false,
+    });
+  });
+
+  it("marks config mismatch when payload tank config conflicts with registry", () => {
+    const tank = mockTanks[0];
+
+    const reading = normalizeCatPayload({
+      payload: {
+        device: "demo-tph-01",
+        measuredAt: "2026-06-28T05:17:57.000Z",
+        tank_shape: "rectangular",
+        capacity_liter: 540,
+        length_cm: 150,
+        width_cm: 60,
+        height_cm: 60,
+        sensor_mount_height_cm: 60,
+        consumption_liter_per_hour: 25,
+        distance_cm: 10.2,
+        raw: {
+          local_H_cm: 49.8,
+          local_volume_l: 448.2,
+          local_percent: 83,
+        },
+      },
+      tank,
+      receivedAt: new Date("2026-06-28T05:18:00.000Z"),
+    });
+
+    expect(reading.volumeLiter).toBe(448.2);
+    expect(reading.fillPercent).toBe(83);
+    expect(reading.quality).toMatchObject({
+      configStatus: "config_mismatch",
+      needsReview: true,
+    });
+    expect(reading.quality?.configMismatchReasons).toEqual(
+      expect.arrayContaining([
+        "Bentuk tangki payload berbeda dari registry resmi.",
+        "Kapasitas tangki payload berbeda 89.2% dari registry.",
+      ]),
+    );
+  });
+
+  it("falls back to server time when device timestamp is too far from received time", () => {
+    const tank = mockTanks[0];
+
+    const reading = normalizeCatPayload({
+      payload: {
+        device: "demo-tph-01",
+        measuredAt: "2026-01-01T00:00:00.000Z",
+        distance: 75,
+      },
+      tank,
+      receivedAt: new Date("2026-06-28T05:18:00.000Z"),
+    });
+
+    expect(reading.measuredAt).toBe("2026-06-28T05:18:00.000Z");
+    expect(reading.quality).toMatchObject({
+      measuredAtSource: "server",
+    });
+    expect(reading.quality?.warnings).toContain(
+      "Timestamp device berbeda lebih dari 24 jam dari waktu server; measuredAt memakai waktu server.",
+    );
+  });
 });

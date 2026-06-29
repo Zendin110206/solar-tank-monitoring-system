@@ -58,6 +58,58 @@ describe("telemetry store", () => {
     expect(storedReading?.tankId).toBe("tank-tph-main");
   });
 
+  it("stores real device payload with config source and review status", async () => {
+    resetMonitoringReadings();
+
+    const result = await ingestTelemetry({
+      deviceIdentifier: "demo-psn-01",
+      deviceKey: "local-development-key",
+      payload: {
+        device: "demo-psn-01",
+        measuredAt: "2026-06-28T05:17:57.000Z",
+        tank_shape: "rectangular",
+        capacity_liter: 540,
+        length_cm: 150,
+        width_cm: 60,
+        height_cm: 60,
+        sensor_mount_height_cm: 60,
+        consumption_liter_per_hour: 25,
+        distance_cm: 10.2,
+        voltage: 3.7,
+        rssi: -54,
+        raw: {
+          local_H_cm: 49.8,
+          local_volume_l: 448.2,
+          local_percent: 83,
+        },
+      },
+      receivedAt: new Date("2026-06-28T05:18:00.000Z"),
+    });
+
+    expect(result.ok).toBe(true);
+
+    if (!result.ok) {
+      throw new Error(result.error);
+    }
+
+    expect(result.data).toMatchObject({
+      deviceId: "demo-psn-01",
+      deviceInternalId: "device-psn-main",
+      tankId: "tank-psn-main",
+      volumeLiter: 448.2,
+      fillPercent: 83,
+      runtimeHour: 17.93,
+      configStatus: "normal",
+      needsReview: false,
+      storage: "memory",
+    });
+    expect(result.reading.quality).toMatchObject({
+      configSource: "payload",
+      volumeSource: "device",
+      fillPercentSource: "device",
+    });
+  });
+
   it("rejects requests without device identity", async () => {
     const result = await ingestTelemetry({
       deviceKey: "local-development-key",

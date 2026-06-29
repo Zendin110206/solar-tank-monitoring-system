@@ -33,7 +33,13 @@ import {
 } from "@/features/monitoring/lib/tank-detail-view-model";
 import { listMonitoringReadings } from "@/features/monitoring/lib/monitoring-storage";
 import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/lib/refresh-interval";
-import type { TankShape } from "@/features/monitoring/types/monitoring";
+import type {
+  ReadingQuality,
+  ReadingValueSource,
+  TankConfigReview,
+  TankConfigStatus,
+  TankShape,
+} from "@/features/monitoring/types/monitoring";
 
 export const metadata: Metadata = {
   title: "Detail Tangki Solar | SolarTank",
@@ -127,6 +133,8 @@ type TankDetail = {
     percent: number;
     wifi_rssi: number | null;
   };
+  dataSources: ReadingQuality;
+  configReview: TankConfigReview;
   readings: ReadingPoint[];
   nearbySites: NearbySite[];
 };
@@ -248,6 +256,29 @@ function formatPercent(value: number) {
   return `${value}%`;
 }
 
+function formatSourceLabel(source: ReadingValueSource) {
+  const labels: Record<ReadingValueSource, string> = {
+    device: "perangkat",
+    backend: "backend",
+    server: "server",
+    unknown: "belum diketahui",
+  };
+
+  return labels[source];
+}
+
+function formatConfigStatusLabel(status: TankConfigStatus) {
+  const labels: Record<TankConfigStatus, string> = {
+    normal: "normal",
+    minor_config_difference: "beda kecil",
+    config_mismatch: "mismatch",
+    invalid_config: "invalid",
+    needs_review: "perlu review",
+  };
+
+  return labels[status];
+}
+
 function formatRuntimeHour(value: number | null) {
   if (value === null || !Number.isFinite(value)) {
     return "-";
@@ -357,6 +388,8 @@ function toTankDetail(view: TankDetailView): TankDetail {
       percent: view.rawPayloadPreview.percent,
       wifi_rssi: view.rawPayloadPreview.wifi_rssi,
     },
+    dataSources: view.dataSources,
+    configReview: view.configReview,
     readings: view.readings.map(toReadingPoint),
     nearbySites: view.nearbySites.map(toNearbySite),
   };
@@ -895,6 +928,139 @@ function ParameterList({ items }: { items: ParameterItem[] }) {
   );
 }
 
+function formatSnapshotItem(
+  value: string | number | null | undefined,
+  suffix = "",
+) {
+  if (typeof value === "undefined" || value === null || value === "") {
+    return "-";
+  }
+
+  return typeof value === "number" ? `${formatLiter(value)}${suffix}` : value;
+}
+
+function ConfigReviewPanel({ tank }: { tank: TankDetail }) {
+  const review = tank.configReview;
+  const isProblem = review.needsReview || review.status === "invalid_config";
+  const isMinor = review.status === "minor_config_difference";
+  const tone = isProblem
+    ? "border-red-200 bg-red-50"
+    : isMinor
+      ? "border-amber-200 bg-amber-50"
+      : "border-emerald-200 bg-emerald-50";
+  const badgeTone = isProblem
+    ? "bg-red-600 text-white"
+    : isMinor
+      ? "bg-amber-500 text-white"
+      : "bg-emerald-600 text-white";
+  const payloadConfig = review.payloadTankConfig;
+  const registryConfig = review.registryTankConfig;
+  const appliedConfig = review.appliedTankConfig;
+  const configCards = [
+    {
+      label: "Registry",
+      shape:
+        registryConfig.shape === "rectangular"
+          ? "Tangki balok"
+          : "Silinder horizontal",
+      capacity: formatSnapshotItem(registryConfig.capacityLiter, " L"),
+      source: "data resmi aplikasi",
+    },
+    {
+      label: "Payload",
+      shape: payloadConfig?.shape
+        ? payloadConfig.shape === "rectangular"
+          ? "Tangki balok"
+          : "Silinder horizontal"
+        : "-",
+      capacity: formatSnapshotItem(payloadConfig?.capacityLiter, " L"),
+      source: "laporan device",
+    },
+    {
+      label: "Dipakai pembacaan",
+      shape:
+        appliedConfig.shape === "rectangular"
+          ? "Tangki balok"
+          : "Silinder horizontal",
+      capacity: formatSnapshotItem(appliedConfig.capacityLiter, " L"),
+      source: "hasil normalisasi",
+    },
+  ];
+
+  return (
+    <section
+      className={`mb-5 animate-soft-fade rounded-lg border p-5 shadow-sm ${tone}`}
+    >
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <SectionHeading
+          label="Review config"
+          title={review.summaryLabel}
+          description="Payload perangkat boleh membawa konfigurasi tangki, tetapi tetap dibandingkan dengan registry agar perubahan besar tidak dipercaya diam-diam."
+        />
+        <div className="flex flex-wrap gap-2">
+          <span
+            className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${badgeTone}`}
+          >
+            {formatConfigStatusLabel(review.status)}
+          </span>
+          <span className="w-fit rounded-full bg-white px-3 py-1 text-xs font-semibold text-zinc-700 ring-1 ring-zinc-200">
+            sumber {review.configSource}
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-5 grid gap-3 md:grid-cols-3">
+        {configCards.map((item) => (
+          <div
+            key={item.label}
+            className="rounded-lg border border-white/70 bg-white/80 p-4 shadow-sm"
+          >
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400">
+              {item.label}
+            </p>
+            <p className="mt-2 text-sm font-semibold text-zinc-950">
+              {item.shape}
+            </p>
+            <p className="mt-1 text-sm text-zinc-600">{item.capacity}</p>
+            <p className="mt-3 text-xs leading-5 text-zinc-500">
+              {item.source}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {review.issues.length > 0 ? (
+        <div className="mt-4 grid gap-2">
+          {review.issues.slice(0, 4).map((issue) => (
+            <div
+              key={`${issue.field}-${issue.message}`}
+              className="rounded-lg border border-white/70 bg-white/80 p-4 text-sm leading-6 text-zinc-700 shadow-sm"
+            >
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="font-semibold text-zinc-950">{issue.label}</p>
+                  <p className="mt-1">{issue.message}</p>
+                </div>
+                <span className="w-fit rounded-full bg-zinc-950 px-3 py-1 text-xs font-semibold text-white">
+                  {issue.severity}
+                </span>
+              </div>
+              <p className="mt-2 text-xs text-zinc-500">
+                Registry: {issue.registryValue} | Payload: {issue.payloadValue}
+              </p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-4 rounded-lg border border-white/70 bg-white/80 p-4 text-sm leading-6 text-zinc-600 shadow-sm">
+          Tidak ada konflik konfigurasi besar yang terdeteksi pada pembacaan
+          terbaru.
+        </p>
+      )}
+    </section>
+  );
+}
+
 function RuntimeParameterPanel({ tank }: { tank: TankDetail }) {
   const activeParameter = getRuntimeLevelParameter(
     tank.hasReading ? tank.runtimeHour : null,
@@ -976,6 +1142,8 @@ function TankConfigurationPanel({ tank }: { tank: TankDetail }) {
           ["Diameter tabung", formatMeasurement(tank.diameterCm, "cm")],
         ];
   const configRows = [
+    ["Status config", tank.configReview.summaryLabel],
+    ["Sumber config", tank.configReview.configSource],
     ["Tipe visual", tank.shapeLabel],
     ["Kapasitas", `${formatLiter(tank.capacityLiter)} L`],
     ...dimensionRows,
@@ -1113,15 +1281,12 @@ export default async function TankDetailPage({
   const refreshIntervalMs = getMonitoringRefreshIntervalMs();
 
   const status = statusMeta[tank.status];
-  const runtimeLevel = getRuntimeLevelParameter(
-    tank.hasReading ? tank.runtimeHour : null,
-  );
   const metrics = [
     {
       label: "Volume saat ini",
       value: tank.hasReading ? `${formatLiter(tank.volumeLiter)} L` : "-",
       note: tank.hasReading
-        ? `${tank.fillPercent}% dari kapasitas konfigurasi ${formatLiter(tank.capacityLiter)} L`
+        ? `${tank.fillPercent}% dari kapasitas konfigurasi ${formatLiter(tank.capacityLiter)} L, sumber volume ${formatSourceLabel(tank.dataSources.volumeSource)}`
         : `menunggu pembacaan pertama dari perangkat, kapasitas konfigurasi ${formatLiter(tank.capacityLiter)} L`,
       icon: Fuel,
       tone: "bg-cyan-50 text-cyan-700 ring-cyan-100",
@@ -1130,7 +1295,7 @@ export default async function TankDetailPage({
       label: "Estimasi runtime",
       value: tank.hasReading ? formatRuntimeHour(tank.runtimeHour) : "-",
       note: tank.hasReading
-        ? `berdasarkan konsumsi ${tank.consumptionLiterPerHour} L/jam, parameter ${runtimeLevel.label}`
+        ? `berdasarkan konsumsi ${tank.consumptionLiterPerHour} L/jam, dihitung ${formatSourceLabel(tank.dataSources.runtimeSource)}`
         : `akan dihitung setelah volume terbaca, konsumsi konfigurasi ${tank.consumptionLiterPerHour} L/jam`,
       icon: Clock,
       tone: "bg-emerald-50 text-emerald-700 ring-emerald-100",
@@ -1188,7 +1353,7 @@ export default async function TankDetailPage({
       label: "Tinggi solar dihitung",
       value: tank.hasReading ? `${tank.fuelHeightCm} cm` : "-",
       detail: tank.hasReading
-        ? "nilai ter-normalisasi dari raw.H_cm"
+        ? `sumber tinggi solar ${formatSourceLabel(tank.dataSources.fuelHeightSource)}`
         : "tinggi solar belum dihitung sebelum data masuk",
     },
     {
@@ -1197,7 +1362,7 @@ export default async function TankDetailPage({
         ? `${formatLiter(tank.volumeLiter)} L / ${tank.fillPercent}%`
         : "-",
       detail: tank.hasReading
-        ? "angka siap dipakai UI dan status"
+        ? `volume dari ${formatSourceLabel(tank.dataSources.volumeSource)}, persen dari ${formatSourceLabel(tank.dataSources.fillPercentSource)}`
         : "dashboard tetap menampilkan STO sambil menunggu data pertama",
     },
     {
@@ -1328,6 +1493,8 @@ export default async function TankDetailPage({
           ))}
         </section>
 
+        <ConfigReviewPanel tank={tank} />
+
         <div className="grid min-w-0 gap-5 xl:grid-cols-[1.32fr_0.68fr]">
           <div className="min-w-0 space-y-5">
             {/* Tank Visual Section */}
@@ -1453,6 +1620,15 @@ export default async function TankDetailPage({
                   tank.hasReading
                     ? formatMeasurement(tank.rawPayload.wifi_rssi, "dBm")
                     : "-",
+                ],
+                ["config.status", formatConfigStatusLabel(tank.configReview.status)],
+                [
+                  "source.volume",
+                  formatSourceLabel(tank.dataSources.volumeSource),
+                ],
+                [
+                  "source.percent",
+                  formatSourceLabel(tank.dataSources.fillPercentSource),
                 ],
               ].map(([key, value]) => (
                 <div

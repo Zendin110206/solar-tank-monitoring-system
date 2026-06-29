@@ -8,6 +8,7 @@ import type {
   Device,
   Reading,
   Tank,
+  TankConfigStatus,
 } from "../types/monitoring";
 import {
   isGlobalDeviceKeyFallbackAllowed,
@@ -48,6 +49,9 @@ type IngestTelemetrySuccess = {
     runtimeHour: number;
     batteryVolt: number | null;
     rssiDbm: number | null;
+    configStatus: TankConfigStatus | null;
+    needsReview: boolean;
+    warnings: string[];
     storage: MonitoringStorageDriver;
   };
 };
@@ -252,6 +256,9 @@ export async function ingestTelemetry({
         runtimeHour: stored.reading.runtimeHour,
         batteryVolt: stored.reading.batteryVolt ?? null,
         rssiDbm: stored.reading.rssiDbm ?? null,
+        configStatus: stored.reading.quality?.configStatus ?? null,
+        needsReview: stored.reading.quality?.needsReview ?? false,
+        warnings: stored.reading.quality?.warnings ?? [],
         storage: stored.storage,
       },
     };

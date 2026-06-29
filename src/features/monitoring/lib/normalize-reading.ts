@@ -2,8 +2,16 @@ import type {
   CatTelemetryPayload,
   NormalizeReadingInput,
   Reading,
+  ReadingQuality,
+  ReadingValueSource,
 } from "../types/monitoring";
-import { clampNumber, toFiniteNumber } from "./number";
+import { clampNumber, roundTo } from "./number";
+import {
+  compareRegistryVsPayloadConfig,
+  pickPayloadNumber,
+  pickPayloadString,
+  resolveTankFromPayloadConfig,
+} from "./reading-tank-config";
 import { calculateRuntimeHours } from "./runtime";
 import {
   calculateFillPercent,
@@ -12,69 +20,231 @@ import {
   getMaxFuelHeightCm,
 } from "./tank-volume";
 
-function readPath(source: Record<string, unknown>, path: string): unknown {
-  return path.split(".").reduce<unknown>((current, key) => {
-    if (
-      current &&
-      typeof current === "object" &&
-      Object.prototype.hasOwnProperty.call(current, key)
-    ) {
-      return (current as Record<string, unknown>)[key];
-    }
+const MAX_DEVICE_TIME_DRIFT_MS = 24 * 60 * 60 * 1000;
+const MAX_REASONABLE_VOLTAGE = 60;
+const MIN_REASONABLE_RSSI = -120;
+const MAX_REASONABLE_RSSI = 0;
+const CALCULATION_MISMATCH_RATIO = 0.05;
 
-    return undefined;
-  }, source);
-}
+type MeasuredAtResult = {
+  measuredAt: string;
+  source: ReadingValueSource;
+  warning: string | null;
+};
 
-function pickNumber(
-  payload: CatTelemetryPayload,
-  paths: string[],
-): number | null {
-  for (const path of paths) {
-    const value = readPath(payload, path);
-    const parsed = toFiniteNumber(value);
+function resolveMeasuredAtCandidate(
+  candidateDate: Date,
+  receivedAt: Date,
+): MeasuredAtResult {
+  const candidateTime = candidateDate.getTime();
 
-    if (parsed !== null) {
-      return parsed;
-    }
+  if (!Number.isFinite(candidateTime)) {
+    return {
+      measuredAt: receivedAt.toISOString(),
+      source: "server",
+      warning: "Timestamp device tidak valid; measuredAt memakai waktu server.",
+    };
   }
 
-  return null;
-}
+  const driftMs = Math.abs(receivedAt.getTime() - candidateTime);
 
-function pickString(
-  payload: CatTelemetryPayload,
-  paths: string[],
-): string | null {
-  for (const path of paths) {
-    const value = readPath(payload, path);
-
-    if (typeof value === "string" && value.trim() !== "") {
-      return value.trim();
-    }
+  if (driftMs > MAX_DEVICE_TIME_DRIFT_MS) {
+    return {
+      measuredAt: receivedAt.toISOString(),
+      source: "server",
+      warning:
+        "Timestamp device berbeda lebih dari 24 jam dari waktu server; measuredAt memakai waktu server.",
+    };
   }
 
-  return null;
+  return {
+    measuredAt: candidateDate.toISOString(),
+    source: "device",
+    warning: null,
+  };
 }
 
 function resolveMeasuredAt(
   payload: CatTelemetryPayload,
   receivedAt: Date,
-): string {
-  const tsIso = pickString(payload, ["ts_iso", "raw.ts_iso"]);
+): MeasuredAtResult {
+  const tsIso = pickPayloadString(payload, [
+    "measuredAt",
+    "measured_at",
+    "ts_iso",
+    "raw.measuredAt",
+    "raw.measured_at",
+    "raw.ts_iso",
+  ]);
 
-  if (tsIso && Number.isFinite(Date.parse(tsIso))) {
-    return new Date(tsIso).toISOString();
+  if (tsIso) {
+    return resolveMeasuredAtCandidate(new Date(tsIso), receivedAt);
   }
 
-  const ts = pickNumber(payload, ["ts", "raw.ts"]);
+  const ts = pickPayloadNumber(payload, ["ts", "raw.ts"]);
 
   if (ts !== null && ts > 0) {
     const timestampMs = ts > 1_000_000_000_000 ? ts : ts * 1000;
-    return new Date(timestampMs).toISOString();
+    return resolveMeasuredAtCandidate(new Date(timestampMs), receivedAt);
   }
 
-  return receivedAt.toISOString();
+  return {
+    measuredAt: receivedAt.toISOString(),
+    source: "server",
+    warning: null,
+  };
+}
+
+function normalizeDistanceCm({
+  value,
+  sensorMountHeightCm,
+  warnings,
+}: {
+  value: number | null;
+  sensorMountHeightCm: number;
+  warnings: string[];
+}): number {
+  if (value === null) {
+    warnings.push(
+      "Payload tidak membawa distance_cm; jarak sensor fallback ke 0 cm.",
+    );
+    return 0;
+  }
+
+  if (value < 0) {
+    warnings.push("distance_cm bernilai negatif; nilai dikunci ke 0 cm.");
+  }
+
+  if (value > sensorMountHeightCm) {
+    warnings.push(
+      "distance_cm lebih tinggi dari sensor_mount_height_cm; nilai dikunci ke tinggi sensor.",
+    );
+  }
+
+  return roundTo(clampNumber(value, 0, sensorMountHeightCm), 2);
+}
+
+function normalizeClampedDeviceNumber({
+  value,
+  min,
+  max,
+  label,
+  warnings,
+}: {
+  value: number | null;
+  min: number;
+  max: number;
+  label: string;
+  warnings: string[];
+}): number | null {
+  if (value === null) {
+    return null;
+  }
+
+  if (value < min || value > max) {
+    warnings.push(`${label} dari payload di luar rentang wajar dan dikunci.`);
+  }
+
+  return roundTo(clampNumber(value, min, max), 2);
+}
+
+function normalizePercent({
+  value,
+  label,
+  warnings,
+}: {
+  value: number | null;
+  label: string;
+  warnings: string[];
+}): number | null {
+  if (value === null) {
+    return null;
+  }
+
+  if (value < 0 || value > 100) {
+    warnings.push(
+      `${label} dari payload harus 0-100%; nilai payload diabaikan dan backend menghitung ulang.`,
+    );
+    return null;
+  }
+
+  return roundTo(value, 2);
+}
+
+function normalizeBatteryVolt(
+  payload: CatTelemetryPayload,
+  warnings: string[],
+): number | null {
+  const value = pickPayloadNumber(payload, [
+    "voltage",
+    "vbatt",
+    "vbat",
+    "batteryVolt",
+    "raw.voltage",
+    "raw.vbatt",
+    "raw.vbat",
+    "raw.batteryVolt",
+  ]);
+
+  if (value === null) {
+    return null;
+  }
+
+  if (value < 0 || value > MAX_REASONABLE_VOLTAGE) {
+    warnings.push("Tegangan payload di luar rentang wajar; nilai diabaikan.");
+    return null;
+  }
+
+  return roundTo(value, 2);
+}
+
+function normalizeRssiDbm(
+  payload: CatTelemetryPayload,
+  warnings: string[],
+): number | null {
+  const value = pickPayloadNumber(payload, [
+    "rssi",
+    "wifi_rssi",
+    "raw.rssi",
+    "raw.wifi_rssi",
+  ]);
+
+  if (value === null) {
+    return null;
+  }
+
+  if (value < MIN_REASONABLE_RSSI || value > MAX_REASONABLE_RSSI) {
+    warnings.push("RSSI payload di luar rentang wajar; nilai diabaikan.");
+    return null;
+  }
+
+  return roundTo(value, 2);
+}
+
+function pushCalculationMismatchWarning({
+  deviceValue,
+  backendValue,
+  capacityLiter,
+  label,
+  warnings,
+}: {
+  deviceValue: number | null;
+  backendValue: number;
+  capacityLiter: number;
+  label: string;
+  warnings: string[];
+}) {
+  if (deviceValue === null || capacityLiter <= 0) {
+    return;
+  }
+
+  const differenceRatio = Math.abs(deviceValue - backendValue) / capacityLiter;
+
+  if (differenceRatio > CALCULATION_MISMATCH_RATIO) {
+    warnings.push(
+      `${label} dari device berbeda lebih dari 5% kapasitas terhadap hitungan backend.`,
+    );
+  }
 }
 
 export function normalizeCatPayload({
@@ -84,81 +254,144 @@ export function normalizeCatPayload({
   receivedAt = new Date(),
   readingId,
 }: NormalizeReadingInput): Reading {
+  const warnings: string[] = [];
+  const configReview = compareRegistryVsPayloadConfig(tank, payload);
+  const readingTank = resolveTankFromPayloadConfig(payload, tank);
   const deviceId =
-    pickString(payload, ["device", "device_id", "raw.device"]) ??
+    pickPayloadString(payload, ["device", "device_id", "raw.device"]) ??
     fallbackDeviceId ??
     "unknown-device";
+  const measuredAtResult = resolveMeasuredAt(payload, receivedAt);
 
-  const sensorDistanceCm =
-    pickNumber(payload, [
+  if (measuredAtResult.warning) {
+    warnings.push(measuredAtResult.warning);
+  }
+
+  const maxFuelHeightCm = getMaxFuelHeightCm(readingTank);
+  const sensorDistanceCm = normalizeDistanceCm({
+    value: pickPayloadNumber(payload, [
       "dist_cm",
       "distance_cm",
       "dist",
       "distance",
+      "raw.dist_cm",
       "raw.distance_cm",
+      "raw.dist",
       "raw.distance",
-    ]) ?? 0;
-
-  const maxFuelHeightCm = getMaxFuelHeightCm(tank);
-  const explicitFuelHeightCm = pickNumber(payload, [
-    "h_cm",
-    "H_cm",
-    "raw.h_cm",
-    "raw.H_cm",
-  ]);
-
-  const fuelHeightCm =
-    explicitFuelHeightCm !== null
-      ? clampNumber(explicitFuelHeightCm, 0, maxFuelHeightCm)
-      : calculateFuelHeightCm({
-          sensorMountHeightCm: tank.sensorMountHeightCm,
-          sensorDistanceCm,
-          maxFuelHeightCm,
-        });
-
-  const explicitVolumeLiter = pickNumber(payload, [
-    "volume_l",
-    "volume",
-    "raw.volume_l",
-    "raw.volume",
-  ]);
-
-  const volumeLiter =
-    explicitVolumeLiter !== null
-      ? clampNumber(explicitVolumeLiter, 0, tank.capacityLiter)
-      : calculateTankVolumeLiter(tank, fuelHeightCm);
-
-  const explicitFillPercent = pickNumber(payload, ["percent", "raw.percent"]);
-
-  const fillPercent =
-    explicitFillPercent !== null
-      ? clampNumber(explicitFillPercent, 0, 100)
-      : calculateFillPercent(volumeLiter, tank.capacityLiter);
-
+    ]),
+    sensorMountHeightCm: readingTank.sensorMountHeightCm,
+    warnings,
+  });
+  const deviceFuelHeightCm = normalizeClampedDeviceNumber({
+    value: pickPayloadNumber(payload, [
+      "local_H_cm",
+      "fuel_height_cm",
+      "fuelHeightCm",
+      "h_cm",
+      "H_cm",
+      "local_result.fuel_height_cm",
+      "local_result.fuelHeightCm",
+      "raw.local_H_cm",
+      "raw.fuel_height_cm",
+      "raw.fuelHeightCm",
+      "raw.h_cm",
+      "raw.H_cm",
+    ]),
+    min: 0,
+    max: maxFuelHeightCm,
+    label: "Tinggi solar",
+    warnings,
+  });
+  const backendFuelHeightCm = calculateFuelHeightCm({
+    sensorMountHeightCm: readingTank.sensorMountHeightCm,
+    sensorDistanceCm,
+    maxFuelHeightCm,
+  });
+  const fuelHeightCm = deviceFuelHeightCm ?? backendFuelHeightCm;
+  const fuelHeightSource: ReadingValueSource =
+    deviceFuelHeightCm !== null ? "device" : "backend";
+  const deviceVolumeLiter = normalizeClampedDeviceNumber({
+    value: pickPayloadNumber(payload, [
+      "local_volume_l",
+      "volume_liter",
+      "volume_l",
+      "volume",
+      "local_result.volume_liter",
+      "local_result.volumeLiter",
+      "raw.local_volume_l",
+      "raw.volume_liter",
+      "raw.volume_l",
+      "raw.volume",
+    ]),
+    min: 0,
+    max: readingTank.capacityLiter,
+    label: "Volume",
+    warnings,
+  });
+  const backendVolumeLiter = calculateTankVolumeLiter(readingTank, fuelHeightCm);
+  const volumeLiter = deviceVolumeLiter ?? backendVolumeLiter;
+  const volumeSource: ReadingValueSource =
+    deviceVolumeLiter !== null ? "device" : "backend";
+  const deviceFillPercent = normalizePercent({
+    value: pickPayloadNumber(payload, [
+      "local_percent",
+      "fill_percent",
+      "percent",
+      "local_result.fill_percent",
+      "local_result.fillPercent",
+      "raw.local_percent",
+      "raw.fill_percent",
+      "raw.percent",
+    ]),
+    label: "Fill percent",
+    warnings,
+  });
+  const backendFillPercent = calculateFillPercent(
+    volumeLiter,
+    readingTank.capacityLiter,
+  );
+  const fillPercent = deviceFillPercent ?? backendFillPercent;
+  const fillPercentSource: ReadingValueSource =
+    deviceFillPercent !== null ? "device" : "backend";
   const runtimeHour =
-    calculateRuntimeHours(volumeLiter, tank.consumptionLiterPerHour) ?? 0;
+    calculateRuntimeHours(volumeLiter, readingTank.consumptionLiterPerHour) ??
+    0;
+  const batteryVolt = normalizeBatteryVolt(payload, warnings);
+  const rssiDbm = normalizeRssiDbm(payload, warnings);
 
-  const batteryVolt = pickNumber(payload, [
-    "voltage",
-    "vbatt",
-    "vbat",
-    "raw.voltage",
-    "raw.vbatt",
-    "raw.vbat",
-  ]);
+  pushCalculationMismatchWarning({
+    deviceValue: deviceVolumeLiter,
+    backendValue: backendVolumeLiter,
+    capacityLiter: readingTank.capacityLiter,
+    label: "Volume",
+    warnings,
+  });
+  pushCalculationMismatchWarning({
+    deviceValue: deviceFillPercent,
+    backendValue: backendFillPercent,
+    capacityLiter: 100,
+    label: "Persen isi",
+    warnings,
+  });
 
-  const rssiDbm = pickNumber(payload, [
-    "rssi",
-    "wifi_rssi",
-    "raw.rssi",
-    "raw.wifi_rssi",
-  ]);
+  const quality: ReadingQuality = {
+    measuredAtSource: measuredAtResult.source,
+    fuelHeightSource,
+    volumeSource,
+    fillPercentSource,
+    runtimeSource: "backend",
+    configSource: configReview.configSource,
+    configStatus: configReview.status,
+    needsReview: configReview.needsReview,
+    warnings: [...configReview.reasons, ...warnings],
+    configMismatchReasons: configReview.reasons,
+  };
 
   return {
     id: readingId ?? `reading-${deviceId}-${receivedAt.getTime()}`,
     deviceId,
     tankId: tank.id,
-    measuredAt: resolveMeasuredAt(payload, receivedAt),
+    measuredAt: measuredAtResult.measuredAt,
     receivedAt: receivedAt.toISOString(),
     sensorDistanceCm,
     fuelHeightCm,
@@ -168,5 +401,6 @@ export function normalizeCatPayload({
     ...(batteryVolt !== null ? { batteryVolt } : {}),
     ...(rssiDbm !== null ? { rssiDbm } : {}),
     rawPayload: payload,
+    quality,
   };
 }

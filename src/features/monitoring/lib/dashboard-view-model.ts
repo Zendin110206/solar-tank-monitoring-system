@@ -9,9 +9,14 @@ import type {
   Reading,
   RuntimeStatus,
   Site,
+  TankConfigStatus,
   Tank,
 } from "../types/monitoring";
 import { clampNumber } from "./number";
+import {
+  compareRegistryVsPayloadConfig,
+  resolveTankFromPayloadConfig,
+} from "./reading-tank-config";
 import {
   getDeviceStatus,
   getLevelStatus,
@@ -44,6 +49,9 @@ export type DashboardMonitoringSite = {
   top: string;
   note: string;
   consumptionLiterPerHour: number;
+  configStatus: TankConfigStatus;
+  configNeedsReview: boolean;
+  configSummary: string;
 };
 
 type DashboardSummary = {
@@ -172,9 +180,16 @@ function buildStatusNote(row: {
   fillPercent: number;
   runtimeHour: number;
   deviceStatus: DeviceStatus;
+  configNeedsReview: boolean;
+  configSummary: string;
+  configReasons: string[];
 }): string {
   if (!row.hasReading) {
     return "Belum ada pembacaan dari perangkat. Lokasi perlu dicek setelah perangkat aktif.";
+  }
+
+  if (row.configNeedsReview) {
+    return `${row.configSummary}. ${row.configReasons[0] ?? "Perlu cek teknisi/admin sebelum config dianggap resmi."}`;
   }
 
   if (row.status === "offline") {
@@ -242,6 +257,12 @@ export function buildDashboardOverview({
       return [];
     }
 
+    const configReview = reading?.rawPayload
+      ? compareRegistryVsPayloadConfig(tank, reading.rawPayload)
+      : compareRegistryVsPayloadConfig(tank, null);
+    const displayTank = reading?.rawPayload
+      ? resolveTankFromPayloadConfig(reading.rawPayload, tank)
+      : tank;
     const fillPercent = reading?.fillPercent ?? 0;
     const volumeLiter = reading?.volumeLiter ?? 0;
     const runtimeHour = reading?.runtimeHour ?? 0;
@@ -261,7 +282,11 @@ export function buildDashboardOverview({
       levelStatus,
       deviceStatus,
     });
-    const status = toDashboardStatus(deviceStatus, operationalStatus);
+    const baseStatus = toDashboardStatus(deviceStatus, operationalStatus);
+    const status =
+      configReview.needsReview && baseStatus === "online"
+        ? "warning"
+        : baseStatus;
     const position = mapPositions[site.id] ?? { left: "50%", top: "50%" };
 
     const row: DashboardMonitoringSite = {
@@ -288,7 +313,10 @@ export function buildDashboardOverview({
       left: position.left,
       top: position.top,
       note: "",
-      consumptionLiterPerHour: tank.consumptionLiterPerHour,
+      consumptionLiterPerHour: displayTank.consumptionLiterPerHour,
+      configStatus: configReview.status,
+      configNeedsReview: configReview.needsReview,
+      configSummary: configReview.summaryLabel,
     };
 
     return [
@@ -297,6 +325,7 @@ export function buildDashboardOverview({
         note: buildStatusNote({
           ...row,
           hasReading: Boolean(reading),
+          configReasons: configReview.reasons,
         }),
       },
     ];
