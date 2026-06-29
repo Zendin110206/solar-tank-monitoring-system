@@ -452,52 +452,65 @@ function TankLevelGraphic({
   if (isRectangular) {
     return (
       <div className="relative mx-auto h-56 max-w-md px-6 pt-7">
-        <div className="absolute left-12 right-3 top-4 h-12 -skew-x-12 rounded-t-2xl border border-cyan-100 bg-gradient-to-r from-white via-cyan-50 to-blue-100 shadow-sm" />
-        <div className="absolute bottom-10 right-2 top-14 w-12 skew-y-6 rounded-r-2xl border border-blue-100 bg-gradient-to-b from-blue-50 to-blue-200 shadow-sm" />
+        <div className="absolute inset-x-16 bottom-4 h-7 rounded-full bg-slate-900/10 blur-xl" />
 
-        <div className="relative z-10 h-44 overflow-hidden rounded-2xl border border-zinc-300 bg-white shadow-[0_20px_36px_rgba(15,23,42,0.12),inset_0_1px_0_rgba(255,255,255,0.8)]">
+        <div className="relative z-10 h-44 overflow-hidden rounded-[1.35rem] border border-zinc-300 bg-gradient-to-br from-white via-slate-50 to-slate-100 shadow-[0_24px_42px_rgba(15,23,42,0.14),inset_0_1px_0_rgba(255,255,255,0.9),inset_0_-18px_28px_rgba(15,23,42,0.08)]">
           <div
-            className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-cyan-500 via-blue-500 to-blue-300 shadow-[inset_0_18px_28px_rgba(255,255,255,0.22)] transition-[height] duration-700 ease-out"
+            className="absolute inset-x-0 bottom-0 overflow-visible bg-gradient-to-t from-cyan-600 via-blue-500 to-cyan-300 shadow-[inset_0_18px_28px_rgba(255,255,255,0.26),inset_0_-18px_24px_rgba(15,23,42,0.12)] transition-[height] duration-700 ease-out"
             style={fillStyle}
-          />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,.32)_1px,transparent_1px),linear-gradient(0deg,rgba(255,255,255,.32)_1px,transparent_1px)] bg-[size:22px_22px]" />
-          <div className="absolute inset-x-5 top-5 h-8 rounded-full bg-white/25 blur-sm" />
+          >
+            <div className="absolute -top-2 left-[-6%] h-5 w-[112%] rounded-[50%] bg-cyan-200/75 shadow-[0_-4px_12px_rgba(34,211,238,0.26)]" />
+          </div>
+          <div className="absolute inset-x-6 top-5 h-8 rounded-full bg-white/35 blur-sm" />
+          <div className="absolute inset-y-4 left-5 w-10 rounded-full bg-white/18 blur-sm" />
+          <div className="absolute inset-y-0 right-0 w-14 bg-gradient-to-l from-slate-900/12 to-transparent" />
           <div
-            className="absolute left-4 right-4 z-20 border-t border-dashed border-red-500 transition-[bottom] duration-700 ease-out"
+            className="absolute left-5 right-5 z-20 border-t border-dashed border-red-500 transition-[bottom] duration-700 ease-out"
             style={surfaceStyle}
           />
-          <div className="absolute left-1/2 top-2 z-30 size-3 -translate-x-1/2 rounded-full bg-red-600 ring-4 ring-red-100" />
+          <div className="absolute left-1/2 top-1.5 z-30 grid size-5 -translate-x-1/2 place-items-center rounded-full bg-white shadow-sm ring-1 ring-red-100">
+            <span className="size-3 rounded-full bg-red-600 ring-4 ring-red-100" />
+          </div>
           <div
-            className="absolute left-1/2 top-4 z-20 border-l-2 border-dashed border-red-500 transition-[height] duration-700 ease-out"
+            className="absolute left-1/2 top-5 z-20 border-l-2 border-dashed border-red-500 transition-[height] duration-700 ease-out"
             style={sensorDropStyle}
           />
         </div>
+
+        <div className="absolute bottom-5 left-[22%] h-6 w-14 rounded-b-lg bg-gradient-to-r from-slate-400 via-slate-200 to-slate-500 shadow-sm" />
+        <div className="absolute bottom-5 right-[22%] h-6 w-14 rounded-b-lg bg-gradient-to-r from-slate-400 via-slate-200 to-slate-500 shadow-sm" />
       </div>
     );
   }
 
   return (
     <div className="relative mx-auto h-56 max-w-md px-6 pt-8">
-      <div className="absolute left-12 right-12 top-4 h-12 rounded-full border border-cyan-100 bg-gradient-to-r from-white via-cyan-50 to-blue-100 shadow-sm" />
+      <div className="absolute inset-x-16 bottom-5 h-7 rounded-full bg-slate-900/10 blur-xl" />
 
-      <div className="relative z-10 h-44 overflow-hidden rounded-[999px] border border-zinc-300 bg-white shadow-[0_20px_36px_rgba(15,23,42,0.12),inset_0_1px_0_rgba(255,255,255,0.8)]">
+      <div className="relative z-10 h-44 overflow-hidden rounded-[999px] border border-zinc-300 bg-gradient-to-br from-white via-slate-50 to-slate-100 shadow-[0_24px_42px_rgba(15,23,42,0.14),inset_0_1px_0_rgba(255,255,255,0.92),inset_0_-20px_30px_rgba(15,23,42,0.09)]">
         <div
-          className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-cyan-500 via-blue-500 to-blue-300 shadow-[inset_0_18px_28px_rgba(255,255,255,0.28)] transition-[height] duration-700 ease-out"
+          className="absolute inset-x-0 bottom-0 overflow-visible bg-gradient-to-t from-cyan-600 via-blue-500 to-cyan-300 shadow-[inset_0_18px_28px_rgba(255,255,255,0.28),inset_0_-18px_24px_rgba(15,23,42,0.12)] transition-[height] duration-700 ease-out"
           style={fillStyle}
-        />
-        <div className="absolute inset-y-0 left-7 w-12 rounded-full border border-white/80 bg-white/30" />
-        <div className="absolute inset-y-0 right-7 w-12 rounded-full border border-zinc-300 bg-white/30" />
-        <div className="absolute inset-x-14 top-6 h-8 rounded-full bg-white/25 blur-sm" />
+        >
+          <div className="absolute -top-2 left-[-5%] h-5 w-[110%] rounded-[50%] bg-cyan-200/80 shadow-[0_-4px_12px_rgba(34,211,238,0.28)]" />
+        </div>
+        <div className="absolute inset-x-16 top-5 h-8 rounded-full bg-white/35 blur-sm" />
+        <div className="absolute inset-x-10 bottom-4 h-5 rounded-full bg-slate-900/10 blur-sm" />
         <div
           className="absolute left-10 right-10 z-20 border-t border-dashed border-red-500 transition-[bottom] duration-700 ease-out"
           style={surfaceStyle}
         />
-        <div className="absolute left-1/2 top-2 z-30 size-3 -translate-x-1/2 rounded-full bg-red-600 ring-4 ring-red-100" />
+        <div className="absolute left-1/2 top-1.5 z-30 grid size-5 -translate-x-1/2 place-items-center rounded-full bg-white shadow-sm ring-1 ring-red-100">
+          <span className="size-3 rounded-full bg-red-600 ring-4 ring-red-100" />
+        </div>
         <div
-          className="absolute left-1/2 top-4 z-20 border-l-2 border-dashed border-red-500 transition-[height] duration-700 ease-out"
+          className="absolute left-1/2 top-5 z-20 border-l-2 border-dashed border-red-500 transition-[height] duration-700 ease-out"
           style={sensorDropStyle}
         />
       </div>
+
+      <div className="absolute bottom-5 left-[21%] h-6 w-14 rounded-b-lg bg-gradient-to-r from-slate-400 via-slate-200 to-slate-500 shadow-sm" />
+      <div className="absolute bottom-5 right-[21%] h-6 w-14 rounded-b-lg bg-gradient-to-r from-slate-400 via-slate-200 to-slate-500 shadow-sm" />
     </div>
   );
 }
@@ -631,13 +644,19 @@ function TankVisual({ tank }: { tank: TankDetail }) {
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          {dimensionItems.map((item) => {
+          {dimensionItems.map((item, index) => {
             const Icon = item.icon;
+            const shouldCenterItem =
+              !isRectangular && index === dimensionItems.length - 1;
 
             return (
               <div
                 key={item.label}
-                className="rounded-lg border border-zinc-200 bg-zinc-50 p-3"
+                className={`rounded-lg border border-zinc-200 bg-zinc-50 p-3 ${
+                  shouldCenterItem
+                    ? "sm:col-span-2 sm:mx-auto sm:w-[calc(50%-0.375rem)]"
+                    : ""
+                }`}
               >
                 <div className="flex items-center gap-3">
                   <span className="grid size-10 place-items-center rounded-lg bg-white text-red-600 ring-1 ring-zinc-200">
@@ -1335,10 +1354,6 @@ export default async function TankDetailPage({
               <ReadingTable tank={tank} />
             </section>
 
-            {/* Location Section */}
-            <section id="lokasi">
-              <LocationPanel tank={tank} />
-            </section>
           </div>
 
           <aside className="min-w-0 space-y-5">
@@ -1360,135 +1375,140 @@ export default async function TankDetailPage({
 
             {/* Tank Configuration Section */}
             <TankConfigurationPanel tank={tank} />
-
-            {/* Data Flow Section */}
-            <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
-              <SectionHeading
-                label="Alur baca"
-                title="Dari sensor ke keputusan"
-                description="Urutan ini menjaga dashboard tidak salah memahami data mentah perangkat."
-              />
-
-              <div className="mt-6 space-y-4">
-                {dataFlow.map((item, index) => (
-                  <div key={item.label} className="flex gap-4">
-                    <div className="flex flex-col items-center">
-                      <span className="grid size-9 place-items-center rounded-full bg-red-50 text-sm font-semibold text-red-600 ring-1 ring-red-100">
-                        {index + 1}
-                      </span>
-                      {index < dataFlow.length - 1 ? (
-                        <span className="mt-2 h-full min-h-10 border-l border-zinc-200" />
-                      ) : null}
-                    </div>
-                    <div className="pb-2">
-                      <p className="font-semibold text-zinc-950">
-                        {item.label}
-                      </p>
-                      <p className="mt-1 text-xl font-semibold text-zinc-950">
-                        {item.value}
-                      </p>
-                      <p className="mt-1 text-sm leading-6 text-zinc-500">
-                        {item.detail}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* Payload Section */}
-            <section
-              id="payload"
-              className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
-            >
-              <SectionHeading
-                label="Payload"
-                title="Field kompatibel CAT"
-                description="Nilai berikut menjadi jembatan dari payload lama ke bentuk data internal yang lebih rapi."
-              />
-
-              <div className="mt-6 space-y-3">
-                {[
-                  [
-                    "distance",
-                    tank.hasReading ? `${tank.rawPayload.distance} cm` : "-",
-                  ],
-                  [
-                    "raw.H_cm",
-                    tank.hasReading ? `${tank.rawPayload.H_cm} cm` : "-",
-                  ],
-                  [
-                    "raw.volume",
-                    tank.hasReading
-                      ? `${formatLiter(tank.rawPayload.volume)} L`
-                      : "-",
-                  ],
-                  [
-                    "raw.percent",
-                    tank.hasReading ? `${tank.rawPayload.percent}%` : "-",
-                  ],
-                  [
-                    "raw.wifi_rssi",
-                    tank.hasReading
-                      ? formatMeasurement(tank.rawPayload.wifi_rssi, "dBm")
-                      : "-",
-                  ],
-                ].map(([key, value]) => (
-                  <div
-                    key={key}
-                    className="flex items-center justify-between gap-4 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3"
-                  >
-                    <code className="text-sm font-semibold text-zinc-700">
-                      {key}
-                    </code>
-                    <span className="text-sm font-semibold text-zinc-950">
-                      {value}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-5 rounded-lg bg-zinc-950 p-4 text-sm text-white">
-                <div className="flex items-center gap-2 font-semibold">
-                  <Zap className="size-4 text-cyan-300" aria-hidden="true" />
-                  POST /api/ingest
-                </div>
-                <p className="mt-2 text-zinc-300">
-                  Dashboard membaca data yang sudah dinormalisasi, bukan membaca
-                  sensor secara langsung.
-                </p>
-              </div>
-            </section>
-
-            {/* Validation Notes Section */}
-            <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
-              <SectionHeading
-                label="Validasi"
-                title="Hal yang nanti diganti data asli"
-                description="Bagian ini menampilkan payload terakhir sebagai bahan audit pembacaan perangkat dan proses normalisasi data."
-              />
-
-              <div className="mt-6 space-y-3">
-                {[
-                  "Dimensi tangki dari pengukuran lapangan.",
-                  "Konsumsi solar per jam tiap STO.",
-                  "Interval kirim data aktual dari perangkat.",
-                  "Koordinat manual yang sudah disetujui.",
-                ].map((note) => (
-                  <div
-                    key={note}
-                    className="flex items-start gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-4"
-                  >
-                    <AlertTriangle
-                      className="mt-0.5 size-4 shrink-0 text-red-600"
-                      aria-hidden="true"
-                    />
-                    <p className="text-sm leading-6 text-zinc-600">{note}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
           </aside>
+        </div>
+
+        {/* Location Section */}
+        <section id="lokasi" className="mt-5 min-w-0">
+          <LocationPanel tank={tank} />
+        </section>
+
+        <div className="mt-5 grid min-w-0 gap-5 xl:grid-cols-3">
+          {/* Data Flow Section */}
+          <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+            <SectionHeading
+              label="Alur baca"
+              title="Dari sensor ke keputusan"
+              description="Urutan ini menjaga dashboard tidak salah memahami data mentah perangkat."
+            />
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+              {dataFlow.map((item, index) => (
+                <div key={item.label} className="flex gap-4">
+                  <div className="flex flex-col items-center">
+                    <span className="grid size-9 place-items-center rounded-full bg-red-50 text-sm font-semibold text-red-600 ring-1 ring-red-100">
+                      {index + 1}
+                    </span>
+                    {index < dataFlow.length - 1 ? (
+                      <span className="mt-2 h-full min-h-10 border-l border-zinc-200 sm:hidden xl:block" />
+                    ) : null}
+                  </div>
+                  <div className="pb-2">
+                    <p className="font-semibold text-zinc-950">{item.label}</p>
+                    <p className="mt-1 text-xl font-semibold text-zinc-950">
+                      {item.value}
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-zinc-500">
+                      {item.detail}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Payload Section */}
+          <section
+            id="payload"
+            className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
+          >
+            <SectionHeading
+              label="Payload"
+              title="Field kompatibel CAT"
+              description="Nilai berikut menjadi jembatan dari payload lama ke bentuk data internal yang lebih rapi."
+            />
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+              {[
+                [
+                  "distance",
+                  tank.hasReading ? `${tank.rawPayload.distance} cm` : "-",
+                ],
+                [
+                  "raw.H_cm",
+                  tank.hasReading ? `${tank.rawPayload.H_cm} cm` : "-",
+                ],
+                [
+                  "raw.volume",
+                  tank.hasReading
+                    ? `${formatLiter(tank.rawPayload.volume)} L`
+                    : "-",
+                ],
+                [
+                  "raw.percent",
+                  tank.hasReading ? `${tank.rawPayload.percent}%` : "-",
+                ],
+                [
+                  "raw.wifi_rssi",
+                  tank.hasReading
+                    ? formatMeasurement(tank.rawPayload.wifi_rssi, "dBm")
+                    : "-",
+                ],
+              ].map(([key, value]) => (
+                <div
+                  key={key}
+                  className="flex items-center justify-between gap-4 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3"
+                >
+                  <code className="text-sm font-semibold text-zinc-700">
+                    {key}
+                  </code>
+                  <span className="text-sm font-semibold text-zinc-950">
+                    {value}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-5 rounded-lg bg-zinc-950 p-4 text-sm text-white">
+              <div className="flex items-center gap-2 font-semibold">
+                <Zap className="size-4 text-cyan-300" aria-hidden="true" />
+                POST /api/ingest
+              </div>
+              <p className="mt-2 text-zinc-300">
+                Dashboard membaca data yang sudah dinormalisasi, bukan membaca
+                sensor secara langsung.
+              </p>
+            </div>
+          </section>
+
+          {/* Validation Notes Section */}
+          <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+            <SectionHeading
+              label="Validasi"
+              title="Hal yang nanti diganti data asli"
+              description="Bagian ini menjaga batas data simulator tetap jelas sebelum perangkat asli dan database production disambungkan."
+            />
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+              {[
+                "Dimensi tangki dari pengukuran lapangan.",
+                "Konsumsi solar per jam tiap STO.",
+                "Interval kirim data aktual dari perangkat.",
+                "Koordinat manual yang sudah disetujui.",
+              ].map((note) => (
+                <div
+                  key={note}
+                  className="flex items-start gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-4"
+                >
+                  <AlertTriangle
+                    className="mt-0.5 size-4 shrink-0 text-red-600"
+                    aria-hidden="true"
+                  />
+                  <p className="text-sm leading-6 text-zinc-600">{note}</p>
+                </div>
+              ))}
+            </div>
+          </section>
         </div>
       </div>
     </main>
