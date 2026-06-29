@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function LoginPage() {
   return (
     <AuthShell
-      description="Halaman ini menyiapkan tampilan masuk untuk operator monitoring. Integrasi autentikasi dan sesi pengguna belum diaktifkan pada fase frontend ini."
+      description="Halaman ini menyiapkan tampilan masuk untuk operator monitoring. Integrasi autentikasi dan sesi pengguna akan disambungkan pada tahap berikutnya."
       footerPrompt={
         <>
           Belum memiliki akses?{" "}

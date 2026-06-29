@@ -38,7 +38,7 @@ import type { TankShape } from "@/features/monitoring/types/monitoring";
 export const metadata: Metadata = {
   title: "Detail Tangki Solar | SolarTank",
   description:
-    "Halaman detail frontend untuk membaca kondisi satu tangki solar, visual isi tangki, parameter perangkat, dan riwayat pembacaan.",
+    "Halaman detail untuk membaca kondisi satu tangki solar, visual isi tangki, parameter perangkat, dan riwayat pembacaan.",
 };
 
 export const runtime = "nodejs";
