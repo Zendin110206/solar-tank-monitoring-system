@@ -12,10 +12,116 @@ http://localhost:3000
 
 | Method | Endpoint | Fungsi |
 |---|---|---|
+| `GET` | `/api/health` | Mengecek aplikasi hidup tanpa mengecek database |
+| `GET` | `/api/ready` | Mengecek kesiapan storage aktif |
 | `GET` | `/api/dashboard/overview` | Ringkasan semua lokasi/tangki |
 | `GET` | `/api/tanks/[tankId]` | Detail satu tangki |
 | `GET` | `/api/tanks/[tankId]/readings` | Riwayat pembacaan satu tangki |
 | `POST` | `/api/ingest` | Menerima data device atau simulator |
+
+## GET /api/health
+
+Fungsi:
+
+```text
+Mengecek apakah aplikasi Next.js hidup.
+```
+
+Endpoint ini tidak mengecek database. Gunakan endpoint ini untuk membedakan
+apakah masalah ada di aplikasi atau di storage.
+
+Contoh:
+
+```powershell
+curl.exe http://localhost:3000/api/health
+```
+
+Response sukses:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "status": "ok",
+    "service": "solar-tank-monitoring-system",
+    "storageDriver": "mysql"
+  }
+}
+```
+
+## GET /api/ready
+
+Fungsi:
+
+```text
+Mengecek apakah storage aktif siap dipakai dashboard dan API baca.
+```
+
+Jika `SOLAR_TANK_STORAGE_DRIVER="memory"`, endpoint ini tetap sukses tetapi
+statusnya `degraded` karena data memory tidak permanen.
+
+Jika `SOLAR_TANK_STORAGE_DRIVER="mysql"`, endpoint ini mengetes koneksi MySQL
+langsung. Jika MySQL gagal, response memakai HTTP `503`.
+
+Contoh:
+
+```powershell
+curl.exe http://localhost:3000/api/ready
+```
+
+Response MySQL siap:
+
+```json
+{
+  "ok": true,
+  "data": {
+    "ok": true,
+    "status": "ready",
+    "storageDriver": "mysql",
+    "checks": [
+      {
+        "name": "mysql",
+        "ok": true,
+        "status": "ok",
+        "message": "Koneksi MySQL aktif."
+      },
+      {
+        "name": "mysql-reference-registry",
+        "ok": true,
+        "status": "ok",
+        "message": "Registry MySQL berisi site, tangki, dan device aktif."
+      }
+    ]
+  }
+}
+```
+
+Response MySQL belum siap:
+
+```json
+{
+  "ok": false,
+  "data": {
+    "ok": false,
+    "status": "not_ready",
+    "storageDriver": "mysql",
+    "checks": [
+      {
+        "name": "mysql",
+        "ok": false,
+        "status": "error",
+        "message": "Koneksi MySQL gagal. Cek MYSQL_DATABASE_URL, status database, SSL, network, dan allowlist provider."
+      }
+    ]
+  }
+}
+```
+
+Catatan:
+
+```text
+Jika baru mengubah .env.local, restart dev server. Tombol retry di dashboard tidak memuat ulang env.
+```
 
 ## GET /api/dashboard/overview
 
@@ -53,6 +159,12 @@ Response sukses:
       "activeDriver": "mysql",
       "isFallback": false,
       "label": "Database MySQL"
+    },
+    "registry": {
+      "configuredDriver": "mysql",
+      "activeDriver": "mysql",
+      "isFallback": false,
+      "label": "Registry MySQL"
     }
   }
 }
@@ -61,7 +173,7 @@ Response sukses:
 Catatan:
 
 ```text
-Field data berisi isi dashboard. Field meta.storage membantu melihat apakah data sedang dibaca dari MySQL, memory lokal, atau fallback memory karena MySQL kosong.
+Field data berisi isi dashboard. Field meta.storage membantu melihat apakah reading sedang dibaca dari MySQL atau memory lokal. Jika mode MySQL aktif tetapi tabel reading masih kosong, API tetap memakai MySQL dan mengembalikan daftar reading kosong; dashboard akan menampilkan STO dari registry dengan status belum ada data. Field meta.registry membantu melihat apakah referensi site/tangki/device sedang dibaca dari memory lokal atau MySQL.
 ```
 
 ## GET /api/tanks/[tankId]
@@ -140,7 +252,7 @@ Response sukses:
 Fungsi:
 
 ```text
-Menerima payload dari device atau simulator.
+Menerima payload dari device, simulator, atau smoke test pilot.
 ```
 
 Header wajib:
@@ -176,6 +288,29 @@ Payload contoh:
 }
 ```
 
+Payload pilot real-format juga didukung. Payload ini dapat membawa config tangki dari device:
+
+```json
+{
+  "device": "pilot-tph-01",
+  "tank_shape": "rectangular",
+  "capacity_liter": 540,
+  "length_cm": 150,
+  "width_cm": 60,
+  "height_cm": 60,
+  "sensor_mount_height_cm": 60,
+  "consumption_liter_per_hour": 25,
+  "distance": 10.2,
+  "voltage": 3.7,
+  "raw": {
+    "local_H_cm": 49.8,
+    "local_volume_l": 448.2,
+    "local_percent": 83,
+    "wifi_rssi": -54
+  }
+}
+```
+
 Contoh curl:
 
 ```powershell
@@ -197,7 +332,10 @@ Response sukses:
     "volumeLiter": 3650,
     "fillPercent": 73,
     "runtimeHour": 146,
-    "storage": "memory"
+    "storage": "memory",
+    "configStatus": "no_payload_config",
+    "needsReview": false,
+    "warnings": []
   }
 }
 ```
@@ -209,6 +347,16 @@ Nilai `storage` bisa berisi:
 | `memory` | Reading disimpan sementara di memory store development |
 | `mysql` | Reading disimpan ke MySQL sesuai `MYSQL_DATABASE_URL` |
 
+Nilai `configStatus` membantu melihat apakah config payload cocok dengan registry:
+
+| Nilai | Arti |
+|---|---|
+| `no_payload_config` | Payload tidak membawa config tangki |
+| `config_match` | Config payload dan registry cocok |
+| `config_minor_difference` | Ada beda kecil yang perlu diketahui |
+| `config_mismatch` | Ada beda besar dan perlu review |
+| `invalid_payload_config` | Config payload tidak valid |
+
 ## Error yang Mungkin Muncul
 
 | Status | Penyebab |
@@ -217,6 +365,7 @@ Nilai `storage` bisa berisi:
 | `401` | Key kosong atau salah |
 | `403` | Device tidak aktif |
 | `404` | Device atau tangki tidak ditemukan |
+| `503` | Storage aktif belum siap, terutama MySQL belum bisa dikoneksi |
 
 Contoh response error:
 
@@ -235,7 +384,7 @@ Sebelum production, perlu ditambah atau dimatangkan:
 
 - autentikasi user;
 - rate limit;
-- registry site/tank/device dari database;
+- halaman manajemen registry site/tank/device;
 - validasi schema lebih ketat;
 - audit log;
 - rotasi key device;

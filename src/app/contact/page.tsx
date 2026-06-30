@@ -16,7 +16,7 @@ import ContactForm from "./contact-form";
 export const metadata: Metadata = {
   title: "Kontak Operasional | SolarTank",
   description:
-    "Halaman kontak frontend-only untuk bantuan operasional SolarTank.",
+    "Halaman kontak untuk bantuan operasional monitoring SolarTank.",
 };
 
 const supportItems = [
@@ -36,7 +36,7 @@ const supportItems = [
     icon: MapPin,
     label: "Acuan lokasi",
     value: "STO Pasuruan",
-    note: "Dipakai sebagai konteks demo public-safe, bukan data final lapangan.",
+    note: "Dipakai sebagai konteks awal, bukan data final lapangan.",
   },
 ];
 
@@ -52,7 +52,7 @@ const helpTopics = [
   {
     question: "Apakah formulir ini sudah mengirim tiket?",
     answer:
-      "Belum. Halaman ini masih frontend-only, sehingga submit hanya menampilkan status visual dan tidak mengirim data ke server.",
+      "Belum. Pada tahap ini formulir masih menampilkan status pengiriman secara visual dan belum mengirim data ke server.",
   },
   {
     question: "Kapan sebaiknya menghubungi tim operasional?",
@@ -165,7 +165,8 @@ export default function ContactPage() {
             <p className="mt-6 max-w-2xl text-base leading-8 text-zinc-600 sm:text-lg">
               Hubungi pengelola operasional untuk akses dashboard, klarifikasi
               pembacaan volume, atau tindak lanjut perangkat yang terlambat
-              mengirim data. Halaman ini masih rancangan frontend-only.
+              mengirim data. Halaman ini disiapkan sebagai rancangan alur
+              bantuan operasional.
             </p>
 
             <div className="mt-10 space-y-4">
@@ -207,7 +208,7 @@ export default function ContactPage() {
         <div className="mx-auto max-w-[1280px]">
           <p className="text-center text-sm font-medium text-zinc-500">
             Rancangan kontak ini disiapkan untuk koordinasi bantuan operasional
-            monitoring, bukan kanal penjualan.
+            monitoring tangki solar.
           </p>
           <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             {operationTags.map(({ icon: Icon, label }) => (
@@ -238,7 +239,7 @@ export default function ContactPage() {
               className="mt-8 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700"
               href="/dashboard"
             >
-              Buka dashboard demo
+              Buka dashboard monitoring
               <ArrowRight aria-hidden="true" className="size-4" />
             </Link>
           </div>

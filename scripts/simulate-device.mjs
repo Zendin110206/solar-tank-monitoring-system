@@ -2,47 +2,11 @@
 
 import process from "node:process";
 
-const DEMO_DEVICE_PROFILES = new Map([
-  [
-    "demo-tph-01",
-    {
-      deviceKey: "demo-tph-key",
-      capacityLiter: 5000,
-      sensorMountHeightCm: 150,
-    },
-  ],
-  [
-    "demo-psn-01",
-    {
-      deviceKey: "demo-psn-key",
-      capacityLiter: 540,
-      sensorMountHeightCm: 60,
-    },
-  ],
-  [
-    "demo-nja-01",
-    {
-      deviceKey: "demo-nja-key",
-      capacityLiter: 5000,
-      sensorMountHeightCm: 150,
-    },
-  ],
-  [
-    "demo-jto-01",
-    {
-      deviceKey: "demo-jto-key",
-      capacityLiter: 5000,
-      sensorMountHeightCm: 150,
-    },
-  ],
-  [
-    "demo-skp-01",
-    {
-      deviceKey: "demo-skp-key",
-      capacityLiter: 5000,
-      sensorMountHeightCm: 150,
-    },
-  ],
+const DEMO_DEVICE_KEYS = new Map([
+  ["demo-tph-01", "demo-tph-key"],
+  ["demo-nja-01", "demo-nja-key"],
+  ["demo-jto-01", "demo-jto-key"],
+  ["demo-skp-01", "demo-skp-key"],
 ]);
 
 const DEFAULT_OPTIONS = {
@@ -151,7 +115,6 @@ function sleep(ms) {
 
 function parseArgs(argv) {
   const options = { ...DEFAULT_OPTIONS };
-  const providedOptions = new Set();
 
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -185,27 +148,19 @@ function parseArgs(argv) {
     }
 
     options[optionKey] = value;
-    providedOptions.add(optionKey);
     index += 1;
   }
 
-  return normalizeOptions(options, providedOptions);
+  return normalizeOptions(options);
 }
 
-function normalizeOptions(options, providedOptions = new Set()) {
+function normalizeOptions(options) {
   const device = String(options.device).trim();
-  const deviceProfile = DEMO_DEVICE_PROFILES.get(device);
   const deviceKey =
     String(options.deviceKey).trim() ||
-    deviceProfile?.deviceKey ||
+    DEMO_DEVICE_KEYS.get(device) ||
     process.env.SOLAR_TANK_LOCAL_DEVICE_KEY?.trim() ||
     "local-development-key";
-  const capacityLiter = providedOptions.has("capacityLiter")
-    ? options.capacityLiter
-    : (deviceProfile?.capacityLiter ?? options.capacityLiter);
-  const sensorMountHeightCm = providedOptions.has("sensorMountHeightCm")
-    ? options.sensorMountHeightCm
-    : (deviceProfile?.sensorMountHeightCm ?? options.sensorMountHeightCm);
 
   const normalized = {
     ...options,
@@ -223,11 +178,11 @@ function normalizeOptions(options, providedOptions = new Set()) {
       min: 0,
       max: 100,
     }),
-    capacityLiter: toNumber(capacityLiter, "--capacity-liter", {
+    capacityLiter: toNumber(options.capacityLiter, "--capacity-liter", {
       min: 1,
     }),
     sensorMountHeightCm: toNumber(
-      sensorMountHeightCm,
+      options.sensorMountHeightCm,
       "--sensor-height-cm",
       { min: 1 },
     ),

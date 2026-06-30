@@ -1,7 +1,4 @@
-import { mockDevices } from "../data/mock-devices";
-import { mockSites } from "../data/mock-sites";
-import { mockTanks } from "../data/mock-tanks";
-import type { Device, Reading, Site, Tank } from "../types/monitoring";
+import type { Reading } from "../types/monitoring";
 import {
   getMonitoringReadings,
   saveMonitoringReadingToMemory,
@@ -10,7 +7,6 @@ import {
   listMonitoringReadingsFromMysql,
   saveMonitoringReadingToMysql,
 } from "./mysql-reading-repository";
-import { listMonitoringReferenceFromMysql } from "./mysql-reference-repository";
 
 export type MonitoringStorageDriver = "memory" | "mysql";
 
@@ -29,12 +25,6 @@ export type SaveMonitoringReadingResult = {
 export type ListMonitoringReadingsResult = {
   readings: Reading[];
   source: MonitoringStorageSource;
-};
-
-export type ListMonitoringDataResult = ListMonitoringReadingsResult & {
-  sites: Site[];
-  tanks: Tank[];
-  devices: Device[];
 };
 
 export function getMonitoringStorageDriver(
@@ -66,7 +56,7 @@ function createStorageSource({
       configuredDriver,
       activeDriver,
       isFallback: true,
-      label: "Memory fallback (MySQL kosong)",
+      label: "Memory fallback",
     };
   }
 
@@ -105,37 +95,6 @@ export async function listMonitoringReadingsWithSource(): Promise<ListMonitoring
 export async function listMonitoringReadings(): Promise<Reading[]> {
   const result = await listMonitoringReadingsWithSource();
   return result.readings;
-}
-
-export async function listMonitoringDataWithSource(): Promise<ListMonitoringDataResult> {
-  const readingsResult = await listMonitoringReadingsWithSource();
-
-  if (readingsResult.source.activeDriver !== "mysql") {
-    return {
-      ...readingsResult,
-      sites: mockSites,
-      tanks: mockTanks,
-      devices: mockDevices,
-    };
-  }
-
-  const { sites, tanks, devices } = await listMonitoringReferenceFromMysql();
-
-  if (sites.length === 0 || tanks.length === 0 || devices.length === 0) {
-    return {
-      ...readingsResult,
-      sites: mockSites,
-      tanks: mockTanks,
-      devices: mockDevices,
-    };
-  }
-
-  return {
-    ...readingsResult,
-    sites,
-    tanks,
-    devices,
-  };
 }
 
 export async function saveMonitoringReading(

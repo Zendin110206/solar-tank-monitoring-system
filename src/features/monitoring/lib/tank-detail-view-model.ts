@@ -68,8 +68,6 @@ export type TankDetailView = {
   siteName: string;
   areaLabel: string;
   tankName: string;
-  shape: Tank["shape"];
-  shapeLabel: string;
   status: TankDetailStatus;
   statusLabel: string;
   statusNote: string;
@@ -82,6 +80,8 @@ export type TankDetailView = {
   fillPercent: number;
   volumeLiter: number;
   capacityLiter: number;
+  shape: Tank["shape"];
+  shapeLabel: string;
   runtimeHour: number;
   consumptionLiterPerHour: number;
   sensorDistanceCm: number;
@@ -141,8 +141,6 @@ type TankBundle = {
 };
 
 const DEFAULT_NOW = new Date("2026-06-25T07:45:00.000Z");
-const HISTORY_RANGE_MS = 24 * 60 * 60 * 1000;
-const HISTORY_BUCKET_MS = 5 * 60 * 1000;
 
 const statusLabels: Record<TankDetailStatus, string> = {
   online: "Online",
@@ -420,43 +418,9 @@ function toReadingPoint(reading: Reading): TankReadingPoint {
   };
 }
 
-function sampleReadingsEveryFiveMinutes(
-  readings: Reading[],
-  now: Date,
-): Reading[] {
-  const rangeStartTime = now.getTime() - HISTORY_RANGE_MS;
-  const bucketedReadings = new Map<number, Reading>();
-
-  readings.forEach((reading) => {
-    const receivedTime = new Date(reading.receivedAt).getTime();
-
-    if (!Number.isFinite(receivedTime) || receivedTime < rangeStartTime) {
-      return;
-    }
-
-    const bucketTime =
-      Math.floor((receivedTime - rangeStartTime) / HISTORY_BUCKET_MS) *
-        HISTORY_BUCKET_MS +
-      rangeStartTime;
-    const existingReading = bucketedReadings.get(bucketTime);
-
-    if (
-      !existingReading ||
-      new Date(reading.receivedAt).getTime() >
-        new Date(existingReading.receivedAt).getTime()
-    ) {
-      bucketedReadings.set(bucketTime, reading);
-    }
-  });
-
-  return [...bucketedReadings.entries()]
-    .sort(([leftBucket], [rightBucket]) => leftBucket - rightBucket)
-    .map(([, reading]) => reading);
-}
-
 function getCoordinateLabel(site: Site): string {
   if (typeof site.latitude === "number" && typeof site.longitude === "number") {
-    return `${site.latitude.toFixed(4)}, ${site.longitude.toFixed(4)} (koordinat contoh)`;
+    return `${site.latitude.toFixed(4)}, ${site.longitude.toFixed(4)} (koordinat manual)`;
   }
 
   return "koordinat manual belum diisi";
@@ -466,8 +430,11 @@ function buildReadingSeries(
   tank: Tank,
   latestReading: Reading | null,
   readings: Reading[],
-  now: Date,
 ): TankReadingPoint[] {
+  if (!latestReading) {
+    return [];
+  }
+
   const tankReadings = readings
     .filter((reading) => reading.tankId === tank.id)
     .sort(
@@ -475,15 +442,8 @@ function buildReadingSeries(
         new Date(a.receivedAt).getTime() - new Date(b.receivedAt).getTime(),
     );
 
-  if (!latestReading) {
-    return [];
-  }
-
   if (tankReadings.length > 1) {
-    const sampledReadings = sampleReadingsEveryFiveMinutes(tankReadings, now);
-    return (sampledReadings.length > 0 ? sampledReadings : [latestReading]).map(
-      toReadingPoint,
-    );
+    return tankReadings.slice(-24).map(toReadingPoint);
   }
 
   const baseReceivedTime = new Date(latestReading.receivedAt).getTime();
@@ -542,8 +502,9 @@ function buildNearbySites(
   input: Required<Pick<BuildTankDetailInput, "now">> & BuildTankDetailInput,
 ): NearbyTankSite[] {
   const tanks = input.tanks ?? mockTanks;
-  const sites = input.sites ?? mockSites;
-  const mapPositions = buildMapPositionsFromCoordinates(sites);
+  const mapPositions = buildMapPositionsFromCoordinates(
+    input.sites ?? mockSites,
+  );
 
   return tanks
     .flatMap((tank): NearbyTankSite[] => {
@@ -553,7 +514,12 @@ function buildNearbySites(
         return [];
       }
 
-      const { site, device, latestReading } = bundle;
+      const { site, tank: bundleTank, device, latestReading } = bundle;
+      const configReview = latestReading?.rawPayload
+        ? compareRegistryVsPayloadConfig(bundleTank, latestReading.rawPayload)
+        : compareRegistryVsPayloadConfig(bundleTank, null);
+      const fillPercent = latestReading?.fillPercent ?? 0;
+      const runtimeHour = latestReading?.runtimeHour ?? 0;
       const runtimeStatus = latestReading
         ? getRuntimeStatus(latestReading.runtimeHour)
         : getRuntimeStatus(null);
@@ -572,7 +538,10 @@ function buildNearbySites(
         levelStatus,
         deviceStatus,
       });
-      const status = toTankDetailStatus(deviceStatus, operationalStatus);
+      const status = toReviewAwareStatus(
+        toTankDetailStatus(deviceStatus, operationalStatus),
+        configReview,
+      );
       const position = mapPositions[site.id] ?? { left: "50%", top: "50%" };
 
       return [
@@ -584,8 +553,8 @@ function buildNearbySites(
           status,
           left: position.left,
           top: position.top,
-          runtimeHour: latestReading?.runtimeHour ?? 0,
-          fillPercent: latestReading?.fillPercent ?? 0,
+          runtimeHour,
+          fillPercent,
           updateLabel: latestReading
             ? formatAgeLabel(latestReading.receivedAt, input.now)
             : "belum ada data",
@@ -618,25 +587,25 @@ export function buildTankDetail(
   }
 
   const { site, tank, device, latestReading } = bundle;
-  const hasReading = Boolean(latestReading);
   const configReview = latestReading?.rawPayload
     ? compareRegistryVsPayloadConfig(tank, latestReading.rawPayload)
     : compareRegistryVsPayloadConfig(tank, null);
   const displayTank = latestReading?.rawPayload
     ? resolveTankFromPayloadConfig(latestReading.rawPayload, tank)
     : tank;
-  const readingQuality =
-    latestReading?.quality ??
-    buildFallbackReadingQuality(latestReading, configReview);
+  const dataSources =
+    latestReading?.quality ?? buildFallbackReadingQuality(latestReading, configReview);
+  const hasReading = Boolean(latestReading);
   const fillPercent = latestReading?.fillPercent ?? 0;
   const volumeLiter = latestReading?.volumeLiter ?? 0;
   const runtimeHour = latestReading?.runtimeHour ?? 0;
-  const sensorDistanceCm = latestReading?.sensorDistanceCm ?? 0;
+  const sensorDistanceCm =
+    latestReading?.sensorDistanceCm ?? displayTank.sensorMountHeightCm;
   const fuelHeightCm = latestReading?.fuelHeightCm ?? 0;
   const runtimeStatus = latestReading
     ? getRuntimeStatus(latestReading.runtimeHour)
     : getRuntimeStatus(null);
-  const levelStatus = latestReading ? getLevelStatus(latestReading.fillPercent) : "low";
+  const levelStatus = latestReading ? getLevelStatus(fillPercent) : "low";
   const deviceStatus = latestReading
     ? getDeviceStatus({
         lastReceivedAt: latestReading.receivedAt,
@@ -649,9 +618,13 @@ export function buildTankDetail(
     levelStatus,
     deviceStatus,
   });
-  const baseStatus = toTankDetailStatus(deviceStatus, operationalStatus);
-  const status = toReviewAwareStatus(baseStatus, configReview);
-  const mapPositions = buildMapPositionsFromCoordinates(input.sites ?? mockSites);
+  const status = toReviewAwareStatus(
+    toTankDetailStatus(deviceStatus, operationalStatus),
+    configReview,
+  );
+  const mapPositions = buildMapPositionsFromCoordinates(
+    input.sites ?? mockSites,
+  );
   const position = mapPositions[site.id] ?? { left: "50%", top: "50%" };
 
   return {
@@ -660,14 +633,12 @@ export function buildTankDetail(
     siteCode: site.code,
     siteName: site.name,
     areaLabel: site.areaLabel,
-    tankName: displayTank.name,
-    shape: displayTank.shape,
-    shapeLabel: getTankShapeLabel(displayTank.shape),
+    tankName: tank.name,
     status,
     statusLabel: statusLabels[status],
     statusNote: buildStatusNote({
-      status,
       hasReading,
+      status,
       fillPercent,
       runtimeHour,
       deviceStatus,
@@ -681,6 +652,8 @@ export function buildTankDetail(
     fillPercent,
     volumeLiter,
     capacityLiter: displayTank.capacityLiter,
+    shape: displayTank.shape,
+    shapeLabel: getTankShapeLabel(displayTank.shape),
     runtimeHour,
     consumptionLiterPerHour: displayTank.consumptionLiterPerHour,
     sensorDistanceCm,
@@ -724,9 +697,9 @@ export function buildTankDetail(
       percent: fillPercent,
       wifi_rssi: latestReading?.rssiDbm ?? null,
     },
-    dataSources: readingQuality,
+    dataSources,
     configReview,
-    readings: buildReadingSeries(displayTank, latestReading, readings, now),
+    readings: buildReadingSeries(displayTank, latestReading, readings),
     nearbySites: buildNearbySites(tank.id, {
       ...input,
       now,

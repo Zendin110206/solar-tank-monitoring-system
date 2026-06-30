@@ -598,29 +598,11 @@ export function resolveTankFromPayloadConfig(
   }
 
   const shape = payloadConfig.shape ?? baseTank.shape;
-  const resolvedLengthCm = payloadConfig.lengthCm ?? baseTank.lengthCm;
-  const resolvedWidthCm = payloadConfig.widthCm ?? baseTank.widthCm;
-  const resolvedHeightCm = payloadConfig.heightCm ?? baseTank.heightCm;
-  const resolvedDiameterCm = payloadConfig.diameterCm ?? baseTank.diameterCm;
-  const derivedCapacityLiter =
-    shape === "rectangular" &&
-    resolvedLengthCm &&
-    resolvedWidthCm &&
-    resolvedHeightCm
-      ? roundTo((resolvedLengthCm * resolvedWidthCm * resolvedHeightCm) / 1000, 2)
-      : shape === "horizontal-cylinder" && resolvedLengthCm && resolvedDiameterCm
-        ? roundTo(
-            (Math.PI * (resolvedDiameterCm / 2) ** 2 * resolvedLengthCm) /
-              1000,
-            2,
-          )
-        : undefined;
 
   return {
     ...baseTank,
     shape,
-    capacityLiter:
-      payloadConfig.capacityLiter ?? derivedCapacityLiter ?? baseTank.capacityLiter,
+    capacityLiter: payloadConfig.capacityLiter ?? baseTank.capacityLiter,
     sensorMountHeightCm:
       payloadConfig.sensorMountHeightCm ?? baseTank.sensorMountHeightCm,
     lowLevelPercent: payloadConfig.lowLevelPercent ?? baseTank.lowLevelPercent,
@@ -631,14 +613,14 @@ export function resolveTankFromPayloadConfig(
       baseTank.consumptionLiterPerHour,
     ...(shape === "rectangular"
       ? {
-          lengthCm: resolvedLengthCm,
-          widthCm: resolvedWidthCm,
-          heightCm: resolvedHeightCm,
+          lengthCm: payloadConfig.lengthCm ?? baseTank.lengthCm,
+          widthCm: payloadConfig.widthCm ?? baseTank.widthCm,
+          heightCm: payloadConfig.heightCm ?? baseTank.heightCm,
           diameterCm: undefined,
         }
       : {
-          lengthCm: resolvedLengthCm,
-          diameterCm: resolvedDiameterCm,
+          lengthCm: payloadConfig.lengthCm ?? baseTank.lengthCm,
+          diameterCm: payloadConfig.diameterCm ?? baseTank.diameterCm,
           widthCm: undefined,
           heightCm: undefined,
         }),

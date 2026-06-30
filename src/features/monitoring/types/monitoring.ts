@@ -137,7 +137,6 @@ export type CatTelemetryPayload = {
   ts?: unknown;
   ts_iso?: unknown;
   tank_shape?: unknown;
-  tank_type?: unknown;
   shape?: unknown;
   capacity_liter?: unknown;
   capacityLiter?: unknown;

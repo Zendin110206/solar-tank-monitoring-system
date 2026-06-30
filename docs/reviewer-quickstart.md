@@ -43,7 +43,25 @@ Halaman yang bisa dilihat:
 | `/dashboard` | dashboard awal |
 | `/dashboard/tanks/tank-tph-main` | detail tangki contoh |
 
-## 3. Jalankan Pengecekan
+## 3. Cek Aplikasi dan Storage
+
+Cek aplikasi hidup:
+
+```powershell
+curl.exe http://localhost:3000/api/health
+```
+
+Cek storage aktif siap:
+
+```powershell
+curl.exe http://localhost:3000/api/ready
+```
+
+Jika mode default `memory` dipakai, `/api/ready` tetap sukses tetapi statusnya
+`degraded` karena data memory tidak permanen. Jika mode `mysql` dipakai dan
+database belum siap, `/api/ready` akan mengembalikan HTTP `503`.
+
+## 4. Jalankan Pengecekan
 
 ```powershell
 pnpm check
@@ -55,7 +73,7 @@ Perintah ini menjalankan:
 typecheck -> lint -> test -> build
 ```
 
-## 4. Coba Simulator Memory Mode
+## 5. Coba Simulator Memory Mode
 
 Pastikan dev server masih berjalan.
 
@@ -77,7 +95,7 @@ Simulator otomatis memakai key demo sesuai device. Jika ingin mengisi key manual
 pnpm simulate:device --device demo-tph-01 --key demo-tph-key --once
 ```
 
-## 5. Cek API Detail
+## 6. Cek API Detail
 
 ```powershell
 curl.exe http://localhost:3000/api/tanks/tank-tph-main
@@ -90,7 +108,7 @@ fillPercent = 73
 volumeLiter = 3650
 ```
 
-## 6. Cek History
+## 7. Cek History
 
 ```powershell
 curl.exe "http://localhost:3000/api/tanks/tank-tph-main/readings?range=24h"
@@ -98,19 +116,97 @@ curl.exe "http://localhost:3000/api/tanks/tank-tph-main/readings?range=24h"
 
 History harus bertambah setelah simulator mengirim data.
 
-## 7. Hal yang Perlu Dipahami Reviewer
+## 8. Hal yang Perlu Dipahami Reviewer
 
 - UI dashboard/detail membaca storage aktif yang sama dengan endpoint API.
+- `/api/health` hanya mengecek aplikasi hidup.
+- `/api/ready` mengecek apakah storage aktif siap dipakai.
+- Mode MySQL membaca registry site, tangki, device, dan hash key dari database.
+- Registry pilot bisa disiapkan lewat `pnpm pilot:registry`, tetapi file real harus lokal dan tidak boleh masuk Git.
+- Smoke test payload real-format bisa dikirim lewat `pnpm pilot:smoke`.
 - Halaman login/register baru bersifat frontend-only dan belum membuat sesi pengguna.
 - API sudah bisa menerima data simulator.
 - Saat server baru berjalan, memory mode menyiapkan data demo dengan timestamp relatif agar dashboard tidak langsung terlihat basi.
 - Memory store hilang ketika server restart.
 - MySQL mode tersedia untuk latihan persistent reading, tetapi belum berarti production-ready.
 - Key per device sudah divalidasi memakai hash pada data dummy.
-- Data real belum digunakan.
+- Data real hanya boleh dipakai lewat file lokal/env yang tidak di-commit.
 - Repo tidak boleh memuat credential atau data internal.
 
-## 8. Jika Ada Error
+## 9. Coba Mode MySQL Jika Database Tersedia
+
+Mode default tetap `memory`. Jika reviewer punya database MySQL lokal atau cloud
+khusus demo, isi `.env.local`:
+
+```env
+SOLAR_TANK_STORAGE_DRIVER="mysql"
+MYSQL_DATABASE_URL="mysql://user:password@host:port/database"
+MYSQL_CONNECTION_LIMIT="2"
+MYSQL_SSL_MODE="disabled"
+SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK="false"
+```
+
+Untuk cloud MySQL yang mewajibkan TLS, gunakan:
+
+```env
+MYSQL_SSL_MODE="required"
+```
+
+Jika provider memberi CA certificate, isi `MYSQL_SSL_CA`.
+
+Jalankan migration dan seed:
+
+```powershell
+pnpm db:setup:mysql
+```
+
+Setelah mengubah `.env.local`, restart `pnpm dev`, lalu cek:
+
+```powershell
+curl.exe http://localhost:3000/api/ready
+```
+
+## 10. Coba Alur Pilot Jika Data Sudah Disetujui
+
+Bagian ini hanya untuk reviewer yang memang punya data pilot yang boleh dipakai.
+Jangan memakai koordinat, key, atau connection string asli di file yang akan
+di-commit.
+
+```powershell
+pnpm db:migrate:mysql
+pnpm pilot:hash-key
+Copy-Item config/pilot-registry.example.json config/pilot-registry.local.json
+```
+
+Setelah itu edit `config/pilot-registry.local.json`:
+
+- isi 5 STO yang disetujui;
+- ganti `coordinateStatus` menjadi `approved`;
+- isi hash key device dari `pnpm pilot:hash-key`;
+- pastikan kapasitas dan dimensi tangki sesuai data yang dipakai.
+
+Validasi tanpa menulis database:
+
+```powershell
+pnpm pilot:registry -- --dry-run
+```
+
+Jika sudah sukses:
+
+```powershell
+pnpm pilot:registry
+```
+
+Smoke test:
+
+```powershell
+$env:PILOT_API_BASE_URL="http://localhost:3000"
+$env:PILOT_DEVICE_ID="pilot-tph-01"
+$env:PILOT_DEVICE_KEY="key-asli-device"
+pnpm pilot:smoke
+```
+
+## 11. Jika Ada Error
 
 Jika `pnpm simulate:device` gagal:
 
@@ -119,6 +215,13 @@ Jika `pnpm simulate:device` gagal:
 - pastikan key sesuai device, misalnya `demo-tph-key` untuk `demo-tph-01`;
 - jika memakai fallback global, pastikan `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK` tidak diset ke `false`;
 - coba `pnpm simulate:device --help`.
+
+Jika dashboard menampilkan "Data monitoring belum bisa dibaca":
+
+- buka `http://localhost:3000/api/ready`;
+- jika `/api/ready` HTTP `503`, cek `MYSQL_DATABASE_URL`, status database,
+  SSL/allowlist provider, dan koneksi jaringan;
+- jika baru mengubah `.env.local`, hentikan lalu jalankan ulang `pnpm dev`.
 
 Jika `pnpm check` gagal:
 

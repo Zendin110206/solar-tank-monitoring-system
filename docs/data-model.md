@@ -111,6 +111,23 @@ Field penting:
 | `batteryVolt` | tegangan device jika ada |
 | `rssiDbm` | sinyal WiFi jika ada |
 | `rawPayload` | payload mentah untuk audit development |
+| `quality` | catatan sumber angka dan status review config jika payload membawa config tangki |
+
+`quality` membantu menjawab:
+
+- waktu ukur berasal dari device atau fallback server;
+- volume berasal dari device atau dihitung backend;
+- persen berasal dari device atau dihitung backend;
+- runtime berasal dari device atau dihitung backend;
+- config payload cocok atau berbeda dari registry.
+
+Jika config payload berbeda jauh dari registry, reading bisa membawa status:
+
+```text
+config_mismatch
+```
+
+Dashboard/detail kemudian dapat memberi tanda bahwa data perlu review, bukan diam-diam dianggap aman.
 
 ## Status
 
@@ -148,4 +165,6 @@ Karakteristik MySQL saat ini:
 - sudah memiliki migration dan seed demo;
 - menyimpan reading dari endpoint ingest;
 - query mengambil data terbaru terlebih dahulu, lalu dibalik untuk grafik;
-- belum menjadi production database penuh karena registry site, tank, device, rotasi key, user, role, audit log, dan backup belum final.
+- sudah dapat membaca registry site, tank, device, dan hash key dari database;
+- dapat diisi registry pilot melalui file lokal yang tidak di-commit;
+- belum menjadi production database penuh karena rotasi key, user, role, audit log, rate limit, backup, dan SOP operasional belum final.

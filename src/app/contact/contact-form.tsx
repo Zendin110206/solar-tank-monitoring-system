@@ -145,14 +145,14 @@ export default function ContactForm() {
         <div className="mt-5 flex gap-3 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
           <CheckCircle2 aria-hidden="true" className="mt-0.5 size-5 shrink-0" />
           <p>
-            Rancangan formulir kontak sudah berjalan di sisi frontend. Data
-            belum dikirim ke server sampai modul tiket atau kanal bantuan resmi
-            disambungkan.
+            Rancangan formulir kontak sudah berjalan sebagai tampilan awal.
+            Data belum dikirim ke server sampai modul tiket atau kanal bantuan
+            resmi disambungkan.
           </p>
         </div>
       ) : null}
 
-      {/* Frontend-only submission */}
+      {/* Visual-only submission */}
       <button
         className="group mt-6 inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20 sm:w-auto"
         type="submit"

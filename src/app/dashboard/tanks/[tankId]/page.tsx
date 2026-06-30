@@ -27,7 +27,7 @@ import {
   TankHorizontalCylinderScene3D,
   TankRectangularScene3D,
 } from "@/features/monitoring/components/tank-rectangular-scene-3d";
-import { mockTanks } from "@/features/monitoring/data/mock-tanks";
+import { getMonitoringReferenceData } from "@/features/monitoring/lib/monitoring-registry";
 import {
   buildTankDetail,
   type NearbyTankSite,
@@ -35,13 +35,20 @@ import {
   type TankDetailView,
   type TankReadingPoint,
 } from "@/features/monitoring/lib/tank-detail-view-model";
-import { listMonitoringDataWithSource } from "@/features/monitoring/lib/monitoring-storage";
+import { listMonitoringReadings } from "@/features/monitoring/lib/monitoring-storage";
 import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/lib/refresh-interval";
+import type {
+  ReadingQuality,
+  ReadingValueSource,
+  TankConfigReview,
+  TankConfigStatus,
+  TankShape,
+} from "@/features/monitoring/types/monitoring";
 
 export const metadata: Metadata = {
   title: "Detail Tangki Solar | SolarTank",
   description:
-    "Halaman detail frontend untuk membaca kondisi satu tangki solar, visual isi tangki, parameter perangkat, dan riwayat pembacaan.",
+    "Halaman detail untuk membaca kondisi satu tangki solar, visual isi tangki, parameter perangkat, dan riwayat pembacaan.",
 };
 
 export const runtime = "nodejs";
@@ -49,7 +56,6 @@ export const runtime = "nodejs";
 type TankStatus = TankDetailStatus;
 
 type ReadingPoint = {
-  receivedAt: string;
   time: string;
   percent: number;
   volumeLiter: number;
@@ -69,7 +75,17 @@ type ParameterItem = {
   icon: LucideIcon;
 };
 
+type RuntimeLevelParameter = {
+  label: string;
+  range: string;
+  description: string;
+  badge: string;
+  card: string;
+  dot: string;
+};
+
 type NearbySite = {
+  tankId: string;
   code: string;
   name: string;
   status: TankStatus;
@@ -80,16 +96,18 @@ type NearbySite = {
 
 type TankDetail = {
   id: string;
+  hasReading: boolean;
   siteCode: string;
   siteName: string;
   areaLabel: string;
   tankName: string;
-  shape: TankDetailView["shape"];
   status: TankStatus;
   statusNote: string;
   fillPercent: number;
   volumeLiter: number;
   capacityLiter: number;
+  shape: TankShape;
+  shapeLabel: string;
   runtimeHour: number;
   consumptionLiterPerHour: number;
   sensorDistanceCm: number;
@@ -99,6 +117,8 @@ type TankDetail = {
   heightCm: number | null;
   widthCm: number | null;
   sensorMountHeightCm: number;
+  lowLevelPercent: number;
+  criticalLevelPercent: number;
   deviceId: string;
   deviceLabel: string;
   expectedIntervalMin: number;
@@ -117,6 +137,8 @@ type TankDetail = {
     percent: number;
     wifi_rssi: number | null;
   };
+  dataSources: ReadingQuality;
+  configReview: TankConfigReview;
   readings: ReadingPoint[];
   nearbySites: NearbySite[];
 };
@@ -166,32 +188,147 @@ const statusMeta: Record<
   },
 };
 
+const runtimeLevelParameters: RuntimeLevelParameter[] = [
+  {
+    label: "Kritis",
+    range: "< 13 jam",
+    description: "Sisa runtime sudah masuk prioritas tindakan cepat.",
+    badge: "bg-red-50 text-red-700 ring-red-100",
+    card: "border-red-200 bg-red-50",
+    dot: "bg-red-600",
+  },
+  {
+    label: "Threshold Under",
+    range: "13 - <14 jam",
+    description: "Mendekati batas bawah dan perlu dipantau lebih rapat.",
+    badge: "bg-orange-50 text-orange-700 ring-orange-100",
+    card: "border-orange-200 bg-orange-50",
+    dot: "bg-orange-500",
+  },
+  {
+    label: "Under",
+    range: "14 - <16 jam",
+    description: "Masih di bawah zona ideal operasional.",
+    badge: "bg-amber-50 text-amber-700 ring-amber-100",
+    card: "border-amber-200 bg-amber-50",
+    dot: "bg-amber-500",
+  },
+  {
+    label: "Threshold Upper",
+    range: "16 - <19 jam",
+    description: "Sudah melewati batas bawah dan menuju zona atas.",
+    badge: "bg-cyan-50 text-cyan-700 ring-cyan-100",
+    card: "border-cyan-200 bg-cyan-50",
+    dot: "bg-cyan-500",
+  },
+  {
+    label: "Upper",
+    range: "19 - <24 jam",
+    description: "Runtime berada di zona atas yang masih normal.",
+    badge: "bg-blue-50 text-blue-700 ring-blue-100",
+    card: "border-blue-200 bg-blue-50",
+    dot: "bg-blue-600",
+  },
+  {
+    label: "Overstock",
+    range: ">= 24 jam",
+    description: "Cadangan runtime sangat panjang dibanding batas parameter.",
+    badge: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+    card: "border-emerald-200 bg-emerald-50",
+    dot: "bg-emerald-600",
+  },
+];
+
+const unknownRuntimeLevel: RuntimeLevelParameter = {
+  label: "Belum terbaca",
+  range: "-",
+  description: "Parameter sisa jam menunggu data volume dan konsumsi valid.",
+  badge: "bg-zinc-100 text-zinc-700 ring-zinc-200",
+  card: "border-zinc-200 bg-zinc-50",
+  dot: "bg-zinc-400",
+};
+
 function formatLiter(value: number) {
   return new Intl.NumberFormat("id-ID").format(value);
-}
-
-function formatJakartaTimeLabel(value: number) {
-  return new Intl.DateTimeFormat("id-ID", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-    timeZone: "Asia/Jakarta",
-  }).format(new Date(value));
-}
-
-export function generateStaticParams() {
-  return mockTanks.map((tank) => ({
-    tankId: tank.id,
-  }));
 }
 
 function formatMeasurement(value: number | null, unit: string) {
   return value === null ? "-" : `${value} ${unit}`;
 }
 
+function formatPercent(value: number) {
+  return `${value}%`;
+}
+
+function formatSourceLabel(source: ReadingValueSource) {
+  const labels: Record<ReadingValueSource, string> = {
+    device: "perangkat",
+    backend: "backend",
+    server: "server",
+    unknown: "belum diketahui",
+  };
+
+  return labels[source];
+}
+
+function formatConfigStatusLabel(status: TankConfigStatus) {
+  const labels: Record<TankConfigStatus, string> = {
+    normal: "normal",
+    minor_config_difference: "beda kecil",
+    config_mismatch: "mismatch",
+    invalid_config: "invalid",
+    needs_review: "perlu review",
+  };
+
+  return labels[status];
+}
+
+function formatRuntimeHour(value: number | null) {
+  if (value === null || !Number.isFinite(value)) {
+    return "-";
+  }
+
+  return `${new Intl.NumberFormat("id-ID", {
+    maximumFractionDigits: 2,
+  }).format(value)} jam`;
+}
+
+function clampPercent(value: number) {
+  return Math.min(Math.max(value, 0), 100);
+}
+
+function getRuntimeLevelParameter(
+  runtimeHour: number | null,
+): RuntimeLevelParameter {
+  if (runtimeHour === null || !Number.isFinite(runtimeHour)) {
+    return unknownRuntimeLevel;
+  }
+
+  if (runtimeHour < 13) {
+    return runtimeLevelParameters[0];
+  }
+
+  if (runtimeHour < 14) {
+    return runtimeLevelParameters[1];
+  }
+
+  if (runtimeHour < 16) {
+    return runtimeLevelParameters[2];
+  }
+
+  if (runtimeHour < 19) {
+    return runtimeLevelParameters[3];
+  }
+
+  if (runtimeHour < 24) {
+    return runtimeLevelParameters[4];
+  }
+
+  return runtimeLevelParameters[5];
+}
+
 function toReadingPoint(reading: TankReadingPoint): ReadingPoint {
   return {
-    receivedAt: reading.receivedAt,
     time: reading.timeLabel,
     percent: reading.fillPercent,
     volumeLiter: reading.volumeLiter,
@@ -201,6 +338,7 @@ function toReadingPoint(reading: TankReadingPoint): ReadingPoint {
 
 function toNearbySite(site: NearbyTankSite): NearbySite {
   return {
+    tankId: site.tankId,
     code: site.code,
     name: site.name,
     status: site.status,
@@ -213,16 +351,18 @@ function toNearbySite(site: NearbyTankSite): NearbySite {
 function toTankDetail(view: TankDetailView): TankDetail {
   return {
     id: view.id,
+    hasReading: view.hasReading,
     siteCode: view.siteCode,
     siteName: view.siteName,
     areaLabel: view.areaLabel,
     tankName: view.tankName,
-    shape: view.shape,
     status: view.status,
     statusNote: view.statusNote,
     fillPercent: view.fillPercent,
     volumeLiter: view.volumeLiter,
     capacityLiter: view.capacityLiter,
+    shape: view.shape,
+    shapeLabel: view.shapeLabel,
     runtimeHour: view.runtimeHour,
     consumptionLiterPerHour: view.consumptionLiterPerHour,
     sensorDistanceCm: view.sensorDistanceCm,
@@ -232,6 +372,8 @@ function toTankDetail(view: TankDetailView): TankDetail {
     heightCm: view.heightCm,
     widthCm: view.widthCm,
     sensorMountHeightCm: view.sensorMountHeightCm,
+    lowLevelPercent: view.lowLevelPercent,
+    criticalLevelPercent: view.criticalLevelPercent,
     deviceId: view.deviceCode,
     deviceLabel: view.deviceLabel,
     expectedIntervalMin: view.expectedIntervalMin,
@@ -250,6 +392,8 @@ function toTankDetail(view: TankDetailView): TankDetail {
       percent: view.rawPayloadPreview.percent,
       wifi_rssi: view.rawPayloadPreview.wifi_rssi,
     },
+    dataSources: view.dataSources,
+    configReview: view.configReview,
     readings: view.readings.map(toReadingPoint),
     nearbySites: view.nearbySites.map(toNearbySite),
   };
@@ -327,127 +471,162 @@ function MetricCard({
 
 function TankVisual({ tank }: { tank: TankDetail }) {
   const isRectangular = tank.shape === "rectangular";
-  const shapeLabel =
-    isRectangular ? "Tangki balok" : "Silinder horizontal";
-  const shapeDescription =
-    isRectangular
-      ? "Model tampilan ini membaca konfigurasi balok dari database yang dapat diperbarui oleh payload device."
-      : "Model tampilan ini mengikuti skenario tangki tidur. Angka berasal dari data simulator/API lokal dan nantinya diganti konfigurasi lapangan.";
-  const configurationItems =
-    isRectangular
+  const fillPercent = tank.hasReading ? clampPercent(tank.fillPercent) : 0;
+  const visualDescription = isRectangular
+    ? "Model tampilan mengikuti tangki balok/persegi panjang. Sensor berada di atas, sehingga perubahan level dibaca secara vertikal."
+    : "Model tampilan mengikuti tangki silinder horizontal. Sensor berada di atas, sehingga permukaan solar naik-turun secara vertikal.";
+  const dimensionItems: ParameterItem[] = [
+    {
+      label: "Jarak sensor",
+      value: tank.hasReading ? `${tank.sensorDistanceCm} cm` : "-",
+      note: tank.hasReading
+        ? "distance dari payload"
+        : "menunggu payload perangkat",
+      icon: Ruler,
+    },
+    {
+      label: "Tinggi solar",
+      value: tank.hasReading ? `${tank.fuelHeightCm} cm` : "-",
+      note: tank.hasReading
+        ? "raw.H_cm setelah normalisasi"
+        : "menunggu pembacaan sensor",
+      icon: Droplets,
+    },
+    {
+      label: "Kapasitas tangki",
+      value: `${formatLiter(tank.capacityLiter)} L`,
+      note: "kapasitas konfigurasi device",
+      icon: Fuel,
+    },
+    {
+      label: "Tinggi sensor",
+      value: formatMeasurement(tank.sensorMountHeightCm, "cm"),
+      note: "sensor_mount_height_cm",
+      icon: Radio,
+    },
+    {
+      label: "Panjang tangki",
+      value: formatMeasurement(tank.lengthCm, "cm"),
+      note: "konfigurasi fisik tangki",
+      icon: Settings,
+    },
+    ...(isRectangular
       ? [
-          {
-            label: "Panjang tangki",
-            value: formatMeasurement(tank.lengthCm, "cm"),
-            note: "konfigurasi dari device/database",
-            icon: Settings,
-          },
           {
             label: "Lebar tangki",
             value: formatMeasurement(tank.widthCm, "cm"),
-            note: "konfigurasi dari device/database",
-            icon: Gauge,
+            note: "konfigurasi tangki balok",
+            icon: Ruler,
           },
           {
             label: "Tinggi tangki",
             value: formatMeasurement(tank.heightCm, "cm"),
-            note: "konfigurasi dari device/database",
-            icon: Ruler,
+            note: "batas tinggi bahan bakar",
+            icon: Gauge,
           },
         ]
       : [
           {
-            label: "Panjang tangki",
-            value: formatMeasurement(tank.lengthCm, "cm"),
-            note: "konfigurasi tangki",
-            icon: Settings,
-          },
-          {
             label: "Diameter tangki",
             value: formatMeasurement(tank.diameterCm, "cm"),
-            note: "konfigurasi tangki",
+            note: "konfigurasi tangki silinder",
             icon: Gauge,
           },
-        ];
+        ]),
+    {
+      label: "Konsumsi per jam",
+      value: `${tank.consumptionLiterPerHour} L/jam`,
+      note: "parameter estimasi runtime",
+      icon: Activity,
+    },
+    {
+      label: "Low level",
+      value: formatPercent(tank.lowLevelPercent),
+      note: "ambang status waspada",
+      icon: AlertTriangle,
+    },
+    {
+      label: "Critical level",
+      value: formatPercent(tank.criticalLevelPercent),
+      note: "ambang prioritas kritis",
+      icon: Zap,
+    },
+  ];
 
   return (
     <div className="relative overflow-hidden rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <SectionHeading
           label="Visual tangki"
-          title={shapeLabel}
-          description={shapeDescription}
+          title={tank.shapeLabel}
+          description={visualDescription}
         />
         <StatusBadge status={tank.status} />
       </div>
 
-      <div className="mt-8 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <div className="relative min-h-[22rem] rounded-lg border border-dashed border-zinc-200 bg-zinc-50 p-5">
-          <div className="absolute left-6 top-5 flex items-center gap-2 rounded-full bg-white px-3 py-2 text-xs font-semibold text-zinc-600 shadow-sm ring-1 ring-zinc-200">
-            <Radio className="size-4 text-red-600" aria-hidden="true" />
-            Sensor ultrasonic
-          </div>
-
-          <div className="absolute right-6 top-5 rounded-full bg-cyan-50 px-3 py-2 text-xs font-semibold text-cyan-700 ring-1 ring-cyan-100">
-            Isi {tank.fillPercent}%
-          </div>
-
-            <div className="absolute inset-x-6 bottom-16">
-              {isRectangular ? (
-                <div className="relative h-64 overflow-hidden rounded-lg border border-zinc-200 bg-white">
-                  <TankRectangularScene3D
-                    fillPercent={tank.fillPercent}
-                    lengthCm={tank.lengthCm}
-                    widthCm={tank.widthCm}
-                    heightCm={tank.heightCm}
-                    sensorDistanceCm={tank.sensorDistanceCm}
-                    fuelHeightCm={tank.fuelHeightCm}
-                  />
-                </div>
-              ) : (
-                <div className="relative h-64 overflow-hidden rounded-lg border border-zinc-200 bg-white">
-                  <TankHorizontalCylinderScene3D
-                    fillPercent={tank.fillPercent}
-                    lengthCm={tank.lengthCm}
-                    diameterCm={tank.diameterCm}
-                    sensorDistanceCm={tank.sensorDistanceCm}
-                    fuelHeightCm={tank.fuelHeightCm}
-                  />
-                </div>
-              )}
-
-              <div className="mt-4 grid grid-cols-3 gap-2 text-xs font-medium text-zinc-500">
-                <span>0%</span>
-              <span className="text-center">
-                kapasitas {formatLiter(tank.capacityLiter)} L
-              </span>
-              <span className="text-right">100%</span>
+      <div className="mt-5 grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">
+        <div className="rounded-lg border border-dashed border-zinc-200 bg-zinc-50 p-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2 rounded-full bg-white px-3 py-2 text-xs font-semibold text-zinc-600 shadow-sm ring-1 ring-zinc-200">
+              <Radio className="size-4 text-red-600" aria-hidden="true" />
+              Sensor di atas
             </div>
+
+            <div className="rounded-full bg-cyan-50 px-3 py-2 text-xs font-semibold text-cyan-700 ring-1 ring-cyan-100">
+              {tank.hasReading ? `Isi ${tank.fillPercent}%` : "belum ada data"}
+            </div>
+          </div>
+
+          <div className="relative mt-5 h-64 overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm sm:h-72">
+            {isRectangular ? (
+              <TankRectangularScene3D
+                fillPercent={fillPercent}
+                lengthCm={tank.lengthCm}
+                widthCm={tank.widthCm}
+                heightCm={tank.heightCm}
+                sensorDistanceCm={tank.sensorDistanceCm}
+                fuelHeightCm={tank.fuelHeightCm}
+              />
+            ) : (
+              <TankHorizontalCylinderScene3D
+                fillPercent={fillPercent}
+                lengthCm={tank.lengthCm}
+                diameterCm={tank.diameterCm}
+                sensorDistanceCm={tank.sensorDistanceCm}
+                fuelHeightCm={tank.fuelHeightCm}
+              />
+            )}
+          </div>
+
+          <div className="mt-1 grid grid-cols-3 gap-2 text-xs font-medium text-zinc-500">
+            <span>0%</span>
+            <span className="text-center">
+              kapasitas {formatLiter(tank.capacityLiter)} L
+            </span>
+            <span className="text-right">100%</span>
+          </div>
+
+          <div className="mt-4 rounded-lg border border-cyan-100 bg-white p-3 text-xs leading-5 text-zinc-500">
+            Garis merah menunjukkan jarak sensor dari atas ke permukaan solar.
+            Area biru mengikuti tinggi solar secara vertikal, bukan kiri ke
+            kanan.
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-          {[
-            {
-              label: "Jarak sensor",
-              value: `${tank.sensorDistanceCm} cm`,
-              note: "distance dari payload",
-              icon: Ruler,
-            },
-            {
-              label: "Tinggi solar",
-              value: `${tank.fuelHeightCm} cm`,
-              note: "raw.H_cm setelah normalisasi",
-              icon: Droplets,
-            },
-            ...configurationItems,
-          ].map((item) => {
+        <div className="grid gap-3 sm:grid-cols-2">
+          {dimensionItems.map((item, index) => {
             const Icon = item.icon;
+            const shouldCenterItem =
+              !isRectangular && index === dimensionItems.length - 1;
 
             return (
               <div
                 key={item.label}
-                className="rounded-lg border border-zinc-200 bg-zinc-50 p-4"
+                className={`rounded-lg border border-zinc-200 bg-zinc-50 p-3 ${
+                  shouldCenterItem
+                    ? "sm:col-span-2 sm:mx-auto sm:w-[calc(50%-0.375rem)]"
+                    : ""
+                }`}
               >
                 <div className="flex items-center gap-3">
                   <span className="grid size-10 place-items-center rounded-lg bg-white text-red-600 ring-1 ring-zinc-200">
@@ -462,7 +641,9 @@ function TankVisual({ tank }: { tank: TankDetail }) {
                     </p>
                   </div>
                 </div>
-                <p className="mt-3 text-sm text-zinc-500">{item.note}</p>
+                <p className="mt-2 text-xs leading-5 text-zinc-500">
+                  {item.note}
+                </p>
               </div>
             );
           })}
@@ -473,166 +654,53 @@ function TankVisual({ tank }: { tank: TankDetail }) {
 }
 
 function TrendChart({ readings }: { readings: ReadingPoint[] }) {
-  const chartWidth = 1000;
-  const chartHeight = 280;
-  const padding = {
-    top: 20,
-    right: 24,
-    bottom: 34,
-    left: 42,
-  };
-  const plotWidth = chartWidth - padding.left - padding.right;
-  const plotHeight = chartHeight - padding.top - padding.bottom;
-  const parsedReadings = readings
-    .map((reading) => ({
-      ...reading,
-      receivedTime: new Date(reading.receivedAt).getTime(),
-    }))
-    .filter((reading) => Number.isFinite(reading.receivedTime));
-  const fallbackNow =
-    parsedReadings.at(-1)?.receivedTime ?? new Date().getTime();
-  const rangeEnd = fallbackNow;
-  const rangeStart = rangeEnd - 24 * 60 * 60 * 1000;
-  const chartReadings = parsedReadings.filter(
-    (reading) => reading.receivedTime >= rangeStart,
-  );
-  const pointReadings =
-    chartReadings.length > 0 ? chartReadings : parsedReadings.slice(-1);
+  const maxPercent = 100;
 
-  const getX = (receivedTime: number) => {
-    if (rangeEnd <= rangeStart) {
-      return padding.left;
-    }
-
+  if (readings.length === 0) {
     return (
-      padding.left +
-      ((receivedTime - rangeStart) / (rangeEnd - rangeStart)) * plotWidth
+      <div className="mt-6 grid min-h-64 place-items-center rounded-lg border border-dashed border-zinc-200 bg-zinc-50 p-5 text-center">
+        <div>
+          <p className="text-sm font-semibold text-zinc-950">
+            Belum ada riwayat pembacaan
+          </p>
+          <p className="mt-2 max-w-md text-sm leading-6 text-zinc-500">
+            Tangki sudah terdaftar, tetapi perangkat belum mengirim data yang
+            bisa digambar sebagai tren.
+          </p>
+        </div>
+      </div>
     );
-  };
-  const getY = (percent: number) =>
-    padding.top + (1 - Math.min(Math.max(percent, 0), 100) / 100) * plotHeight;
-
-  const points = pointReadings.map((reading) => ({
-    ...reading,
-    x: getX(reading.receivedTime),
-    y: getY(reading.percent),
-  }));
-  const linePath =
-    points.length === 0
-      ? ""
-      : points
-          .map((point, index) =>
-            index === 0 ? `M ${point.x} ${point.y}` : `L ${point.x} ${point.y}`,
-          )
-          .join(" ");
-  const areaPath =
-    points.length === 0
-      ? ""
-      : `${linePath} L ${points.at(-1)?.x} ${padding.top + plotHeight} L ${
-          points[0]?.x
-        } ${padding.top + plotHeight} Z`;
-  const yTicks = [100, 75, 50, 25, 0];
-  const xTicks = Array.from({ length: 7 }, (_, index) => {
-    const time = rangeStart + ((rangeEnd - rangeStart) * index) / 6;
-    return {
-      x: getX(time),
-      label: formatJakartaTimeLabel(time),
-    };
-  });
+  }
 
   return (
-    <div className="mt-6 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50 p-4">
-      <div className="h-72 min-w-[640px]">
-        <svg
-          className="h-full w-full"
-          viewBox={`0 0 ${chartWidth} ${chartHeight}`}
-          role="img"
-          aria-label="Line chart riwayat persentase isi tangki 24 jam"
-        >
-          <defs>
-            <linearGradient id="tank-history-area" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0%" stopColor="#06b6d4" stopOpacity="0.28" />
-              <stop offset="100%" stopColor="#06b6d4" stopOpacity="0.03" />
-            </linearGradient>
-          </defs>
+    <div className="mt-6 rounded-lg border border-zinc-200 bg-zinc-50 p-5">
+      <div className="flex h-64 items-end gap-3">
+        {readings.map((reading, index) => {
+          const height = Math.max((reading.percent / maxPercent) * 100, 8);
 
-          {yTicks.map((tick) => {
-            const y = getY(tick);
-
-            return (
-              <g key={tick}>
-                <line
-                  x1={padding.left}
-                  x2={padding.left + plotWidth}
-                  y1={y}
-                  y2={y}
-                  stroke="#e4e4e7"
-                  strokeDasharray={tick === 0 ? "0" : "6 8"}
+          return (
+            <div
+              key={`${reading.time}-${reading.percent}-${index}`}
+              className="flex h-full flex-1 flex-col justify-end gap-2"
+            >
+              <div className="relative flex flex-1 items-end">
+                <div
+                  className={`w-full rounded-t-lg transition duration-500 ${
+                    reading.percent < 25
+                      ? "bg-red-500"
+                      : reading.percent < 45
+                        ? "bg-amber-500"
+                        : "bg-cyan-500"
+                  }`}
+                  style={{ height: `${height}%` }}
                 />
-                <text
-                  x={padding.left - 12}
-                  y={y + 4}
-                  textAnchor="end"
-                  className="fill-zinc-400 text-[0.68rem] font-medium"
-                >
-                  {tick}%
-                </text>
-              </g>
-            );
-          })}
-
-          {xTicks.map((tick) => (
-            <text
-              key={`${tick.x}-${tick.label}`}
-              x={tick.x}
-              y={chartHeight - 8}
-              textAnchor="middle"
-              className="fill-zinc-400 text-[0.68rem] font-medium"
-            >
-              {tick.label}
-            </text>
-          ))}
-
-          {areaPath ? (
-            <path d={areaPath} fill="url(#tank-history-area)" />
-          ) : null}
-          {linePath ? (
-            <path
-              d={linePath}
-              fill="none"
-              stroke="#06b6d4"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="4"
-            />
-          ) : null}
-
-          {points.map((point, index) => (
-            <g key={`${point.receivedAt}-${index}`}>
-              <circle
-                cx={point.x}
-                cy={point.y}
-                r="4.5"
-                className="fill-white stroke-cyan-500"
-                strokeWidth="3"
-              />
-              <title>{`${point.time} - ${point.percent}% - ${formatLiter(
-                point.volumeLiter,
-              )} L`}</title>
-            </g>
-          ))}
-
-          {points.length === 0 ? (
-            <text
-              x={chartWidth / 2}
-              y={chartHeight / 2}
-              textAnchor="middle"
-              className="fill-zinc-400 text-sm font-medium"
-            >
-              Belum ada data riwayat
-            </text>
-          ) : null}
-        </svg>
+              </div>
+              <span className="text-center text-[0.68rem] font-medium text-zinc-400">
+                {reading.time}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -647,13 +715,13 @@ function NearbyMarker({ site }: { site: NearbySite }) {
 
   return (
     <div className="group absolute z-20" style={markerStyle}>
-      <button
-        type="button"
+      <Link
+        href={`/dashboard/tanks/${site.tankId}`}
         className={`grid size-8 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white shadow-lg shadow-zinc-400/20 ring-4 transition duration-300 hover:scale-110 focus:outline-none focus:ring-4 ${meta.ring}`}
-        aria-label={`${site.name}, ${meta.label}`}
+        aria-label={`Buka detail ${site.name}, ${meta.label}`}
       >
         <span className={`size-3.5 rounded-full ${meta.dot}`} />
-      </button>
+      </Link>
       <div className="pointer-events-none absolute left-1/2 top-7 hidden w-52 -translate-x-1/2 rounded-lg border border-zinc-200 bg-white p-3 text-left shadow-2xl shadow-zinc-300/50 group-hover:block group-focus-within:block">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -754,7 +822,7 @@ function LocationPanel({ tank }: { tank: TankDetail }) {
         ))}
 
         <div
-          className="absolute z-30 -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-600 p-1 ring-8 ring-red-100"
+          className="pointer-events-none absolute z-30 -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-600 p-1 ring-8 ring-red-100"
           style={{ left: tank.markerLeft, top: tank.markerTop }}
           aria-hidden="true"
         >
@@ -797,6 +865,260 @@ function ParameterList({ items }: { items: ParameterItem[] }) {
   );
 }
 
+function formatSnapshotItem(
+  value: string | number | null | undefined,
+  suffix = "",
+) {
+  if (typeof value === "undefined" || value === null || value === "") {
+    return "-";
+  }
+
+  return typeof value === "number" ? `${formatLiter(value)}${suffix}` : value;
+}
+
+function ConfigReviewPanel({ tank }: { tank: TankDetail }) {
+  const review = tank.configReview;
+  const isProblem = review.needsReview || review.status === "invalid_config";
+  const isMinor = review.status === "minor_config_difference";
+  const tone = isProblem
+    ? "border-red-200 bg-red-50"
+    : isMinor
+      ? "border-amber-200 bg-amber-50"
+      : "border-emerald-200 bg-emerald-50";
+  const badgeTone = isProblem
+    ? "bg-red-600 text-white"
+    : isMinor
+      ? "bg-amber-500 text-white"
+      : "bg-emerald-600 text-white";
+  const payloadConfig = review.payloadTankConfig;
+  const registryConfig = review.registryTankConfig;
+  const appliedConfig = review.appliedTankConfig;
+  const configCards = [
+    {
+      label: "Registry",
+      shape:
+        registryConfig.shape === "rectangular"
+          ? "Tangki balok"
+          : "Silinder horizontal",
+      capacity: formatSnapshotItem(registryConfig.capacityLiter, " L"),
+      source: "data resmi aplikasi",
+    },
+    {
+      label: "Payload",
+      shape: payloadConfig?.shape
+        ? payloadConfig.shape === "rectangular"
+          ? "Tangki balok"
+          : "Silinder horizontal"
+        : "-",
+      capacity: formatSnapshotItem(payloadConfig?.capacityLiter, " L"),
+      source: "laporan device",
+    },
+    {
+      label: "Dipakai pembacaan",
+      shape:
+        appliedConfig.shape === "rectangular"
+          ? "Tangki balok"
+          : "Silinder horizontal",
+      capacity: formatSnapshotItem(appliedConfig.capacityLiter, " L"),
+      source: "hasil normalisasi",
+    },
+  ];
+
+  return (
+    <section
+      className={`mb-5 animate-soft-fade rounded-lg border p-5 shadow-sm ${tone}`}
+    >
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <SectionHeading
+          label="Review config"
+          title={review.summaryLabel}
+          description="Payload perangkat boleh membawa konfigurasi tangki, tetapi tetap dibandingkan dengan registry agar perubahan besar tidak dipercaya diam-diam."
+        />
+        <div className="flex flex-wrap gap-2">
+          <span
+            className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ${badgeTone}`}
+          >
+            {formatConfigStatusLabel(review.status)}
+          </span>
+          <span className="w-fit rounded-full bg-white px-3 py-1 text-xs font-semibold text-zinc-700 ring-1 ring-zinc-200">
+            sumber {review.configSource}
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-5 grid gap-3 md:grid-cols-3">
+        {configCards.map((item) => (
+          <div
+            key={item.label}
+            className="rounded-lg border border-white/70 bg-white/80 p-4 shadow-sm"
+          >
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400">
+              {item.label}
+            </p>
+            <p className="mt-2 text-sm font-semibold text-zinc-950">
+              {item.shape}
+            </p>
+            <p className="mt-1 text-sm text-zinc-600">{item.capacity}</p>
+            <p className="mt-3 text-xs leading-5 text-zinc-500">
+              {item.source}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {review.issues.length > 0 ? (
+        <div className="mt-4 grid gap-2">
+          {review.issues.slice(0, 4).map((issue) => (
+            <div
+              key={`${issue.field}-${issue.message}`}
+              className="rounded-lg border border-white/70 bg-white/80 p-4 text-sm leading-6 text-zinc-700 shadow-sm"
+            >
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="font-semibold text-zinc-950">{issue.label}</p>
+                  <p className="mt-1">{issue.message}</p>
+                </div>
+                <span className="w-fit rounded-full bg-zinc-950 px-3 py-1 text-xs font-semibold text-white">
+                  {issue.severity}
+                </span>
+              </div>
+              <p className="mt-2 text-xs text-zinc-500">
+                Registry: {issue.registryValue} | Payload: {issue.payloadValue}
+              </p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-4 rounded-lg border border-white/70 bg-white/80 p-4 text-sm leading-6 text-zinc-600 shadow-sm">
+          Tidak ada konflik konfigurasi besar yang terdeteksi pada pembacaan
+          terbaru.
+        </p>
+      )}
+    </section>
+  );
+}
+
+function RuntimeParameterPanel({ tank }: { tank: TankDetail }) {
+  const activeParameter = getRuntimeLevelParameter(
+    tank.hasReading ? tank.runtimeHour : null,
+  );
+
+  return (
+    <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+      <SectionHeading
+        label="Sisa jam"
+        title="Level parameter runtime"
+        description="Kategori ini membaca sisa runtime genset agar operator tahu posisi tangki terhadap batas operasional."
+      />
+
+      <div
+        className={`mt-5 rounded-lg border p-4 ${activeParameter.card}`}
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
+              Parameter aktif
+            </p>
+            <p className="mt-2 text-2xl font-semibold text-zinc-950">
+              {activeParameter.label}
+            </p>
+          </div>
+          <span
+            className={`w-fit rounded-full px-3 py-1 text-xs font-semibold ring-1 ${activeParameter.badge}`}
+          >
+            {tank.hasReading ? formatRuntimeHour(tank.runtimeHour) : "-"}
+          </span>
+        </div>
+        <p className="mt-3 text-sm leading-6 text-zinc-600">
+          {activeParameter.description}
+        </p>
+      </div>
+
+      <div className="mt-4 grid gap-2 sm:grid-cols-2">
+        {runtimeLevelParameters.map((parameter) => {
+          const isActive = parameter.label === activeParameter.label;
+
+          return (
+            <div
+              key={parameter.label}
+              className={`rounded-lg border p-3 transition duration-300 ${
+                isActive
+                  ? `${parameter.card} ring-2 ring-blue-100`
+                  : "border-zinc-200 bg-zinc-50"
+              }`}
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2">
+                  <span className={`size-2 rounded-full ${parameter.dot}`} />
+                  <span className="text-sm font-semibold text-zinc-950">
+                    {parameter.label}
+                  </span>
+                </div>
+                <span className="text-xs font-semibold text-zinc-500">
+                  {parameter.range}
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+function TankConfigurationPanel({ tank }: { tank: TankDetail }) {
+  const dimensionRows =
+    tank.shape === "rectangular"
+      ? [
+          ["Panjang tangki", formatMeasurement(tank.lengthCm, "cm")],
+          ["Lebar tangki", formatMeasurement(tank.widthCm, "cm")],
+          ["Tinggi tangki", formatMeasurement(tank.heightCm, "cm")],
+        ]
+      : [
+          ["Panjang tabung", formatMeasurement(tank.lengthCm, "cm")],
+          ["Diameter tabung", formatMeasurement(tank.diameterCm, "cm")],
+        ];
+  const configRows = [
+    ["Status config", tank.configReview.summaryLabel],
+    ["Sumber config", tank.configReview.configSource],
+    ["Tipe visual", tank.shapeLabel],
+    ["Kapasitas", `${formatLiter(tank.capacityLiter)} L`],
+    ...dimensionRows,
+    ["Tinggi sensor", formatMeasurement(tank.sensorMountHeightCm, "cm")],
+    ["Konsumsi per jam", `${tank.consumptionLiterPerHour} L/jam`],
+    ["Low level", formatPercent(tank.lowLevelPercent)],
+    ["Critical level", formatPercent(tank.criticalLevelPercent)],
+    ["Interval kirim", `${tank.expectedIntervalMin} menit`],
+  ];
+
+  return (
+    <section
+      id="konfigurasi"
+      className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
+    >
+      <SectionHeading
+        label="Konfigurasi"
+        title="Spesifikasi tangki dan device"
+        description="Ringkasan config yang dipakai UI untuk memilih visual, menghitung volume, dan menentukan ambang operasional."
+      />
+
+      <div className="mt-6 space-y-3">
+        {configRows.map(([label, value]) => (
+          <div
+            key={label}
+            className="flex items-center justify-between gap-4 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3"
+          >
+            <span className="text-sm font-medium text-zinc-500">{label}</span>
+            <span className="text-right text-sm font-semibold text-zinc-950">
+              {value}
+            </span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 function ReadingTable({ tank }: { tank: TankDetail }) {
   return (
     <div className="mt-6 overflow-x-auto">
@@ -811,44 +1133,55 @@ function ReadingTable({ tank }: { tank: TankDetail }) {
           </tr>
         </thead>
         <tbody>
-          {tank.readings.map((reading, index) => (
-            <tr
-              key={`${reading.time}-${reading.volumeLiter}-${index}`}
-              className="bg-zinc-50"
-            >
-              <td className="rounded-l-lg px-4 py-4 font-semibold text-zinc-950">
-                {reading.time}
-              </td>
-              <td className="px-4 py-4">
-                <div className="flex items-center gap-3">
-                  <div className="h-2 w-24 overflow-hidden rounded-full bg-zinc-200">
-                    <span
-                      className={`block h-full rounded-full ${
-                        reading.percent < 25
-                          ? "bg-red-500"
-                          : reading.percent < 45
-                            ? "bg-amber-500"
-                            : "bg-cyan-500"
-                      }`}
-                      style={{ width: `${reading.percent}%` }}
-                    />
-                  </div>
-                  <span className="font-semibold">{reading.percent}%</span>
-                </div>
-              </td>
-              <td className="px-4 py-4 font-semibold">
-                {formatLiter(reading.volumeLiter)} L
-              </td>
-              <td className="px-4 py-4 text-zinc-600">
-                {reading.distanceCm} cm
-              </td>
-              <td className="rounded-r-lg px-4 py-4">
-                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100">
-                  diterima
-                </span>
+          {tank.readings.length === 0 ? (
+            <tr className="bg-zinc-50">
+              <td
+                colSpan={5}
+                className="rounded-lg px-4 py-8 text-center text-sm text-zinc-500"
+              >
+                Belum ada pembacaan tersimpan untuk tangki ini.
               </td>
             </tr>
-          ))}
+          ) : (
+            tank.readings.map((reading, index) => (
+              <tr
+                key={`${reading.time}-${reading.volumeLiter}-${index}`}
+                className="bg-zinc-50"
+              >
+                <td className="rounded-l-lg px-4 py-4 font-semibold text-zinc-950">
+                  {reading.time}
+                </td>
+                <td className="px-4 py-4">
+                  <div className="flex items-center gap-3">
+                    <div className="h-2 w-24 overflow-hidden rounded-full bg-zinc-200">
+                      <span
+                        className={`block h-full rounded-full ${
+                          reading.percent < 25
+                            ? "bg-red-500"
+                            : reading.percent < 45
+                              ? "bg-amber-500"
+                              : "bg-cyan-500"
+                        }`}
+                        style={{ width: `${reading.percent}%` }}
+                      />
+                    </div>
+                    <span className="font-semibold">{reading.percent}%</span>
+                  </div>
+                </td>
+                <td className="px-4 py-4 font-semibold">
+                  {formatLiter(reading.volumeLiter)} L
+                </td>
+                <td className="px-4 py-4 text-zinc-600">
+                  {reading.distanceCm} cm
+                </td>
+                <td className="rounded-r-lg px-4 py-4">
+                  <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100">
+                    diterima
+                  </span>
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>
@@ -864,13 +1197,17 @@ export default async function TankDetailPage({
 
   await connection();
 
-  const monitoringData = await listMonitoringDataWithSource();
+  const now = new Date();
+  const [readings, referenceData] = await Promise.all([
+    listMonitoringReadings(),
+    getMonitoringReferenceData(),
+  ]);
   const tankView = buildTankDetail(tankId, {
-    now: new Date(),
-    sites: monitoringData.sites,
-    tanks: monitoringData.tanks,
-    devices: monitoringData.devices,
-    readings: monitoringData.readings,
+    now,
+    sites: referenceData.sites,
+    tanks: referenceData.tanks,
+    devices: referenceData.devices,
+    readings,
   });
 
   if (!tankView) {
@@ -884,15 +1221,19 @@ export default async function TankDetailPage({
   const metrics = [
     {
       label: "Volume saat ini",
-      value: `${formatLiter(tank.volumeLiter)} L`,
-      note: `${tank.fillPercent}% dari kapasitas konfigurasi ${formatLiter(tank.capacityLiter)} L`,
+      value: tank.hasReading ? `${formatLiter(tank.volumeLiter)} L` : "-",
+      note: tank.hasReading
+        ? `${tank.fillPercent}% dari kapasitas konfigurasi ${formatLiter(tank.capacityLiter)} L, sumber volume ${formatSourceLabel(tank.dataSources.volumeSource)}`
+        : `menunggu pembacaan pertama dari perangkat, kapasitas konfigurasi ${formatLiter(tank.capacityLiter)} L`,
       icon: Fuel,
       tone: "bg-cyan-50 text-cyan-700 ring-cyan-100",
     },
     {
       label: "Estimasi runtime",
-      value: `${tank.runtimeHour} jam`,
-      note: `berdasarkan konsumsi ${tank.consumptionLiterPerHour} L/jam`,
+      value: tank.hasReading ? formatRuntimeHour(tank.runtimeHour) : "-",
+      note: tank.hasReading
+        ? `berdasarkan konsumsi ${tank.consumptionLiterPerHour} L/jam, dihitung ${formatSourceLabel(tank.dataSources.runtimeSource)}`
+        : `akan dihitung setelah volume terbaca, konsumsi konfigurasi ${tank.consumptionLiterPerHour} L/jam`,
       icon: Clock,
       tone: "bg-emerald-50 text-emerald-700 ring-emerald-100",
     },
@@ -940,23 +1281,33 @@ export default async function TankDetailPage({
   const dataFlow: TimelineItem[] = [
     {
       label: "Sensor membaca jarak",
-      value: `${tank.sensorDistanceCm} cm`,
-      detail: "jarak dari sensor ke permukaan solar",
+      value: tank.hasReading ? `${tank.sensorDistanceCm} cm` : "-",
+      detail: tank.hasReading
+        ? "jarak dari sensor ke permukaan solar"
+        : "belum ada jarak sensor yang diterima",
     },
     {
       label: "Tinggi solar dihitung",
-      value: `${tank.fuelHeightCm} cm`,
-      detail: "nilai ter-normalisasi dari raw.H_cm",
+      value: tank.hasReading ? `${tank.fuelHeightCm} cm` : "-",
+      detail: tank.hasReading
+        ? `sumber tinggi solar ${formatSourceLabel(tank.dataSources.fuelHeightSource)}`
+        : "tinggi solar belum dihitung sebelum data masuk",
     },
     {
       label: "Volume dan persen",
-      value: `${formatLiter(tank.volumeLiter)} L / ${tank.fillPercent}%`,
-      detail: "angka siap dipakai UI dan status",
+      value: tank.hasReading
+        ? `${formatLiter(tank.volumeLiter)} L / ${tank.fillPercent}%`
+        : "-",
+      detail: tank.hasReading
+        ? `volume dari ${formatSourceLabel(tank.dataSources.volumeSource)}, persen dari ${formatSourceLabel(tank.dataSources.fillPercentSource)}`
+        : "dashboard tetap menampilkan STO sambil menunggu data pertama",
     },
     {
       label: "Runtime operasional",
-      value: `${tank.runtimeHour} jam`,
-      detail: "perkiraan durasi genset dari konsumsi per jam",
+      value: tank.hasReading ? `${tank.runtimeHour} jam` : "-",
+      detail: tank.hasReading
+        ? "perkiraan durasi genset dari konsumsi per jam"
+        : "runtime baru valid setelah volume solar tersedia",
     },
   ];
 
@@ -991,6 +1342,9 @@ export default async function TankDetailPage({
             </a>
             <a href="#lokasi" className="transition hover:text-red-600">
               Lokasi
+            </a>
+            <a href="#konfigurasi" className="transition hover:text-red-600">
+              Konfigurasi
             </a>
             <a href="#payload" className="transition hover:text-red-600">
               Payload
@@ -1030,7 +1384,7 @@ export default async function TankDetailPage({
                   detail tangki
                 </span>
                 <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
-                  data simulator/API
+                  data monitoring
                 </span>
               </div>
 
@@ -1076,6 +1430,8 @@ export default async function TankDetailPage({
           ))}
         </section>
 
+        <ConfigReviewPanel tank={tank} />
+
         <div className="grid min-w-0 gap-5 xl:grid-cols-[1.32fr_0.68fr]">
           <div className="min-w-0 space-y-5">
             {/* Tank Visual Section */}
@@ -1102,10 +1458,6 @@ export default async function TankDetailPage({
               <ReadingTable tank={tank} />
             </section>
 
-            {/* Location Section */}
-            <section id="lokasi">
-              <LocationPanel tank={tank} />
-            </section>
           </div>
 
           <aside className="min-w-0 space-y-5">
@@ -1122,118 +1474,154 @@ export default async function TankDetailPage({
               <ParameterList items={deviceParameters} />
             </section>
 
-            {/* Data Flow Section */}
-            <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
-              <SectionHeading
-                label="Alur baca"
-                title="Dari sensor ke keputusan"
-                description="Urutan ini menjaga dashboard tidak salah memahami data mentah perangkat."
-              />
+            {/* Runtime Parameter Section */}
+            <RuntimeParameterPanel tank={tank} />
 
-              <div className="mt-6 space-y-4">
-                {dataFlow.map((item, index) => (
-                  <div key={item.label} className="flex gap-4">
-                    <div className="flex flex-col items-center">
-                      <span className="grid size-9 place-items-center rounded-full bg-red-50 text-sm font-semibold text-red-600 ring-1 ring-red-100">
-                        {index + 1}
-                      </span>
-                      {index < dataFlow.length - 1 ? (
-                        <span className="mt-2 h-full min-h-10 border-l border-zinc-200" />
-                      ) : null}
-                    </div>
-                    <div className="pb-2">
-                      <p className="font-semibold text-zinc-950">
-                        {item.label}
-                      </p>
-                      <p className="mt-1 text-xl font-semibold text-zinc-950">
-                        {item.value}
-                      </p>
-                      <p className="mt-1 text-sm leading-6 text-zinc-500">
-                        {item.detail}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </section>
-
-            {/* Payload Section */}
-            <section
-              id="payload"
-              className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
-            >
-              <SectionHeading
-                label="Payload"
-                title="Field kompatibel CAT"
-                description="Nilai berikut menjadi jembatan dari payload lama ke bentuk data internal yang lebih rapi."
-              />
-
-              <div className="mt-6 space-y-3">
-                {[
-                  ["distance", `${tank.rawPayload.distance} cm`],
-                  ["raw.H_cm", `${tank.rawPayload.H_cm} cm`],
-                  ["raw.volume", `${formatLiter(tank.rawPayload.volume)} L`],
-                  ["raw.percent", `${tank.rawPayload.percent}%`],
-                  [
-                    "raw.wifi_rssi",
-                    formatMeasurement(tank.rawPayload.wifi_rssi, "dBm"),
-                  ],
-                ].map(([key, value]) => (
-                  <div
-                    key={key}
-                    className="flex items-center justify-between gap-4 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3"
-                  >
-                    <code className="text-sm font-semibold text-zinc-700">
-                      {key}
-                    </code>
-                    <span className="text-sm font-semibold text-zinc-950">
-                      {value}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-5 rounded-lg bg-zinc-950 p-4 text-sm text-white">
-                <div className="flex items-center gap-2 font-semibold">
-                  <Zap className="size-4 text-cyan-300" aria-hidden="true" />
-                  POST /api/ingest
-                </div>
-                <p className="mt-2 text-zinc-300">
-                  Dashboard membaca data yang sudah dinormalisasi, bukan membaca
-                  sensor secara langsung.
-                </p>
-              </div>
-            </section>
-
-            {/* Validation Notes Section */}
-            <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
-              <SectionHeading
-                label="Validasi"
-                title="Hal yang nanti diganti data asli"
-                description="Bagian ini menjaga batas data simulator tetap jelas sebelum perangkat asli dan database production disambungkan."
-              />
-
-              <div className="mt-6 space-y-3">
-                {[
-                  "Dimensi tangki dari pengukuran lapangan.",
-                  "Konsumsi solar per jam tiap STO.",
-                  "Interval kirim data aktual dari perangkat.",
-                  "Koordinat manual yang sudah disetujui.",
-                ].map((note) => (
-                  <div
-                    key={note}
-                    className="flex items-start gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-4"
-                  >
-                    <AlertTriangle
-                      className="mt-0.5 size-4 shrink-0 text-red-600"
-                      aria-hidden="true"
-                    />
-                    <p className="text-sm leading-6 text-zinc-600">{note}</p>
-                  </div>
-                ))}
-              </div>
-            </section>
+            {/* Tank Configuration Section */}
+            <TankConfigurationPanel tank={tank} />
           </aside>
+        </div>
+
+        {/* Location Section */}
+        <section id="lokasi" className="mt-5 min-w-0">
+          <LocationPanel tank={tank} />
+        </section>
+
+        <div className="mt-5 grid min-w-0 gap-5 xl:grid-cols-3">
+          {/* Data Flow Section */}
+          <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+            <SectionHeading
+              label="Alur baca"
+              title="Dari sensor ke keputusan"
+              description="Urutan ini menjaga dashboard tidak salah memahami data mentah perangkat."
+            />
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+              {dataFlow.map((item, index) => (
+                <div key={item.label} className="flex gap-4">
+                  <div className="flex flex-col items-center">
+                    <span className="grid size-9 place-items-center rounded-full bg-red-50 text-sm font-semibold text-red-600 ring-1 ring-red-100">
+                      {index + 1}
+                    </span>
+                    {index < dataFlow.length - 1 ? (
+                      <span className="mt-2 h-full min-h-10 border-l border-zinc-200 sm:hidden xl:block" />
+                    ) : null}
+                  </div>
+                  <div className="pb-2">
+                    <p className="font-semibold text-zinc-950">{item.label}</p>
+                    <p className="mt-1 text-xl font-semibold text-zinc-950">
+                      {item.value}
+                    </p>
+                    <p className="mt-1 text-sm leading-6 text-zinc-500">
+                      {item.detail}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* Payload Section */}
+          <section
+            id="payload"
+            className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
+          >
+            <SectionHeading
+              label="Payload"
+              title="Field kompatibel CAT"
+              description="Nilai berikut menjadi jembatan dari payload lama ke bentuk data internal yang lebih rapi."
+            />
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+              {[
+                [
+                  "distance",
+                  tank.hasReading ? `${tank.rawPayload.distance} cm` : "-",
+                ],
+                [
+                  "raw.H_cm",
+                  tank.hasReading ? `${tank.rawPayload.H_cm} cm` : "-",
+                ],
+                [
+                  "raw.volume",
+                  tank.hasReading
+                    ? `${formatLiter(tank.rawPayload.volume)} L`
+                    : "-",
+                ],
+                [
+                  "raw.percent",
+                  tank.hasReading ? `${tank.rawPayload.percent}%` : "-",
+                ],
+                [
+                  "raw.wifi_rssi",
+                  tank.hasReading
+                    ? formatMeasurement(tank.rawPayload.wifi_rssi, "dBm")
+                    : "-",
+                ],
+                ["config.status", formatConfigStatusLabel(tank.configReview.status)],
+                [
+                  "source.volume",
+                  formatSourceLabel(tank.dataSources.volumeSource),
+                ],
+                [
+                  "source.percent",
+                  formatSourceLabel(tank.dataSources.fillPercentSource),
+                ],
+              ].map(([key, value]) => (
+                <div
+                  key={key}
+                  className="flex items-center justify-between gap-4 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3"
+                >
+                  <code className="text-sm font-semibold text-zinc-700">
+                    {key}
+                  </code>
+                  <span className="text-sm font-semibold text-zinc-950">
+                    {value}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-5 rounded-lg bg-zinc-950 p-4 text-sm text-white">
+              <div className="flex items-center gap-2 font-semibold">
+                <Zap className="size-4 text-cyan-300" aria-hidden="true" />
+                POST /api/ingest
+              </div>
+              <p className="mt-2 text-zinc-300">
+                Dashboard membaca data yang sudah dinormalisasi, bukan membaca
+                sensor secara langsung.
+              </p>
+            </div>
+          </section>
+
+          {/* Validation Notes Section */}
+          <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+            <SectionHeading
+              label="Validasi lapangan"
+              title="Data yang perlu dikonfirmasi"
+              description="Gunakan daftar ini untuk memastikan pembacaan perangkat, konfigurasi tangki, dan lokasi STO sudah sesuai kondisi lapangan sebelum dipakai sebagai acuan operasional."
+            />
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+              {[
+                "Dimensi tangki mengikuti pengukuran fisik terakhir.",
+                "Konsumsi solar per jam sesuai beban genset masing-masing STO.",
+                "Interval kirim data perangkat sesuai konfigurasi aktif.",
+                "Koordinat manual sudah disetujui penanggung jawab lokasi.",
+              ].map((note) => (
+                <div
+                  key={note}
+                  className="flex items-start gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-4"
+                >
+                  <AlertTriangle
+                    className="mt-0.5 size-4 shrink-0 text-red-600"
+                    aria-hidden="true"
+                  />
+                  <p className="text-sm leading-6 text-zinc-600">{note}</p>
+                </div>
+              ))}
+            </div>
+          </section>
         </div>
       </div>
     </main>
