@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
@@ -14,7 +13,6 @@ import {
   Fuel,
   Gauge,
   History,
-  MapPin,
   Radio,
   Ruler,
   Settings,
@@ -23,6 +21,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { LiveRefreshControl } from "@/features/monitoring/components/live-refresh-control";
+import { TankLocationMap } from "@/features/monitoring/components/tank-location-map";
 import {
   TankHorizontalCylinderScene3D,
   TankRectangularScene3D,
@@ -92,6 +91,8 @@ type NearbySite = {
   left: string;
   top: string;
   runtimeHour: number;
+  fillPercent: number;
+  updateLabel: string;
 };
 
 type TankDetail = {
@@ -345,6 +346,8 @@ function toNearbySite(site: NearbyTankSite): NearbySite {
     left: site.left,
     top: site.top,
     runtimeHour: site.runtimeHour,
+    fillPercent: site.fillPercent,
+    updateLabel: site.updateLabel,
   };
 }
 
@@ -706,40 +709,7 @@ function TrendChart({ readings }: { readings: ReadingPoint[] }) {
   );
 }
 
-function NearbyMarker({ site }: { site: NearbySite }) {
-  const meta = statusMeta[site.status];
-  const markerStyle = {
-    left: site.left,
-    top: site.top,
-  } satisfies CSSProperties;
-
-  return (
-    <div className="group absolute z-20" style={markerStyle}>
-      <Link
-        href={`/dashboard/tanks/${site.tankId}`}
-        className={`grid size-8 -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white shadow-lg shadow-zinc-400/20 ring-4 transition duration-300 hover:scale-110 focus:outline-none focus:ring-4 ${meta.ring}`}
-        aria-label={`Buka detail ${site.name}, ${meta.label}`}
-      >
-        <span className={`size-3.5 rounded-full ${meta.dot}`} />
-      </Link>
-      <div className="pointer-events-none absolute left-1/2 top-7 hidden w-52 -translate-x-1/2 rounded-lg border border-zinc-200 bg-white p-3 text-left shadow-2xl shadow-zinc-300/50 group-hover:block group-focus-within:block">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold text-zinc-950">{site.name}</p>
-            <p className="mt-1 text-xs text-zinc-500">{site.code}</p>
-          </div>
-          <StatusBadge status={site.status} />
-        </div>
-        <p className="mt-3 text-xs text-zinc-500">
-          Runtime estimasi {site.runtimeHour} jam.
-        </p>
-      </div>
-    </div>
-  );
-}
-
 function LocationPanel({ tank }: { tank: TankDetail }) {
-  const sites = tank.nearbySites;
   return (
     <article className="animate-soft-fade overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
       <div className="flex flex-col gap-4 border-b border-zinc-200 p-5 sm:flex-row sm:items-start sm:justify-between">
@@ -753,82 +723,7 @@ function LocationPanel({ tank }: { tank: TankDetail }) {
         </span>
       </div>
 
-      <div className="relative min-h-[28rem] overflow-hidden bg-[#dff7f5]">
-        <div
-          className="absolute inset-0"
-          style={{
-            backgroundImage:
-              "radial-gradient(circle at 20% 22%, rgba(34, 211, 238, 0.32), transparent 24%), radial-gradient(circle at 72% 18%, rgba(132, 204, 22, 0.22), transparent 28%), radial-gradient(circle at 47% 72%, rgba(250, 204, 21, 0.24), transparent 25%), linear-gradient(135deg, rgba(255,255,255,0.8), rgba(236,253,245,0.66))",
-          }}
-        />
-        <div
-          className="absolute inset-0 opacity-60"
-          style={{
-            backgroundImage:
-              "linear-gradient(28deg, transparent 47%, rgba(113,113,122,.2) 48%, rgba(113,113,122,.2) 49%, transparent 50%), linear-gradient(96deg, transparent 47%, rgba(14,165,233,.24) 48%, rgba(14,165,233,.24) 49%, transparent 50%)",
-            backgroundSize: "92px 92px, 124px 124px",
-          }}
-        />
-        <svg
-          className="absolute inset-0 h-full w-full"
-          viewBox="0 0 1000 560"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M70 330 C210 250 340 290 460 220 C580 148 680 192 870 116"
-            stroke="#ffffff"
-            strokeLinecap="round"
-            strokeWidth="28"
-          />
-          <path
-            d="M90 410 C260 380 360 445 530 350 C680 266 770 320 920 260"
-            stroke="#ffffff"
-            strokeLinecap="round"
-            strokeWidth="22"
-          />
-          <path
-            d="M180 120 C280 210 310 300 420 380 C540 466 660 438 820 488"
-            stroke="#ffffff"
-            strokeLinecap="round"
-            strokeWidth="18"
-          />
-          <path
-            d="M70 330 C210 250 340 290 460 220 C580 148 680 192 870 116"
-            stroke="#94a3b8"
-            strokeDasharray="8 10"
-            strokeWidth="2"
-          />
-          <path
-            d="M90 410 C260 380 360 445 530 350 C680 266 770 320 920 260"
-            stroke="#94a3b8"
-            strokeDasharray="8 10"
-            strokeWidth="2"
-          />
-        </svg>
-
-        <div className="absolute left-5 top-5 z-10 rounded-lg border border-zinc-200 bg-white/90 p-4 shadow-lg shadow-zinc-300/30 backdrop-blur">
-          <div className="flex items-center gap-2 text-sm font-semibold text-zinc-950">
-            <MapPin className="size-4 text-red-600" aria-hidden="true" />
-            {tank.siteName}
-          </div>
-          <p className="mt-2 max-w-xs text-xs leading-5 text-zinc-500">
-            Marker aktif menunjukkan detail tangki yang sedang dibuka.
-          </p>
-        </div>
-
-        {sites.map((site) => (
-          <NearbyMarker key={site.code} site={site} />
-        ))}
-
-        <div
-          className="pointer-events-none absolute z-30 -translate-x-1/2 -translate-y-1/2 rounded-full bg-red-600 p-1 ring-8 ring-red-100"
-          style={{ left: tank.markerLeft, top: tank.markerTop }}
-          aria-hidden="true"
-        >
-          <div className="size-4 rounded-full bg-white" />
-        </div>
-      </div>
+      <TankLocationMap sites={tank.nearbySites} initialTankId={tank.id} />
     </article>
   );
 }
