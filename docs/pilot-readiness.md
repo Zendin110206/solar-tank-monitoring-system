@@ -25,6 +25,7 @@ Yang sudah tersedia:
 - script apply registry pilot;
 - script generate key/hash device;
 - script smoke test ingest.
+- peta dashboard berbasis koordinat registry.
 
 Yang belum final:
 
@@ -64,6 +65,7 @@ config/pilot-registry.example.json
 | `scripts/generate-device-key.mjs` | membuat key dan hash device |
 | `scripts/apply-pilot-registry.mjs` | validasi dan apply registry ke MySQL |
 | `scripts/smoke-pilot-ingest.mjs` | mengirim payload real-format untuk uji cepat |
+| `docs/field-pilot-5-sto-guide.md` | panduan lapangan 5 STO dari koordinat sampai device mengirim data |
 
 ## Alur Besar
 
@@ -358,6 +360,8 @@ https://solar-tank-monitoring-system.vercel.app/dashboard
 Yang diharapkan:
 
 - dashboard menampilkan minimal 5 STO setelah registry pilot diterapkan;
+- peta dashboard menampilkan titik dari latitude dan longitude registry;
+- search dan filter peta bisa menemukan STO yang dicari;
 - STO yang baru dikirimi smoke payload punya data terbaru;
 - status device tidak offline jika data baru masuk dan interval benar;
 - detail tangki menampilkan volume, persen, runtime, dan status config.
@@ -420,6 +424,13 @@ Catatan untuk firmware:
 - pakai HTTPS;
 - interval kirim mengikuti `expectedReportIntervalSec`;
 - jika endpoint berubah, firmware harus diarahkan ke URL baru.
+- latitude dan longitude untuk peta diambil dari registry manual, bukan dari device.
+
+Panduan lapangan yang lebih panjang ada di:
+
+```text
+docs/field-pilot-5-sto-guide.md
+```
 
 ## 11. Checklist Demo ke Tim
 
@@ -470,4 +481,3 @@ Sebelum production, masih perlu:
 - validasi keselamatan perangkat;
 - persetujuan data lokasi;
 - keputusan server final.
-

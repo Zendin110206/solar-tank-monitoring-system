@@ -40,6 +40,7 @@ Yang sudah tersedia:
 - fallback key global hanya untuk development lokal;
 - normalisasi payload real-format dari device, termasuk config tangki dari payload;
 - review config payload vs registry agar mismatch tidak diam-diam dianggap benar;
+- peta dashboard berbasis koordinat registry dengan zoom, search, dan filter status;
 - alat bantu pilot:
   - `pnpm pilot:hash-key`
   - `pnpm pilot:registry`
@@ -163,6 +164,7 @@ Struktur aktif saat ini:
 │   ├── development-log.md
 │   ├── device-ingestion.md
 │   ├── domain-model.md
+│   ├── field-pilot-5-sto-guide.md
 │   ├── pilot-readiness.md
 │   ├── reviewer-quickstart.md
 │   ├── roadmap.md
@@ -479,6 +481,7 @@ Catatan penting:
 | `docs/domain-model.md` | Rumus volume, persen, runtime, dan status |
 | `docs/deployment.md` | Catatan deployment lokal, demo, dan self-hosted |
 | `docs/pilot-readiness.md` | Panduan pilot 5 STO dengan registry real, hash key, dan smoke test |
+| `docs/field-pilot-5-sto-guide.md` | Panduan lapangan 5 STO: koordinat, peta, firmware, endpoint, dan checklist demo |
 | `docs/roadmap.md` | Rencana pengembangan bertahap |
 | `docs/safety-and-limitations.md` | Batasan dan keselamatan |
 | `docs/system-boundaries.md` | Hal yang masuk dan tidak masuk repo publik |

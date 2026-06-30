@@ -46,6 +46,7 @@ Dashboard tidak membaca sensor secara langsung. Device atau simulator yang mengi
 | Simulator | `scripts/simulate-device.mjs` | Ada |
 | Pilot registry apply | `scripts/apply-pilot-registry.mjs` | Ada, membaca file lokal yang tidak di-commit |
 | Pilot smoke ingest | `scripts/smoke-pilot-ingest.mjs` | Ada, mengirim payload real-format |
+| Operational map | `src/features/monitoring/components/operational-map.tsx` | Ada, menampilkan marker dari latitude/longitude registry |
 | Unit test | `src/features/monitoring/tests` | Ada |
 
 ## Batas Frontend dan Backend
@@ -165,9 +166,13 @@ Registry pilot wajib memakai:
 - dimensi tangki yang sudah dicek;
 - fallback global key dimatikan.
 
+Dashboard membaca `latitude` dan `longitude` dari registry site untuk marker
+peta. Payload device boleh membawa data sensor dan config tangki, tetapi lokasi
+STO tetap dikelola dari registry karena device saat ini tidak memakai GPS.
+
 ## Target Arsitektur Berikutnya
 
-Kondisi setelah Batch 14:
+Kondisi setelah Batch 15:
 
 ```text
 UI dashboard/detail
@@ -176,6 +181,7 @@ UI dashboard/detail
   -> memory store atau MySQL reading repository
   -> pilot registry lokal dapat diaplikasikan ke MySQL
   -> smoke payload real-format dapat dikirim ke API ingest
+  -> peta koordinat membaca latitude/longitude registry
   -> berubah saat device/smoke mengirim data dan halaman di-refresh
 ```
 

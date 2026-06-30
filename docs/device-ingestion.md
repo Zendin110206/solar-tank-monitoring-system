@@ -114,6 +114,12 @@ Payload real-format untuk pilot:
 
 API tetap memakai registry sebagai identitas resmi site/tangki/device. Config dari payload dibaca sebagai snapshot. Jika snapshot payload berbeda jauh dari registry, response ingest membawa `needsReview=true` dan dashboard/detail menampilkan status review.
 
+Untuk Batch 15, posisi marker peta dashboard tetap berasal dari `latitude` dan
+`longitude` pada registry site. Payload device boleh membawa `lat`/`lng` jika
+suatu saat tersedia, tetapi nilai itu belum dipakai untuk memindahkan titik STO.
+Alasannya, perangkat saat ini tidak memakai modul GPS dan lokasi STO harus
+diisi manual berdasarkan data yang sudah disetujui.
+
 ## Validasi yang Dilakukan
 
 API mengecek:

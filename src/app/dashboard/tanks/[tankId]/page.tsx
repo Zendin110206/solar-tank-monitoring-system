@@ -1660,17 +1660,17 @@ export default async function TankDetailPage({
           {/* Validation Notes Section */}
           <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
             <SectionHeading
-              label="Validasi"
-              title="Hal yang nanti diganti data asli"
-              description="Bagian ini menjaga batas data simulator tetap jelas sebelum perangkat asli dan database production disambungkan."
+              label="Validasi lapangan"
+              title="Data yang perlu dikonfirmasi"
+              description="Gunakan daftar ini untuk memastikan pembacaan perangkat, konfigurasi tangki, dan lokasi STO sudah sesuai kondisi lapangan sebelum dipakai sebagai acuan operasional."
             />
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
               {[
-                "Dimensi tangki dari pengukuran lapangan.",
-                "Konsumsi solar per jam tiap STO.",
-                "Interval kirim data aktual dari perangkat.",
-                "Koordinat manual yang sudah disetujui.",
+                "Dimensi tangki mengikuti pengukuran fisik terakhir.",
+                "Konsumsi solar per jam sesuai beban genset masing-masing STO.",
+                "Interval kirim data perangkat sesuai konfigurasi aktif.",
+                "Koordinat manual sudah disetujui penanggung jawab lokasi.",
               ].map((note) => (
                 <div
                   key={note}

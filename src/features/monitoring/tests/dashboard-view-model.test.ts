@@ -6,11 +6,16 @@ describe("dashboard overview view model", () => {
     const overview = buildDashboardOverview({
       now: new Date("2026-06-25T07:45:00.000Z"),
     });
+    const tph = overview.rows.find((row) => row.code === "TPH");
 
     expect(overview.summary.totalSites).toBe(5);
     expect(overview.summary.totalTanks).toBe(5);
     expect(overview.rows).toHaveLength(5);
     expect(overview.rows.some((row) => row.code === "PSN")).toBe(true);
+    expect(tph).toMatchObject({
+      latitude: -7.65,
+      longitude: 112.9,
+    });
   });
 
   it("calculates status from runtime, level, and device freshness", () => {

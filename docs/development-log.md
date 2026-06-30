@@ -168,6 +168,16 @@ Catatan:
 Data real, key asli, koordinat sensitif, dan file registry lokal tidak boleh di-commit. Jalur pilot memakai file .local.json yang diabaikan Git.
 ```
 
+## 2026-06-30 - Batch 15 Peta Real dan Panduan Lapangan
+
+Pekerjaan:
+
+- mengganti peta ilustratif dashboard menjadi peta berbasis tile dan koordinat registry;
+- menambahkan zoom, drag, recenter, search, filter status, tooltip marker, dan detail overview interaktif;
+- menambahkan latitude dan longitude ke dashboard view model agar API dan UI membawa posisi registry;
+- menambahkan `docs/field-pilot-5-sto-guide.md` sebagai panduan lapangan untuk 5 STO;
+- menegaskan bahwa marker peta berasal dari registry manual, bukan payload GPS device.
+
 ## Status Verifikasi Terakhir
 
 Perintah:

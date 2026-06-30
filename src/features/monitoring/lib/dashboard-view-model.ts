@@ -47,6 +47,8 @@ export type DashboardMonitoringSite = {
   signal: string;
   left: string;
   top: string;
+  latitude?: number;
+  longitude?: number;
   note: string;
   consumptionLiterPerHour: number;
   configStatus: TankConfigStatus;
@@ -312,6 +314,8 @@ export function buildDashboardOverview({
         typeof reading?.rssiDbm === "number" ? `${reading.rssiDbm} dBm` : "-",
       left: position.left,
       top: position.top,
+      latitude: site.latitude,
+      longitude: site.longitude,
       note: "",
       consumptionLiterPerHour: displayTank.consumptionLiterPerHour,
       configStatus: configReview.status,
