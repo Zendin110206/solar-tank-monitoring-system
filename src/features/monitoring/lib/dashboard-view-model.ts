@@ -348,7 +348,8 @@ export function buildDashboardOverview({
     );
 
   const latestRow = [...rows].sort(
-    (a, b) => getReceivedTime(b.lastReceivedAt) - getReceivedTime(a.lastReceivedAt),
+    (a, b) =>
+      getReceivedTime(b.lastReceivedAt) - getReceivedTime(a.lastReceivedAt),
   )[0];
   const onlineDevices = rows.filter(
     (row) => row.deviceStatus === "online",

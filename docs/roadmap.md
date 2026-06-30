@@ -42,7 +42,7 @@ Isi:
 Catatan:
 
 ```text
-UI dashboard dan detail sudah membaca storage aktif yang sama dengan endpoint API. Registry MySQL dan alat bantu pilot sudah tersedia, tetapi auth dan batas production masih perlu dimatangkan.
+UI dashboard dan detail sudah membaca storage aktif yang sama dengan endpoint API. Tahap berikutnya adalah mematangkan registry database, auth, dan batas mode production.
 ```
 
 ## Fase 4 - Domain Logic dan Test
@@ -83,26 +83,25 @@ Isi:
 - UI berubah saat simulator mengirim data lalu halaman dirender ulang;
 - endpoint API tetap tersedia untuk kontrak integrasi.
 
-## Fase 7 - Storage Permanen dan Registry
+## Fase 7 - Storage Permanen
 
-Status: fondasi reading dan registry selesai untuk prototipe, belum production.
+Status: fondasi reading selesai, belum production.
 
 Sudah ada:
 
 - migration MySQL;
 - seed demo MySQL;
 - repository reading MySQL;
-- repository registry MySQL untuk site, tangki, device, dan hash key;
 - storage facade `memory` atau `mysql`;
-- query mengambil data terbaru terlebih dahulu;
-- script apply registry pilot dari file lokal.
+- query mengambil data terbaru terlebih dahulu.
 
 Yang belum selesai:
 
+- registry site, tank, device dari database;
 - rotasi key device;
 - backup database;
 - test integrasi database nyata;
-- audit berkala agar data dummy tetap hanya aktif di mode development lokal.
+- aturan mematikan seluruh fallback dummy pada mode pilot/production.
 
 ## Fase 8 - Auth dan Role
 
@@ -116,16 +115,7 @@ Target:
 
 ## Fase 9 - Integrasi Device Fisik
 
-Status: fondasi payload real-format dan smoke test tersedia, integrasi lapangan tetap perlu validasi.
-
-Sudah ada:
-
-- normalisasi payload real-format;
-- review config payload vs registry;
-- script smoke test ingest;
-- panduan firmware payload minimal.
-
-Target berikutnya:
+Target:
 
 - sepakati payload firmware;
 - key per device;
@@ -136,21 +126,11 @@ Target berikutnya:
 
 Catatan:
 
-Endpoint ingest dan key per device sudah disiapkan untuk latihan dan pilot awal. Perangkat fisik tetap harus mengikuti validasi payload, jaringan, keamanan, dan safety lapangan.
+Endpoint ingest dan key per device sudah disiapkan untuk latihan, tetapi perangkat fisik tetap harus menunggu validasi payload, jaringan, keamanan, dan safety lapangan.
 
 ## Fase 10 - Deployment Demo atau Pilot
 
-Status: jalur Vercel + cloud MySQL tersedia untuk demo/pilot ringan.
-
-Sudah ada:
-
-- health check;
-- readiness check;
-- panduan MySQL cloud;
-- alat registry pilot;
-- smoke ingest ke URL lokal atau Vercel.
-
-Target berikutnya:
+Target:
 
 - deployment demo public-safe;
 - atau deployment internal/self-hosted;

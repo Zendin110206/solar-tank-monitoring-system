@@ -16,10 +16,6 @@ Yang masuk:
 - simulator terminal;
 - memory store development;
 - fondasi MySQL reading;
-- registry MySQL untuk site, tangki, device, dan hash key;
-- template registry pilot yang public-safe;
-- script validasi/apply registry pilot lokal;
-- script smoke test payload real-format;
 - validasi key per device untuk data dummy;
 - unit test;
 - dokumentasi Bahasa Indonesia.
@@ -33,7 +29,7 @@ Yang belum masuk:
 - role user;
 - firmware final;
 - deployment production;
-- data real di Git;
+- data real;
 - notifikasi;
 - integrasi hardware;
 - laporan PDF;
@@ -50,8 +46,7 @@ Yang tidak boleh masuk:
 - IP internal;
 - domain produksi;
 - konfigurasi jaringan privat;
-- payload real yang sensitif;
-- file registry lokal berisi koordinat/hash asli;
+- payload real;
 - file backup;
 - informasi sensitif lokasi.
 
@@ -69,7 +64,7 @@ Klaim yang belum boleh:
 Sistem sudah production-ready.
 Sistem sudah dipakai operasional.
 Sensor sudah aman untuk tangki nyata.
-Data real sudah final dan tervalidasi lapangan.
+Data real sudah terintegrasi.
 Deployment internal sudah final.
 ```
 
@@ -109,14 +104,13 @@ Yang sudah masuk:
 - seed demo;
 - penyimpanan reading;
 - query riwayat terbaru.
-- registry site, tangki, device, dan hash key;
-- script apply registry pilot dari file lokal yang tidak di-commit.
 
 Yang belum final:
 
+- registry device operasional;
 - rotasi key;
 - backup dan restore;
 - audit log;
 - rate limit;
 - aturan akses user;
-- SOP pemisahan data dummy dan data real untuk operasional harian.
+- pemisahan data dummy dan data real untuk mode pilot.

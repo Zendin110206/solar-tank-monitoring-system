@@ -124,7 +124,7 @@ export default function SignInForm() {
         href="/dashboard"
       >
         <ShieldCheck aria-hidden="true" className="size-4" />
-        Buka dashboard monitoring
+        Buka dashboard demo
       </Link>
     </form>
   );

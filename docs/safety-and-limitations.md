@@ -22,9 +22,6 @@ Yang sudah ada:
 - validasi key per device dengan hash pada data dummy;
 - memory store;
 - fondasi MySQL untuk reading;
-- registry MySQL untuk pilot;
-- validasi registry pilot dari file lokal yang tidak di-commit;
-- smoke test payload real-format;
 - simulator;
 - test domain.
 
@@ -38,7 +35,7 @@ Yang belum ada:
 - backup;
 - monitoring server;
 - integrasi hardware real;
-- halaman admin untuk mengelola registry device.
+- registry device yang sepenuhnya dikelola database.
 
 ## Batas Data
 
@@ -54,15 +51,6 @@ Jangan masukkan:
 - screenshot dashboard internal;
 - konfigurasi jaringan;
 - API key production.
-
-Untuk pilot, data real boleh dipakai hanya lewat:
-
-- environment variable lokal/Vercel;
-- database cloud/server yang memang dituju;
-- `config/pilot-registry.local.json` yang di-ignore Git.
-
-File contoh `config/pilot-registry.example.json` tidak boleh dianggap data final
-lapangan.
 
 ## Batas Hardware
 

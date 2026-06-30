@@ -1,6 +1,5 @@
 import { buildTankDetail } from "@/features/monitoring/lib/tank-detail-view-model";
-import { listMonitoringReadings } from "@/features/monitoring/lib/monitoring-storage";
-import { getMonitoringReferenceData } from "@/features/monitoring/lib/monitoring-registry";
+import { listMonitoringDataWithSource } from "@/features/monitoring/lib/monitoring-storage";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -10,17 +9,13 @@ export async function GET(
   { params }: { params: Promise<{ tankId: string }> },
 ) {
   const { tankId } = await params;
-  const now = new Date();
-  const [readings, referenceData] = await Promise.all([
-    listMonitoringReadings(),
-    getMonitoringReferenceData(),
-  ]);
+  const monitoringData = await listMonitoringDataWithSource();
   const detail = buildTankDetail(tankId, {
-    now,
-    sites: referenceData.sites,
-    tanks: referenceData.tanks,
-    devices: referenceData.devices,
-    readings,
+    now: new Date(),
+    sites: monitoringData.sites,
+    tanks: monitoringData.tanks,
+    devices: monitoringData.devices,
+    readings: monitoringData.readings,
   });
 
   if (!detail) {

@@ -164,6 +164,65 @@ describe("telemetry store", () => {
     expect(result.data.volumeLiter).toBe(4100);
   });
 
+  it("uses tank dimensions from telemetry payload when provided", async () => {
+    resetMonitoringReadings();
+
+    const result = await ingestTelemetry({
+      deviceIdentifier: "demo-tph-01",
+      deviceKey: "local-development-key",
+      payload: {
+        device: "demo-tph-01",
+        tank_shape: "rectangular",
+        length_cm: 150,
+        width_cm: 60,
+        height_cm: 60,
+        sensor_mount_height_cm: 60,
+        distance_cm: 10,
+        voltage: 3.7,
+      },
+      receivedAt: new Date("2026-06-26T04:00:00.000Z"),
+    });
+
+    expect(result.ok).toBe(true);
+
+    if (!result.ok) {
+      throw new Error(result.error);
+    }
+
+    expect(result.data.sensorDistanceCm).toBe(10);
+    expect(result.data.fuelHeightCm).toBe(50);
+    expect(result.data.volumeLiter).toBe(450);
+    expect(result.data.fillPercent).toBeCloseTo(83.33, 2);
+  });
+
+  it("accepts tank type aliases from telemetry payload", async () => {
+    resetMonitoringReadings();
+
+    const result = await ingestTelemetry({
+      deviceIdentifier: "demo-tph-01",
+      deviceKey: "local-development-key",
+      payload: {
+        device: "demo-tph-01",
+        tank_type: "silinder",
+        diameter_cm: 150,
+        length_cm: 283,
+        sensor_mount_height_cm: 150,
+        distance_cm: 75,
+      },
+      receivedAt: new Date("2026-06-26T04:15:00.000Z"),
+    });
+
+    expect(result.ok).toBe(true);
+
+    if (!result.ok) {
+      throw new Error(result.error);
+    }
+
+    expect(result.data.fuelHeightCm).toBe(75);
+    expect(result.data.volumeLiter).toBeGreaterThan(2400);
+    expect(result.data.volumeLiter).toBeLessThan(2600);
+  });
+
   it("rejects the global local key when global fallback is disabled", async () => {
     const result = await ingestTelemetry({
       deviceIdentifier: "demo-tph-01",

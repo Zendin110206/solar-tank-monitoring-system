@@ -1,21 +1,16 @@
-import { getMonitoringReferenceDataWithSource } from "@/features/monitoring/lib/monitoring-registry";
 import { buildDashboardOverview } from "@/features/monitoring/lib/dashboard-view-model";
-import { listMonitoringReadingsWithSource } from "@/features/monitoring/lib/monitoring-storage";
+import { listMonitoringDataWithSource } from "@/features/monitoring/lib/monitoring-storage";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function GET() {
-  const [monitoringReadingsResult, monitoringReferenceResult] =
-    await Promise.all([
-      listMonitoringReadingsWithSource(),
-      getMonitoringReferenceDataWithSource(),
-    ]);
+  const monitoringReadingsResult = await listMonitoringDataWithSource();
   const overview = buildDashboardOverview({
     now: new Date(),
-    sites: monitoringReferenceResult.reference.sites,
-    tanks: monitoringReferenceResult.reference.tanks,
-    devices: monitoringReferenceResult.reference.devices,
+    sites: monitoringReadingsResult.sites,
+    tanks: monitoringReadingsResult.tanks,
+    devices: monitoringReadingsResult.devices,
     readings: monitoringReadingsResult.readings,
   });
 
@@ -24,7 +19,6 @@ export async function GET() {
     data: overview,
     meta: {
       storage: monitoringReadingsResult.source,
-      registry: monitoringReferenceResult.source,
     },
   });
 }

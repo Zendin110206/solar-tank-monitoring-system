@@ -216,9 +216,8 @@ export default function SignUpForm() {
 
       {submitted ? (
         <div className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
-          Rancangan form sudah berjalan sebagai tampilan awal. Data belum
-          dikirim ke server sampai modul autentikasi dan persetujuan akses
-          dibuat.
+          Rancangan form sudah berjalan di sisi frontend. Data belum dikirim ke
+          server sampai modul auth dan persetujuan akses dibuat.
         </div>
       ) : null}
 

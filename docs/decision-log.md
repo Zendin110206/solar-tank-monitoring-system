@@ -101,13 +101,13 @@ Alasan:
 Keputusan:
 
 ```text
-telemetry-store.ts dipertahankan untuk mode development lokal, sedangkan query MySQL dipindah ke mysql-reading-repository.ts dan dipilih lewat monitoring-storage.ts. Saat mode MySQL aktif, tabel reading kosong tidak lagi diisi dari data dummy agar dashboard pilot/production tidak menampilkan data simulasi sebagai data lapangan.
+telemetry-store.ts dipertahankan sebagai memory fallback, sedangkan query MySQL dipindah ke mysql-reading-repository.ts dan dipilih lewat monitoring-storage.ts.
 ```
 
 Alasan:
 
 - file tidak terlalu gemuk;
-- mode development tetap sederhana;
+- fallback development tetap sederhana;
 - query database lebih mudah diaudit;
 - mode storage bisa diganti lewat env tanpa mengubah page.
 
