@@ -5,7 +5,7 @@ const navItems = [
   { label: "Cara Kerja", href: "#cara-kerja" },
   { label: "Kontak", href: "/contact" },
   { label: "Akses", href: "#daftar" },
-  { label: "Dashboard", href: "#beranda" },
+  { label: "Dashboard", href: "/dashboard" },
 ];
 
 const tankStatus = [
