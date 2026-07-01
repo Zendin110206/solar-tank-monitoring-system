@@ -19,7 +19,7 @@ import { calculateRuntimeHours } from "./runtime";
 import {
   compareRegistryVsPayloadConfig,
   pickPayloadNumber,
-  resolveTankFromPayloadConfig,
+  resolveReviewedTankFromPayloadConfig,
 } from "./reading-tank-config";
 import {
   getDeviceStatus,
@@ -591,7 +591,11 @@ export function buildTankDetail(
     ? compareRegistryVsPayloadConfig(tank, latestReading.rawPayload)
     : compareRegistryVsPayloadConfig(tank, null);
   const displayTank = latestReading?.rawPayload
-    ? resolveTankFromPayloadConfig(latestReading.rawPayload, tank)
+    ? resolveReviewedTankFromPayloadConfig(
+        latestReading.rawPayload,
+        tank,
+        configReview,
+      )
     : tank;
   const dataSources =
     latestReading?.quality ?? buildFallbackReadingQuality(latestReading, configReview);

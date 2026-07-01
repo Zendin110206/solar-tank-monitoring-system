@@ -587,6 +587,10 @@ function buildConfigSummary({
     : "Config payload parsial, sisanya registry";
 }
 
+function canApplyPayloadConfig(status: TankConfigReview["status"]): boolean {
+  return status === "normal" || status === "minor_config_difference";
+}
+
 export function resolveTankFromPayloadConfig(
   payload: unknown,
   baseTank: Tank,
@@ -633,7 +637,7 @@ export function compareRegistryVsPayloadConfig(
 ): TankConfigReview {
   const registryTankConfig = tankToConfigSnapshot(registryTank);
   const payloadTankConfig = extractPayloadTankConfig(payload);
-  const appliedTankConfig = tankToConfigSnapshot(
+  const payloadAppliedTankConfig = tankToConfigSnapshot(
     resolveTankFromPayloadConfig(payload, registryTank),
   );
   const invalidIssues = collectInvalidConfigIssues(payload);
@@ -712,11 +716,15 @@ export function compareRegistryVsPayloadConfig(
       : hasWarningIssue
         ? "minor_config_difference"
         : "normal";
-  const configSource = !payloadTankConfig
+  const usePayloadConfig = canApplyPayloadConfig(status);
+  const configSource = !payloadTankConfig || !usePayloadConfig
     ? "registry"
     : isPayloadComplete
       ? "payload"
       : "mixed";
+  const appliedTankConfig = usePayloadConfig
+    ? payloadAppliedTankConfig
+    : registryTankConfig;
   const reasons = issues.map((issue) => issue.message);
 
   return {
@@ -734,4 +742,18 @@ export function compareRegistryVsPayloadConfig(
     payloadTankConfig,
     appliedTankConfig,
   };
+}
+
+export function resolveReviewedTankFromPayloadConfig(
+  payload: unknown,
+  baseTank: Tank,
+  review?: TankConfigReview,
+): Tank {
+  const configReview = review ?? compareRegistryVsPayloadConfig(baseTank, payload);
+
+  if (!canApplyPayloadConfig(configReview.status)) {
+    return baseTank;
+  }
+
+  return resolveTankFromPayloadConfig(payload, baseTank);
 }

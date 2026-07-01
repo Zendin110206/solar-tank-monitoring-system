@@ -15,7 +15,7 @@ import type {
 import { clampNumber } from "./number";
 import {
   compareRegistryVsPayloadConfig,
-  resolveTankFromPayloadConfig,
+  resolveReviewedTankFromPayloadConfig,
 } from "./reading-tank-config";
 import {
   getDeviceStatus,
@@ -263,7 +263,11 @@ export function buildDashboardOverview({
       ? compareRegistryVsPayloadConfig(tank, reading.rawPayload)
       : compareRegistryVsPayloadConfig(tank, null);
     const displayTank = reading?.rawPayload
-      ? resolveTankFromPayloadConfig(reading.rawPayload, tank)
+      ? resolveReviewedTankFromPayloadConfig(
+          reading.rawPayload,
+          tank,
+          configReview,
+        )
       : tank;
     const fillPercent = reading?.fillPercent ?? 0;
     const volumeLiter = reading?.volumeLiter ?? 0;

@@ -10,7 +10,7 @@ import {
   compareRegistryVsPayloadConfig,
   pickPayloadNumber,
   pickPayloadString,
-  resolveTankFromPayloadConfig,
+  resolveReviewedTankFromPayloadConfig,
 } from "./reading-tank-config";
 import { calculateRuntimeHours } from "./runtime";
 import {
@@ -256,7 +256,12 @@ export function normalizeCatPayload({
 }: NormalizeReadingInput): Reading {
   const warnings: string[] = [];
   const configReview = compareRegistryVsPayloadConfig(tank, payload);
-  const readingTank = resolveTankFromPayloadConfig(payload, tank);
+  const readingTank = resolveReviewedTankFromPayloadConfig(
+    payload,
+    tank,
+    configReview,
+  );
+  const canUseDeviceCalculatedValues = !configReview.needsReview;
   const deviceId =
     pickPayloadString(payload, ["device", "device_id", "raw.device"]) ??
     fallbackDeviceId ??
@@ -265,6 +270,12 @@ export function normalizeCatPayload({
 
   if (measuredAtResult.warning) {
     warnings.push(measuredAtResult.warning);
+  }
+
+  if (!canUseDeviceCalculatedValues) {
+    warnings.push(
+      "Nilai tinggi, volume, dan persen dari device diabaikan sampai config payload direview.",
+    );
   }
 
   const maxFuelHeightCm = getMaxFuelHeightCm(readingTank);
@@ -282,26 +293,28 @@ export function normalizeCatPayload({
     sensorMountHeightCm: readingTank.sensorMountHeightCm,
     warnings,
   });
-  const deviceFuelHeightCm = normalizeClampedDeviceNumber({
-    value: pickPayloadNumber(payload, [
-      "local_H_cm",
-      "fuel_height_cm",
-      "fuelHeightCm",
-      "h_cm",
-      "H_cm",
-      "local_result.fuel_height_cm",
-      "local_result.fuelHeightCm",
-      "raw.local_H_cm",
-      "raw.fuel_height_cm",
-      "raw.fuelHeightCm",
-      "raw.h_cm",
-      "raw.H_cm",
-    ]),
-    min: 0,
-    max: maxFuelHeightCm,
-    label: "Tinggi solar",
-    warnings,
-  });
+  const deviceFuelHeightCm = canUseDeviceCalculatedValues
+    ? normalizeClampedDeviceNumber({
+        value: pickPayloadNumber(payload, [
+          "local_H_cm",
+          "fuel_height_cm",
+          "fuelHeightCm",
+          "h_cm",
+          "H_cm",
+          "local_result.fuel_height_cm",
+          "local_result.fuelHeightCm",
+          "raw.local_H_cm",
+          "raw.fuel_height_cm",
+          "raw.fuelHeightCm",
+          "raw.h_cm",
+          "raw.H_cm",
+        ]),
+        min: 0,
+        max: maxFuelHeightCm,
+        label: "Tinggi solar",
+        warnings,
+      })
+    : null;
   const backendFuelHeightCm = calculateFuelHeightCm({
     sensorMountHeightCm: readingTank.sensorMountHeightCm,
     sensorDistanceCm,
@@ -310,42 +323,46 @@ export function normalizeCatPayload({
   const fuelHeightCm = deviceFuelHeightCm ?? backendFuelHeightCm;
   const fuelHeightSource: ReadingValueSource =
     deviceFuelHeightCm !== null ? "device" : "backend";
-  const deviceVolumeLiter = normalizeClampedDeviceNumber({
-    value: pickPayloadNumber(payload, [
-      "local_volume_l",
-      "volume_liter",
-      "volume_l",
-      "volume",
-      "local_result.volume_liter",
-      "local_result.volumeLiter",
-      "raw.local_volume_l",
-      "raw.volume_liter",
-      "raw.volume_l",
-      "raw.volume",
-    ]),
-    min: 0,
-    max: readingTank.capacityLiter,
-    label: "Volume",
-    warnings,
-  });
+  const deviceVolumeLiter = canUseDeviceCalculatedValues
+    ? normalizeClampedDeviceNumber({
+        value: pickPayloadNumber(payload, [
+          "local_volume_l",
+          "volume_liter",
+          "volume_l",
+          "volume",
+          "local_result.volume_liter",
+          "local_result.volumeLiter",
+          "raw.local_volume_l",
+          "raw.volume_liter",
+          "raw.volume_l",
+          "raw.volume",
+        ]),
+        min: 0,
+        max: readingTank.capacityLiter,
+        label: "Volume",
+        warnings,
+      })
+    : null;
   const backendVolumeLiter = calculateTankVolumeLiter(readingTank, fuelHeightCm);
   const volumeLiter = deviceVolumeLiter ?? backendVolumeLiter;
   const volumeSource: ReadingValueSource =
     deviceVolumeLiter !== null ? "device" : "backend";
-  const deviceFillPercent = normalizePercent({
-    value: pickPayloadNumber(payload, [
-      "local_percent",
-      "fill_percent",
-      "percent",
-      "local_result.fill_percent",
-      "local_result.fillPercent",
-      "raw.local_percent",
-      "raw.fill_percent",
-      "raw.percent",
-    ]),
-    label: "Fill percent",
-    warnings,
-  });
+  const deviceFillPercent = canUseDeviceCalculatedValues
+    ? normalizePercent({
+        value: pickPayloadNumber(payload, [
+          "local_percent",
+          "fill_percent",
+          "percent",
+          "local_result.fill_percent",
+          "local_result.fillPercent",
+          "raw.local_percent",
+          "raw.fill_percent",
+          "raw.percent",
+        ]),
+        label: "Fill percent",
+        warnings,
+      })
+    : null;
   const backendFillPercent = calculateFillPercent(
     volumeLiter,
     readingTank.capacityLiter,

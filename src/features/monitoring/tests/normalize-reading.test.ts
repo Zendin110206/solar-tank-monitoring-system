@@ -177,9 +177,15 @@ describe("normalizeCatPayload", () => {
       receivedAt: new Date("2026-06-28T05:18:00.000Z"),
     });
 
-    expect(reading.volumeLiter).toBe(448.2);
-    expect(reading.fillPercent).toBe(83);
+    expect(reading.fuelHeightCm).toBe(139.8);
+    expect(reading.volumeLiter).toBe(4853.59);
+    expect(reading.fillPercent).toBe(97.07);
+    expect(reading.runtimeHour).toBe(194.14);
     expect(reading.quality).toMatchObject({
+      fuelHeightSource: "backend",
+      volumeSource: "backend",
+      fillPercentSource: "backend",
+      configSource: "registry",
       configStatus: "config_mismatch",
       needsReview: true,
     });
@@ -188,6 +194,9 @@ describe("normalizeCatPayload", () => {
         "Bentuk tangki payload berbeda dari registry resmi.",
         "Kapasitas tangki payload berbeda 89.2% dari registry.",
       ]),
+    );
+    expect(reading.quality?.warnings).toContain(
+      "Nilai tinggi, volume, dan persen dari device diabaikan sampai config payload direview.",
     );
   });
 
