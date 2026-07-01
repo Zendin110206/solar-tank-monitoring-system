@@ -57,13 +57,19 @@ export default function DashboardLocationsPage() {
 
           <nav className="hidden items-center gap-7 text-sm font-medium text-zinc-600 lg:flex">
             <Link href="/dashboard" className="transition hover:text-red-600">
-              Dashboard
+              Dashboard Simple
             </Link>
-            <Link href="/dashboard#peta" className="transition hover:text-red-600">
+            <Link
+              href="/dashboard/detail#peta"
+              className="transition hover:text-red-600"
+            >
               Peta STO
             </Link>
             <span className="text-zinc-950">Konfigurasi Lokasi</span>
-            <Link href="/dashboard#log" className="transition hover:text-red-600">
+            <Link
+              href="/dashboard/detail#log"
+              className="transition hover:text-red-600"
+            >
               Log Perangkat
             </Link>
           </nav>
