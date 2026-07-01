@@ -490,30 +490,81 @@ Catatan penting:
 
 ## Alur Kerja Kontributor
 
-Sebelum mulai mengubah kode:
+Sebelum mulai mengubah kode, pastikan identitas Git sudah sesuai dengan akun
+masing-masing. Ini penting agar riwayat kontribusi di GitHub tidak tercatat
+sebagai orang lain.
 
 ```powershell
-git pull --rebase origin main
+git config user.name
+git config user.email
+```
+
+Jika masih memakai identitas orang lain, ganti di repo ini:
+
+```powershell
+git config user.name "Nama GitHub atau nama kontributor"
+git config user.email "email-yang-terhubung-ke-github@example.com"
+```
+
+Gunakan `--global` hanya jika identitas tersebut memang ingin dipakai untuk
+semua repository di laptop itu:
+
+```powershell
+git config --global user.name "Nama GitHub atau nama kontributor"
+git config --global user.email "email-yang-terhubung-ke-github@example.com"
+```
+
+Sebelum mulai mengubah kode, selalu ambil kondisi terbaru dari `main`:
+
+```powershell
+git checkout main
+git pull --ff-only origin main
 pnpm install
 pnpm check
 ```
 
-Sebelum push:
+Buat branch baru untuk setiap pekerjaan:
+
+```powershell
+git checkout -b feat/nama-pekerjaan-singkat
+```
+
+Contoh nama branch:
+
+```text
+feat/dashboard-ringkas
+fix/peta-marker-mobile
+docs/panduan-device-local
+chore/dev-lan-script
+```
+
+Sebelum push, jalankan pengecekan:
 
 ```powershell
 git status
 pnpm check
+```
+
+Commit message memakai pola Conventional Commit. Deskripsi setelah titik dua
+boleh memakai Bahasa Indonesia agar mudah dipahami tim.
+
+Contoh:
+
+```powershell
 git add .
-git commit -m "docs(readme): rapikan dokumentasi proyek"
-git push origin main
+git commit -m "feat(dashboard): sederhanakan kartu monitoring"
+git push -u origin feat/nama-pekerjaan-singkat
 ```
 
 Aturan penting:
 
+- utamakan branch baru dan pull request untuk perubahan yang dikerjakan tim;
+- jangan push langsung ke `main` kecuali sudah disepakati;
 - jangan commit `.env.local`;
 - jangan commit data real;
 - jangan commit credential;
 - jangan commit folder `local_context`;
+- jangan commit folder kerja lokal perangkat atau firmware yang belum disepakati;
 - jangan force push kecuali sudah disepakati;
 - kalau ada konflik Git, berhenti dulu dan minta bantuan.
 
@@ -546,6 +597,7 @@ Sebelum dipakai dengan perangkat dan tangki nyata, perlu validasi:
 |---|---|---|
 | Muhammad Zaenal Abidin Abdurrahman | Pengelola proyek dan pengembangan awal | - |
 | Yattaqi Muazirul Mulki | Kolaborator pengembangan aplikasi | [ukiirving](https://github.com/ukiirving) |
+| Astra | Kontributor perangkat, pengujian data real, dan dukungan integrasi lapangan | [Ata22](https://github.com/Ata22) |
 
 ## Lisensi
 
