@@ -5,6 +5,7 @@
   "packageManager": "pnpm@9.15.3",
   "scripts": {
     "dev": "next dev",
+    "dev:lan": "next dev --hostname 0.0.0.0 -p 3000",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
