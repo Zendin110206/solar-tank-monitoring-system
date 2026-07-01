@@ -1,18 +1,19 @@
-import { getMonitoringReferenceDataWithSource } from "@/features/monitoring/lib/monitoring-registry";
+import { SimpleDashboardView } from "@/features/monitoring/components/simple-dashboard-view";
 import { buildDashboardOverview } from "@/features/monitoring/lib/dashboard-view-model";
-import {
-  SimpleDashboardCards,
-  type SimpleDashboardSite,
-} from "@/features/monitoring/components/simple-dashboard-cards";
+import { getMonitoringReferenceDataWithSource } from "@/features/monitoring/lib/monitoring-registry";
 import { listMonitoringReadingsWithSource } from "@/features/monitoring/lib/monitoring-storage";
+import {
+  createSimpleDashboardSites,
+  type SimpleDashboardSite,
+} from "@/features/monitoring/lib/simple-dashboard-model";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
 
 export const metadata: Metadata = {
-  title: "Dashboard Simple Monitoring Solar | SolarTank",
+  title: "Dashboard Ringkas Monitoring Solar | SolarTank",
   description:
-    "Ringkasan kartu per STO untuk memantau volume tangki solar dan membuka detail tangki dengan satu klik.",
+    "Ringkasan kartu per STO untuk memantau volume tangki solar, status online perangkat, dan akses cepat ke detail tangki.",
 };
 
 export const runtime = "nodejs";
@@ -26,6 +27,7 @@ export default async function SimpleDashboardPage() {
       listMonitoringReadingsWithSource(),
       getMonitoringReferenceDataWithSource(),
     ]);
+
   const dashboardOverview = buildDashboardOverview({
     now,
     sites: monitoringReferenceResult.reference.sites,
@@ -33,30 +35,31 @@ export default async function SimpleDashboardPage() {
     devices: monitoringReferenceResult.reference.devices,
     readings: monitoringReadingsResult.readings,
   });
-  const monitoredSites = dashboardOverview.rows;
   const capacityByTankId = new Map(
     monitoringReferenceResult.reference.tanks.map((tank) => [
       tank.id,
       tank.capacityLiter,
     ]),
   );
-  const simpleSites: SimpleDashboardSite[] = monitoredSites.map((site) => ({
-    code: site.code,
-    name: site.name,
-    tankId: site.tankId,
-    volumeLiter: site.volumeLiter,
-    capacityLiter: capacityByTankId.get(site.tankId) ?? 0,
-    updateLabel: site.updateLabel,
-    isOnline: site.deviceStatus === "online",
-  }));
+  const shapeByTankId = new Map(
+    monitoringReferenceResult.reference.tanks.map((tank) => [
+      tank.id,
+      tank.shape,
+    ]),
+  );
+  const simpleSites: SimpleDashboardSite[] = createSimpleDashboardSites(
+    dashboardOverview.rows,
+    capacityByTankId,
+    shapeByTankId,
+  );
+
   return (
-    <main className="h-screen overflow-hidden bg-[#f5faf8] text-zinc-950">
-      {/* Simple Dashboard Header */}
-      <header className="h-16 border-b border-zinc-200/70 bg-white/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-full max-w-[1540px] items-center gap-4 px-4 sm:px-6 lg:px-8">
+    <main className="min-h-screen w-full min-w-0 overflow-x-hidden bg-[#f5faf8] text-zinc-950">
+      <header className="sticky top-0 z-20 border-b border-zinc-200/70 bg-white/90 backdrop-blur-xl">
+        <div className="mx-auto flex w-full max-w-[1540px] min-w-0 flex-col gap-3 px-4 py-3 sm:px-6 lg:h-16 lg:flex-row lg:items-center lg:justify-between lg:px-8 lg:py-0">
           <Link
             href="/"
-            className="flex shrink-0 items-center gap-3"
+            className="flex w-fit shrink-0 items-center gap-3"
             aria-label="Kembali ke beranda SolarTank"
           >
             <span className="relative grid size-8 place-items-center">
@@ -68,17 +71,19 @@ export default async function SimpleDashboardPage() {
             <span className="text-lg font-semibold">SolarTank</span>
           </Link>
 
-          <nav className="hidden items-center gap-7 text-sm font-medium text-zinc-600 lg:flex">
-            <span className="text-zinc-950">Dashboard Simple</span>
+          <nav className="grid w-full min-w-0 grid-cols-1 items-center gap-2 py-1 text-sm font-semibold text-zinc-600 sm:flex sm:w-auto">
+            <span className="shrink-0 rounded-lg bg-blue-600 px-3 py-2 text-center text-white shadow-lg shadow-blue-600/15">
+              Dashboard Ringkas
+            </span>
             <Link
               href="/dashboard/detail"
-              className="transition hover:text-red-600"
+              className="shrink-0 rounded-lg px-3 py-2 text-center transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
             >
               Dashboard Detail
             </Link>
             <Link
               href="/dashboard/locations"
-              className="transition hover:text-red-600"
+              className="shrink-0 rounded-lg px-3 py-2 text-center transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
             >
               Konfigurasi Lokasi
             </Link>
@@ -86,8 +91,8 @@ export default async function SimpleDashboardPage() {
         </div>
       </header>
 
-      <div className="mx-auto flex h-[calc(100vh-4rem)] max-w-[1540px] flex-col gap-3 px-4 py-3 sm:px-6 lg:px-8">
-        <SimpleDashboardCards sites={simpleSites} />
+      <div className="mx-auto flex w-full max-w-[1540px] min-w-0 flex-col px-4 py-5 sm:px-6 lg:px-8">
+        <SimpleDashboardView sites={simpleSites} />
       </div>
     </main>
   );

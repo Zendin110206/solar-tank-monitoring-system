@@ -237,7 +237,7 @@ export default async function DashboardPage() {
               href="/dashboard"
               className="transition hover:text-red-600"
             >
-              Dashboard Simple
+              Dashboard Ringkas
             </Link>
             <a href="#ringkasan" className="text-zinc-950">
               Dashboard Detail

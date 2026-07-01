@@ -57,7 +57,7 @@ export default function DashboardLocationsPage() {
 
           <nav className="hidden items-center gap-7 text-sm font-medium text-zinc-600 lg:flex">
             <Link href="/dashboard" className="transition hover:text-red-600">
-              Dashboard Simple
+              Dashboard Ringkas
             </Link>
             <Link
               href="/dashboard/detail#peta"
