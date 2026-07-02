@@ -178,7 +178,13 @@ export type CatTelemetryPayload = {
   ip?: unknown;
   lat?: unknown;
   lng?: unknown;
+  site_code?: unknown;
+  site_name?: unknown;
+  area_label?: unknown;
+  device_label?: unknown;
+  expected_report_interval_sec?: unknown;
   tank?: Record<string, unknown> | null;
+  site?: Record<string, unknown> | null;
   local_result?: Record<string, unknown> | null;
   raw?: Record<string, unknown> | null;
 };

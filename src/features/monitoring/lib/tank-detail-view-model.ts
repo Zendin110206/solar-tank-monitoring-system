@@ -472,9 +472,9 @@ function buildReadingSeries(
     );
     const sensorDistanceCm = roundTo(
       clampNumber(
-        tank.sensorMountHeightCm - fuelHeightCm,
+        maxFuelHeightCm - fuelHeightCm,
         0,
-        tank.sensorMountHeightCm,
+        maxFuelHeightCm,
       ),
       2,
     );
@@ -604,7 +604,7 @@ export function buildTankDetail(
   const volumeLiter = latestReading?.volumeLiter ?? 0;
   const runtimeHour = latestReading?.runtimeHour ?? 0;
   const sensorDistanceCm =
-    latestReading?.sensorDistanceCm ?? displayTank.sensorMountHeightCm;
+    latestReading?.sensorDistanceCm ?? getMaxFuelHeightCm(displayTank);
   const fuelHeightCm = latestReading?.fuelHeightCm ?? 0;
   const runtimeStatus = latestReading
     ? getRuntimeStatus(latestReading.runtimeHour)

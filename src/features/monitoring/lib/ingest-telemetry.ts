@@ -14,6 +14,7 @@ import {
   isGlobalDeviceKeyFallbackAllowed,
   verifyDeviceKey,
 } from "./device-key";
+import { provisionMonitoringDevice } from "./device-provisioning";
 import { normalizeCatPayload } from "./normalize-reading";
 import {
   saveMonitoringReading,
@@ -27,6 +28,9 @@ type IngestTelemetryInput = {
   deviceKey?: string | null;
   expectedDeviceKey?: string;
   allowGlobalDeviceKeyFallback?: boolean;
+  allowDeviceAutoProvisioning?: boolean;
+  provisioningKey?: string | null;
+  expectedProvisioningKey?: string | null;
   payload: unknown;
   receivedAt?: Date;
 };
@@ -53,6 +57,7 @@ type IngestTelemetrySuccess = {
     needsReview: boolean;
     warnings: string[];
     storage: MonitoringStorageDriver;
+    provisioned: boolean;
   };
 };
 
@@ -120,6 +125,9 @@ export async function ingestTelemetry({
   deviceKey,
   expectedDeviceKey = DEFAULT_LOCAL_DEVICE_KEY,
   allowGlobalDeviceKeyFallback = isGlobalDeviceKeyFallbackAllowed(),
+  allowDeviceAutoProvisioning = false,
+  provisioningKey,
+  expectedProvisioningKey,
   payload,
   receivedAt = new Date(),
 }: IngestTelemetryInput): Promise<IngestTelemetryResult> {
@@ -164,17 +172,56 @@ export async function ingestTelemetry({
     };
   }
 
-  const device = findDeviceByIdentifier(
+  let device = findDeviceByIdentifier(
     cleanDeviceIdentifier,
     referenceData.devices,
   );
+  let provisioned = false;
+  let tank: Tank | null = null;
 
   if (!device) {
-    return {
-      ok: false,
-      status: 404,
-      error: "Device tidak terdaftar di data monitoring.",
-    };
+    const payloadDeviceIdentifier = readPayloadDeviceIdentifier(payload);
+
+    if (
+      payloadDeviceIdentifier &&
+      payloadDeviceIdentifier !== cleanDeviceIdentifier
+    ) {
+      return {
+        ok: false,
+        status: 400,
+        error: "Identitas device di payload tidak sesuai dengan header.",
+      };
+    }
+
+    const provisioningResult = await provisionMonitoringDevice({
+      deviceIdentifier: cleanDeviceIdentifier,
+      deviceKey: cleanDeviceKey,
+      expectedDeviceKey,
+      allowGlobalDeviceKeyFallback,
+      allowDeviceAutoProvisioning,
+      provisioningKey,
+      expectedProvisioningKey,
+      payload,
+    });
+
+    if (!provisioningResult.ok) {
+      if (
+        provisioningResult.status === 403 &&
+        !allowDeviceAutoProvisioning
+      ) {
+        return {
+          ok: false,
+          status: 404,
+          error: "Device tidak terdaftar di data monitoring.",
+        };
+      }
+
+      return provisioningResult;
+    }
+
+    device = provisioningResult.device;
+    tank = provisioningResult.tank;
+    provisioned = true;
   }
 
   if (!device.isActive) {
@@ -213,7 +260,31 @@ export async function ingestTelemetry({
     };
   }
 
-  const tank = findTankByDevice(device, referenceData.tanks);
+  const canSyncProvisionedConfig =
+    allowDeviceAutoProvisioning &&
+    Boolean(provisioningKey?.trim()) &&
+    (!expectedProvisioningKey?.trim() ||
+      provisioningKey?.trim() === expectedProvisioningKey.trim());
+
+  if (canSyncProvisionedConfig) {
+    const syncResult = await provisionMonitoringDevice({
+      deviceIdentifier: cleanDeviceIdentifier,
+      deviceKey: cleanDeviceKey,
+      expectedDeviceKey,
+      allowGlobalDeviceKeyFallback,
+      allowDeviceAutoProvisioning,
+      provisioningKey,
+      expectedProvisioningKey,
+      payload,
+    });
+
+    if (syncResult.ok && syncResult.device.id === device.id) {
+      device = syncResult.device;
+      tank = syncResult.tank;
+    }
+  }
+
+  tank = tank ?? findTankByDevice(device, referenceData.tanks);
 
   if (!tank) {
     return {
@@ -260,6 +331,7 @@ export async function ingestTelemetry({
         needsReview: stored.reading.quality?.needsReview ?? false,
         warnings: stored.reading.quality?.warnings ?? [],
         storage: stored.storage,
+        provisioned,
       },
     };
   } catch {

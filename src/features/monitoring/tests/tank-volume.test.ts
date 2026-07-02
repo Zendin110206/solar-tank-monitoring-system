@@ -44,6 +44,16 @@ describe("tank volume calculation", () => {
     ).toBe(150);
   });
 
+  it("calculates fuel height from tank height, not sensor offset", () => {
+    expect(
+      calculateFuelHeightCm({
+        sensorMountHeightCm: 5,
+        sensorDistanceCm: 12,
+        maxFuelHeightCm: 45,
+      }),
+    ).toBe(33);
+  });
+
   it("clamps fill percent between zero and one hundred", () => {
     expect(calculateFillPercent(-10, 5000)).toBe(0);
     expect(calculateFillPercent(6000, 5000)).toBe(100);

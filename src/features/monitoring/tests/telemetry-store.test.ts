@@ -137,6 +137,92 @@ describe("telemetry store", () => {
     });
   });
 
+  it("keeps unknown devices rejected when auto provisioning is disabled", async () => {
+    const result = await ingestTelemetry({
+      deviceIdentifier: "demo-new-01",
+      deviceKey: "new-device-key",
+      payload: {
+        device: "demo-new-01",
+        tank_shape: "rectangular",
+        capacity_liter: 540,
+        length_cm: 150,
+        width_cm: 60,
+        height_cm: 60,
+        sensor_mount_height_cm: 60,
+        lat: -7.65,
+        lng: 112.9,
+      },
+    });
+
+    expect(result).toMatchObject({
+      ok: false,
+      status: 404,
+    });
+  });
+
+  it("auto provisions a new device from firmware config when explicitly enabled", async () => {
+    resetMonitoringReadings();
+
+    const result = await ingestTelemetry({
+      deviceIdentifier: "demo-auto-01",
+      deviceKey: "new-device-key",
+      allowDeviceAutoProvisioning: true,
+      provisioningKey: "fleet-provisioning-key",
+      expectedProvisioningKey: "fleet-provisioning-key",
+      payload: {
+        device: "demo-auto-01",
+        site_code: "AUTO",
+        site_name: "STO Auto",
+        area_label: "Pasuruan",
+        lat: -7.651,
+        lng: 112.901,
+        tank_shape: "rectangular",
+        capacity_liter: 540,
+        length_cm: 150,
+        width_cm: 60,
+        height_cm: 60,
+        sensor_mount_height_cm: 5,
+        low_level_percent: 30,
+        critical_level_percent: 15,
+        consumption_liter_per_hour: 25,
+        distance_cm: 20,
+        voltage: 3.7,
+        raw: {
+          local_H_cm: 40,
+          local_volume_l: 360,
+          local_percent: 67,
+          wifi_rssi: -51,
+        },
+      },
+      receivedAt: new Date("2026-07-02T03:00:00.000Z"),
+    });
+
+    expect(result.ok).toBe(true);
+
+    if (!result.ok) {
+      throw new Error(result.error);
+    }
+
+    expect(result.data).toMatchObject({
+      deviceId: "demo-auto-01",
+      deviceInternalId: "device-demo-auto-01-main",
+      tankId: "tank-demo-auto-01-main",
+      sensorDistanceCm: 20,
+      fuelHeightCm: 40,
+      volumeLiter: 360,
+      fillPercent: 67,
+      provisioned: true,
+      storage: "memory",
+    });
+
+    const storedReading = getMonitoringReadings().find(
+      (reading) => reading.id === result.data.readingId,
+    );
+
+    expect(storedReading?.deviceId).toBe("device-demo-auto-01-main");
+    expect(storedReading?.tankId).toBe("tank-demo-auto-01-main");
+  });
+
   it("accepts the registered demo key when global fallback is disabled", async () => {
     const result = await ingestTelemetry({
       deviceIdentifier: "demo-tph-01",
