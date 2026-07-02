@@ -2,7 +2,7 @@ import type { Tank } from "../types/monitoring";
 import { clampNumber, roundTo } from "./number";
 
 type FuelHeightInput = {
-  sensorMountHeightCm: number;
+  sensorMountHeightCm?: number;
   sensorDistanceCm: number;
   maxFuelHeightCm: number;
 };
@@ -29,11 +29,10 @@ export function getMaxFuelHeightCm(tank: Tank): number {
 }
 
 export function calculateFuelHeightCm({
-  sensorMountHeightCm,
   sensorDistanceCm,
   maxFuelHeightCm,
 }: FuelHeightInput): number {
-  const rawHeight = sensorMountHeightCm - sensorDistanceCm;
+  const rawHeight = maxFuelHeightCm - sensorDistanceCm;
   return roundTo(clampNumber(rawHeight, 0, maxFuelHeightCm), 2);
 }
 

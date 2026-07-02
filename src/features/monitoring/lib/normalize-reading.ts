@@ -97,11 +97,11 @@ function resolveMeasuredAt(
 
 function normalizeDistanceCm({
   value,
-  sensorMountHeightCm,
+  maxFuelHeightCm,
   warnings,
 }: {
   value: number | null;
-  sensorMountHeightCm: number;
+  maxFuelHeightCm: number;
   warnings: string[];
 }): number {
   if (value === null) {
@@ -115,13 +115,13 @@ function normalizeDistanceCm({
     warnings.push("distance_cm bernilai negatif; nilai dikunci ke 0 cm.");
   }
 
-  if (value > sensorMountHeightCm) {
+  if (value > maxFuelHeightCm) {
     warnings.push(
-      "distance_cm lebih tinggi dari sensor_mount_height_cm; nilai dikunci ke tinggi sensor.",
+      "distance_cm lebih tinggi dari batas tinggi tangki; nilai dikunci ke tinggi maksimum tangki.",
     );
   }
 
-  return roundTo(clampNumber(value, 0, sensorMountHeightCm), 2);
+  return roundTo(clampNumber(value, 0, maxFuelHeightCm), 2);
 }
 
 function normalizeClampedDeviceNumber({
@@ -290,7 +290,7 @@ export function normalizeCatPayload({
       "raw.dist",
       "raw.distance",
     ]),
-    sensorMountHeightCm: readingTank.sensorMountHeightCm,
+    maxFuelHeightCm,
     warnings,
   });
   const deviceFuelHeightCm = canUseDeviceCalculatedValues
