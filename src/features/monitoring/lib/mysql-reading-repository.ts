@@ -3,6 +3,11 @@ import { getMysqlPool } from "./mysql-connection";
 import type { Reading } from "../types/monitoring";
 
 const DEFAULT_MYSQL_READINGS_LIMIT = 1000;
+const DEFAULT_MYSQL_TANK_HISTORY_LIMIT = 10_000;
+
+function normalizeLimit(limit: number) {
+  return Math.min(Math.max(Math.round(limit), 1), 50_000);
+}
 
 type ReadingRow = RowDataPacket & {
   id: string;
@@ -126,6 +131,7 @@ export async function listMonitoringReadingsFromMysql(
   limit = DEFAULT_MYSQL_READINGS_LIMIT,
 ): Promise<Reading[]> {
   const pool = getMysqlPool();
+  const safeLimit = normalizeLimit(limit);
   const [rows] = await pool.query<ReadingRow[]>(
     `
       SELECT
@@ -146,7 +152,40 @@ export async function listMonitoringReadingsFromMysql(
       ORDER BY received_at DESC
       LIMIT ?
     `,
-    [limit],
+    [safeLimit],
+  );
+
+  return rows.map(rowToReading).reverse();
+}
+
+export async function listMonitoringReadingsForTankFromMysql(
+  tankId: string,
+  limit = DEFAULT_MYSQL_TANK_HISTORY_LIMIT,
+): Promise<Reading[]> {
+  const pool = getMysqlPool();
+  const safeLimit = normalizeLimit(limit);
+  const [rows] = await pool.query<ReadingRow[]>(
+    `
+      SELECT
+        id,
+        device_id,
+        tank_id,
+        measured_at,
+        received_at,
+        sensor_distance_cm,
+        fuel_height_cm,
+        volume_liter,
+        fill_percent,
+        runtime_hour,
+        battery_volt,
+        rssi_dbm,
+        raw_payload
+      FROM monitoring_readings
+      WHERE tank_id = ?
+      ORDER BY received_at DESC
+      LIMIT ?
+    `,
+    [tankId, safeLimit],
   );
 
   return rows.map(rowToReading).reverse();

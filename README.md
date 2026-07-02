@@ -17,8 +17,9 @@ Yang sudah tersedia:
 
 - landing page berbahasa Indonesia;
 - halaman login dan pengajuan akses frontend-only;
-- halaman dashboard awal;
-- halaman detail tangki awal;
+- dashboard detail untuk monitoring teknis;
+- dashboard ringkas dengan tampilan kartu dan peta;
+- halaman detail ringkas per tangki untuk operator;
 - data contoh untuk lokasi, tangki, perangkat, dan pembacaan;
 - timestamp data contoh memory mode digeser relatif ke waktu server start agar demo awal tetap mudah dibaca;
 - fungsi domain untuk volume, runtime, status, dan normalisasi payload;
@@ -34,6 +35,7 @@ Yang sudah tersedia:
 - memory store lokal untuk menerima data simulator selama dev server hidup;
 - fondasi MySQL untuk registry site/tangki/device dan penyimpanan reading pada mode pengembangan lanjutan;
 - dashboard dan detail membaca storage aktif yang sama dengan endpoint API;
+- detail ringkas mengambil riwayat MySQL per tangki agar grafik tren tidak terpotong oleh limit dashboard global;
 - health check dan readiness check untuk membedakan aplikasi hidup dengan storage benar-benar siap;
 - auto-refresh ringan pada dashboard dan detail, dengan tombol refresh manual serta pause/resume;
 - validasi key per device memakai hash pada data dummy;
@@ -41,6 +43,7 @@ Yang sudah tersedia:
 - normalisasi payload real-format dari device, termasuk config tangki dari payload;
 - review config payload vs registry agar mismatch tidak diam-diam dianggap benar;
 - peta dashboard berbasis koordinat registry dengan zoom, search, dan filter status;
+- grafik tren volume pada detail ringkas dengan pilihan rentang harian, mingguan, dan bulanan;
 - alat bantu pilot:
   - `pnpm pilot:hash-key`
   - `pnpm pilot:registry`
