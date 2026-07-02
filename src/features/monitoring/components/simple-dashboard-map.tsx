@@ -493,7 +493,7 @@ export function SimpleDashboardMap({ sites }: { sites: SimpleDashboardSite[] }) 
 
             <Link
               className="mt-5 inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-sm shadow-blue-600/20 transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20"
-              href={`/dashboard/tanks/${activeSite.tankId}`}
+              href={`/dashboard/ringkas/tanks/${activeSite.tankId}`}
             >
               Detail
               <MapPin className="size-4" aria-hidden="true" />

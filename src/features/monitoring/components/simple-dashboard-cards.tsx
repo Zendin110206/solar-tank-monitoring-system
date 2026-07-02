@@ -57,7 +57,7 @@ export function SimpleDashboardCards({ sites }: SimpleDashboardCardsProps) {
         <Link
           aria-label={`Buka detail tangki ${site.name}`}
           className="group relative overflow-hidden rounded-lg border border-zinc-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-100"
-          href={`/dashboard/tanks/${site.tankId}`}
+          href={`/dashboard/ringkas/tanks/${site.tankId}`}
           key={`${site.code}-${site.tankId}`}
         >
           <span

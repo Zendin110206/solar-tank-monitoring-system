@@ -4,6 +4,7 @@ import {
   saveMonitoringReadingToMemory,
 } from "./telemetry-store";
 import {
+  listMonitoringReadingsForTankFromMysql,
   listMonitoringReadingsFromMysql,
   saveMonitoringReadingToMysql,
 } from "./mysql-reading-repository";
@@ -95,6 +96,24 @@ export async function listMonitoringReadingsWithSource(): Promise<ListMonitoring
 export async function listMonitoringReadings(): Promise<Reading[]> {
   const result = await listMonitoringReadingsWithSource();
   return result.readings;
+}
+
+export async function listMonitoringReadingsForTank(
+  tankId: string,
+  limit?: number,
+): Promise<Reading[]> {
+  if (getMonitoringStorageDriver() === "mysql") {
+    return listMonitoringReadingsForTankFromMysql(tankId, limit);
+  }
+
+  return getMonitoringReadings()
+    .filter((reading) => reading.tankId === tankId)
+    .sort((first, second) => {
+      return (
+        new Date(first.receivedAt).getTime() -
+        new Date(second.receivedAt).getTime()
+      );
+    });
 }
 
 export async function saveMonitoringReading(

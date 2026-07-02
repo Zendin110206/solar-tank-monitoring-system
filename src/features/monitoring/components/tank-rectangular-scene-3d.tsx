@@ -10,6 +10,7 @@ type TankRectangularScene3DProps = {
   heightCm: number | null;
   sensorDistanceCm: number;
   fuelHeightCm: number;
+  showMeasurementBadges?: boolean;
 };
 
 type TankHorizontalCylinderScene3DProps = {
@@ -18,6 +19,7 @@ type TankHorizontalCylinderScene3DProps = {
   diameterCm: number | null;
   sensorDistanceCm: number;
   fuelHeightCm: number;
+  showMeasurementBadges?: boolean;
 };
 
 function clamp(value: number, min: number, max: number) {
@@ -191,6 +193,7 @@ export function TankRectangularScene3D({
   heightCm,
   sensorDistanceCm,
   fuelHeightCm,
+  showMeasurementBadges = true,
 }: TankRectangularScene3DProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -409,12 +412,16 @@ export function TankRectangularScene3D({
         className="h-full w-full cursor-grab touch-none active:cursor-grabbing"
         aria-label={`Visual 3D tangki balok dengan isi ${fillPercent}%`}
       />
-      <div className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
-        H {fuelHeightCm} cm
-      </div>
-      <div className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
-        Distance {sensorDistanceCm} cm
-      </div>
+      {showMeasurementBadges ? (
+        <>
+          <div className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
+            H {fuelHeightCm} cm
+          </div>
+          <div className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
+            Distance {sensorDistanceCm} cm
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }
@@ -425,6 +432,7 @@ export function TankHorizontalCylinderScene3D({
   diameterCm,
   sensorDistanceCm,
   fuelHeightCm,
+  showMeasurementBadges = true,
 }: TankHorizontalCylinderScene3DProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -740,12 +748,16 @@ export function TankHorizontalCylinderScene3D({
         className="h-full w-full cursor-grab touch-none active:cursor-grabbing"
         aria-label={`Visual 3D tangki silinder horizontal dengan isi ${displayFillPercent}%`}
       />
-      <div className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
-        H {fuelHeightCm} cm
-      </div>
-      <div className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
-        Isi {displayFillPercent}%
-      </div>
+      {showMeasurementBadges ? (
+        <>
+          <div className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
+            H {fuelHeightCm} cm
+          </div>
+          <div className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
+            Isi {displayFillPercent}%
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }
