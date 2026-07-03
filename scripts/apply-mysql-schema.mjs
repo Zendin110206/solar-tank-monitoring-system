@@ -52,7 +52,18 @@ const connection = await mysql.createConnection({
 
 try {
   for (const statement of statements) {
-    await connection.query(statement);
+    try {
+      await connection.query(statement);
+    } catch (error) {
+      if (error?.code === "ER_DUP_FIELDNAME") {
+        console.warn(
+          `[schema] kolom sudah ada, statement dilewati: ${statement.slice(0, 120)}...`,
+        );
+        continue;
+      }
+
+      throw error;
+    }
   }
 
   console.log(

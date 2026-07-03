@@ -1,3 +1,5 @@
+import { LogoutButton } from "@/features/auth/components/logout-button";
+import { requirePageUser } from "@/features/auth/lib/auth-guards";
 import { SimpleDashboardView } from "@/features/monitoring/components/simple-dashboard-view";
 import { buildDashboardOverview } from "@/features/monitoring/lib/dashboard-view-model";
 import { getMonitoringReferenceDataWithSource } from "@/features/monitoring/lib/monitoring-registry";
@@ -20,6 +22,8 @@ export const runtime = "nodejs";
 
 export default async function SimpleDashboardPage() {
   await connection();
+  const user = await requirePageUser();
+  const isAdmin = user.role === "admin";
 
   const now = new Date();
   const [monitoringReadingsResult, monitoringReferenceResult] =
@@ -75,18 +79,38 @@ export default async function SimpleDashboardPage() {
             <span className="shrink-0 rounded-lg bg-blue-600 px-3 py-2 text-center text-white shadow-lg shadow-blue-600/15">
               Dashboard Ringkas
             </span>
+            {isAdmin ? (
+              <>
+                <Link
+                  href="/dashboard/detail"
+                  className="shrink-0 rounded-lg px-3 py-2 text-center transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
+                >
+                  Dashboard Detail
+                </Link>
+                <Link
+                  href="/dashboard/locations"
+                  className="shrink-0 rounded-lg px-3 py-2 text-center transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
+                >
+                  Konfigurasi Lokasi
+                </Link>
+                <Link
+                  href="/dashboard/admin/users"
+                  className="shrink-0 rounded-lg px-3 py-2 text-center transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
+                >
+                  Admin User
+                </Link>
+              </>
+            ) : null}
+            <span className="shrink-0 rounded-lg bg-zinc-100 px-3 py-2 text-center text-zinc-700">
+              {user.fullName}
+            </span>
             <Link
-              href="/dashboard/detail"
+              href="/dashboard/account/security"
               className="shrink-0 rounded-lg px-3 py-2 text-center transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
             >
-              Dashboard Detail
+              Keamanan Akun
             </Link>
-            <Link
-              href="/dashboard/locations"
-              className="shrink-0 rounded-lg px-3 py-2 text-center transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
-            >
-              Konfigurasi Lokasi
-            </Link>
+            <LogoutButton />
           </nav>
         </div>
       </header>

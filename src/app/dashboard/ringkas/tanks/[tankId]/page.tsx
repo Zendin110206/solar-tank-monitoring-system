@@ -1,3 +1,4 @@
+import { requirePageUser } from "@/features/auth/lib/auth-guards";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -436,6 +437,7 @@ export default async function SimpleTankDetailPage({
   const { tankId } = await params;
 
   await connection();
+  await requirePageUser();
 
   const now = new Date();
   const refreshIntervalMs = getMonitoringRefreshIntervalMs();

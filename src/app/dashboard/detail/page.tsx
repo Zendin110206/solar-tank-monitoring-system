@@ -1,3 +1,4 @@
+import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
 import { getMonitoringReferenceDataWithSource } from "@/features/monitoring/lib/monitoring-registry";
 import type { Metadata } from "next";
 import Link from "next/link";
@@ -184,6 +185,7 @@ function SectionHeader({
 
 export default async function DashboardPage() {
   await connection();
+  await requirePageAdmin();
 
   const now = new Date();
   const refreshIntervalMs = getMonitoringRefreshIntervalMs();

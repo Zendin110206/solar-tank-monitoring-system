@@ -408,29 +408,16 @@ function buildProvisionedBundle({
 }
 
 function isAuthorizedForProvisioning({
-  deviceKey,
-  expectedDeviceKey,
-  allowGlobalDeviceKeyFallback = false,
   provisioningKey,
   expectedProvisioningKey,
 }: Pick<
   ProvisionMonitoringDeviceInput,
-  | "deviceKey"
-  | "expectedDeviceKey"
-  | "allowGlobalDeviceKeyFallback"
-  | "provisioningKey"
-  | "expectedProvisioningKey"
+  "provisioningKey" | "expectedProvisioningKey"
 >): boolean {
   const cleanExpectedProvisioningKey = expectedProvisioningKey?.trim();
-
-  if (cleanExpectedProvisioningKey) {
-    return provisioningKey?.trim() === cleanExpectedProvisioningKey;
-  }
-
   return Boolean(
-    allowGlobalDeviceKeyFallback &&
-      expectedDeviceKey?.trim() &&
-      deviceKey.trim() === expectedDeviceKey.trim(),
+    cleanExpectedProvisioningKey &&
+      provisioningKey?.trim() === cleanExpectedProvisioningKey,
   );
 }
 
@@ -561,8 +548,6 @@ async function saveProvisionedBundleToMysql({
 export async function provisionMonitoringDevice({
   deviceIdentifier,
   deviceKey,
-  expectedDeviceKey,
-  allowGlobalDeviceKeyFallback,
   allowDeviceAutoProvisioning,
   provisioningKey,
   expectedProvisioningKey,
@@ -579,9 +564,6 @@ export async function provisionMonitoringDevice({
 
   if (
     !isAuthorizedForProvisioning({
-      deviceKey,
-      expectedDeviceKey,
-      allowGlobalDeviceKeyFallback,
       provisioningKey,
       expectedProvisioningKey,
     })
