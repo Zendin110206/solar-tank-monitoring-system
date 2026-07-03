@@ -1,3 +1,4 @@
+import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -35,7 +36,9 @@ const preparationItems = [
   },
 ];
 
-export default function DashboardLocationsPage() {
+export default async function DashboardLocationsPage() {
+  await requirePageAdmin();
+
   return (
     <main className="min-h-screen w-full overflow-x-hidden bg-[#f5faf8] text-zinc-950">
       {/* Configuration Header */}

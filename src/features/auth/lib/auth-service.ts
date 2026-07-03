@@ -1,0 +1,804 @@
+import type { NextRequest } from "next/server";
+
+import type { AuthSafeUser, AuthSessionUser } from "../types";
+import {
+  createOtpCode,
+  createRandomToken,
+  hashOneTimeToken,
+  hashPassword,
+  hashOtpCode,
+  hashRequestFingerprint,
+  hashSessionToken,
+  hmacSha256Hex,
+  passwordNeedsRehash,
+  verifyOtpHash,
+  verifyPassword,
+} from "./auth-crypto";
+import {
+  getAppBaseUrl,
+  getEmailVerificationTtlSeconds,
+  getOtpTtlSeconds,
+  getPasswordResetTtlSeconds,
+  getSessionTtlSeconds,
+  getSessionLastSeenUpdateSeconds,
+  getTelegramBindTtlSeconds,
+  isPasswordResetEnabled,
+  shouldRequireAdminOtp,
+} from "./auth-config";
+import {
+  sendAdminLoginOtp,
+  sendEmailVerificationEmail,
+  sendPasswordResetEmail,
+} from "./auth-email";
+import {
+  buildTelegramDeepLink,
+  sendTelegramMessage,
+} from "./auth-telegram";
+import {
+  createAuthSession,
+  createEmailVerificationTokenRecord,
+  createOtpCodeRecord,
+  createPasswordResetTokenRecord,
+  createPendingAccessRequest,
+  createTelegramBindTokenRecord,
+  findAuthSessionByTokenHash,
+  findAuthUserByIdentity,
+  findAuthUserById,
+  findEmailVerificationTokenRecord,
+  findOtpCodeRecord,
+  findPasswordResetTokenRecord,
+  findTelegramBindTokenRecord,
+  listAuthSessionsForUser,
+  markAuthUserEmailVerified,
+  markEmailVerificationTokenUsed,
+  markOtpAttempt,
+  markOtpUsed,
+  markPasswordResetTokenUsed,
+  markTelegramBindTokenUsed,
+  recordAuthAuditEvent,
+  recordFailedLogin,
+  resetFailedLogin,
+  revokeAllUserSessions,
+  revokeAuthSessionForUser,
+  revokeAuthSession,
+  revokeOtherUserSessions,
+  setAuthUserTelegramChatId,
+  touchAuthSessionIfStale,
+  updateAuthUserPasswordHash,
+} from "./mysql-auth-repository";
+import type {
+  ChangePasswordPayload,
+  RegisterAccessPayload,
+  ResetPasswordPayload,
+} from "./auth-validation";
+import type { AuthSessionSummary } from "../types";
+
+type AuthRequestContext = Pick<NextRequest, "headers">;
+
+export type LoginResult =
+  | {
+      ok: true;
+      status: "authenticated";
+      user: AuthSessionUser;
+      sessionToken: string;
+      expiresAt: Date;
+    }
+  | {
+      ok: true;
+      status: "otp_required";
+      challengeId: string;
+      delivery: "email" | "log";
+    };
+
+export type VerifyOtpResult = {
+  user: AuthSessionUser;
+  sessionToken: string;
+  expiresAt: Date;
+};
+
+function getRequestIp(request: AuthRequestContext): string | null {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    null
+  );
+}
+
+function getRequestUserAgent(request: AuthRequestContext): string | null {
+  return request.headers.get("user-agent");
+}
+
+function isLocked(lockedUntil: string | null): boolean {
+  return Boolean(lockedUntil && new Date(lockedUntil).getTime() > Date.now());
+}
+
+function buildSessionExpiry(user: AuthSafeUser): Date {
+  return new Date(Date.now() + getSessionTtlSeconds(user.role) * 1000);
+}
+
+function buildAppUrl(path: string, params?: Record<string, string>): string {
+  const url = new URL(path, getAppBaseUrl());
+
+  for (const [key, value] of Object.entries(params ?? {})) {
+    url.searchParams.set(key, value);
+  }
+
+  return url.toString();
+}
+
+function buildTokenExpiry(ttlSeconds: number): Date {
+  return new Date(Date.now() + ttlSeconds * 1000);
+}
+
+function isTokenUsable(token: {
+  used_at: Date | null;
+  expires_at: Date;
+}): boolean {
+  return !token.used_at && token.expires_at.getTime() > Date.now();
+}
+
+async function createSessionForUser(
+  user: AuthSafeUser,
+  request: AuthRequestContext,
+): Promise<VerifyOtpResult> {
+  const sessionToken = createRandomToken();
+  const expiresAt = buildSessionExpiry(user);
+  const sessionId = await createAuthSession({
+    user,
+    sessionTokenHash: hashSessionToken(sessionToken),
+    expiresAt,
+    ipHash: hashRequestFingerprint(getRequestIp(request)),
+    userAgentHash: hashRequestFingerprint(getRequestUserAgent(request)),
+  });
+
+  return {
+    user: {
+      ...user,
+      sessionId,
+    },
+    sessionToken,
+    expiresAt,
+  };
+}
+
+export async function loginWithPassword({
+  identity,
+  password,
+  request,
+}: {
+  identity: string;
+  password: string;
+  request: AuthRequestContext;
+}): Promise<LoginResult> {
+  const user = await findAuthUserByIdentity(identity);
+  const ip = getRequestIp(request);
+  const userAgent = getRequestUserAgent(request);
+
+  if (!user) {
+    await recordAuthAuditEvent({
+      eventType: "login_failed_unknown_identity",
+      ip,
+      userAgent,
+      metadata: { identityHash: `sha256:${hmacSha256Hex(identity)}` },
+    }).catch(() => undefined);
+    throw new Error("Login gagal. Periksa kembali data masuk Anda.");
+  }
+
+  if (isLocked(user.lockedUntil)) {
+    await recordAuthAuditEvent({
+      eventType: "login_failed_locked",
+      targetUserId: user.id,
+      ip,
+      userAgent,
+    }).catch(() => undefined);
+    throw new Error("Akun terkunci sementara. Coba lagi beberapa saat.");
+  }
+
+  const passwordValid = await verifyPassword(password, user.passwordHash);
+
+  if (!passwordValid) {
+    await recordFailedLogin(user.id);
+    await recordAuthAuditEvent({
+      eventType: "login_failed_invalid_password",
+      targetUserId: user.id,
+      ip,
+      userAgent,
+    }).catch(() => undefined);
+    throw new Error("Login gagal. Periksa kembali data masuk Anda.");
+  }
+
+  if (user.status !== "active") {
+    await recordAuthAuditEvent({
+      eventType: "login_failed_inactive_user",
+      targetUserId: user.id,
+      ip,
+      userAgent,
+      metadata: { status: user.status },
+    }).catch(() => undefined);
+    throw new Error("Akun belum aktif. Hubungi administrator.");
+  }
+
+  if (passwordNeedsRehash(user.passwordHash)) {
+    await updateAuthUserPasswordHash({
+      userId: user.id,
+      passwordHash: await hashPassword(password),
+    });
+    await recordAuthAuditEvent({
+      eventType: "password_hash_upgraded",
+      actorUserId: user.id,
+      targetUserId: user.id,
+      ip,
+      userAgent,
+    }).catch(() => undefined);
+  }
+
+  await resetFailedLogin(user.id);
+
+  if (user.role === "admin" && shouldRequireAdminOtp()) {
+    const code = createOtpCode();
+    const expiresAt = new Date(Date.now() + getOtpTtlSeconds() * 1000);
+    const delivery = await sendAdminLoginOtp({ email: user.email, code });
+
+    if (!delivery.delivered) {
+      throw new Error(delivery.reason);
+    }
+
+    const challengeId = await createOtpCodeRecord({
+      userId: user.id,
+      purpose: "login_admin_2fa",
+      channel: "email",
+      destinationHash: `hmac-sha256:${hmacSha256Hex(user.email)}`,
+      codeHash: hashOtpCode(code),
+      expiresAt,
+    });
+
+    await recordAuthAuditEvent({
+      eventType: "login_admin_otp_sent",
+      targetUserId: user.id,
+      ip,
+      userAgent,
+      metadata: { delivery: delivery.delivery },
+    }).catch(() => undefined);
+
+    return {
+      ok: true,
+      status: "otp_required",
+      challengeId,
+      delivery: delivery.delivery,
+    };
+  }
+
+  const session = await createSessionForUser(user, request);
+  await recordAuthAuditEvent({
+    eventType: "login_success",
+    actorUserId: user.id,
+    targetUserId: user.id,
+    ip,
+    userAgent,
+  }).catch(() => undefined);
+
+  return {
+    ok: true,
+    status: "authenticated",
+    ...session,
+  };
+}
+
+export async function verifyAdminOtpLogin({
+  challengeId,
+  code,
+  request,
+}: {
+  challengeId: string;
+  code: string;
+  request: AuthRequestContext;
+}): Promise<VerifyOtpResult> {
+  const ip = getRequestIp(request);
+  const userAgent = getRequestUserAgent(request);
+  const otp = await findOtpCodeRecord(challengeId);
+
+  if (
+    !otp ||
+    otp.purpose !== "login_admin_2fa" ||
+    otp.used_at ||
+    !otp.user_id
+  ) {
+    throw new Error("Kode masuk tidak valid.");
+  }
+
+  if (otp.expires_at.getTime() <= Date.now()) {
+    throw new Error("Kode masuk sudah kedaluwarsa.");
+  }
+
+  if (otp.attempt_count >= otp.max_attempts) {
+    throw new Error("Percobaan kode terlalu banyak.");
+  }
+
+  if (!verifyOtpHash(code, otp.code_hash)) {
+    await markOtpAttempt(otp.id);
+    await recordAuthAuditEvent({
+      eventType: "login_admin_otp_failed",
+      targetUserId: otp.user_id,
+      ip,
+      userAgent,
+    }).catch(() => undefined);
+    throw new Error("Kode masuk tidak valid.");
+  }
+
+  const user = await findAuthUserById(otp.user_id);
+
+  if (!user || user.role !== "admin" || user.status !== "active") {
+    throw new Error("Akun admin tidak tersedia.");
+  }
+
+  await markOtpUsed(otp.id);
+  const session = await createSessionForUser(user, request);
+  await recordAuthAuditEvent({
+    eventType: "login_success_admin_otp",
+    actorUserId: user.id,
+    targetUserId: user.id,
+    ip,
+    userAgent,
+  }).catch(() => undefined);
+
+  return session;
+}
+
+export async function getSessionUserFromToken(
+  sessionToken: string | undefined,
+): Promise<AuthSessionUser | null> {
+  if (!sessionToken) {
+    return null;
+  }
+
+  const user = await findAuthSessionByTokenHash(hashSessionToken(sessionToken));
+
+  if (user) {
+    const staleBefore = new Date(
+      Date.now() - getSessionLastSeenUpdateSeconds() * 1000,
+    );
+    await touchAuthSessionIfStale({
+      sessionId: user.sessionId,
+      staleBefore,
+    }).catch(() => undefined);
+  }
+
+  return user;
+}
+
+export async function logoutSession(sessionId: string): Promise<void> {
+  await revokeAuthSession(sessionId);
+}
+
+export async function submitAccessRequest(
+  payload: RegisterAccessPayload,
+  request: AuthRequestContext,
+): Promise<void> {
+  const result = await createPendingAccessRequest(payload);
+  await recordAuthAuditEvent({
+    eventType: result.created
+      ? "access_request_submitted"
+      : "access_request_duplicate",
+    targetUserId: result.userId,
+    ip: getRequestIp(request),
+    userAgent: getRequestUserAgent(request),
+    metadata: {
+      requestedRole: payload.requestedRole,
+      accessRequestId: result.accessRequestId || null,
+    },
+  }).catch(() => undefined);
+
+  if (result.created) {
+    await sendEmailVerificationForUserId({
+      userId: result.userId,
+      request,
+    }).catch((error) =>
+      recordAuthAuditEvent({
+        eventType: "email_verification_send_failed",
+        targetUserId: result.userId,
+        ip: getRequestIp(request),
+        userAgent: getRequestUserAgent(request),
+        metadata: {
+          reason: error instanceof Error ? error.message : "unknown",
+        },
+      }).catch(() => undefined),
+    );
+  }
+}
+
+export async function requestPasswordReset({
+  identity,
+  request,
+}: {
+  identity: string;
+  request: AuthRequestContext;
+}): Promise<void> {
+  const ip = getRequestIp(request);
+  const userAgent = getRequestUserAgent(request);
+
+  if (!isPasswordResetEnabled()) {
+    throw new Error("Reset kata sandi sedang dinonaktifkan.");
+  }
+
+  const user = await findAuthUserByIdentity(identity);
+
+  if (!user || user.status === "disabled" || user.status === "suspended") {
+    await recordAuthAuditEvent({
+      eventType: "password_reset_requested_no_delivery",
+      targetUserId: user?.id ?? null,
+      ip,
+      userAgent,
+      metadata: { identityHash: `sha256:${hmacSha256Hex(identity)}` },
+    }).catch(() => undefined);
+    return;
+  }
+
+  const token = createRandomToken();
+  const tokenHash = hashOneTimeToken(token);
+  const expiresAt = buildTokenExpiry(getPasswordResetTtlSeconds());
+
+  await createPasswordResetTokenRecord({
+    userId: user.id,
+    tokenHash,
+    destinationHash: `hmac-sha256:${hmacSha256Hex(user.email)}`,
+    expiresAt,
+    ipHash: hashRequestFingerprint(ip),
+    userAgentHash: hashRequestFingerprint(userAgent),
+  });
+
+  const delivery = await sendPasswordResetEmail({
+    email: user.email,
+    resetUrl: buildAppUrl("/reset-password", { token }),
+  });
+
+  await recordAuthAuditEvent({
+    eventType: delivery.delivered
+      ? "password_reset_email_sent"
+      : "password_reset_email_failed",
+    targetUserId: user.id,
+    ip,
+    userAgent,
+    metadata: {
+      delivery: delivery.delivery,
+      reason: delivery.delivered ? null : delivery.reason,
+    },
+  }).catch(() => undefined);
+
+  if (!delivery.delivered) {
+    throw new Error(delivery.reason);
+  }
+}
+
+export async function sendPasswordResetForUserId({
+  userId,
+  request,
+}: {
+  userId: string;
+  request: AuthRequestContext;
+}): Promise<void> {
+  const user = await findAuthUserById(userId);
+  const ip = getRequestIp(request);
+  const userAgent = getRequestUserAgent(request);
+
+  if (!isPasswordResetEnabled()) {
+    throw new Error("Reset kata sandi sedang dinonaktifkan.");
+  }
+
+  if (!user || user.status === "disabled" || user.status === "suspended") {
+    throw new Error("Akun tidak tersedia untuk reset kata sandi.");
+  }
+
+  const token = createRandomToken();
+  const expiresAt = buildTokenExpiry(getPasswordResetTtlSeconds());
+
+  await createPasswordResetTokenRecord({
+    userId: user.id,
+    tokenHash: hashOneTimeToken(token),
+    destinationHash: `hmac-sha256:${hmacSha256Hex(user.email)}`,
+    expiresAt,
+    ipHash: hashRequestFingerprint(ip),
+    userAgentHash: hashRequestFingerprint(userAgent),
+  });
+
+  const delivery = await sendPasswordResetEmail({
+    email: user.email,
+    resetUrl: buildAppUrl("/reset-password", { token }),
+  });
+
+  await recordAuthAuditEvent({
+    eventType: delivery.delivered
+      ? "password_reset_admin_email_sent"
+      : "password_reset_admin_email_failed",
+    targetUserId: user.id,
+    ip,
+    userAgent,
+    metadata: {
+      delivery: delivery.delivery,
+      reason: delivery.delivered ? null : delivery.reason,
+    },
+  }).catch(() => undefined);
+
+  if (!delivery.delivered) {
+    throw new Error(delivery.reason);
+  }
+}
+
+export async function resetPasswordWithToken({
+  payload,
+  request,
+}: {
+  payload: ResetPasswordPayload;
+  request: AuthRequestContext;
+}): Promise<void> {
+  const token = await findPasswordResetTokenRecord(
+    hashOneTimeToken(payload.token),
+  );
+  const ip = getRequestIp(request);
+  const userAgent = getRequestUserAgent(request);
+
+  if (!token || !isTokenUsable(token)) {
+    throw new Error("Link reset sudah tidak valid atau kedaluwarsa.");
+  }
+
+  const user = await findAuthUserById(token.user_id);
+
+  if (!user || user.status === "disabled" || user.status === "suspended") {
+    throw new Error("Akun tidak tersedia untuk reset kata sandi.");
+  }
+
+  await updateAuthUserPasswordHash({
+    userId: user.id,
+    passwordHash: await hashPassword(payload.password),
+  });
+  await markPasswordResetTokenUsed(token.id);
+  await revokeAllUserSessions(user.id);
+  await recordAuthAuditEvent({
+    eventType: "password_reset_completed",
+    actorUserId: user.id,
+    targetUserId: user.id,
+    ip,
+    userAgent,
+  }).catch(() => undefined);
+}
+
+export async function changePasswordForSession({
+  user,
+  payload,
+  request,
+}: {
+  user: AuthSessionUser;
+  payload: ChangePasswordPayload;
+  request: AuthRequestContext;
+}): Promise<void> {
+  const userWithPassword = await findAuthUserByIdentity(user.email);
+  const ip = getRequestIp(request);
+  const userAgent = getRequestUserAgent(request);
+
+  if (!userWithPassword || userWithPassword.id !== user.id) {
+    throw new Error("Akun tidak ditemukan.");
+  }
+
+  const passwordValid = await verifyPassword(
+    payload.currentPassword,
+    userWithPassword.passwordHash,
+  );
+
+  if (!passwordValid) {
+    await recordAuthAuditEvent({
+      eventType: "password_change_failed",
+      actorUserId: user.id,
+      targetUserId: user.id,
+      ip,
+      userAgent,
+    }).catch(() => undefined);
+    throw new Error("Kata sandi saat ini tidak sesuai.");
+  }
+
+  await updateAuthUserPasswordHash({
+    userId: user.id,
+    passwordHash: await hashPassword(payload.password),
+  });
+  await revokeOtherUserSessions({
+    userId: user.id,
+    currentSessionId: user.sessionId,
+  });
+  await recordAuthAuditEvent({
+    eventType: "password_changed",
+    actorUserId: user.id,
+    targetUserId: user.id,
+    ip,
+    userAgent,
+  }).catch(() => undefined);
+}
+
+export async function sendEmailVerificationForUserId({
+  userId,
+  request,
+}: {
+  userId: string;
+  request: AuthRequestContext;
+}): Promise<void> {
+  const user = await findAuthUserById(userId);
+  const ip = getRequestIp(request);
+  const userAgent = getRequestUserAgent(request);
+
+  if (!user || user.emailVerifiedAt) {
+    return;
+  }
+
+  const token = createRandomToken();
+  const tokenHash = hashOneTimeToken(token);
+
+  await createEmailVerificationTokenRecord({
+    userId: user.id,
+    tokenHash,
+    destinationHash: `hmac-sha256:${hmacSha256Hex(user.email)}`,
+    expiresAt: buildTokenExpiry(getEmailVerificationTtlSeconds()),
+    ipHash: hashRequestFingerprint(ip),
+    userAgentHash: hashRequestFingerprint(userAgent),
+  });
+
+  const delivery = await sendEmailVerificationEmail({
+    email: user.email,
+    verificationUrl: buildAppUrl("/api/auth/email/verify", { token }),
+  });
+
+  await recordAuthAuditEvent({
+    eventType: delivery.delivered
+      ? "email_verification_sent"
+      : "email_verification_failed",
+    targetUserId: user.id,
+    ip,
+    userAgent,
+    metadata: {
+      delivery: delivery.delivery,
+      reason: delivery.delivered ? null : delivery.reason,
+    },
+  }).catch(() => undefined);
+
+  if (!delivery.delivered) {
+    throw new Error(delivery.reason);
+  }
+}
+
+export async function resendEmailVerification({
+  identity,
+  request,
+}: {
+  identity: string;
+  request: AuthRequestContext;
+}): Promise<void> {
+  const user = await findAuthUserByIdentity(identity);
+
+  if (!user || user.emailVerifiedAt) {
+    return;
+  }
+
+  await sendEmailVerificationForUserId({ userId: user.id, request });
+}
+
+export async function verifyEmailToken({
+  token,
+  request,
+}: {
+  token: string;
+  request: AuthRequestContext;
+}): Promise<void> {
+  const record = await findEmailVerificationTokenRecord(hashOneTimeToken(token));
+
+  if (!record || !isTokenUsable(record)) {
+    throw new Error("Link verifikasi email sudah tidak valid.");
+  }
+
+  await markAuthUserEmailVerified(record.user_id);
+  await markEmailVerificationTokenUsed(record.id);
+  await recordAuthAuditEvent({
+    eventType: "email_verified",
+    actorUserId: record.user_id,
+    targetUserId: record.user_id,
+    ip: getRequestIp(request),
+    userAgent: getRequestUserAgent(request),
+  }).catch(() => undefined);
+}
+
+export async function listCurrentUserSessions({
+  user,
+}: {
+  user: AuthSessionUser;
+}): Promise<AuthSessionSummary[]> {
+  return listAuthSessionsForUser({
+    userId: user.id,
+    currentSessionId: user.sessionId,
+  });
+}
+
+export async function revokeCurrentUserSessionById({
+  user,
+  sessionId,
+}: {
+  user: AuthSessionUser;
+  sessionId: string;
+}): Promise<void> {
+  if (sessionId === user.sessionId) {
+    throw new Error("Sesi aktif dicabut lewat tombol keluar.");
+  }
+
+  await revokeAuthSessionForUser({
+    userId: user.id,
+    sessionId,
+  });
+  await recordAuthAuditEvent({
+    eventType: "own_session_revoked",
+    actorUserId: user.id,
+    targetUserId: user.id,
+    metadata: { sessionId },
+  }).catch(() => undefined);
+}
+
+export async function startTelegramBinding({
+  user,
+  request,
+}: {
+  user: AuthSessionUser;
+  request: AuthRequestContext;
+}): Promise<{ token: string; deepLink: string | null; expiresAt: Date }> {
+  const token = createRandomToken();
+  const expiresAt = buildTokenExpiry(getTelegramBindTtlSeconds());
+
+  await createTelegramBindTokenRecord({
+    userId: user.id,
+    tokenHash: hashOneTimeToken(token),
+    expiresAt,
+    ipHash: hashRequestFingerprint(getRequestIp(request)),
+    userAgentHash: hashRequestFingerprint(getRequestUserAgent(request)),
+  });
+  await recordAuthAuditEvent({
+    eventType: "telegram_bind_started",
+    actorUserId: user.id,
+    targetUserId: user.id,
+    ip: getRequestIp(request),
+    userAgent: getRequestUserAgent(request),
+  }).catch(() => undefined);
+
+  return {
+    token,
+    deepLink: buildTelegramDeepLink(token),
+    expiresAt,
+  };
+}
+
+export async function completeTelegramBinding({
+  token,
+  chatId,
+  request,
+}: {
+  token: string;
+  chatId: string;
+  request: AuthRequestContext;
+}): Promise<void> {
+  const record = await findTelegramBindTokenRecord(hashOneTimeToken(token));
+
+  if (!record || !isTokenUsable(record)) {
+    throw new Error("Token Telegram sudah tidak valid.");
+  }
+
+  await markTelegramBindTokenUsed({
+    tokenId: record.id,
+    chatId,
+  });
+  await setAuthUserTelegramChatId({
+    userId: record.user_id,
+    chatId,
+  });
+  await sendTelegramMessage({
+    chatId,
+    text: "Akun Telegram berhasil terhubung ke SolarTank.",
+  }).catch(() => undefined);
+  await recordAuthAuditEvent({
+    eventType: "telegram_bound",
+    actorUserId: record.user_id,
+    targetUserId: record.user_id,
+    ip: getRequestIp(request),
+    userAgent: getRequestUserAgent(request),
+  }).catch(() => undefined);
+}

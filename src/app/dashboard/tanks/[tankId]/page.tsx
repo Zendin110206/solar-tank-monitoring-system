@@ -1,3 +1,4 @@
+import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
@@ -1091,6 +1092,7 @@ export default async function TankDetailPage({
   const { tankId } = await params;
 
   await connection();
+  await requirePageAdmin();
 
   const now = new Date();
   const [readings, referenceData] = await Promise.all([

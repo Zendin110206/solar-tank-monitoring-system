@@ -9,10 +9,18 @@ export const metadata: Metadata = {
     "Masuk ke dashboard SolarTank untuk memantau volume tangki, runtime genset, dan kondisi perangkat.",
 };
 
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ verified?: string; reason?: string }>;
+}) {
+  const params = await searchParams;
+  const verified =
+    params.verified === "1" ? "1" : params.verified === "0" ? "0" : undefined;
+
   return (
     <AuthShell
-      description="Halaman ini menyiapkan tampilan masuk untuk operator monitoring. Integrasi autentikasi dan sesi pengguna akan disambungkan pada tahap berikutnya."
+      description="Masuk dengan akun yang sudah disetujui administrator untuk membuka dashboard monitoring sesuai peran akses."
       footerPrompt={
         <>
           Belum memiliki akses?{" "}
@@ -27,7 +35,10 @@ export default function LoginPage() {
       }
       heading="Masuk ke SolarTank"
     >
-      <SignInForm />
+      <SignInForm
+        verificationReason={params.reason}
+        verified={verified}
+      />
     </AuthShell>
   );
 }

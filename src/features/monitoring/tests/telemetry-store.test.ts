@@ -160,6 +160,30 @@ describe("telemetry store", () => {
     });
   });
 
+  it("rejects auto provisioning without a dedicated provisioning key", async () => {
+    const result = await ingestTelemetry({
+      deviceIdentifier: "demo-auto-no-key-01",
+      deviceKey: "local-development-key",
+      allowDeviceAutoProvisioning: true,
+      payload: {
+        device: "demo-auto-no-key-01",
+        tank_shape: "rectangular",
+        capacity_liter: 540,
+        length_cm: 150,
+        width_cm: 60,
+        height_cm: 60,
+        sensor_mount_height_cm: 60,
+        lat: -7.65,
+        lng: 112.9,
+      },
+    });
+
+    expect(result).toMatchObject({
+      ok: false,
+      status: 401,
+    });
+  });
+
   it("auto provisions a new device from firmware config when explicitly enabled", async () => {
     resetMonitoringReadings();
 

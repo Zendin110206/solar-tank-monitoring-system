@@ -12,6 +12,8 @@ import {
   UserRound,
 } from "lucide-react";
 
+import { TurnstileWidget } from "@/features/auth/components/turnstile-widget";
+
 const inputClassName =
   "h-11 w-full rounded-lg border border-zinc-300 bg-white px-3.5 text-sm text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10";
 const labelClassName =
@@ -64,12 +66,68 @@ function PasswordField({
   );
 }
 
-export default function SignUpForm() {
-  const [submitted, setSubmitted] = useState(false);
+function buildAccessReason(formData: FormData): string {
+  const position = String(formData.get("position") ?? "").trim();
+  const note = String(formData.get("accessReason") ?? "").trim();
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  return [`Peran kerja: ${position || "-"}`, note]
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+export default function SignUpForm() {
+  const [pending, setPending] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitted(true);
+    const form = event.currentTarget;
+    setPending(true);
+    setError(null);
+    setSubmitted(false);
+
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch("/api/auth/register-request", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          fullName: formData.get("fullName"),
+          username: formData.get("username"),
+          email: formData.get("email"),
+          phone: formData.get("phone"),
+          requestedRole: "user",
+          password: formData.get("password"),
+          confirmPassword: formData.get("confirmPassword"),
+          accessReason: buildAccessReason(formData),
+          captchaToken: formData.get("captchaToken"),
+        }),
+      });
+      const result = (await response.json().catch(() => null)) as
+        | { ok?: boolean; error?: string }
+        | null;
+
+      if (!response.ok || !result?.ok) {
+        throw new Error(
+          result?.error ?? "Pengajuan akses belum bisa diproses.",
+        );
+      }
+
+      setSubmitted(true);
+      form.reset();
+    } catch (caughtError) {
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "Pengajuan akses belum bisa diproses.",
+      );
+    } finally {
+      setPending(false);
+    }
   }
 
   return (
@@ -133,8 +191,7 @@ export default function SignUpForm() {
           />
         </div>
         <p className="mt-1 text-[0.72rem] leading-5 text-zinc-500">
-          Untuk saat ini form hanya menyiapkan tampilan. Verifikasi email dan
-          pembuatan akun disambungkan pada tahap auth.
+          Email ini dipakai admin untuk meninjau dan mengaktifkan akses.
         </p>
       </div>
 
@@ -153,12 +210,17 @@ export default function SignUpForm() {
               className={`${inputClassName} pl-10`}
               id="phone"
               inputMode="tel"
+              pattern="(?:[+]?62|0|8)[0-9 .()-]{7,16}"
               name="phone"
-              placeholder="08xxxxxxxxxx"
+              placeholder="08xxxxxxxxxx atau +628xxxxxxxxxx"
               required
+              title="Gunakan nomor seluler Indonesia, contoh 081234567890 atau +6281234567890."
               type="tel"
             />
           </div>
+          <p className="mt-1 text-[0.72rem] leading-5 text-zinc-500">
+            Nomor akan disimpan konsisten dalam format +62.
+          </p>
         </div>
         <div>
           <label className={labelClassName} htmlFor="position">
@@ -192,7 +254,7 @@ export default function SignUpForm() {
           id="password"
           label="Kata sandi"
           name="password"
-          placeholder="Minimal 8 karakter"
+          placeholder="Minimal 10 karakter"
         />
         <PasswordField
           id="confirmPassword"
@@ -214,19 +276,27 @@ export default function SignUpForm() {
         />
       </div>
 
+      <TurnstileWidget />
+
       {submitted ? (
         <div className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
-          Rancangan form sudah berjalan sebagai tampilan awal. Data belum
-          dikirim ke server sampai modul autentikasi dan persetujuan akses
-          dibuat.
+          Pengajuan akses diterima. Cek email kerja untuk verifikasi, lalu
+          administrator akan meninjau sebelum akun aktif.
+        </div>
+      ) : null}
+
+      {error ? (
+        <div className="rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm leading-6 text-red-800">
+          {error}
         </div>
       ) : null}
 
       <button
-        className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20"
+        className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20 disabled:cursor-not-allowed disabled:opacity-70"
+        disabled={pending}
         type="submit"
       >
-        Ajukan akses
+        {pending ? "Mengirim..." : "Ajukan akses"}
         <ArrowRight
           aria-hidden="true"
           className="size-4 transition group-hover:translate-x-0.5"

@@ -16,9 +16,9 @@ export default function RegisterPage() {
       contextNote={{
         title: "Pengajuan akses",
         description:
-          "Form ini masih berupa rancangan tampilan. Persetujuan dan pembuatan akun akan disambungkan pada tahap autentikasi.",
+          "Akun baru masuk sebagai pengajuan dan harus disetujui administrator sebelum bisa membuka dashboard.",
       }}
-      description="Lengkapi identitas kerja untuk rancangan pengajuan akses dashboard monitoring tangki."
+      description="Lengkapi identitas kerja untuk mengajukan akses dashboard monitoring tangki."
       footerPrompt={
         <>
           Sudah memiliki akun?{" "}

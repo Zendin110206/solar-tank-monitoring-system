@@ -1,3 +1,21 @@
+import {
+  canLogOtpInDevelopment,
+  getCaptchaProvider,
+  getCaptchaSecretKey,
+  getRequiredAuthSecret,
+  getTelegramBotToken,
+  getTelegramBotUsername,
+  getTelegramWebhookSecret,
+  isPasswordResetEnabled,
+  isProductionLikeEnvironment,
+  shouldRequireAdminOtp,
+  shouldRequireEmailVerificationForApproval,
+} from "../../auth/lib/auth-config";
+import {
+  getExpectedProvisioningKey,
+  isDeviceAutoProvisioningEnabled,
+} from "./device-provisioning";
+import { isGlobalDeviceKeyFallbackAllowed } from "./device-key";
 import { checkMysqlConnection } from "./mysql-connection";
 import { countMonitoringReferenceRowsFromMysql } from "./mysql-reference-repository";
 import {
@@ -142,12 +160,249 @@ async function checkReferenceRegistryReadiness(): Promise<DeploymentCheck> {
   }
 }
 
+function hasSmtpConfig(): boolean {
+  return Boolean(
+    process.env.SMTP_HOST?.trim() &&
+      process.env.SMTP_USER?.trim() &&
+      process.env.SMTP_PASS?.trim() &&
+      process.env.SMTP_FROM?.trim(),
+  );
+}
+
+function checkAuthSecretReadiness(): DeploymentCheck {
+  try {
+    getRequiredAuthSecret();
+
+    if (!process.env.AUTH_SECRET?.trim()) {
+      return {
+        name: "auth-secret",
+        ok: true,
+        status: "degraded",
+        message:
+          "AUTH_SECRET belum diisi. Development fallback aktif dan tidak boleh dipakai untuk production.",
+      };
+    }
+
+    return {
+      name: "auth-secret",
+      ok: true,
+      status: "ok",
+      message: "AUTH_SECRET aktif.",
+    };
+  } catch {
+    return {
+      name: "auth-secret",
+      ok: false,
+      status: "error",
+      message: "AUTH_SECRET minimal 32 karakter wajib diisi.",
+    };
+  }
+}
+
+function checkAdminOtpReadiness(): DeploymentCheck {
+  const productionLike = isProductionLikeEnvironment();
+
+  if (!shouldRequireAdminOtp()) {
+    return {
+      name: "admin-otp",
+      ok: !productionLike,
+      status: productionLike ? "error" : "degraded",
+      message: productionLike
+        ? "OTP admin tidak boleh dimatikan di production."
+        : "OTP admin sedang dimatikan. Aktifkan sebelum production.",
+    };
+  }
+
+  if (hasSmtpConfig()) {
+    return {
+      name: "admin-otp",
+      ok: true,
+      status: "ok",
+      message: "OTP admin aktif dengan SMTP.",
+    };
+  }
+
+  if (canLogOtpInDevelopment()) {
+    return {
+      name: "admin-otp",
+      ok: true,
+      status: "degraded",
+      message:
+        "SMTP belum diisi. OTP admin hanya dicetak ke log development.",
+    };
+  }
+
+  return {
+    name: "admin-otp",
+    ok: false,
+    status: "error",
+    message: "SMTP wajib diisi saat OTP admin aktif.",
+  };
+}
+
+function checkAuthEmailFlowReadiness(): DeploymentCheck {
+  const needsEmail =
+    shouldRequireAdminOtp() ||
+    isPasswordResetEnabled() ||
+    shouldRequireEmailVerificationForApproval();
+
+  if (!needsEmail) {
+    return {
+      name: "auth-email-flow",
+      ok: !isProductionLikeEnvironment(),
+      status: isProductionLikeEnvironment() ? "error" : "degraded",
+      message:
+        "Semua flow email auth sedang tidak wajib. Kondisi ini tidak disarankan untuk production.",
+    };
+  }
+
+  if (hasSmtpConfig()) {
+    return {
+      name: "auth-email-flow",
+      ok: true,
+      status: "ok",
+      message: "SMTP siap untuk OTP, verifikasi email, dan reset password.",
+    };
+  }
+
+  if (canLogOtpInDevelopment()) {
+    return {
+      name: "auth-email-flow",
+      ok: true,
+      status: "degraded",
+      message:
+        "SMTP belum diisi. Email auth hanya dicetak ke log development.",
+    };
+  }
+
+  return {
+    name: "auth-email-flow",
+    ok: false,
+    status: "error",
+    message:
+      "SMTP wajib diisi untuk OTP, verifikasi email, dan reset password.",
+  };
+}
+
+function checkCaptchaReadiness(): DeploymentCheck {
+  const provider = getCaptchaProvider();
+
+  if (provider === "disabled") {
+    return {
+      name: "auth-captcha",
+      ok: !isProductionLikeEnvironment(),
+      status: isProductionLikeEnvironment() ? "error" : "degraded",
+      message:
+        "CAPTCHA form publik nonaktif. Aktifkan Turnstile sebelum production.",
+    };
+  }
+
+  if (!getCaptchaSecretKey() || !process.env.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY) {
+    return {
+      name: "auth-captcha",
+      ok: false,
+      status: "error",
+      message:
+        "Turnstile aktif tetapi site key atau secret key CAPTCHA belum lengkap.",
+    };
+  }
+
+  return {
+    name: "auth-captcha",
+    ok: true,
+    status: "ok",
+    message: "CAPTCHA Turnstile aktif untuk form publik.",
+  };
+}
+
+function checkTelegramReadiness(): DeploymentCheck {
+  const hasTelegram =
+    getTelegramBotToken() && getTelegramWebhookSecret() && getTelegramBotUsername();
+
+  if (hasTelegram) {
+    return {
+      name: "auth-telegram",
+      ok: true,
+      status: "ok",
+      message: "Telegram bot siap untuk binding akun.",
+    };
+  }
+
+  return {
+    name: "auth-telegram",
+    ok: true,
+    status: "degraded",
+    message:
+      "Telegram bot belum lengkap. Sistem tetap berjalan dengan email sebagai kanal utama.",
+  };
+}
+
+function checkDeviceKeyPolicyReadiness(): DeploymentCheck {
+  const productionLike = isProductionLikeEnvironment();
+
+  if (isGlobalDeviceKeyFallbackAllowed()) {
+    return {
+      name: "device-key-policy",
+      ok: !productionLike,
+      status: productionLike ? "error" : "degraded",
+      message: productionLike
+        ? "Global device key fallback wajib dimatikan di production."
+        : "Global device key fallback aktif untuk development.",
+    };
+  }
+
+  return {
+    name: "device-key-policy",
+    ok: true,
+    status: "ok",
+    message: "Global device key fallback nonaktif.",
+  };
+}
+
+function checkAutoProvisioningReadiness(): DeploymentCheck {
+  if (!isDeviceAutoProvisioningEnabled()) {
+    return {
+      name: "device-auto-provisioning",
+      ok: true,
+      status: "ok",
+      message: "Auto provisioning device nonaktif.",
+    };
+  }
+
+  if (!getExpectedProvisioningKey()) {
+    return {
+      name: "device-auto-provisioning",
+      ok: false,
+      status: "error",
+      message:
+        "Auto provisioning aktif tetapi SOLAR_TANK_DEVICE_PROVISIONING_KEY belum diisi.",
+    };
+  }
+
+  return {
+    name: "device-auto-provisioning",
+    ok: true,
+    status: "degraded",
+    message:
+      "Auto provisioning device aktif. Gunakan hanya saat onboarding device baru.",
+  };
+}
+
 export async function getDeploymentReadiness(
   now = new Date(),
 ): Promise<DeploymentReadiness> {
   const storageDriver = getMonitoringStorageDriver();
   const storageCheck = await checkStorageReadiness(storageDriver);
-  const checks = [storageCheck];
+  const checks = [
+    storageCheck,
+    checkAuthSecretReadiness(),
+    checkAdminOtpReadiness(),
+    checkAuthEmailFlowReadiness(),
+    checkCaptchaReadiness(),
+    checkTelegramReadiness(),
+    checkDeviceKeyPolicyReadiness(),
+    checkAutoProvisioningReadiness(),
+  ];
 
   if (storageDriver === "mysql" && storageCheck.ok) {
     checks.push(await checkReferenceRegistryReadiness());
