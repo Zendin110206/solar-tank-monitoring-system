@@ -59,6 +59,7 @@ export function getMysqlPool(): Pool {
     uri: getMysqlDatabaseUrl(),
     connectionLimit: getMysqlConnectionLimit(),
     timezone: "Z",
+    dateStrings: true,
     ...(ssl ? { ssl } : {}),
   });
 

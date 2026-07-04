@@ -21,6 +21,8 @@ describe("monitoring storage", () => {
     process.env.SOLAR_TANK_STORAGE_DRIVER = "mysql";
 
     vi.doMock("../lib/mysql-reading-repository", () => ({
+      listLatestMonitoringReadingsByTankFromMysql: vi.fn().mockResolvedValue([]),
+      listMonitoringReadingsForTankFromMysql: vi.fn(),
       listMonitoringReadingsFromMysql: vi.fn().mockResolvedValue([]),
       saveMonitoringReadingToMysql: vi.fn(),
     }));
@@ -32,6 +34,48 @@ describe("monitoring storage", () => {
     const result = await listMonitoringReadingsWithSource();
 
     expect(result.readings).toEqual([]);
+    expect(result.source).toMatchObject({
+      configuredDriver: "mysql",
+      activeDriver: "mysql",
+      isFallback: false,
+      label: "Database MySQL",
+    });
+  });
+
+  it("can read only the latest mysql reading per tank for dashboard overview", async () => {
+    process.env.SOLAR_TANK_STORAGE_DRIVER = "mysql";
+
+    const latestReadings = [
+      {
+        id: "reading-tph-latest",
+        deviceId: "device-tph-main",
+        tankId: "tank-tph-main",
+        measuredAt: "2026-07-02T03:15:08.000Z",
+        receivedAt: "2026-07-02T03:15:09.000Z",
+        sensorDistanceCm: 24.2,
+        fuelHeightCm: 35.77,
+        volumeLiter: 321.96,
+        fillPercent: 59,
+        runtimeHour: 12.69,
+      },
+    ];
+
+    vi.doMock("../lib/mysql-reading-repository", () => ({
+      listLatestMonitoringReadingsByTankFromMysql: vi
+        .fn()
+        .mockResolvedValue(latestReadings),
+      listMonitoringReadingsForTankFromMysql: vi.fn(),
+      listMonitoringReadingsFromMysql: vi.fn(),
+      saveMonitoringReadingToMysql: vi.fn(),
+    }));
+
+    const { listLatestMonitoringReadingsByTankWithSource } = await import(
+      "../lib/monitoring-storage"
+    );
+
+    const result = await listLatestMonitoringReadingsByTankWithSource();
+
+    expect(result.readings).toEqual(latestReadings);
     expect(result.source).toMatchObject({
       configuredDriver: "mysql",
       activeDriver: "mysql",

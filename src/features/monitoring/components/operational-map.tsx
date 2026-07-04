@@ -2,7 +2,13 @@
 
 /* eslint-disable @next/next/no-img-element -- Map tiles are external slippy-map tiles; routing them through next/image would add unnecessary proxying. */
 
-import { useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useMemo,
+  useRef,
+  useState,
+  type PointerEvent,
+  type WheelEvent,
+} from "react";
 import { Crosshair, MapPin, Minus, Plus, Search } from "lucide-react";
 
 import type { DashboardSiteStatus } from "../lib/dashboard-view-model";
@@ -296,6 +302,42 @@ export function OperationalMap({
     setZoom(clamp(nextZoom, MIN_ZOOM, MAX_ZOOM));
   }
 
+  function changeZoomAtPointer(
+    nextZoom: number,
+    event: WheelEvent<HTMLDivElement>,
+  ) {
+    const clampedZoom = clamp(nextZoom, MIN_ZOOM, MAX_ZOOM);
+
+    if (clampedZoom === zoom) {
+      return;
+    }
+
+    const rect = event.currentTarget.getBoundingClientRect();
+    const pointerX = MAP_WIDTH / 2 + event.clientX - rect.left - rect.width / 2;
+    const pointerY =
+      MAP_HEIGHT / 2 + event.clientY - rect.top - rect.height / 2;
+    const centerPixel = latLngToWorldPixel(center, zoom);
+    const anchoredPoint = worldPixelToLatLng(
+      {
+        x: centerPixel.x + pointerX - MAP_WIDTH / 2,
+        y: centerPixel.y + pointerY - MAP_HEIGHT / 2,
+      },
+      zoom,
+    );
+    const anchoredPixel = latLngToWorldPixel(anchoredPoint, clampedZoom);
+
+    setCenter(
+      worldPixelToLatLng(
+        {
+          x: anchoredPixel.x - pointerX + MAP_WIDTH / 2,
+          y: anchoredPixel.y - pointerY + MAP_HEIGHT / 2,
+        },
+        clampedZoom,
+      ),
+    );
+    setZoom(clampedZoom);
+  }
+
   function resetMap() {
     setCenter(initialCenter);
     setZoom(DEFAULT_ZOOM);
@@ -341,6 +383,15 @@ export function OperationalMap({
     }
   }
 
+  function handleWheel(event: WheelEvent<HTMLDivElement>) {
+    if (!hasCoordinates) {
+      return;
+    }
+
+    event.preventDefault();
+    changeZoomAtPointer(zoom + (event.deltaY > 0 ? -1 : 1), event);
+  }
+
   return (
     <div className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
       <div
@@ -349,6 +400,7 @@ export function OperationalMap({
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerEnd}
         onPointerCancel={handlePointerEnd}
+        onWheel={handleWheel}
         role="application"
         aria-label="Peta koordinat STO"
       >

@@ -25,11 +25,11 @@ describe("tank detail view model", () => {
     expect(detail).toBeNull();
   });
 
-  it("builds reading series and keeps latest reading as the last point", () => {
+  it("builds reading series from real stored readings only", () => {
     const readings = buildTankReadings("tank-tph-main", { now });
     const latest = readings.at(-1);
 
-    expect(readings).toHaveLength(8);
+    expect(readings).toHaveLength(1);
     expect(latest?.volumeLiter).toBe(3900);
     expect(latest?.fillPercent).toBe(78);
   });

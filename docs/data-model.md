@@ -129,6 +129,12 @@ config_mismatch
 
 Dashboard/detail kemudian dapat memberi tanda bahwa data perlu review, bukan diam-diam dianggap aman.
 
+Catatan waktu:
+
+- `measuredAt` dan `receivedAt` disimpan sebagai waktu UTC dan keluar dari API sebagai ISO string berakhiran `Z`;
+- UI operasional menampilkan label jam dalam WIB/Asia Jakarta supaya hasil lokal dan Vercel tidak bergeser;
+- jika device mengirim timestamp terlalu jauh dari waktu server, sistem memakai waktu server dan menambahkan warning di `quality`.
+
 ## Status
 
 Status dibuat dari data reading dan konfigurasi.
@@ -164,7 +170,9 @@ Karakteristik MySQL saat ini:
 
 - sudah memiliki migration dan seed demo;
 - menyimpan reading dari endpoint ingest;
-- query mengambil data terbaru terlebih dahulu, lalu dibalik untuk grafik;
+- query history tangki mengambil riwayat per tangki;
+- query overview mengambil reading terbaru per tangki agar tank yang jarang mengirim tidak tersisih oleh data tank lain yang lebih sering masuk;
+- nilai `DATETIME` MySQL diperlakukan sebagai UTC oleh repository aplikasi;
 - sudah dapat membaca registry site, tank, device, dan hash key dari database;
 - dapat diisi registry pilot melalui file lokal yang tidak di-commit;
-- belum menjadi production database penuh karena rotasi key, user, role, audit log, rate limit, backup, dan SOP operasional belum final.
+- tetap membutuhkan SOP production seperti backup, restore, rotasi key, dan monitoring database.

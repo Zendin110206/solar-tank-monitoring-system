@@ -84,6 +84,13 @@ Penjelasan:
 | `raw.percent` | persen isi |
 | `raw.wifi_rssi` | sinyal WiFi |
 
+Catatan timestamp:
+
+- Kirim `measuredAt`/`ts_iso` dalam format ISO UTC jika firmware sudah punya waktu yang benar.
+- Jika hanya punya Unix timestamp, kirim `ts` dalam detik atau milidetik.
+- Jika waktu device belum dipercaya, kirim `ts: 0`; server akan memakai waktu terima.
+- Dashboard menampilkan jam operasional dalam WIB, tetapi data API tetap disimpan sebagai UTC agar konsisten antara lokal, Vercel, dan server kantor.
+
 Payload real-format untuk pilot:
 
 ```json

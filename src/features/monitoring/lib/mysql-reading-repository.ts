@@ -25,8 +25,37 @@ type ReadingRow = RowDataPacket & {
   raw_payload: unknown;
 };
 
-function toIsoString(value: Date | string): string {
-  return new Date(value).toISOString();
+export function formatMysqlUtcDateTime(value: string): string {
+  const date = new Date(value);
+  const time = date.getTime();
+
+  if (!Number.isFinite(time)) {
+    throw new Error("Timestamp reading tidak valid.");
+  }
+
+  return date.toISOString().slice(0, 23).replace("T", " ");
+}
+
+export function parseMysqlDateTimeAsUtc(value: Date | string): string {
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  const cleanValue = value.trim();
+  const hasExplicitTimezone = /(?:z|[+-]\d{2}:?\d{2})$/i.test(cleanValue);
+  const normalizedValue = cleanValue.includes("T")
+    ? cleanValue
+    : cleanValue.replace(" ", "T");
+  const isoCandidate = hasExplicitTimezone
+    ? normalizedValue
+    : `${normalizedValue}Z`;
+  const parsedTime = new Date(isoCandidate).getTime();
+
+  if (!Number.isFinite(parsedTime)) {
+    throw new Error("Timestamp reading dari MySQL tidak valid.");
+  }
+
+  return new Date(parsedTime).toISOString();
 }
 
 function toNumber(value: number | string | null): number {
@@ -59,8 +88,8 @@ function rowToReading(row: ReadingRow): Reading {
     id: row.id,
     deviceId: row.device_id,
     tankId: row.tank_id,
-    measuredAt: toIsoString(row.measured_at),
-    receivedAt: toIsoString(row.received_at),
+    measuredAt: parseMysqlDateTimeAsUtc(row.measured_at),
+    receivedAt: parseMysqlDateTimeAsUtc(row.received_at),
     sensorDistanceCm: toNumber(row.sensor_distance_cm),
     fuelHeightCm: toNumber(row.fuel_height_cm),
     volumeLiter: toNumber(row.volume_liter),
@@ -111,8 +140,8 @@ export async function saveMonitoringReadingToMysql(
       reading.id,
       reading.deviceId,
       reading.tankId,
-      new Date(reading.measuredAt),
-      new Date(reading.receivedAt),
+      formatMysqlUtcDateTime(reading.measuredAt),
+      formatMysqlUtcDateTime(reading.receivedAt),
       reading.sensorDistanceCm,
       reading.fuelHeightCm,
       reading.volumeLiter,
@@ -156,6 +185,41 @@ export async function listMonitoringReadingsFromMysql(
   );
 
   return rows.map(rowToReading).reverse();
+}
+
+export async function listLatestMonitoringReadingsByTankFromMysql(): Promise<
+  Reading[]
+> {
+  const pool = getMysqlPool();
+  const [rows] = await pool.query<ReadingRow[]>(
+    `
+      SELECT
+        r.id,
+        r.device_id,
+        r.tank_id,
+        r.measured_at,
+        r.received_at,
+        r.sensor_distance_cm,
+        r.fuel_height_cm,
+        r.volume_liter,
+        r.fill_percent,
+        r.runtime_hour,
+        r.battery_volt,
+        r.rssi_dbm,
+        r.raw_payload
+      FROM monitoring_readings r
+      WHERE r.id = (
+        SELECT r2.id
+        FROM monitoring_readings r2
+        WHERE r2.tank_id = r.tank_id
+        ORDER BY r2.received_at DESC, r2.id DESC
+        LIMIT 1
+      )
+      ORDER BY r.received_at ASC, r.id ASC
+    `,
+  );
+
+  return rows.map(rowToReading);
 }
 
 export async function listMonitoringReadingsForTankFromMysql(

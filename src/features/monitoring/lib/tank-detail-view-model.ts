@@ -14,8 +14,7 @@ import type {
   Tank,
   TankConfigReview,
 } from "../types/monitoring";
-import { clampNumber, roundTo } from "./number";
-import { calculateRuntimeHours } from "./runtime";
+import { roundTo } from "./number";
 import {
   compareRegistryVsPayloadConfig,
   pickPayloadNumber,
@@ -27,11 +26,7 @@ import {
   getOperationalStatus,
   getRuntimeStatus,
 } from "./status";
-import {
-  calculateFillPercent,
-  calculateTankVolumeLiter,
-  getMaxFuelHeightCm,
-} from "./tank-volume";
+import { getMaxFuelHeightCm } from "./tank-volume";
 import { buildMapPositionsFromCoordinates } from "./map-position";
 
 export type TankDetailStatus = "online" | "warning" | "critical" | "offline";
@@ -442,59 +437,7 @@ function buildReadingSeries(
         new Date(a.receivedAt).getTime() - new Date(b.receivedAt).getTime(),
     );
 
-  if (tankReadings.length > 1) {
-    return tankReadings.slice(-24).map(toReadingPoint);
-  }
-
-  const baseReceivedTime = new Date(latestReading.receivedAt).getTime();
-  const baseMeasuredTime = new Date(latestReading.measuredAt).getTime();
-  const maxFuelHeightCm = getMaxFuelHeightCm(tank);
-  const historyHours = [14, 12, 10, 8, 6, 4, 2, 0];
-
-  return historyHours.map((hoursAgo) => {
-    if (hoursAgo === 0) {
-      return toReadingPoint(latestReading);
-    }
-
-    const receivedAt = new Date(
-      baseReceivedTime - hoursAgo * 60 * 60 * 1000,
-    ).toISOString();
-    const measuredAt = new Date(
-      baseMeasuredTime - hoursAgo * 60 * 60 * 1000,
-    ).toISOString();
-    const fuelHeightCm = roundTo(
-      clampNumber(
-        latestReading.fuelHeightCm + hoursAgo * 1.2,
-        0,
-        maxFuelHeightCm,
-      ),
-      2,
-    );
-    const sensorDistanceCm = roundTo(
-      clampNumber(
-        maxFuelHeightCm - fuelHeightCm,
-        0,
-        maxFuelHeightCm,
-      ),
-      2,
-    );
-    const volumeLiter = calculateTankVolumeLiter(tank, fuelHeightCm);
-    const fillPercent = calculateFillPercent(volumeLiter, tank.capacityLiter);
-    const runtimeHour =
-      calculateRuntimeHours(volumeLiter, tank.consumptionLiterPerHour) ?? 0;
-
-    return {
-      measuredAt,
-      receivedAt,
-      timeLabel: formatTimeLabel(receivedAt),
-      sensorDistanceCm,
-      fuelHeightCm,
-      volumeLiter,
-      fillPercent,
-      runtimeHour,
-      status: getReadingPointStatus(fillPercent),
-    };
-  });
+  return tankReadings.slice(-24).map(toReadingPoint);
 }
 
 function buildNearbySites(

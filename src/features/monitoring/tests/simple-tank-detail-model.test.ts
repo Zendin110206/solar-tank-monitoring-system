@@ -9,6 +9,8 @@ import { buildTankDetail } from "../lib/tank-detail-view-model";
 import type { TankReadingPoint } from "../lib/tank-detail-view-model";
 import type { Reading } from "../types/monitoring";
 
+const WIB_OFFSET_MS = 7 * 60 * 60 * 1000;
+
 function createReadingPoint(minute: number, volumeLiter: number): TankReadingPoint {
   const receivedAt = new Date(
     Date.UTC(2026, 6, 2, 8, minute, 0),
@@ -41,7 +43,9 @@ function createChartPoint({
   minute: number;
   volumeLiter: number;
 }): SimpleTankDetailChartPoint {
-  const receivedAt = new Date(2026, 6, day, hour, minute, 0).toISOString();
+  const receivedAt = new Date(
+    Date.UTC(2026, 6, day, hour, minute, 0) - WIB_OFFSET_MS,
+  ).toISOString();
 
   return {
     fullTimeLabel: "",
@@ -160,6 +164,8 @@ describe("simple tank detail model", () => {
     );
 
     expect(trend.totalSlots).toBe(288);
+    expect(trend.domainStart).toBe("2026-07-01T17:00:00.000Z");
+    expect(trend.domainEnd).toBe("2026-07-02T17:00:00.000Z");
     expect(trend.range.bucketLabel).toBe("Bucket 5 menit");
     expect(trend.xTicks.map((tick) => tick.label)).toEqual([
       "00:00",
