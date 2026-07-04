@@ -172,15 +172,27 @@ export function getAppBaseUrl(): string {
     return baseUrl.replace(/\/+$/, "");
   }
 
-  return isProductionLikeEnvironment()
-    ? "https://localhost"
-    : "http://localhost:3000";
+  if (isProductionLikeEnvironment()) {
+    throw new Error("APP_BASE_URL wajib diisi untuk production.");
+  }
+
+  return "http://localhost:3000";
 }
 
-export function getCaptchaProvider(): "disabled" | "turnstile" {
+export type CaptchaProvider = "disabled" | "turnstile" | "invalid";
+
+export function getCaptchaProvider(): CaptchaProvider {
   const provider = process.env.AUTH_CAPTCHA_PROVIDER?.trim().toLowerCase();
 
-  return provider === "turnstile" ? "turnstile" : "disabled";
+  if (!provider || provider === "disabled") {
+    return "disabled";
+  }
+
+  if (provider === "turnstile") {
+    return "turnstile";
+  }
+
+  return "invalid";
 }
 
 export function getCaptchaSecretKey(): string | null {

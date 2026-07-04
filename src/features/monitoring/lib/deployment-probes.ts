@@ -1,5 +1,6 @@
 import {
   canLogOtpInDevelopment,
+  getAppBaseUrl,
   getCaptchaProvider,
   getCaptchaSecretKey,
   getRequiredAuthSecret,
@@ -199,6 +200,44 @@ function checkAuthSecretReadiness(): DeploymentCheck {
   }
 }
 
+function checkAppBaseUrlReadiness(): DeploymentCheck {
+  try {
+    const baseUrl = getAppBaseUrl();
+    const url = new URL(baseUrl);
+    const isLocalhost =
+      url.hostname === "localhost" ||
+      url.hostname === "127.0.0.1" ||
+      url.hostname === "::1";
+
+    if (isProductionLikeEnvironment() && isLocalhost) {
+      return {
+        name: "app-base-url",
+        ok: false,
+        status: "error",
+        message:
+          "APP_BASE_URL production tidak boleh memakai localhost karena dipakai untuk link email.",
+      };
+    }
+
+    return {
+      name: "app-base-url",
+      ok: true,
+      status: isLocalhost ? "degraded" : "ok",
+      message: isLocalhost
+        ? "APP_BASE_URL masih memakai localhost. Aman untuk development, bukan untuk production."
+        : "APP_BASE_URL siap untuk link email.",
+    };
+  } catch {
+    return {
+      name: "app-base-url",
+      ok: false,
+      status: "error",
+      message:
+        "APP_BASE_URL wajib diisi dengan URL aplikasi yang valid untuk production.",
+    };
+  }
+}
+
 function checkAdminOtpReadiness(): DeploymentCheck {
   const productionLike = isProductionLikeEnvironment();
 
@@ -286,6 +325,16 @@ function checkAuthEmailFlowReadiness(): DeploymentCheck {
 
 function checkCaptchaReadiness(): DeploymentCheck {
   const provider = getCaptchaProvider();
+
+  if (provider === "invalid") {
+    return {
+      name: "auth-captcha",
+      ok: false,
+      status: "error",
+      message:
+        "AUTH_CAPTCHA_PROVIDER tidak dikenali. Gunakan disabled atau turnstile.",
+    };
+  }
 
   if (provider === "disabled") {
     return {
@@ -396,6 +445,7 @@ export async function getDeploymentReadiness(
   const checks = [
     storageCheck,
     checkAuthSecretReadiness(),
+    checkAppBaseUrlReadiness(),
     checkAdminOtpReadiness(),
     checkAuthEmailFlowReadiness(),
     checkCaptchaReadiness(),

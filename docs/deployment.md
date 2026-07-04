@@ -121,6 +121,11 @@ SMTP_SECURE="false"
 ```
 
 Jika provider memberi CA certificate, isi `MYSQL_SSL_CA` di environment Vercel.
+Pastikan `APP_BASE_URL` memakai domain aplikasi yang benar. Production tidak
+boleh memakai localhost karena URL ini dipakai untuk link verifikasi email dan
+reset password. `AUTH_CAPTCHA_PROVIDER` hanya menerima `disabled` atau
+`turnstile`; salah ketik akan membuat readiness gagal supaya masalah terlihat
+sebelum dipakai user.
 
 Langkah pilot:
 
