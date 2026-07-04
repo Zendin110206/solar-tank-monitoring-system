@@ -6,19 +6,33 @@ import { ArrowRight, Mail } from "lucide-react";
 
 import { TurnstileWidget } from "@/features/auth/components/turnstile-widget";
 
+const captchaRequiredMessage =
+  "Selesaikan verifikasi keamanan terlebih dahulu.";
+const isCaptchaEnabled = Boolean(
+  process.env.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY?.trim(),
+);
+
 export default function ForgotPasswordForm() {
   const [pending, setPending] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [captchaRenderKey, setCaptchaRenderKey] = useState(0);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
-    setPending(true);
     setMessage(null);
     setError(null);
 
     const formData = new FormData(form);
+    const captchaToken = String(formData.get("captchaToken") ?? "").trim();
+
+    if (isCaptchaEnabled && !captchaToken) {
+      setError(captchaRequiredMessage);
+      return;
+    }
+
+    setPending(true);
 
     try {
       const response = await fetch("/api/auth/password/forgot", {
@@ -26,7 +40,7 @@ export default function ForgotPasswordForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           identity: formData.get("identity"),
-          captchaToken: formData.get("captchaToken"),
+          captchaToken,
         }),
       });
       const result = (await response.json().catch(() => null)) as
@@ -49,6 +63,9 @@ export default function ForgotPasswordForm() {
           : "Permintaan reset belum bisa diproses.",
       );
     } finally {
+      if (isCaptchaEnabled) {
+        setCaptchaRenderKey((currentKey) => currentKey + 1);
+      }
       setPending(false);
     }
   }
@@ -81,7 +98,7 @@ export default function ForgotPasswordForm() {
         </div>
       </div>
 
-      <TurnstileWidget />
+      <TurnstileWidget key={captchaRenderKey} />
 
       {message ? (
         <div className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">

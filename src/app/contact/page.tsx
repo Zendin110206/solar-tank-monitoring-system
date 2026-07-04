@@ -57,7 +57,7 @@ const helpTopics = [
   {
     question: "Kapan sebaiknya menghubungi tim operasional?",
     answer:
-      "Gunakan halaman ini sebagai rancangan alur bantuan ketika akses dashboard, status perangkat, atau pembacaan volume perlu diklarifikasi.",
+      "Gunakan halaman ini sebagai rancangan alur bantuan ketika akses sistem monitoring, status perangkat, atau pembacaan volume perlu diklarifikasi.",
   },
   {
     question: "Data apa yang perlu disiapkan?",
@@ -163,7 +163,8 @@ export default function ContactPage() {
             </h1>
 
             <p className="mt-6 max-w-2xl text-base leading-8 text-zinc-600 sm:text-lg">
-              Hubungi pengelola operasional untuk akses dashboard, klarifikasi
+              Hubungi pengelola operasional untuk akses sistem monitoring,
+              klarifikasi
               pembacaan volume, atau tindak lanjut perangkat yang terlambat
               mengirim data. Halaman ini disiapkan sebagai rancangan alur
               bantuan operasional.

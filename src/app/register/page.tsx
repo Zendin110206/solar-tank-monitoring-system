@@ -18,7 +18,7 @@ export default function RegisterPage() {
         description:
           "Akun baru masuk sebagai pengajuan dan harus disetujui administrator sebelum bisa membuka dashboard.",
       }}
-      description="Lengkapi identitas kerja untuk mengajukan akses dashboard monitoring tangki."
+      description="Lengkapi identitas kerja untuk mengajukan akses sistem monitoring tangki."
       footerPrompt={
         <>
           Sudah memiliki akun?{" "}

@@ -30,7 +30,7 @@ export async function verifyCaptchaToken({
     return {
       ok: false,
       enforced: true,
-      error: "Provider CAPTCHA tidak dikenali.",
+      error: "Provider verifikasi keamanan tidak dikenali.",
     };
   }
 
@@ -40,7 +40,7 @@ export async function verifyCaptchaToken({
     return {
       ok: false,
       enforced: true,
-      error: "Secret CAPTCHA belum dikonfigurasi.",
+      error: "Verifikasi keamanan belum dikonfigurasi.",
     };
   }
 
@@ -48,7 +48,7 @@ export async function verifyCaptchaToken({
     return {
       ok: false,
       enforced: true,
-      error: "Verifikasi CAPTCHA wajib diisi.",
+      error: "Selesaikan verifikasi keamanan terlebih dahulu.",
     };
   }
 
@@ -72,7 +72,7 @@ export async function verifyCaptchaToken({
     return {
       ok: false,
       enforced: true,
-      error: "Verifikasi CAPTCHA belum bisa diproses.",
+      error: "Verifikasi keamanan belum bisa diproses.",
     };
   }
 
@@ -90,7 +90,7 @@ export async function verifyCaptchaToken({
     enforced: true,
     error:
       isMissingInput && !isProductionLikeEnvironment()
-        ? "Token CAPTCHA kosong. Nonaktifkan AUTH_CAPTCHA_PROVIDER untuk development lokal."
-        : "Verifikasi CAPTCHA tidak valid.",
+        ? "Token verifikasi keamanan kosong. Nonaktifkan AUTH_CAPTCHA_PROVIDER untuk development lokal."
+        : "Verifikasi keamanan tidak valid.",
   };
 }

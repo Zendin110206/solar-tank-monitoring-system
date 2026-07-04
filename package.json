@@ -18,9 +18,9 @@
     "pilot:smoke": "node scripts/smoke-pilot-ingest.mjs",
     "db:migrate:mysql": "node scripts/apply-mysql-schema.mjs database/migrations/001_create_monitoring_core_mysql.sql",
     "db:migrate:auth": "node scripts/apply-mysql-schema.mjs database/migrations/002_create_auth_core_mysql.sql",
-    "db:migrate:auth-18d": "node scripts/apply-mysql-schema.mjs database/migrations/003_extend_auth_recovery_mysql.sql",
+    "db:migrate:auth-recovery": "node scripts/apply-mysql-schema.mjs database/migrations/003_extend_auth_recovery_mysql.sql",
     "db:seed:mysql": "node scripts/apply-mysql-schema.mjs database/seeds/001_seed_demo_monitoring_reference_mysql.sql",
-    "db:setup:mysql": "pnpm db:migrate:mysql && pnpm db:migrate:auth && pnpm db:migrate:auth-18d && pnpm db:seed:mysql",
+    "db:setup:mysql": "pnpm db:migrate:mysql && pnpm db:migrate:auth && pnpm db:migrate:auth-recovery && pnpm db:seed:mysql",
     "auth:create-admin": "node scripts/create-auth-admin.mjs",
     "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
   },

@@ -24,9 +24,13 @@ Dashboard tidak membaca sensor secara langsung. Device atau simulator yang mengi
 | Komponen | Lokasi | Status |
 |---|---|---|
 | Landing page | `src/app/page.tsx` | Ada |
-| Login | `src/app/login/page.tsx` | Ada, frontend-only |
-| Pengajuan akses | `src/app/register/page.tsx` | Ada, frontend-only |
-| Dashboard awal | `src/app/dashboard/page.tsx` | Ada, membaca storage aktif |
+| Login | `src/app/login/page.tsx` dan `src/app/api/auth/login/route.ts` | Ada, membuat session database |
+| Pengajuan akses | `src/app/register/page.tsx` dan `src/app/api/auth/register-request/route.ts` | Ada, pending approval admin dan bisa dilindungi Turnstile |
+| Lupa/reset password | `src/app/forgot-password`, `src/app/reset-password`, dan API auth password | Ada, memakai token sekali pakai |
+| Manajemen pengguna | `src/app/dashboard/admin/users/page.tsx` | Ada, khusus admin |
+| Audit keamanan auth | `src/app/dashboard/admin/audit/page.tsx` | Ada, khusus admin |
+| Keamanan akun | `src/app/dashboard/account/security/page.tsx` | Ada, session aktif, ganti password, dan Telegram binding |
+| Monitoring operasional | `src/app/dashboard/page.tsx` | Ada, membaca storage aktif |
 | Detail tangki | `src/app/dashboard/tanks/[tankId]/page.tsx` | Ada, membaca storage aktif |
 | API health | `src/app/api/health/route.ts` | Ada, mengecek aplikasi hidup |
 | API readiness | `src/app/api/ready/route.ts` | Ada, mengecek storage aktif |
@@ -48,13 +52,14 @@ Dashboard tidak membaca sensor secara langsung. Device atau simulator yang mengi
 | Pilot smoke ingest | `scripts/smoke-pilot-ingest.mjs` | Ada, mengirim payload real-format |
 | Operational map | `src/features/monitoring/components/operational-map.tsx` | Ada, menampilkan marker dari latitude/longitude registry |
 | Unit test | `src/features/monitoring/tests` | Ada |
+| Unit test auth | `src/features/auth/tests` | Ada |
 
 ## Batas Frontend dan Backend
 
 Frontend bertugas:
 
 - menampilkan halaman;
-- menyiapkan tampilan login dan pengajuan akses;
+- menampilkan form login, pengajuan akses, reset password, dan keamanan akun;
 - menampilkan status dan angka yang sudah rapi;
 - memberi pengalaman baca yang mudah;
 - tidak menghitung hal operasional penting secara tersebar.
@@ -72,7 +77,7 @@ Backend/API bertugas:
 - memberi status review jika config payload dan registry berbeda;
 - menyediakan data siap baca untuk dashboard;
 - membaca registry site, tangki, device, dan hash key dari memory atau MySQL sesuai mode storage;
-- nanti menangani autentikasi dan persetujuan akses pengguna;
+- menangani autentikasi, session, role admin/user, OTP admin, reset password, verifikasi email, pengajuan akses, CAPTCHA form publik, dan audit auth;
 - menyimpan data reading ke storage aktif.
 
 ## Alur Ingest
@@ -172,7 +177,7 @@ STO tetap dikelola dari registry karena device saat ini tidak memakai GPS.
 
 ## Target Arsitektur Berikutnya
 
-Kondisi setelah Batch 15:
+Kondisi fondasi monitoring saat ini:
 
 ```text
 UI dashboard/detail
@@ -185,12 +190,27 @@ UI dashboard/detail
   -> berubah saat device/smoke mengirim data dan halaman di-refresh
 ```
 
-Setelah itu:
+Setelah fondasi auth tersedia, sisa pematangan production:
 
 ```text
-user auth, role access, rate limit, audit log, rotasi key, backup
-  -> dimatangkan sebelum pilot/production
+SMTP real, Turnstile real, HTTPS, backup/restore, rate limit ingest, rotasi key device
+  -> divalidasi sebelum production
 ```
+
+Kondisi sekarang untuk auth:
+
+```text
+login/register/reset password
+  -> API auth
+  -> validasi payload, rate limit, CAPTCHA form publik bila aktif
+  -> MySQL auth tables
+  -> session cookie httpOnly
+  -> halaman user/admin dibatasi role
+```
+
+Sisa pematangan sebelum production adalah environment production, SMTP real,
+Turnstile real, backup/restore, HTTPS final, rate limit ingest, rotasi key
+device, dan prosedur operasional.
 
 ## Prinsip Desain
 

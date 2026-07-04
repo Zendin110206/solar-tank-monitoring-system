@@ -35,9 +35,9 @@ import { buildTankDetail } from "@/features/monitoring/lib/tank-detail-view-mode
 import type { DeviceStatus, Reading } from "@/features/monitoring/types/monitoring";
 
 export const metadata: Metadata = {
-  title: "Detail Ringkas Tangki | SolarTank",
+  title: "Detail Operasional Tangki | SolarTank",
   description:
-    "Detail ringkas tangki solar untuk membaca volume, status perangkat, update terakhir, dan tren volume terbaru.",
+    "Detail operasional tangki solar untuk membaca volume, status perangkat, update terakhir, dan tren volume terbaru.",
 };
 
 export const runtime = "nodejs";
@@ -437,7 +437,8 @@ export default async function SimpleTankDetailPage({
   const { tankId } = await params;
 
   await connection();
-  await requirePageUser();
+  const user = await requirePageUser();
+  const isAdmin = user.role === "admin";
 
   const now = new Date();
   const refreshIntervalMs = getMonitoringRefreshIntervalMs();
@@ -495,20 +496,24 @@ export default async function SimpleTankDetailPage({
               href="/dashboard"
               className="shrink-0 rounded-lg bg-blue-600 px-3 py-2 text-center text-white shadow-lg shadow-blue-600/15"
             >
-              Dashboard Ringkas
+              Monitoring Tangki
             </Link>
-            <Link
-              href="/dashboard/detail"
-              className="shrink-0 rounded-lg px-3 py-2 text-center transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
-            >
-              Dashboard Detail
-            </Link>
-            <Link
-              href="/dashboard/locations"
-              className="shrink-0 rounded-lg px-3 py-2 text-center transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
-            >
-              Konfigurasi Lokasi
-            </Link>
+            {isAdmin ? (
+              <>
+                <Link
+                  href="/dashboard/detail"
+                  className="shrink-0 rounded-lg px-3 py-2 text-center transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
+                >
+                  Analisis Teknis
+                </Link>
+                <Link
+                  href="/dashboard/locations"
+                  className="shrink-0 rounded-lg px-3 py-2 text-center transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
+                >
+                  Lokasi dan Perangkat
+                </Link>
+              </>
+            ) : null}
           </nav>
         </div>
       </header>
@@ -523,7 +528,7 @@ export default async function SimpleTankDetailPage({
             Kembali ke dashboard
           </Link>
           <p className="text-sm font-medium text-zinc-500">
-            Detail ringkas untuk pemantauan operasional harian
+            Detail operasional untuk pemantauan harian
           </p>
           <LiveRefreshControl
             className="flex"
@@ -637,7 +642,7 @@ export default async function SimpleTankDetailPage({
               </span>
               <div>
                 <p className="text-sm font-semibold uppercase text-zinc-500">
-                  Informasi ringkas
+                  Informasi operasional
                 </p>
                 <h2 className="mt-1 text-xl font-semibold tracking-normal text-zinc-950">
                   {tank.siteCode}

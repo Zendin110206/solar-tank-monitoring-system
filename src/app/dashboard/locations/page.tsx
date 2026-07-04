@@ -13,9 +13,9 @@ import {
 import { TankConfigDraftPanel } from "@/features/monitoring/components/tank-config-draft-panel";
 
 export const metadata: Metadata = {
-  title: "Konfigurasi Lokasi & Device | SolarTank",
+  title: "Lokasi dan Perangkat | SolarTank",
   description:
-    "Persiapan konfigurasi STO, registrasi device, koordinat manual, dan konfigurasi fisik tangki SolarTank.",
+    "Pengelolaan data STO, registrasi perangkat, koordinat manual, dan konfigurasi fisik tangki SolarTank.",
 };
 
 const preparationItems = [
@@ -60,7 +60,7 @@ export default async function DashboardLocationsPage() {
 
           <nav className="hidden items-center gap-7 text-sm font-medium text-zinc-600 lg:flex">
             <Link href="/dashboard" className="transition hover:text-red-600">
-              Dashboard Ringkas
+              Monitoring Tangki
             </Link>
             <Link
               href="/dashboard/detail#peta"
@@ -68,7 +68,7 @@ export default async function DashboardLocationsPage() {
             >
               Peta STO
             </Link>
-            <span className="text-zinc-950">Konfigurasi Lokasi</span>
+            <span className="text-zinc-950">Lokasi dan Perangkat</span>
             <Link
               href="/dashboard/detail#log"
               className="transition hover:text-red-600"
@@ -102,17 +102,17 @@ export default async function DashboardLocationsPage() {
                   Kembali ke dashboard
                 </Link>
                 <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600 ring-1 ring-red-100">
-                  konfigurasi lokasi
+                  lokasi dan perangkat
                 </span>
               </div>
 
               <h1 className="mt-4 max-w-4xl break-words text-[1.75rem] font-semibold leading-[1.08] tracking-normal text-zinc-950 sm:text-4xl lg:text-5xl">
-                Persiapan data STO dan device pemantau
+                Pengelolaan lokasi dan perangkat pemantau
               </h1>
               <p className="mt-3 max-w-3xl break-words text-sm leading-6 text-zinc-500 sm:text-base">
-                Halaman ini menyiapkan data lokasi, koordinat manual, device,
-                dan konfigurasi tangki agar alur monitoring bisa disambungkan
-                bertahap tanpa mengganggu dashboard operasional.
+                Halaman ini menyiapkan data lokasi, koordinat manual,
+                perangkat, dan konfigurasi tangki agar alur monitoring bisa
+                disambungkan bertahap tanpa mengganggu tampilan operasional.
               </p>
             </div>
 
@@ -144,7 +144,7 @@ export default async function DashboardLocationsPage() {
         {/* Location and Device Form Section */}
         <TankConfigDraftPanel />
 
-        {/* Frontend-only Boundary Section */}
+        {/* Data Change Boundary Section */}
         <section className="mt-5 grid gap-4 lg:grid-cols-2">
           <article className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
             <div className="flex items-start gap-3">
@@ -156,9 +156,9 @@ export default async function DashboardLocationsPage() {
                   Batas perubahan data
                 </p>
                 <p className="mt-2 text-sm leading-6 text-zinc-500">
-                  Data pada halaman ini belum mengubah registry monitoring.
-                  Penyimpanan ke database akan diaktifkan setelah modul
-                  manajemen lokasi dan hak akses siap.
+                  Form ini masih menjadi ruang persiapan. Perubahan belum
+                  menulis registry monitoring sampai modul penyimpanan lokasi
+                  dan persetujuan admin dinyatakan siap.
                 </p>
               </div>
             </div>
@@ -174,7 +174,7 @@ export default async function DashboardLocationsPage() {
                   Siap disambungkan bertahap
                 </p>
                 <p className="mt-2 text-sm leading-6 text-zinc-500">
-                  Field sudah mengikuti kebutuhan STO, device, koordinat
+                  Field sudah mengikuti kebutuhan STO, perangkat, koordinat
                   manual, dan konfigurasi tangki agar integrasi penyimpanan
                   nanti tidak perlu mengubah alur tampilan besar-besaran.
                 </p>

@@ -40,8 +40,14 @@ Halaman yang bisa dilihat:
 | URL | Isi |
 |---|---|
 | `/` | landing page |
-| `/dashboard` | dashboard awal |
-| `/dashboard/tanks/tank-tph-main` | detail tangki contoh |
+| `/login` | login pengguna |
+| `/register` | pengajuan akses pengguna baru |
+| `/forgot-password` | permintaan reset kata sandi |
+| `/dashboard` | monitoring operasional tangki |
+| `/dashboard/ringkas/tanks/tank-tph-main` | detail operasional tangki contoh |
+| `/dashboard/detail` | analisis teknis khusus admin |
+| `/dashboard/admin/users` | manajemen pengguna khusus admin |
+| `/dashboard/admin/audit` | audit keamanan auth khusus admin |
 
 ## 3. Cek Aplikasi dan Storage
 
@@ -124,7 +130,10 @@ History harus bertambah setelah simulator mengirim data.
 - Mode MySQL membaca registry site, tangki, device, dan hash key dari database.
 - Registry pilot bisa disiapkan lewat `pnpm pilot:registry`, tetapi file real harus lokal dan tidak boleh masuk Git.
 - Smoke test payload real-format bisa dikirim lewat `pnpm pilot:smoke`.
-- Halaman login/register baru bersifat frontend-only dan belum membuat sesi pengguna.
+- Login/register sudah terhubung ke auth database jika migration auth dan admin awal sudah disiapkan.
+- Pengajuan akses user baru masuk status pending dan harus ditinjau admin.
+- Form publik dapat dilindungi Cloudflare Turnstile jika `AUTH_CAPTCHA_PROVIDER="turnstile"` dan key lengkap.
+- OTP admin, verifikasi email, serta reset password membutuhkan SMTP atau dev log non-production yang diizinkan.
 - API sudah bisa menerima data simulator.
 - Saat server baru berjalan, memory mode menyiapkan data demo dengan timestamp relatif agar dashboard tidak langsung terlihat basi.
 - Memory store hilang ketika server restart.
@@ -144,6 +153,11 @@ MYSQL_DATABASE_URL="mysql://user:password@host:port/database"
 MYSQL_CONNECTION_LIMIT="2"
 MYSQL_SSL_MODE="disabled"
 SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK="false"
+AUTH_SECRET="ganti-dengan-secret-minimal-32-karakter"
+AUTH_REQUIRE_ADMIN_OTP="true"
+AUTH_ENABLE_REGISTER="true"
+AUTH_ALLOW_PASSWORD_RESET="true"
+AUTH_CAPTCHA_PROVIDER="disabled"
 ```
 
 Untuk cloud MySQL yang mewajibkan TLS, gunakan:
@@ -158,6 +172,7 @@ Jalankan migration dan seed:
 
 ```powershell
 pnpm db:setup:mysql
+pnpm auth:create-admin
 ```
 
 Setelah mengubah `.env.local`, restart `pnpm dev`, lalu cek:

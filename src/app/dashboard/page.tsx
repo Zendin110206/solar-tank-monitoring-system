@@ -13,9 +13,9 @@ import Link from "next/link";
 import { connection } from "next/server";
 
 export const metadata: Metadata = {
-  title: "Dashboard Ringkas Monitoring Solar | SolarTank",
+  title: "Monitoring Tangki Solar | SolarTank",
   description:
-    "Ringkasan kartu per STO untuk memantau volume tangki solar, status online perangkat, dan akses cepat ke detail tangki.",
+    "Tampilan operasional per STO untuk memantau volume tangki solar, status perangkat, dan akses cepat ke detail tangki.",
 };
 
 export const runtime = "nodejs";
@@ -77,7 +77,7 @@ export default async function SimpleDashboardPage() {
 
           <nav className="grid w-full min-w-0 grid-cols-1 items-center gap-2 py-1 text-sm font-semibold text-zinc-600 sm:flex sm:w-auto">
             <span className="shrink-0 rounded-lg bg-blue-600 px-3 py-2 text-center text-white shadow-lg shadow-blue-600/15">
-              Dashboard Ringkas
+              Monitoring Tangki
             </span>
             {isAdmin ? (
               <>
@@ -85,19 +85,19 @@ export default async function SimpleDashboardPage() {
                   href="/dashboard/detail"
                   className="shrink-0 rounded-lg px-3 py-2 text-center transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
                 >
-                  Dashboard Detail
+                  Analisis Teknis
                 </Link>
                 <Link
                   href="/dashboard/locations"
                   className="shrink-0 rounded-lg px-3 py-2 text-center transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
                 >
-                  Konfigurasi Lokasi
+                  Lokasi dan Perangkat
                 </Link>
                 <Link
                   href="/dashboard/admin/users"
                   className="shrink-0 rounded-lg px-3 py-2 text-center transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
                 >
-                  Admin User
+                  Manajemen Pengguna
                 </Link>
               </>
             ) : null}

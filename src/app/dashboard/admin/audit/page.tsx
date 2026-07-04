@@ -6,7 +6,7 @@ import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
 import { listAuthAuditEvents } from "@/features/auth/lib/mysql-auth-repository";
 
 export const metadata: Metadata = {
-  title: "Audit Auth | SolarTank",
+  title: "Audit Keamanan | SolarTank",
   description: "Log audit keamanan akun SolarTank untuk administrator.",
 };
 
@@ -58,10 +58,10 @@ export default async function AdminAuditPage() {
               href="/dashboard/admin/users"
               className="rounded-lg px-3 py-2 transition hover:bg-blue-50 hover:text-blue-700"
             >
-              Admin User
+              Manajemen Pengguna
             </Link>
             <span className="rounded-lg bg-blue-600 px-3 py-2 text-white">
-              Audit
+              Audit Keamanan
             </span>
           </nav>
         </div>
@@ -78,7 +78,7 @@ export default async function AdminAuditPage() {
                 Audit keamanan
               </p>
               <h1 className="mt-1 text-2xl font-semibold sm:text-3xl">
-                Log aktivitas auth
+                Log aktivitas keamanan
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
                 Catatan login, OTP, reset password, perubahan role, aktivasi,

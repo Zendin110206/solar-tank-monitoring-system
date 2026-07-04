@@ -11,15 +11,23 @@ Repositori ini menggunakan Bahasa Indonesia agar mudah dibaca oleh pengguna oper
 
 ## Status Saat Ini
 
-Repositori sudah melewati tahap fondasi awal dan sekarang berada pada tahap prototipe aplikasi monitoring dengan alur data lokal, API ingest, simulator, auto-refresh dashboard, fondasi penyimpanan MySQL, registry MySQL, dan alat bantu pilot 5 STO.
+Repositori sudah melewati tahap fondasi awal dan sekarang berada pada tahap prototipe aplikasi monitoring dengan alur data lokal, API ingest, simulator, auto-refresh dashboard, fondasi penyimpanan MySQL, registry MySQL, alat bantu pilot 5 STO, serta autentikasi pengguna berbasis database.
 
 Yang sudah tersedia:
 
 - landing page berbahasa Indonesia;
-- halaman login dan pengajuan akses frontend-only;
-- dashboard detail untuk monitoring teknis;
-- dashboard ringkas dengan tampilan kartu dan peta;
-- halaman detail ringkas per tangki untuk operator;
+- halaman login, pengajuan akses, verifikasi email, lupa password, dan reset password;
+- session user memakai cookie `httpOnly` dengan role `admin` dan `user`;
+- password disimpan dengan hash Argon2id, dengan dukungan upgrade dari hash legacy;
+- OTP email untuk login admin jika `AUTH_REQUIRE_ADMIN_OTP` aktif;
+- rate limit untuk login, pengajuan akses, lupa password, dan pengiriman ulang verifikasi email;
+- audit event untuk login, OTP, reset password, verifikasi email, perubahan role, aktivasi, dan aksi keamanan akun;
+- halaman manajemen pengguna untuk admin: review pengajuan, aktivasi/nonaktif, ubah role, cabut sesi, kirim verifikasi, dan reset password;
+- halaman audit keamanan auth untuk admin;
+- halaman keamanan akun untuk ganti kata sandi, melihat sesi aktif, mencabut sesi lain, dan menghubungkan Telegram;
+- analisis teknis untuk monitoring detail;
+- monitoring operasional dengan tampilan kartu dan peta;
+- halaman detail operasional per tangki untuk operator;
 - data contoh untuk lokasi, tangki, perangkat, dan pembacaan;
 - timestamp data contoh memory mode digeser relatif ke waktu server start agar demo awal tetap mudah dibaca;
 - fungsi domain untuk volume, runtime, status, dan normalisasi payload;
@@ -55,18 +63,18 @@ Yang sudah tersedia:
 
 Yang belum tersedia:
 
-- autentikasi pengguna final;
-- proses pembuatan akun sungguhan;
-- role admin, operator, atau viewer;
 - deployment produksi;
 - kalibrasi tangki nyata;
-- notifikasi;
-- rate limit dan audit log untuk endpoint ingest.
+- notifikasi operasional di luar email auth;
+- rate limit khusus endpoint ingest;
+- rotasi key device lewat UI admin;
+- manajemen registry site/tangki/device yang menulis database dari UI;
+- backup dan restore database production.
 
 Catatan penting:
 
 ```text
-Saat ini dashboard dan detail sudah membaca storage aktif lewat layer aplikasi. Mode default tetap `memory` agar mudah dicoba. Mode `mysql` sudah tersedia untuk latihan persistent storage dan registry monitoring, tetapi belum boleh dianggap production-ready karena autentikasi, rate limit, audit log, backup, dan prosedur operasional belum final.
+Saat ini dashboard dan detail sudah membaca storage aktif lewat layer aplikasi. Mode default tetap `memory` agar mudah dicoba. Mode `mysql` sudah tersedia untuk persistent storage, registry monitoring, dan auth database. Sistem belum boleh dianggap production-ready sampai environment production, SMTP, CAPTCHA, HTTPS, backup, prosedur restore, rate limit ingest, dan prosedur operasional final sudah divalidasi.
 ```
 
 ## Tujuan Produk
@@ -192,6 +200,11 @@ Struktur aktif saat ini:
 │   │   ├── layout.tsx
 │   │   └── page.tsx
 │   └── features/
+│       ├── auth/
+│       │   ├── components/
+│       │   ├── lib/
+│       │   ├── tests/
+│       │   └── types.ts
 │       └── monitoring/
 │           ├── components/
 │           ├── data/
@@ -212,6 +225,7 @@ Penjelasan folder utama:
 | Folder | Fungsi |
 |---|---|
 | `src/app` | Halaman Next.js dan API route |
+| `src/features/auth` | Logika login, session, OTP, reset password, verifikasi email, CAPTCHA, Telegram binding, validasi payload, dan repository auth MySQL |
 | `src/features/monitoring/components` | Komponen client kecil untuk refresh dan jam real-time |
 | `src/features/monitoring/data` | Data contoh yang aman untuk pengembangan |
 | `src/features/monitoring/lib` | Logika domain, normalisasi, view model, storage facade, memory store, dan repository MySQL |
@@ -268,10 +282,17 @@ Halaman penting:
 | Halaman | Fungsi |
 |---|---|
 | `/` | Landing page |
-| `/login` | Tampilan masuk frontend-only |
-| `/register` | Tampilan pengajuan akses frontend-only |
-| `/dashboard` | Dashboard awal |
-| `/dashboard/tanks/tank-tph-main` | Detail tangki contoh |
+| `/login` | Login pengguna dengan session database |
+| `/register` | Pengajuan akses pengguna baru, dilindungi verifikasi keamanan jika CAPTCHA aktif |
+| `/forgot-password` | Permintaan link reset kata sandi |
+| `/reset-password` | Membuat kata sandi baru dari link reset |
+| `/dashboard` | Monitoring operasional tangki |
+| `/dashboard/ringkas/tanks/tank-tph-main` | Detail operasional tangki untuk user |
+| `/dashboard/detail` | Analisis teknis untuk admin |
+| `/dashboard/locations` | Persiapan lokasi dan perangkat untuk admin |
+| `/dashboard/admin/users` | Manajemen pengguna untuk admin |
+| `/dashboard/admin/audit` | Audit keamanan auth untuk admin |
+| `/dashboard/account/security` | Keamanan akun dan sesi aktif |
 
 ## Menjalankan Simulator
 
@@ -360,8 +381,11 @@ curl.exe -X POST http://localhost:3000/api/ingest `
 | `pnpm pilot:registry` | Memvalidasi dan apply registry pilot lokal ke MySQL |
 | `pnpm pilot:smoke` | Mengirim payload real-format ke `/api/ingest` untuk uji pilot |
 | `pnpm db:migrate:mysql` | Menjalankan migration MySQL dari folder `database/migrations` |
+| `pnpm db:migrate:auth` | Menjalankan migration core auth MySQL |
+| `pnpm db:migrate:auth-recovery` | Menjalankan migration tambahan reset password, verifikasi email, Telegram, dan audit auth |
 | `pnpm db:seed:mysql` | Mengisi data contoh site, tangki, dan device ke MySQL |
 | `pnpm db:setup:mysql` | Menjalankan migration lalu seed MySQL |
+| `pnpm auth:create-admin` | Membuat atau memastikan admin awal dari env bootstrap |
 | `pnpm check` | Menjalankan typecheck, lint, test, dan build |
 
 ## Variabel Lingkungan
@@ -387,6 +411,23 @@ Variabel yang relevan saat ini:
 | `MYSQL_CONNECTION_LIMIT` | Batas koneksi pool MySQL. Untuk serverless awal gunakan nilai kecil seperti `1` atau `2` |
 | `MYSQL_SSL_MODE` | Gunakan `required` jika provider MySQL cloud mewajibkan TLS |
 | `MYSQL_SSL_CA` | CA certificate dari provider MySQL jika diperlukan |
+| `AUTH_SESSION_COOKIE_NAME` | Nama cookie session auth |
+| `AUTH_SECRET` | Secret minimal 32 karakter untuk token/CSRF auth |
+| `AUTH_REQUIRE_ADMIN_OTP` | Set `true` agar admin wajib OTP saat login |
+| `AUTH_ENABLE_REGISTER` | Set `true` untuk membuka halaman pengajuan akses publik |
+| `AUTH_ALLOW_PASSWORD_RESET` | Set `true` agar reset kata sandi lewat email aktif |
+| `AUTH_REQUIRE_EMAIL_VERIFICATION_FOR_APPROVAL` | Set `true` agar email wajib terverifikasi sebelum approval user |
+| `AUTH_COOKIE_SECURE` | Set `true` di HTTPS production; lokal boleh `false` |
+| `APP_BASE_URL` | URL aplikasi untuk link email verifikasi dan reset password |
+| `AUTH_BOOTSTRAP_ADMIN_EMAIL` | Email admin awal untuk script `pnpm auth:create-admin` |
+| `AUTH_BOOTSTRAP_ADMIN_USERNAME` | Username admin awal |
+| `AUTH_BOOTSTRAP_ADMIN_FULL_NAME` | Nama lengkap admin awal |
+| `AUTH_BOOTSTRAP_ADMIN_PASSWORD` | Password awal admin yang kuat |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `SMTP_SECURE` | Konfigurasi email untuk OTP admin, verifikasi email, dan reset password |
+| `AUTH_CAPTCHA_PROVIDER` | Provider verifikasi form publik: `disabled` atau `turnstile` |
+| `NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY` | Site key Turnstile yang aman untuk browser |
+| `AUTH_CAPTCHA_SECRET_KEY` | Secret key Turnstile untuk server. Jangan commit |
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_BOT_USERNAME` | Konfigurasi Telegram binding akun |
 | `PILOT_REGISTRY_FILE` | Path file registry pilot lokal untuk script `pnpm pilot:registry` |
 | `PILOT_API_BASE_URL` | Base URL target smoke test, misalnya URL Vercel |
 | `PILOT_DEVICE_ID` | Device ID yang dipakai smoke test |
@@ -411,14 +452,20 @@ Mode default tetap `memory`, sehingga aplikasi bisa langsung dicoba tanpa databa
 Jika ingin latihan data registry dan reading yang tidak hilang saat server restart:
 
 1. Buat database MySQL lokal.
-2. Isi `.env.local` dengan `MYSQL_DATABASE_URL`.
-3. Jalankan setup database:
+2. Isi `.env.local` dengan `MYSQL_DATABASE_URL`, konfigurasi auth, dan secret yang aman.
+3. Jalankan setup database monitoring dan auth:
 
 ```powershell
 pnpm db:setup:mysql
 ```
 
-4. Isi atau pastikan `.env.local`:
+4. Jalankan bootstrap admin awal jika tabel auth masih kosong:
+
+```powershell
+pnpm auth:create-admin
+```
+
+5. Isi atau pastikan `.env.local`:
 
 ```env
 SOLAR_TANK_STORAGE_DRIVER="mysql"
@@ -426,10 +473,21 @@ MYSQL_DATABASE_URL="mysql://solar_tank_app:password@127.0.0.1:3306/solar_tank_mo
 MYSQL_CONNECTION_LIMIT="2"
 MYSQL_SSL_MODE="disabled"
 SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK="false"
+AUTH_SECRET="ganti-dengan-secret-minimal-32-karakter"
+AUTH_REQUIRE_ADMIN_OTP="true"
+AUTH_ENABLE_REGISTER="true"
+AUTH_ALLOW_PASSWORD_RESET="true"
+AUTH_CAPTCHA_PROVIDER="disabled"
 ```
 
 Untuk cloud MySQL yang mewajibkan TLS, gunakan `MYSQL_SSL_MODE="required"`.
 Jika provider memberi CA certificate, isi `MYSQL_SSL_CA`.
+
+Untuk production atau Vercel yang membuka form publik, gunakan
+`AUTH_CAPTCHA_PROVIDER="turnstile"` lalu isi
+`NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY` dan `AUTH_CAPTCHA_SECRET_KEY` dari
+Cloudflare Turnstile. Jangan aktifkan Turnstile hanya di salah satu sisi; site
+key dan secret key harus berasal dari widget yang sama.
 
 Setelah mengubah `.env.local`, hentikan lalu jalankan ulang `pnpm dev`.
 Tombol refresh di dashboard hanya mencoba mengambil data ulang dari proses server
@@ -535,7 +593,7 @@ git checkout -b feat/nama-pekerjaan-singkat
 Contoh nama branch:
 
 ```text
-feat/dashboard-ringkas
+feat/monitoring-operasional
 fix/peta-marker-mobile
 docs/panduan-device-local
 chore/dev-lan-script
@@ -586,7 +644,9 @@ Sebelum dipakai dengan perangkat dan tangki nyata, perlu validasi:
 - konsumsi bahan bakar per lokasi;
 - interval pengiriman device;
 - keamanan API key;
-- akses user dan role;
+- konfigurasi SMTP untuk OTP admin, verifikasi email, dan reset password;
+- konfigurasi Turnstile untuk form pengajuan akses dan lupa password;
+- akses user, role, approval admin, dan prosedur deaktivasi akun;
 - deployment server;
 - backup database;
 - rate limit dan audit log endpoint ingest;

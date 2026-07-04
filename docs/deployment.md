@@ -19,6 +19,9 @@ Yang sudah aman dilakukan:
 - membuat hash key device pilot lewat `pnpm pilot:hash-key`;
 - memvalidasi dan apply registry pilot lokal lewat `pnpm pilot:registry`;
 - mengirim smoke payload real-format lewat `pnpm pilot:smoke`;
+- menjalankan migration auth lewat `pnpm db:migrate:auth` dan `pnpm db:migrate:auth-recovery`;
+- membuat admin awal lewat `pnpm auth:create-admin`;
+- menguji login, pengajuan akses, verifikasi email, reset password, dan halaman admin jika env auth lengkap;
 - menjalankan `pnpm check`;
 - membangun production build lokal.
 
@@ -27,7 +30,7 @@ Yang belum final:
 - database production dengan backup dan SOP restore;
 - domain production final;
 - HTTPS production final di server pilihan akhir;
-- auth final;
+- konfigurasi auth production final, termasuk SMTP, CAPTCHA, session secret, dan cookie secure;
 - backup;
 - monitoring server;
 - integrasi device fisik yang sudah divalidasi lapangan.
@@ -99,6 +102,22 @@ SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK="false"
 MYSQL_DATABASE_URL="mysql://..."
 MYSQL_CONNECTION_LIMIT="1"
 MYSQL_SSL_MODE="required"
+AUTH_SECRET="..."
+AUTH_REQUIRE_ADMIN_OTP="true"
+AUTH_ENABLE_REGISTER="true"
+AUTH_ALLOW_PASSWORD_RESET="true"
+AUTH_REQUIRE_EMAIL_VERIFICATION_FOR_APPROVAL="true"
+AUTH_COOKIE_SECURE="true"
+APP_BASE_URL="https://solar-tank-monitoring-system.vercel.app"
+AUTH_CAPTCHA_PROVIDER="turnstile"
+NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY="..."
+AUTH_CAPTCHA_SECRET_KEY="..."
+SMTP_HOST="..."
+SMTP_PORT="587"
+SMTP_USER="..."
+SMTP_PASS="..."
+SMTP_FROM="SolarTank <noreply@example.com>"
+SMTP_SECURE="false"
 ```
 
 Jika provider memberi CA certificate, isi `MYSQL_SSL_CA` di environment Vercel.
@@ -181,7 +200,7 @@ Jangan upload `.env.local`.
 
 Gunakan `.env.example` sebagai referensi nama variabel.
 
-Variabel saat ini:
+Variabel utama saat ini:
 
 ```text
 NEXT_PUBLIC_APP_NAME
@@ -195,17 +214,45 @@ MYSQL_DATABASE_URL
 MYSQL_CONNECTION_LIMIT
 MYSQL_SSL_MODE
 MYSQL_SSL_CA
+AUTH_SESSION_COOKIE_NAME
+AUTH_SECRET
+AUTH_REQUIRE_ADMIN_OTP
+AUTH_ENABLE_REGISTER
+AUTH_ALLOW_PASSWORD_RESET
+AUTH_REQUIRE_EMAIL_VERIFICATION_FOR_APPROVAL
+AUTH_COOKIE_SECURE
+APP_BASE_URL
+AUTH_BOOTSTRAP_ADMIN_EMAIL
+AUTH_BOOTSTRAP_ADMIN_USERNAME
+AUTH_BOOTSTRAP_ADMIN_FULL_NAME
+AUTH_BOOTSTRAP_ADMIN_PASSWORD
+SMTP_HOST
+SMTP_PORT
+SMTP_USER
+SMTP_PASS
+SMTP_FROM
+SMTP_SECURE
+AUTH_CAPTCHA_PROVIDER
+NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY
+AUTH_CAPTCHA_SECRET_KEY
+TELEGRAM_BOT_TOKEN
+TELEGRAM_WEBHOOK_SECRET
+TELEGRAM_BOT_USERNAME
 ```
 
 ## Checklist Sebelum Production
 
 - Database sudah tersedia.
 - Secret tidak ada di Git.
+- Migration monitoring dan auth sudah dijalankan.
+- Admin awal sudah dibuat.
+- SMTP sudah diuji untuk OTP admin, verifikasi email, dan reset password.
+- Turnstile sudah aktif untuk form publik dan domain production sudah terdaftar di Cloudflare.
 - API key device tidak memakai dummy key.
 - Fallback global device key dimatikan.
 - HTTPS aktif.
 - Endpoint ingest punya rate limit.
-- User login dan role sudah jelas.
+- User login, role, approval admin, dan deaktivasi akun sudah diuji.
 - Backup database disiapkan.
 - Registry site, tank, device, dan key berasal dari database yang dikelola.
 - Rumus volume sudah dikalibrasi.
@@ -220,4 +267,4 @@ Memory store saat ini hanya untuk development.
 
 Jika server restart, data hasil simulator hilang.
 
-Untuk deployment yang perlu history, storage harus memakai database. Fondasi MySQL sudah tersedia untuk registry monitoring dan reading, tetapi belum menggantikan kebutuhan auth, rate limit, audit log, backup, rotasi key, dan prosedur production.
+Untuk deployment yang perlu history, storage harus memakai database. Fondasi MySQL sudah tersedia untuk registry monitoring, reading, dan auth. Production tetap membutuhkan SMTP, Turnstile, HTTPS, backup/restore, rate limit ingest, rotasi key device, monitoring server, dan prosedur operasional.

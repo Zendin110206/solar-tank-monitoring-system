@@ -60,18 +60,28 @@ Yang sudah ada:
 - hash key per device pada data dummy;
 - fallback key global bisa dimatikan lewat `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK="false"`;
 - data bisa disimpan di memory store lokal atau MySQL reading repository.
+- login pengguna berbasis database MySQL;
+- session disimpan sebagai token hash di database dan cookie browser memakai `httpOnly`, `sameSite=lax`, serta `secure` saat environment production;
+- role `admin` dan `user` dipakai untuk membatasi halaman admin;
+- password memakai Argon2id dan hash legacy ditandai untuk upgrade;
+- login admin dapat diwajibkan memakai OTP email;
+- pengajuan akses publik masuk status pending dan harus direview admin;
+- verifikasi email, reset password, dan perubahan password memakai token sekali pakai berbasis hash;
+- form publik bisa dilindungi Cloudflare Turnstile melalui `AUTH_CAPTCHA_PROVIDER="turnstile"`;
+- rate limit tersedia untuk login, pengajuan akses, lupa password, dan pengiriman ulang verifikasi email;
+- audit event auth mencatat login, OTP, reset password, verifikasi email, perubahan role, aktivasi/nonaktif akun, dan aksi sesi;
+- halaman keamanan akun tersedia untuk ganti kata sandi, melihat sesi aktif, mencabut sesi lain, dan binding Telegram.
 
 Yang belum ada:
 
-- rate limit;
-- audit log;
-- autentikasi user;
-- role-based access control;
-- registry device dan key yang sepenuhnya dikelola database;
+- rate limit khusus endpoint ingest;
+- rotasi key device dari UI admin;
+- manajemen registry site/tangki/device yang menulis database dari UI;
 - database production dengan backup;
 - HTTPS produksi;
-- rotasi key;
 - monitoring server.
+- prosedur recovery akun dan database yang sudah diuji berkala;
+- hardening reverse proxy untuk deployment self-hosted.
 
 ## Pelaporan Masalah Keamanan
 
@@ -89,12 +99,18 @@ Sebelum deployment nyata:
 - ganti key dummy;
 - simpan secret di environment;
 - matikan fallback global device key;
+- jalankan semua migration database monitoring dan auth;
+- buat admin awal lewat `pnpm auth:create-admin`;
+- isi `AUTH_SECRET` minimal 32 karakter;
+- aktifkan SMTP untuk OTP admin, verifikasi email, dan reset password;
+- aktifkan Turnstile untuk form publik dan pastikan site key serta secret key berasal dari widget yang sama;
+- set `AUTH_COOKIE_SECURE="true"` pada domain HTTPS;
 - aktifkan HTTPS;
-- batasi akses dashboard;
+- batasi akses halaman admin hanya untuk role admin;
 - tambah rate limit untuk endpoint ingest;
 - gunakan database dengan backup;
-- pisahkan role user;
-- siapkan audit log;
+- uji restore backup database;
+- review audit log keamanan secara berkala;
 - validasi payload device;
 - review konfigurasi server.
 
