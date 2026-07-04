@@ -418,13 +418,13 @@ Variabel yang relevan saat ini:
 | `AUTH_ALLOW_PASSWORD_RESET` | Set `true` agar reset kata sandi lewat email aktif |
 | `AUTH_REQUIRE_EMAIL_VERIFICATION_FOR_APPROVAL` | Set `true` agar email wajib terverifikasi sebelum approval user |
 | `AUTH_COOKIE_SECURE` | Set `true` di HTTPS production; lokal boleh `false` |
-| `APP_BASE_URL` | URL aplikasi untuk link email verifikasi dan reset password |
+| `APP_BASE_URL` | URL aplikasi untuk link email verifikasi dan reset password. Production wajib memakai domain asli, bukan localhost |
 | `AUTH_BOOTSTRAP_ADMIN_EMAIL` | Email admin awal untuk script `pnpm auth:create-admin` |
 | `AUTH_BOOTSTRAP_ADMIN_USERNAME` | Username admin awal |
 | `AUTH_BOOTSTRAP_ADMIN_FULL_NAME` | Nama lengkap admin awal |
 | `AUTH_BOOTSTRAP_ADMIN_PASSWORD` | Password awal admin yang kuat |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `SMTP_SECURE` | Konfigurasi email untuk OTP admin, verifikasi email, dan reset password |
-| `AUTH_CAPTCHA_PROVIDER` | Provider verifikasi form publik: `disabled` atau `turnstile` |
+| `AUTH_CAPTCHA_PROVIDER` | Provider verifikasi form publik: `disabled` atau `turnstile`. Nilai selain itu dianggap error konfigurasi |
 | `NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY` | Site key Turnstile yang aman untuk browser |
 | `AUTH_CAPTCHA_SECRET_KEY` | Secret key Turnstile untuk server. Jangan commit |
 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_BOT_USERNAME` | Konfigurasi Telegram binding akun |
@@ -488,6 +488,11 @@ Untuk production atau Vercel yang membuka form publik, gunakan
 `NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY` dan `AUTH_CAPTCHA_SECRET_KEY` dari
 Cloudflare Turnstile. Jangan aktifkan Turnstile hanya di salah satu sisi; site
 key dan secret key harus berasal dari widget yang sama.
+
+`APP_BASE_URL` wajib diisi dengan alamat aplikasi yang benar sebelum email auth
+dipakai. Jika production masih memakai localhost atau nilai kosong, endpoint
+readiness akan menandainya sebagai error agar link verifikasi/reset password
+tidak terkirim ke alamat yang salah.
 
 Setelah mengubah `.env.local`, hentikan lalu jalankan ulang `pnpm dev`.
 Tombol refresh di dashboard hanya mencoba mengambil data ulang dari proses server

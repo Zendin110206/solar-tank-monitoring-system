@@ -13,9 +13,13 @@ const originalProvisioningKey =
   process.env.SOLAR_TANK_DEVICE_PROVISIONING_KEY;
 const originalMysqlDatabaseUrl = process.env.MYSQL_DATABASE_URL;
 const originalAppEnv = process.env.NEXT_PUBLIC_APP_ENV;
+const originalAppBaseUrl = process.env.APP_BASE_URL;
 const originalAuthSecret = process.env.AUTH_SECRET;
 const originalAuthRequireAdminOtp = process.env.AUTH_REQUIRE_ADMIN_OTP;
 const originalAuthAllowDevOtpLog = process.env.AUTH_ALLOW_DEV_OTP_LOG;
+const originalCaptchaProvider = process.env.AUTH_CAPTCHA_PROVIDER;
+const originalCaptchaSiteKey = process.env.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY;
+const originalCaptchaSecretKey = process.env.AUTH_CAPTCHA_SECRET_KEY;
 const originalSmtpHost = process.env.SMTP_HOST;
 const originalSmtpUser = process.env.SMTP_USER;
 const originalSmtpPass = process.env.SMTP_PASS;
@@ -59,6 +63,12 @@ function restoreEnv() {
     process.env.NEXT_PUBLIC_APP_ENV = originalAppEnv;
   }
 
+  if (typeof originalAppBaseUrl === "undefined") {
+    delete process.env.APP_BASE_URL;
+  } else {
+    process.env.APP_BASE_URL = originalAppBaseUrl;
+  }
+
   if (typeof originalAuthSecret === "undefined") {
     delete process.env.AUTH_SECRET;
   } else {
@@ -75,6 +85,24 @@ function restoreEnv() {
     delete process.env.AUTH_ALLOW_DEV_OTP_LOG;
   } else {
     process.env.AUTH_ALLOW_DEV_OTP_LOG = originalAuthAllowDevOtpLog;
+  }
+
+  if (typeof originalCaptchaProvider === "undefined") {
+    delete process.env.AUTH_CAPTCHA_PROVIDER;
+  } else {
+    process.env.AUTH_CAPTCHA_PROVIDER = originalCaptchaProvider;
+  }
+
+  if (typeof originalCaptchaSiteKey === "undefined") {
+    delete process.env.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY;
+  } else {
+    process.env.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY = originalCaptchaSiteKey;
+  }
+
+  if (typeof originalCaptchaSecretKey === "undefined") {
+    delete process.env.AUTH_CAPTCHA_SECRET_KEY;
+  } else {
+    process.env.AUTH_CAPTCHA_SECRET_KEY = originalCaptchaSecretKey;
   }
 
   if (typeof originalSmtpHost === "undefined") {
@@ -178,6 +206,7 @@ describe("deployment probes", () => {
     process.env.SOLAR_TANK_AUTO_PROVISION_DEVICES = "false";
     process.env.NEXT_PUBLIC_APP_ENV = "production";
     delete process.env.AUTH_SECRET;
+    delete process.env.APP_BASE_URL;
     delete process.env.SMTP_HOST;
     delete process.env.SMTP_USER;
     delete process.env.SMTP_PASS;
@@ -204,6 +233,7 @@ describe("deployment probes", () => {
     process.env.SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK = "true";
     process.env.SOLAR_TANK_AUTO_PROVISION_DEVICES = "false";
     process.env.NEXT_PUBLIC_APP_ENV = "production";
+    process.env.APP_BASE_URL = "https://solar-tank.example.com";
     process.env.AUTH_SECRET = "x".repeat(32);
     process.env.SMTP_HOST = "smtp.example.com";
     process.env.SMTP_USER = "user";
@@ -219,5 +249,65 @@ describe("deployment probes", () => {
 
     expect(readiness.ok).toBe(false);
     expect(devicePolicy).toMatchObject({ ok: false, status: "error" });
+  });
+
+  it("marks production as not ready when app base url is missing or localhost", async () => {
+    process.env.SOLAR_TANK_STORAGE_DRIVER = "memory";
+    process.env.SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK = "false";
+    process.env.SOLAR_TANK_AUTO_PROVISION_DEVICES = "false";
+    process.env.NEXT_PUBLIC_APP_ENV = "production";
+    process.env.AUTH_SECRET = "x".repeat(32);
+    process.env.AUTH_CAPTCHA_PROVIDER = "turnstile";
+    process.env.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY = "site-key";
+    process.env.AUTH_CAPTCHA_SECRET_KEY = "secret-key";
+    process.env.SMTP_HOST = "smtp.example.com";
+    process.env.SMTP_USER = "user";
+    process.env.SMTP_PASS = "pass";
+    process.env.SMTP_FROM = "SolarTank <noreply@example.com>";
+    delete process.env.APP_BASE_URL;
+
+    const missingUrl = await getDeploymentReadiness(
+      new Date("2026-06-27T02:30:00.000Z"),
+    );
+    const missingBaseUrl = missingUrl.checks.find(
+      (check) => check.name === "app-base-url",
+    );
+
+    process.env.APP_BASE_URL = "http://localhost:3000";
+    const localhostUrl = await getDeploymentReadiness(
+      new Date("2026-06-27T02:30:00.000Z"),
+    );
+    const localhostBaseUrl = localhostUrl.checks.find(
+      (check) => check.name === "app-base-url",
+    );
+
+    expect(missingBaseUrl).toMatchObject({ ok: false, status: "error" });
+    expect(localhostBaseUrl).toMatchObject({ ok: false, status: "error" });
+  });
+
+  it("marks readiness as not ready when captcha provider is invalid", async () => {
+    process.env.SOLAR_TANK_STORAGE_DRIVER = "memory";
+    process.env.SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK = "false";
+    process.env.SOLAR_TANK_AUTO_PROVISION_DEVICES = "false";
+    process.env.NEXT_PUBLIC_APP_ENV = "production";
+    process.env.APP_BASE_URL = "https://solar-tank.example.com";
+    process.env.AUTH_SECRET = "x".repeat(32);
+    process.env.AUTH_CAPTCHA_PROVIDER = "turnstyle";
+    process.env.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY = "site-key";
+    process.env.AUTH_CAPTCHA_SECRET_KEY = "secret-key";
+    process.env.SMTP_HOST = "smtp.example.com";
+    process.env.SMTP_USER = "user";
+    process.env.SMTP_PASS = "pass";
+    process.env.SMTP_FROM = "SolarTank <noreply@example.com>";
+
+    const readiness = await getDeploymentReadiness(
+      new Date("2026-06-27T02:30:00.000Z"),
+    );
+    const captcha = readiness.checks.find(
+      (check) => check.name === "auth-captcha",
+    );
+
+    expect(readiness.ok).toBe(false);
+    expect(captcha).toMatchObject({ ok: false, status: "error" });
   });
 });
