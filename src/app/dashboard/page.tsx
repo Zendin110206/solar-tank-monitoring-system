@@ -62,9 +62,9 @@ export default async function SimpleDashboardPage() {
       <header className="sticky top-0 z-20 border-b border-zinc-200/70 bg-white/90 backdrop-blur-xl">
         <div className="mx-auto flex w-full max-w-[1540px] min-w-0 flex-col gap-3 px-4 py-3 sm:px-6 lg:h-16 lg:flex-row lg:items-center lg:justify-between lg:px-8 lg:py-0">
           <Link
-            href="/"
+            href="/dashboard"
             className="flex w-fit shrink-0 items-center gap-3"
-            aria-label="Kembali ke beranda SolarTank"
+            aria-label="Kembali ke dashboard SolarTank"
           >
             <span className="relative grid size-8 place-items-center">
               <span className="absolute size-8 rounded-full border-2 border-red-500" />

@@ -8,7 +8,10 @@ export function proxy(request: NextRequest) {
 
   if (!sessionCookie && request.nextUrl.pathname.startsWith("/dashboard")) {
     const loginUrl = new URL("/login", request.nextUrl);
-    loginUrl.searchParams.set("next", request.nextUrl.pathname);
+    loginUrl.searchParams.set(
+      "next",
+      `${request.nextUrl.pathname}${request.nextUrl.search}`,
+    );
 
     return NextResponse.redirect(loginUrl);
   }

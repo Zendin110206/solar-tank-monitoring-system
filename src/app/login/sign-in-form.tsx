@@ -13,9 +13,11 @@ import {
 } from "lucide-react";
 
 export default function SignInForm({
+  redirectTo = "/dashboard",
   verificationReason,
   verified,
 }: {
+  redirectTo?: string;
   verificationReason?: string;
   verified?: "0" | "1";
 }) {
@@ -81,8 +83,7 @@ export default function SignInForm({
         return;
       }
 
-      router.replace(result.data?.redirectTo ?? "/dashboard");
-      router.refresh();
+      router.replace(redirectTo || result.data?.redirectTo || "/dashboard");
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
@@ -93,6 +94,28 @@ export default function SignInForm({
       setPending(false);
     }
   }
+
+  const notice = error
+    ? {
+        className: "border-red-100 bg-red-50 text-red-800",
+        text: error,
+      }
+    : message
+      ? {
+          className: "border-blue-100 bg-blue-50 text-blue-800",
+          text: message,
+        }
+      : verified === "1"
+        ? {
+            className: "border-emerald-100 bg-emerald-50 text-emerald-800",
+            text: "Email berhasil diverifikasi. Jika admin sudah menyetujui akses, Anda bisa masuk.",
+          }
+        : verified === "0"
+          ? {
+              className: "border-amber-100 bg-amber-50 text-amber-800",
+              text: verificationReason || "Verifikasi email belum berhasil.",
+            }
+          : null;
 
   return (
     <form className="mt-7 space-y-4" noValidate onSubmit={handleSubmit}>
@@ -193,28 +216,11 @@ export default function SignInForm({
         </div>
       ) : null}
 
-      {message ? (
-        <div className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
-          {message}
-        </div>
-      ) : null}
-
-      {verified === "1" ? (
-        <div className="rounded-lg border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm leading-6 text-emerald-800">
-          Email berhasil diverifikasi. Jika admin sudah menyetujui akses, Anda
-          bisa masuk.
-        </div>
-      ) : null}
-
-      {verified === "0" ? (
-        <div className="rounded-lg border border-amber-100 bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-800">
-          {verificationReason || "Verifikasi email belum berhasil."}
-        </div>
-      ) : null}
-
-      {error ? (
-        <div className="rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm leading-6 text-red-800">
-          {error}
+      {notice ? (
+        <div
+          className={`rounded-lg border px-4 py-3 text-sm leading-6 ${notice.className}`}
+        >
+          {notice.text}
         </div>
       ) : null}
 

@@ -1,6 +1,8 @@
 import AuthShell from "@/components/auth/auth-shell";
+import { getCurrentSessionUser } from "@/features/auth/lib/auth-session";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import SignUpForm from "./sign-up-form";
 
 export const metadata: Metadata = {
@@ -9,7 +11,13 @@ export const metadata: Metadata = {
     "Tampilan pengajuan akses SolarTank untuk operator monitoring dan reviewer operasional.",
 };
 
-export default function RegisterPage() {
+export default async function RegisterPage() {
+  const user = await getCurrentSessionUser().catch(() => null);
+
+  if (user) {
+    redirect("/dashboard");
+  }
+
   return (
     <AuthShell
       contentWidth="wide"
