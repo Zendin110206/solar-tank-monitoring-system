@@ -4,6 +4,7 @@ import {
   saveMonitoringReadingToMemory,
 } from "./telemetry-store";
 import {
+  listLatestMonitoringReadingsByTankFromMysql,
   listMonitoringReadingsForTankFromMysql,
   listMonitoringReadingsFromMysql,
   saveMonitoringReadingToMysql,
@@ -86,6 +87,47 @@ export async function listMonitoringReadingsWithSource(): Promise<ListMonitoring
 
   return {
     readings: mysqlReadings,
+    source: createStorageSource({
+      configuredDriver,
+      activeDriver: "mysql",
+    }),
+  };
+}
+
+export async function listLatestMonitoringReadingsByTankWithSource(): Promise<ListMonitoringReadingsResult> {
+  const configuredDriver = getMonitoringStorageDriver();
+
+  if (configuredDriver !== "mysql") {
+    const latestByTankId = new Map<string, Reading>();
+
+    getMonitoringReadings().forEach((reading) => {
+      const currentReading = latestByTankId.get(reading.tankId);
+
+      if (
+        !currentReading ||
+        new Date(reading.receivedAt).getTime() >
+          new Date(currentReading.receivedAt).getTime()
+      ) {
+        latestByTankId.set(reading.tankId, reading);
+      }
+    });
+
+    return {
+      readings: Array.from(latestByTankId.values()).sort((first, second) => {
+        return (
+          new Date(first.receivedAt).getTime() -
+          new Date(second.receivedAt).getTime()
+        );
+      }),
+      source: createStorageSource({
+        configuredDriver,
+        activeDriver: "memory",
+      }),
+    };
+  }
+
+  return {
+    readings: await listLatestMonitoringReadingsByTankFromMysql(),
     source: createStorageSource({
       configuredDriver,
       activeDriver: "mysql",

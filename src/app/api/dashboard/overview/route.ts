@@ -1,7 +1,7 @@
 import { requireApiUser } from "@/features/auth/lib/auth-guards";
 import { getMonitoringReferenceDataWithSource } from "@/features/monitoring/lib/monitoring-registry";
 import { buildDashboardOverview } from "@/features/monitoring/lib/dashboard-view-model";
-import { listMonitoringReadingsWithSource } from "@/features/monitoring/lib/monitoring-storage";
+import { listLatestMonitoringReadingsByTankWithSource } from "@/features/monitoring/lib/monitoring-storage";
 import type { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
   const [monitoringReadingsResult, monitoringReferenceResult] =
     await Promise.all([
-      listMonitoringReadingsWithSource(),
+      listLatestMonitoringReadingsByTankWithSource(),
       getMonitoringReferenceDataWithSource(),
     ]);
   const overview = buildDashboardOverview({

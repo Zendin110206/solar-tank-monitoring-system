@@ -44,6 +44,8 @@ Yang sudah tersedia:
 - fondasi MySQL untuk registry site/tangki/device dan penyimpanan reading pada mode pengembangan lanjutan;
 - dashboard dan detail membaca storage aktif yang sama dengan endpoint API;
 - detail ringkas mengambil riwayat MySQL per tangki agar grafik tren tidak terpotong oleh limit dashboard global;
+- overview dashboard mengambil reading terbaru per tangki agar STO yang jarang mengirim tidak hilang ketika device lain lebih sering mengirim;
+- timestamp reading disimpan dan dikirim sebagai ISO UTC, lalu label UI ditampilkan dalam WIB agar lokal dan Vercel konsisten;
 - health check dan readiness check untuk membedakan aplikasi hidup dengan storage benar-benar siap;
 - auto-refresh ringan pada dashboard dan detail, dengan tombol refresh manual serta pause/resume;
 - validasi key per device memakai hash pada data dummy;

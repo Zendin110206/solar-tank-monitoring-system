@@ -1,6 +1,6 @@
 import { requireApiUser } from "@/features/auth/lib/auth-guards";
 import { buildTankReadings } from "@/features/monitoring/lib/tank-detail-view-model";
-import { listMonitoringReadings } from "@/features/monitoring/lib/monitoring-storage";
+import { listMonitoringReadingsForTank } from "@/features/monitoring/lib/monitoring-storage";
 import { getMonitoringReferenceData } from "@/features/monitoring/lib/monitoring-registry";
 import type { NextRequest } from "next/server";
 
@@ -22,7 +22,7 @@ export async function GET(
   const range = url.searchParams.get("range") ?? "24h";
   const now = new Date();
   const [monitoringReadings, referenceData] = await Promise.all([
-    listMonitoringReadings(),
+    listMonitoringReadingsForTank(tankId),
     getMonitoringReferenceData(),
   ]);
 

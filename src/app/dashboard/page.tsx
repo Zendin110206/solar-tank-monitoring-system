@@ -3,7 +3,7 @@ import { requirePageUser } from "@/features/auth/lib/auth-guards";
 import { SimpleDashboardView } from "@/features/monitoring/components/simple-dashboard-view";
 import { buildDashboardOverview } from "@/features/monitoring/lib/dashboard-view-model";
 import { getMonitoringReferenceDataWithSource } from "@/features/monitoring/lib/monitoring-registry";
-import { listMonitoringReadingsWithSource } from "@/features/monitoring/lib/monitoring-storage";
+import { listLatestMonitoringReadingsByTankWithSource } from "@/features/monitoring/lib/monitoring-storage";
 import {
   createSimpleDashboardSites,
   type SimpleDashboardSite,
@@ -28,7 +28,7 @@ export default async function SimpleDashboardPage() {
   const now = new Date();
   const [monitoringReadingsResult, monitoringReferenceResult] =
     await Promise.all([
-      listMonitoringReadingsWithSource(),
+      listLatestMonitoringReadingsByTankWithSource(),
       getMonitoringReferenceDataWithSource(),
     ]);
 

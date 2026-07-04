@@ -234,6 +234,12 @@ Fungsi:
 Mengambil riwayat pembacaan satu tangki.
 ```
 
+Catatan:
+
+- `measuredAt` dan `receivedAt` adalah ISO UTC.
+- UI boleh menampilkan label WIB, tetapi API tetap mengirim waktu standar UTC.
+- Endpoint ini membaca history tank terkait, bukan daftar global dashboard.
+
 Contoh:
 
 ```powershell

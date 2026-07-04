@@ -113,7 +113,7 @@ Alasan:
 
 Catatan:
 
-Query MySQL mengambil reading terbaru dengan `ORDER BY received_at DESC LIMIT ?`, lalu hasil dibalik di kode agar grafik tetap urut lama ke baru.
+Query MySQL awal mengambil reading terbaru global lalu dibalik untuk grafik. Setelah data real makin banyak, overview memakai query reading terbaru per tangki, sedangkan history detail memakai query khusus tank agar tidak terpotong oleh data tank lain.
 
 ## 2026-06-26 - Tambah Key Per Device
 

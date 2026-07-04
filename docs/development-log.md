@@ -101,7 +101,7 @@ Pekerjaan:
 - seed demo MySQL;
 - repository MySQL untuk reading;
 - storage facade untuk memilih memory atau MySQL;
-- query reading terbaru memakai `ORDER BY received_at DESC LIMIT ?`;
+- query reading awal memakai batas global untuk fondasi storage;
 - memory store tetap tersedia untuk development lokal, tetapi mode MySQL tidak menampilkan data dummy ketika tabel reading kosong.
 
 ## 2026-06-26 - Auto-refresh Dashboard dan Detail
@@ -144,7 +144,7 @@ Pekerjaan:
 - membuat dashboard, detail, dan API membaca registry aktif dari memory atau MySQL;
 - menambahkan script `pnpm db:migrate:mysql`, `pnpm db:seed:mysql`, dan `pnpm db:setup:mysql`;
 - menambahkan konfigurasi `MYSQL_CONNECTION_LIMIT`, `MYSQL_SSL_MODE`, dan `MYSQL_SSL_CA` untuk deployment cloud MySQL;
-- menjaga query reading MySQL mengambil data terbaru dahulu dengan `ORDER BY received_at DESC LIMIT ?`, lalu dibalik di aplikasi agar grafik tetap kronologis;
+- menjaga query reading MySQL mengambil data kronologis untuk grafik detail;
 - membuat marker STO dan tabel dashboard bisa membuka halaman detail tangki terkait;
 - membuat marker lokasi di halaman detail bisa pindah ke detail STO lain;
 - menghapus payload sementara dari working tree agar tidak ikut commit.

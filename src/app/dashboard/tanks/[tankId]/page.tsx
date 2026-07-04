@@ -27,6 +27,7 @@ import {
   TankHorizontalCylinderScene3D,
   TankRectangularScene3D,
 } from "@/features/monitoring/components/tank-rectangular-scene-3d";
+import { SimpleTankVolumeChart } from "@/features/monitoring/components/simple-tank-volume-chart";
 import { getMonitoringReferenceData } from "@/features/monitoring/lib/monitoring-registry";
 import {
   buildTankDetail,
@@ -35,9 +36,17 @@ import {
   type TankDetailView,
   type TankReadingPoint,
 } from "@/features/monitoring/lib/tank-detail-view-model";
-import { listMonitoringReadings } from "@/features/monitoring/lib/monitoring-storage";
+import {
+  listMonitoringReadings,
+  listMonitoringReadingsForTank,
+} from "@/features/monitoring/lib/monitoring-storage";
 import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/lib/refresh-interval";
+import {
+  buildSimpleTankDetail,
+  type SimpleTankTrendByRange,
+} from "@/features/monitoring/lib/simple-tank-detail-model";
 import type {
+  Reading,
   ReadingQuality,
   ReadingValueSource,
   TankConfigReview,
@@ -142,6 +151,7 @@ type TankDetail = {
   dataSources: ReadingQuality;
   configReview: TankConfigReview;
   readings: ReadingPoint[];
+  chartTrends: SimpleTankTrendByRange;
   nearbySites: NearbySite[];
 };
 
@@ -299,6 +309,21 @@ function clampPercent(value: number) {
   return Math.min(Math.max(value, 0), 100);
 }
 
+function mergeReadingsById(readings: Reading[], additionalReadings: Reading[]) {
+  const readingById = new Map<string, Reading>();
+
+  [...readings, ...additionalReadings].forEach((reading) => {
+    readingById.set(reading.id, reading);
+  });
+
+  return Array.from(readingById.values()).sort((first, second) => {
+    return (
+      new Date(first.receivedAt).getTime() -
+      new Date(second.receivedAt).getTime()
+    );
+  });
+}
+
 function getRuntimeLevelParameter(
   runtimeHour: number | null,
 ): RuntimeLevelParameter {
@@ -352,7 +377,10 @@ function toNearbySite(site: NearbyTankSite): NearbySite {
   };
 }
 
-function toTankDetail(view: TankDetailView): TankDetail {
+function toTankDetail(
+  view: TankDetailView,
+  chartTrends: SimpleTankTrendByRange,
+): TankDetail {
   return {
     id: view.id,
     hasReading: view.hasReading,
@@ -399,6 +427,7 @@ function toTankDetail(view: TankDetailView): TankDetail {
     dataSources: view.dataSources,
     configReview: view.configReview,
     readings: view.readings.map(toReadingPoint),
+    chartTrends,
     nearbySites: view.nearbySites.map(toNearbySite),
   };
 }
@@ -652,59 +681,6 @@ function TankVisual({ tank }: { tank: TankDetail }) {
             );
           })}
         </div>
-      </div>
-    </div>
-  );
-}
-
-function TrendChart({ readings }: { readings: ReadingPoint[] }) {
-  const maxPercent = 100;
-
-  if (readings.length === 0) {
-    return (
-      <div className="mt-6 grid min-h-64 place-items-center rounded-lg border border-dashed border-zinc-200 bg-zinc-50 p-5 text-center">
-        <div>
-          <p className="text-sm font-semibold text-zinc-950">
-            Belum ada riwayat pembacaan
-          </p>
-          <p className="mt-2 max-w-md text-sm leading-6 text-zinc-500">
-            Tangki sudah terdaftar, tetapi perangkat belum mengirim data yang
-            bisa digambar sebagai tren.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="mt-6 rounded-lg border border-zinc-200 bg-zinc-50 p-5">
-      <div className="flex h-64 items-end gap-3">
-        {readings.map((reading, index) => {
-          const height = Math.max((reading.percent / maxPercent) * 100, 8);
-
-          return (
-            <div
-              key={`${reading.time}-${reading.percent}-${index}`}
-              className="flex h-full flex-1 flex-col justify-end gap-2"
-            >
-              <div className="relative flex flex-1 items-end">
-                <div
-                  className={`w-full rounded-t-lg transition duration-500 ${
-                    reading.percent < 25
-                      ? "bg-red-500"
-                      : reading.percent < 45
-                        ? "bg-amber-500"
-                        : "bg-cyan-500"
-                  }`}
-                  style={{ height: `${height}%` }}
-                />
-              </div>
-              <span className="text-center text-[0.68rem] font-medium text-zinc-400">
-                {reading.time}
-              </span>
-            </div>
-          );
-        })}
       </div>
     </div>
   );
@@ -1095,8 +1071,9 @@ export default async function TankDetailPage({
   await requirePageAdmin();
 
   const now = new Date();
-  const [readings, referenceData] = await Promise.all([
+  const [readings, tankHistoryReadings, referenceData] = await Promise.all([
     listMonitoringReadings(),
+    listMonitoringReadingsForTank(tankId),
     getMonitoringReferenceData(),
   ]);
   const tankView = buildTankDetail(tankId, {
@@ -1104,14 +1081,15 @@ export default async function TankDetailPage({
     sites: referenceData.sites,
     tanks: referenceData.tanks,
     devices: referenceData.devices,
-    readings,
+    readings: mergeReadingsById(readings, tankHistoryReadings),
   });
 
   if (!tankView) {
     notFound();
   }
 
-  const tank = toTankDetail(tankView);
+  const simpleTankDetail = buildSimpleTankDetail(tankView, tankHistoryReadings);
+  const tank = toTankDetail(tankView, simpleTankDetail.chartTrends);
   const refreshIntervalMs = getMonitoringRefreshIntervalMs();
 
   const status = statusMeta[tank.status];
@@ -1351,7 +1329,10 @@ export default async function TankDetailPage({
                   {`/api/tanks/${tank.id}/readings?range=24h`}
                 </span>
               </div>
-              <TrendChart readings={tank.readings} />
+              <SimpleTankVolumeChart
+                capacityLiter={tank.capacityLiter}
+                trends={tank.chartTrends}
+              />
               <ReadingTable tank={tank} />
             </section>
 

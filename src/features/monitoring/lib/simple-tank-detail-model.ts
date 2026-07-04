@@ -11,6 +11,9 @@ import type {
 
 export const SIMPLE_TANK_DETAIL_CHART_INTERVAL_MINUTES = 5;
 export const SIMPLE_TANK_DETAIL_CHART_MAX_POINTS = 48;
+const DISPLAY_TIME_ZONE = "Asia/Jakarta";
+const DISPLAY_TIME_ZONE_OFFSET_MS = 7 * 60 * 60 * 1000;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 export type SimpleTankChartRangeKey = "day" | "week" | "month";
 
@@ -129,18 +132,22 @@ function parseTime(value: string) {
   return Number.isFinite(time) ? time : null;
 }
 
-function padTimePart(value: number) {
-  return String(value).padStart(2, "0");
-}
-
 function formatClockLabel(date: Date) {
-  return `${padTimePart(date.getHours())}:${padTimePart(date.getMinutes())}`;
+  return new Intl.DateTimeFormat("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: DISPLAY_TIME_ZONE,
+  })
+    .format(date)
+    .replaceAll(".", ":");
 }
 
 function formatDateLabel(date: Date) {
   return new Intl.DateTimeFormat("id-ID", {
     day: "2-digit",
     month: "short",
+    timeZone: DISPLAY_TIME_ZONE,
   }).format(date);
 }
 
@@ -156,18 +163,15 @@ function formatFullTimeLabel(value: string) {
   return `${formatDateLabel(date)}, ${formatClockLabel(date)}`;
 }
 
-function startOfLocalDay(time: number) {
-  const date = new Date(time);
-  date.setHours(0, 0, 0, 0);
+function startOfDisplayDay(time: number) {
+  const date = new Date(time + DISPLAY_TIME_ZONE_OFFSET_MS);
+  date.setUTCHours(0, 0, 0, 0);
 
-  return date;
+  return new Date(date.getTime() - DISPLAY_TIME_ZONE_OFFSET_MS);
 }
 
 function addDays(date: Date, days: number) {
-  const nextDate = new Date(date);
-  nextDate.setDate(nextDate.getDate() + days);
-
-  return nextDate;
+  return new Date(date.getTime() + days * DAY_MS);
 }
 
 function addMinutes(date: Date, minutes: number) {
@@ -321,7 +325,7 @@ export function buildSimpleTankTrend(
 
   if (latestTime === undefined) {
     const now = new Date();
-    const domainStart = startOfLocalDay(now.getTime());
+    const domainStart = startOfDisplayDay(now.getTime());
     const domainEnd = addDays(domainStart, range.days);
 
     return {
@@ -337,7 +341,7 @@ export function buildSimpleTankTrend(
     };
   }
 
-  const latestDayStart = startOfLocalDay(latestTime);
+  const latestDayStart = startOfDisplayDay(latestTime);
   const domainStart = addDays(latestDayStart, -(range.days - 1));
   const domainEnd = addDays(latestDayStart, 1);
   const domainStartTime = domainStart.getTime();
