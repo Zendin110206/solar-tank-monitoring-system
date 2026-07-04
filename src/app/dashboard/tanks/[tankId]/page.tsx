@@ -37,7 +37,7 @@ import {
   type TankReadingPoint,
 } from "@/features/monitoring/lib/tank-detail-view-model";
 import {
-  listMonitoringReadings,
+  listLatestMonitoringReadingsByTankWithSource,
   listMonitoringReadingsForTank,
 } from "@/features/monitoring/lib/monitoring-storage";
 import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/lib/refresh-interval";
@@ -1071,17 +1071,21 @@ export default async function TankDetailPage({
   await requirePageAdmin();
 
   const now = new Date();
-  const [readings, tankHistoryReadings, referenceData] = await Promise.all([
-    listMonitoringReadings(),
-    listMonitoringReadingsForTank(tankId),
-    getMonitoringReferenceData(),
-  ]);
+  const [latestReadingsResult, tankHistoryReadings, referenceData] =
+    await Promise.all([
+      listLatestMonitoringReadingsByTankWithSource(),
+      listMonitoringReadingsForTank(tankId),
+      getMonitoringReferenceData(),
+    ]);
   const tankView = buildTankDetail(tankId, {
     now,
     sites: referenceData.sites,
     tanks: referenceData.tanks,
     devices: referenceData.devices,
-    readings: mergeReadingsById(readings, tankHistoryReadings),
+    readings: mergeReadingsById(
+      latestReadingsResult.readings,
+      tankHistoryReadings,
+    ),
   });
 
   if (!tankView) {

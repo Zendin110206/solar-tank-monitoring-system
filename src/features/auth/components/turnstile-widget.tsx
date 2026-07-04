@@ -29,13 +29,15 @@ export function TurnstileWidget({
   inputName?: string;
 }) {
   const siteKey = process.env.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY?.trim();
-  const [token, setToken] = useState("");
   const [scriptError, setScriptError] = useState(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const hostRef = useRef<HTMLDivElement | null>(null);
   const widgetIdRef = useRef<string | null>(null);
 
   const clearToken = useCallback(() => {
-    setToken("");
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
   }, []);
 
   const renderWidget = useCallback(() => {
@@ -49,7 +51,9 @@ export function TurnstileWidget({
     widgetIdRef.current = turnstile.render(host, {
       sitekey: siteKey,
       callback: (nextToken) => {
-        setToken(nextToken);
+        if (inputRef.current) {
+          inputRef.current.value = nextToken;
+        }
         setScriptError(false);
       },
       "expired-callback": clearToken,
@@ -84,7 +88,7 @@ export function TurnstileWidget({
           clearToken();
         }}
       />
-      <input id={inputId} name={inputName} type="hidden" readOnly value={token} />
+      <input ref={inputRef} id={inputId} name={inputName} type="hidden" />
       <div ref={hostRef} />
       {scriptError ? (
         <p className="text-xs leading-5 text-red-700">

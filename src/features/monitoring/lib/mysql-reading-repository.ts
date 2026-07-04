@@ -208,12 +208,15 @@ export async function listLatestMonitoringReadingsByTankFromMysql(): Promise<
         r.rssi_dbm,
         r.raw_payload
       FROM monitoring_readings r
-      WHERE r.id = (
-        SELECT r2.id
-        FROM monitoring_readings r2
-        WHERE r2.tank_id = r.tank_id
-        ORDER BY r2.received_at DESC, r2.id DESC
-        LIMIT 1
+      JOIN monitoring_tanks t
+        ON t.id = r.tank_id
+       AND t.is_active = TRUE
+       AND r.id = (
+         SELECT r2.id
+         FROM monitoring_readings r2
+         WHERE r2.tank_id = t.id
+         ORDER BY r2.received_at DESC, r2.id DESC
+         LIMIT 1
       )
       ORDER BY r.received_at ASC, r.id ASC
     `,

@@ -1,3 +1,7 @@
+import { redirect } from "next/navigation";
+
+import { getCurrentSessionUser } from "@/features/auth/lib/auth-session";
+
 const navItems = [
   { label: "Fitur", href: "#fitur" },
   { label: "Alur Data", href: "#alur-data" },
@@ -103,7 +107,13 @@ const workflowSteps = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const user = await getCurrentSessionUser().catch(() => null);
+
+  if (user) {
+    redirect("/dashboard");
+  }
+
   return (
     <main
       id="beranda"

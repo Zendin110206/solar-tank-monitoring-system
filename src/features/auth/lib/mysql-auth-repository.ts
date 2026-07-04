@@ -121,8 +121,32 @@ type AuthUserLifecycleRow = RowDataPacket & {
   email_verified_at: Date | null;
 };
 
-function toIso(value: Date | null): string | null {
-  return value ? value.toISOString() : null;
+function toIso(value: Date | string | null | undefined): string | null {
+  if (!value) {
+    return null;
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  const parsedTime = Date.parse(value);
+
+  if (!Number.isFinite(parsedTime)) {
+    return null;
+  }
+
+  return new Date(parsedTime).toISOString();
+}
+
+function toRequiredIso(value: Date | string): string {
+  const isoValue = toIso(value);
+
+  if (!isoValue) {
+    throw new Error("Timestamp auth dari MySQL tidak valid.");
+  }
+
+  return isoValue;
 }
 
 function rowToSafeUser(row: AuthUserRow): AuthSafeUser {
@@ -181,7 +205,7 @@ function rowToAccessRequest(row: AuthAccessRequestRow): AuthAccessRequest {
         : "pending",
     reviewNote: row.review_note,
     reviewedAt: toIso(row.reviewed_at),
-    createdAt: row.created_at.toISOString(),
+    createdAt: toRequiredIso(row.created_at),
   };
 }
 
@@ -197,7 +221,7 @@ function rowToAuditEvent(row: AuthAuditEventRow): AuthAuditEvent {
     eventType: row.event_type,
     targetUserId: row.target_user_id,
     metadata,
-    createdAt: row.created_at.toISOString(),
+    createdAt: toRequiredIso(row.created_at),
   };
 }
 
@@ -208,9 +232,9 @@ function rowToSessionSummary(
   return {
     id: row.id,
     userId: row.user_id,
-    createdAt: row.created_at.toISOString(),
-    lastSeenAt: row.last_seen_at.toISOString(),
-    expiresAt: row.expires_at.toISOString(),
+    createdAt: toRequiredIso(row.created_at),
+    lastSeenAt: toRequiredIso(row.last_seen_at),
+    expiresAt: toRequiredIso(row.expires_at),
     revokedAt: toIso(row.revoked_at),
     current: row.id === currentSessionId,
   };
@@ -576,7 +600,7 @@ export async function updateAuthUserRole({
     }
 
     if (
-      status === "active" &&
+      target.status === "active" &&
       shouldRequireEmailVerificationForApproval() &&
       !target.emailVerifiedAt
     ) {

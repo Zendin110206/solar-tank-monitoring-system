@@ -24,7 +24,7 @@ import {
   type DashboardSiteStatus as SiteStatus,
 } from "@/features/monitoring/lib/dashboard-view-model";
 
-import { listMonitoringReadingsWithSource } from "@/features/monitoring/lib/monitoring-storage";
+import { listLatestMonitoringReadingsByTankWithSource } from "@/features/monitoring/lib/monitoring-storage";
 import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/lib/refresh-interval";
 
 export const metadata: Metadata = {
@@ -191,7 +191,7 @@ export default async function DashboardPage() {
   const refreshIntervalMs = getMonitoringRefreshIntervalMs();
   const [monitoringReadingsResult, monitoringReferenceResult] =
     await Promise.all([
-      listMonitoringReadingsWithSource(),
+      listLatestMonitoringReadingsByTankWithSource(),
       getMonitoringReferenceDataWithSource(),
     ]);
   const dashboardOverview = buildDashboardOverview({
@@ -221,9 +221,9 @@ export default async function DashboardPage() {
       <header className="sticky top-0 z-50 overflow-hidden border-b border-zinc-200/70 bg-white/90 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-[1540px] items-center gap-4 px-4 sm:px-6 lg:px-8">
           <Link
-            href="/"
+            href="/dashboard"
             className="flex shrink-0 items-center gap-3"
-            aria-label="Kembali ke beranda SolarTank"
+            aria-label="Kembali ke dashboard SolarTank"
           >
             <span className="relative grid size-8 place-items-center">
               <span className="absolute size-8 rounded-full border-2 border-red-500" />
