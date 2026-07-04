@@ -1,6 +1,7 @@
 "use client";
 
 import Script from "next/script";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 declare global {
   interface Window {
@@ -14,6 +15,7 @@ declare global {
           "error-callback"?: () => void;
         },
       ) => string;
+      remove?: (widgetId: string) => void;
       reset: (widgetId?: string) => void;
     };
   }
@@ -27,6 +29,44 @@ export function TurnstileWidget({
   inputName?: string;
 }) {
   const siteKey = process.env.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY?.trim();
+  const [token, setToken] = useState("");
+  const [scriptError, setScriptError] = useState(false);
+  const hostRef = useRef<HTMLDivElement | null>(null);
+  const widgetIdRef = useRef<string | null>(null);
+
+  const clearToken = useCallback(() => {
+    setToken("");
+  }, []);
+
+  const renderWidget = useCallback(() => {
+    const host = hostRef.current;
+    const turnstile = window.turnstile;
+
+    if (!siteKey || !host || !turnstile || widgetIdRef.current) {
+      return;
+    }
+
+    widgetIdRef.current = turnstile.render(host, {
+      sitekey: siteKey,
+      callback: (nextToken) => {
+        setToken(nextToken);
+        setScriptError(false);
+      },
+      "expired-callback": clearToken,
+      "error-callback": clearToken,
+    });
+  }, [clearToken, siteKey]);
+
+  useEffect(() => {
+    return () => {
+      const widgetId = widgetIdRef.current;
+
+      if (widgetId) {
+        window.turnstile?.remove?.(widgetId);
+        widgetIdRef.current = null;
+      }
+    };
+  }, []);
 
   if (!siteKey) {
     return <input id={inputId} name={inputName} type="hidden" defaultValue="" />;
@@ -35,33 +75,23 @@ export function TurnstileWidget({
   return (
     <div className="space-y-2">
       <Script
+        id="cloudflare-turnstile-script"
         src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
         strategy="afterInteractive"
-        onLoad={() => {
-          const host = document.getElementById(`${inputId}-host`);
-          const input = document.getElementById(inputId) as HTMLInputElement;
-
-          if (!host || !input || host.dataset.rendered === "true") {
-            return;
-          }
-
-          window.turnstile?.render(host, {
-            sitekey: siteKey,
-            callback: (token) => {
-              input.value = token;
-            },
-            "expired-callback": () => {
-              input.value = "";
-            },
-            "error-callback": () => {
-              input.value = "";
-            },
-          });
-          host.dataset.rendered = "true";
+        onReady={renderWidget}
+        onError={() => {
+          setScriptError(true);
+          clearToken();
         }}
       />
-      <input id={inputId} name={inputName} type="hidden" defaultValue="" />
-      <div id={`${inputId}-host`} />
+      <input id={inputId} name={inputName} type="hidden" readOnly value={token} />
+      <div ref={hostRef} />
+      {scriptError ? (
+        <p className="text-xs leading-5 text-red-700">
+          Verifikasi keamanan belum bisa dimuat. Periksa koneksi lalu muat ulang
+          halaman.
+        </p>
+      ) : null}
     </div>
   );
 }

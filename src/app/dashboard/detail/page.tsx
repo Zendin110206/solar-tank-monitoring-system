@@ -28,9 +28,9 @@ import { listMonitoringReadingsWithSource } from "@/features/monitoring/lib/moni
 import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/lib/refresh-interval";
 
 export const metadata: Metadata = {
-  title: "Dashboard Detail Monitoring Solar | SolarTank",
+  title: "Analisis Teknis Monitoring Solar | SolarTank",
   description:
-    "Dashboard detail untuk memantau volume tangki solar, runtime genset, status perangkat, peta STO, dan log data monitoring.",
+    "Analisis teknis untuk memantau volume tangki solar, runtime genset, status perangkat, peta STO, dan log data monitoring.",
 };
 
 export const runtime = "nodejs";
@@ -239,10 +239,10 @@ export default async function DashboardPage() {
               href="/dashboard"
               className="transition hover:text-red-600"
             >
-              Dashboard Ringkas
+              Monitoring Tangki
             </Link>
             <a href="#ringkasan" className="text-zinc-950">
-              Dashboard Detail
+              Analisis Teknis
             </a>
             <a href="#peta" className="transition hover:text-red-600">
               Peta STO
@@ -254,7 +254,7 @@ export default async function DashboardPage() {
               href="/dashboard/locations"
               className="transition hover:text-red-600"
             >
-              Konfigurasi Lokasi
+              Lokasi dan Perangkat
             </Link>
             <a href="#log" className="transition hover:text-red-600">
               Log Perangkat
@@ -554,7 +554,7 @@ export default async function DashboardPage() {
               href={`/dashboard/tanks/${latestSite.tankId}`}
               className="w-full rounded-lg bg-blue-600 px-5 py-3 text-center text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 sm:w-auto"
             >
-              Masuk ke detail dashboard
+              Buka detail tangki
             </Link>
           </div>
 

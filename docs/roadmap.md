@@ -42,7 +42,7 @@ Isi:
 Catatan:
 
 ```text
-UI dashboard dan detail sudah membaca storage aktif yang sama dengan endpoint API. Registry MySQL dan alat bantu pilot sudah tersedia, tetapi auth dan batas production masih perlu dimatangkan.
+UI monitoring dan detail sudah membaca storage aktif yang sama dengan endpoint API. Registry MySQL, alat bantu pilot, dan fondasi auth database sudah tersedia, tetapi hardening production masih perlu dimatangkan.
 ```
 
 ## Fase 4 - Domain Logic dan Test
@@ -106,13 +106,23 @@ Yang belum selesai:
 
 ## Fase 8 - Auth dan Role
 
-Target:
+Status: fondasi utama tersedia, production hardening berlanjut.
+
+Yang sudah tersedia:
 
 - login;
-- role admin/operator/viewer;
-- proteksi dashboard;
-- audit log sederhana;
-- aturan akses per fitur.
+- role `admin` dan `user`;
+- proteksi dashboard dan halaman admin;
+- pengajuan akses pending review admin;
+- OTP admin, reset password, verifikasi email, session management, dan audit log auth.
+
+Yang masih perlu dimatangkan:
+
+- SMTP production;
+- Turnstile production;
+- role operasional lebih rinci jika memang diperlukan;
+- prosedur recovery akun;
+- audit review berkala.
 
 ## Fase 9 - Integrasi Device Fisik
 

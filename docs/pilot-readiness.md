@@ -26,13 +26,14 @@ Yang sudah tersedia:
 - script generate key/hash device;
 - script smoke test ingest.
 - peta dashboard berbasis koordinat registry.
+- login, pengajuan akses, session user, role admin/user, OTP admin, reset password, verifikasi email, dan audit auth berbasis MySQL.
 
 Yang belum final:
 
-- auth user sungguhan;
-- role admin/operator/viewer;
+- SMTP production dan domain email resmi;
+- Turnstile production untuk form publik;
 - rate limit endpoint ingest;
-- audit log request gagal;
+- audit log khusus request ingest gagal;
 - backup database production;
 - keputusan server final;
 - integrasi RTU/Modbus;
@@ -71,7 +72,7 @@ config/pilot-registry.example.json
 
 ```text
 1. Siapkan database MySQL.
-2. Siapkan .env.local.
+2. Siapkan .env.local untuk MySQL, auth, SMTP, dan CAPTCHA sesuai target.
 3. Generate key dan hash device.
 4. Salin template registry ke file lokal.
 5. Isi 5 STO, koordinat approved, tangki, device, dan hash.
@@ -92,6 +93,14 @@ MYSQL_DATABASE_URL="mysql://user:password@host:port/database"
 MYSQL_CONNECTION_LIMIT="1"
 MYSQL_SSL_MODE="required"
 SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK="false"
+AUTH_SECRET="ganti-dengan-secret-minimal-32-karakter"
+AUTH_REQUIRE_ADMIN_OTP="true"
+AUTH_ENABLE_REGISTER="true"
+AUTH_ALLOW_PASSWORD_RESET="true"
+AUTH_REQUIRE_EMAIL_VERIFICATION_FOR_APPROVAL="true"
+AUTH_CAPTCHA_PROVIDER="turnstile"
+NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY="site-key-turnstile"
+AUTH_CAPTCHA_SECRET_KEY="secret-key-turnstile"
 ```
 
 Jika provider memberi CA certificate:
@@ -109,10 +118,11 @@ Tombol refresh dashboard tidak membaca ulang env.
 
 ## 2. Jalankan Migration
 
-Migration membuat tabel yang dibutuhkan:
+Migration membuat tabel monitoring dan auth yang dibutuhkan:
 
 ```powershell
-pnpm db:migrate:mysql
+pnpm db:setup:mysql
+pnpm auth:create-admin
 ```
 
 Jika gagal, cek:
@@ -471,11 +481,11 @@ Pilot ini belum berarti production final.
 
 Sebelum production, masih perlu:
 
-- auth dan role;
-- rate limit;
-- audit log;
+- SMTP production dan Turnstile production;
+- rate limit endpoint ingest;
+- audit log khusus request ingest gagal;
 - backup database;
-- rotasi key;
+- rotasi key device dari UI/prosedur resmi;
 - monitoring server;
 - SOP jika device offline;
 - validasi keselamatan perangkat;

@@ -18,6 +18,11 @@ const inputClassName =
   "h-11 w-full rounded-lg border border-zinc-300 bg-white px-3.5 text-sm text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10";
 const labelClassName =
   "mb-1.5 block text-[0.82rem] font-semibold text-zinc-800";
+const captchaRequiredMessage =
+  "Selesaikan verifikasi keamanan terlebih dahulu.";
+const isCaptchaEnabled = Boolean(
+  process.env.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY?.trim(),
+);
 
 function PasswordField({
   id,
@@ -79,15 +84,23 @@ export default function SignUpForm() {
   const [pending, setPending] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [captchaRenderKey, setCaptchaRenderKey] = useState(0);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
-    setPending(true);
     setError(null);
     setSubmitted(false);
 
     const formData = new FormData(form);
+    const captchaToken = String(formData.get("captchaToken") ?? "").trim();
+
+    if (isCaptchaEnabled && !captchaToken) {
+      setError(captchaRequiredMessage);
+      return;
+    }
+
+    setPending(true);
 
     try {
       const response = await fetch("/api/auth/register-request", {
@@ -104,7 +117,7 @@ export default function SignUpForm() {
           password: formData.get("password"),
           confirmPassword: formData.get("confirmPassword"),
           accessReason: buildAccessReason(formData),
-          captchaToken: formData.get("captchaToken"),
+          captchaToken,
         }),
       });
       const result = (await response.json().catch(() => null)) as
@@ -126,6 +139,9 @@ export default function SignUpForm() {
           : "Pengajuan akses belum bisa diproses.",
       );
     } finally {
+      if (isCaptchaEnabled) {
+        setCaptchaRenderKey((currentKey) => currentKey + 1);
+      }
       setPending(false);
     }
   }
@@ -276,7 +292,7 @@ export default function SignUpForm() {
         />
       </div>
 
-      <TurnstileWidget />
+      <TurnstileWidget key={captchaRenderKey} />
 
       {submitted ? (
         <div className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">

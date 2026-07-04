@@ -22,7 +22,7 @@ import {
 import { AdminActionForm, AdminRoleForm } from "./admin-action-controls";
 
 export const metadata: Metadata = {
-  title: "Admin User | SolarTank",
+  title: "Manajemen Pengguna | SolarTank",
   description:
     "Manajemen akses pengguna SolarTank untuk admin monitoring tangki solar.",
 };
@@ -101,16 +101,16 @@ export default async function AdminUsersPage() {
               href="/dashboard"
               className="rounded-lg px-3 py-2 transition hover:bg-blue-50 hover:text-blue-700"
             >
-              Dashboard
+              Monitoring Tangki
             </Link>
             <span className="rounded-lg bg-blue-600 px-3 py-2 text-white">
-              Admin User
+              Manajemen Pengguna
             </span>
             <Link
               href="/dashboard/admin/audit"
               className="rounded-lg px-3 py-2 transition hover:bg-blue-50 hover:text-blue-700"
             >
-              Audit
+              Audit Keamanan
             </Link>
           </nav>
         </div>
@@ -121,7 +121,7 @@ export default async function AdminUsersPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-sm font-semibold uppercase text-zinc-500">
-                Admin akses
+                Akses pengguna
               </p>
               <h1 className="mt-2 text-2xl font-semibold sm:text-3xl">
                 Pengguna dan pengajuan akses

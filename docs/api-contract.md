@@ -18,6 +18,20 @@ http://localhost:3000
 | `GET` | `/api/tanks/[tankId]` | Detail satu tangki |
 | `GET` | `/api/tanks/[tankId]/readings` | Riwayat pembacaan satu tangki |
 | `POST` | `/api/ingest` | Menerima data device atau simulator |
+| `POST` | `/api/auth/login` | Login dengan email/username dan password |
+| `POST` | `/api/auth/login/verify-otp` | Verifikasi OTP login admin |
+| `POST` | `/api/auth/logout` | Keluar dan mencabut session aktif |
+| `GET` | `/api/auth/me` | Membaca user session aktif |
+| `POST` | `/api/auth/register-request` | Mengajukan akses pengguna baru |
+| `GET` | `/api/auth/email/verify` | Verifikasi email dari link token |
+| `POST` | `/api/auth/email/resend-verification` | Kirim ulang email verifikasi |
+| `POST` | `/api/auth/password/forgot` | Meminta link reset kata sandi |
+| `POST` | `/api/auth/password/reset` | Mengganti kata sandi memakai token reset |
+| `POST` | `/api/auth/password/change` | Mengganti kata sandi user yang sedang login |
+| `GET` | `/api/auth/sessions` | Melihat sesi aktif milik user |
+| `POST` | `/api/auth/sessions/revoke` | Mencabut sesi lain milik user |
+| `POST` | `/api/auth/telegram/bind/start` | Membuat token binding Telegram |
+| `POST` | `/api/auth/telegram/webhook` | Webhook Telegram untuk binding |
 
 ## GET /api/health
 
@@ -376,16 +390,65 @@ Contoh response error:
 }
 ```
 
+## Endpoint Auth
+
+Endpoint auth memakai response JSON umum:
+
+```json
+{
+  "ok": true,
+  "data": {}
+}
+```
+
+Jika gagal:
+
+```json
+{
+  "ok": false,
+  "error": "Pesan error"
+}
+```
+
+Catatan keamanan auth:
+
+- `/api/auth/register-request`, `/api/auth/password/forgot`, dan
+  `/api/auth/email/resend-verification` dapat dilindungi Turnstile jika
+  `AUTH_CAPTCHA_PROVIDER="turnstile"`;
+- token verifikasi keamanan dikirim sebagai `captchaToken`;
+- login admin dapat mengembalikan status `otp_required` jika OTP admin aktif;
+- session dikirim sebagai cookie `httpOnly`;
+- halaman admin tetap divalidasi server-side memakai role admin, bukan hanya
+  disembunyikan dari UI;
+- reset password, verifikasi email, dan Telegram binding memakai token sekali
+  pakai yang disimpan sebagai hash di database.
+
+Contoh login:
+
+```powershell
+curl.exe -X POST http://localhost:3000/api/auth/login `
+  -H "Content-Type: application/json" `
+  -d "{\"identity\":\"admin@example.com\",\"password\":\"Password12345\"}"
+```
+
+Contoh pengajuan akses:
+
+```powershell
+curl.exe -X POST http://localhost:3000/api/auth/register-request `
+  -H "Content-Type: application/json" `
+  -d "{\"fullName\":\"Operator Monitoring\",\"username\":\"operator_1\",\"email\":\"operator@example.com\",\"phone\":\"081234567890\",\"password\":\"Password12345\",\"confirmPassword\":\"Password12345\",\"requestedRole\":\"user\",\"accessReason\":\"Perlu memantau STO area Pasuruan\",\"captchaToken\":\"token-turnstile\"}"
+```
+
 ## Catatan Versi
 
 Kontrak API ini masih untuk prototipe lokal.
 
 Sebelum production, perlu ditambah atau dimatangkan:
 
-- autentikasi user;
-- rate limit;
 - halaman manajemen registry site/tank/device;
 - validasi schema lebih ketat;
-- audit log;
+- rate limit endpoint ingest;
 - rotasi key device;
+- backup/restore database;
+- SMTP dan Turnstile production;
 - versioning API jika device sudah banyak.

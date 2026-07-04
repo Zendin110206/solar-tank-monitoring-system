@@ -29,8 +29,8 @@ Yang masuk:
 Yang belum masuk:
 
 - database production lengkap;
-- auth final;
-- role user;
+- konfigurasi auth production final, termasuk SMTP, CAPTCHA, backup, dan prosedur recovery;
+- role operasional yang lebih rinci di luar `admin` dan `user`;
 - firmware final;
 - deployment production;
 - data real di Git;

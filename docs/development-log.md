@@ -168,7 +168,7 @@ Catatan:
 Data real, key asli, koordinat sensitif, dan file registry lokal tidak boleh di-commit. Jalur pilot memakai file .local.json yang diabaikan Git.
 ```
 
-## 2026-06-30 - Batch 15 Peta Real dan Panduan Lapangan
+## 2026-06-30 - Fase Peta Real dan Panduan Lapangan
 
 Pekerjaan:
 

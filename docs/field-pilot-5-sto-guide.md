@@ -353,17 +353,17 @@ Pastikan:
 - tidak ada credential di layar;
 - data lokasi yang ditampilkan boleh dibagikan.
 
-## Batas Batch Ini
+## Batas Fase Pilot Ini
 
-Batch ini membuat pilot 5 STO semakin real dari sisi dashboard dan alur data.
+Fase ini membuat pilot 5 STO semakin real dari sisi dashboard dan alur data.
 
-Namun batch ini belum membuat:
+Namun fase ini belum membuat:
 
-- login final;
+- konfigurasi SMTP dan Turnstile production final;
 - admin registry di browser;
 - backup database;
-- audit log;
-- rate limit;
+- audit log khusus request ingest gagal;
+- rate limit endpoint ingest;
 - rotasi key otomatis;
 - MQTT;
 - RTU/Modbus;
