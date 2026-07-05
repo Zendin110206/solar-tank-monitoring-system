@@ -2,6 +2,10 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { requireApiUser } from "@/features/auth/lib/auth-guards";
 import { revokeCurrentUserSessionById } from "@/features/auth/lib/auth-service";
+import {
+  getSafeErrorMessage,
+  getSafeErrorStatus,
+} from "@/lib/safe-error-message";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -34,10 +38,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         ok: false,
-        error:
-          error instanceof Error ? error.message : "Sesi belum bisa dicabut.",
+        error: getSafeErrorMessage(error, {
+          fallbackMessage: "Sesi belum bisa dicabut.",
+          internalMessage:
+            "Sesi belum bisa dicabut karena layanan sedang disiapkan. Coba lagi nanti.",
+        }),
       },
-      { status: 400 },
+      { status: getSafeErrorStatus(error) },
     );
   }
 }

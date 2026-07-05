@@ -5,6 +5,10 @@ import { isAccessRequestEnabled } from "@/features/auth/lib/auth-config";
 import { submitAccessRequest } from "@/features/auth/lib/auth-service";
 import { parseRegisterAccessPayload } from "@/features/auth/lib/auth-validation";
 import { checkRateLimit } from "@/features/auth/lib/rate-limit";
+import {
+  getSafeErrorMessage,
+  getSafeErrorStatus,
+} from "@/lib/safe-error-message";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -23,6 +27,20 @@ function getCaptchaToken(payload: unknown): string | null {
   ).trim();
 
   return token || null;
+}
+
+function getRegisterErrorResponse(error: unknown): {
+  message: string;
+  status: number;
+} {
+  return {
+    message: getSafeErrorMessage(error, {
+      fallbackMessage: "Pengajuan akses belum bisa diproses.",
+      internalMessage:
+        "Pengajuan akses belum bisa diproses karena layanan sedang disiapkan. Coba lagi nanti atau hubungi administrator.",
+    }),
+    status: getSafeErrorStatus(error),
+  };
 }
 
 export async function POST(request: NextRequest) {
@@ -83,15 +101,14 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
+    const response = getRegisterErrorResponse(error);
+
     return NextResponse.json(
       {
         ok: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Pengajuan akses belum bisa diproses.",
+        error: response.message,
       },
-      { status: 400 },
+      { status: response.status },
     );
   }
 }

@@ -3,6 +3,10 @@ import { NextResponse, type NextRequest } from "next/server";
 import { resetPasswordWithToken } from "@/features/auth/lib/auth-service";
 import { parseResetPasswordPayload } from "@/features/auth/lib/auth-validation";
 import { checkRateLimit } from "@/features/auth/lib/rate-limit";
+import {
+  getSafeErrorMessage,
+  getSafeErrorStatus,
+} from "@/lib/safe-error-message";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -50,12 +54,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         ok: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Reset kata sandi belum bisa diproses.",
+        error: getSafeErrorMessage(error, {
+          fallbackMessage: "Reset kata sandi belum bisa diproses.",
+          internalMessage:
+            "Reset kata sandi belum bisa diproses karena layanan sedang disiapkan. Coba lagi nanti.",
+        }),
       },
-      { status: 400 },
+      { status: getSafeErrorStatus(error) },
     );
   }
 }

@@ -109,6 +109,9 @@ AUTH_ALLOW_PASSWORD_RESET="true"
 AUTH_REQUIRE_EMAIL_VERIFICATION_FOR_APPROVAL="true"
 AUTH_COOKIE_SECURE="true"
 APP_BASE_URL="https://solar-tank-monitoring-system.vercel.app"
+DEVICE_PACKAGE_ENCRYPTION_KEY="..."
+DEVICE_PACKAGE_DOWNLOAD_TTL_DAYS="7"
+DEVICE_PACKAGE_MAX_DOWNLOADS="3"
 AUTH_CAPTCHA_PROVIDER="turnstile"
 NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY="..."
 AUTH_CAPTCHA_SECRET_KEY="..."
@@ -127,10 +130,19 @@ reset password. `AUTH_CAPTCHA_PROVIDER` hanya menerima `disabled` atau
 `turnstile`; salah ketik akan membuat readiness gagal supaya masalah terlihat
 sebelum dipakai user.
 
+`DEVICE_PACKAGE_ENCRYPTION_KEY` wajib diisi di production karena paket firmware
+disimpan terenkripsi. Buat nilainya sekali, simpan di password manager, lalu
+pakai nilai yang sama selama paket firmware lama masih perlu bisa dibuka.
+Contoh membuat key dari terminal:
+
+```powershell
+node -e "console.log(require('node:crypto').randomBytes(32).toString('base64url'))"
+```
+
 Langkah pilot:
 
 ```powershell
-pnpm db:migrate:mysql
+pnpm db:setup:mysql
 pnpm pilot:hash-key
 Copy-Item config/pilot-registry.example.json config/pilot-registry.local.json
 # edit config/pilot-registry.local.json sampai koordinat dan hash device sudah real/approved
@@ -140,6 +152,18 @@ $env:PILOT_API_BASE_URL="https://solar-tank-monitoring-system.vercel.app"
 $env:PILOT_DEVICE_ID="pilot-tph-01"
 $env:PILOT_DEVICE_KEY="key-asli-device"
 pnpm pilot:smoke
+```
+
+Jika database production sudah ada dan tidak boleh di-seed ulang, jangan pakai
+`pnpm db:setup:mysql`. Jalankan migration satu per satu, lalu apply registry
+yang memang sudah disetujui:
+
+```powershell
+pnpm db:migrate:mysql
+pnpm db:migrate:auth
+pnpm db:migrate:auth-recovery
+pnpm db:migrate:device-provisioning
+pnpm db:migrate:device-request-fields
 ```
 
 Catatan:
@@ -219,6 +243,9 @@ MYSQL_DATABASE_URL
 MYSQL_CONNECTION_LIMIT
 MYSQL_SSL_MODE
 MYSQL_SSL_CA
+DEVICE_PACKAGE_ENCRYPTION_KEY
+DEVICE_PACKAGE_DOWNLOAD_TTL_DAYS
+DEVICE_PACKAGE_MAX_DOWNLOADS
 AUTH_SESSION_COOKIE_NAME
 AUTH_SECRET
 AUTH_REQUIRE_ADMIN_OTP

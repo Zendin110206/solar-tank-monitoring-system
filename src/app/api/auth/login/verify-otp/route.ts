@@ -3,6 +3,10 @@ import { NextResponse, type NextRequest } from "next/server";
 import { setSessionCookie } from "@/features/auth/lib/auth-session";
 import { verifyAdminOtpLogin } from "@/features/auth/lib/auth-service";
 import { checkRateLimit } from "@/features/auth/lib/rate-limit";
+import {
+  getSafeErrorMessage,
+  getSafeErrorStatus,
+} from "@/lib/safe-error-message";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -58,10 +62,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         ok: false,
-        error:
-          error instanceof Error ? error.message : "Kode masuk tidak valid.",
+        error: getSafeErrorMessage(error, {
+          fallbackMessage: "Kode masuk tidak valid.",
+          internalMessage:
+            "Kode masuk belum bisa diverifikasi karena layanan sedang disiapkan. Coba lagi nanti.",
+        }),
       },
-      { status: 401 },
+      { status: getSafeErrorStatus(error, { defaultStatus: 401 }) },
     );
   }
 }

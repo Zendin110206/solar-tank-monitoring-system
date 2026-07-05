@@ -175,6 +175,14 @@ pnpm db:setup:mysql
 pnpm auth:create-admin
 ```
 
+Jika database sudah pernah dibuat sebelum Batch 19, jalankan juga migration
+khusus pengajuan perangkat agar kolom operasional terbaru tersedia:
+
+```powershell
+pnpm db:migrate:device-provisioning
+pnpm db:migrate:device-request-fields
+```
+
 Setelah mengubah `.env.local`, restart `pnpm dev`, lalu cek:
 
 ```powershell

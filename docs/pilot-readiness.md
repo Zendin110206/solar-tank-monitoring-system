@@ -125,6 +125,14 @@ pnpm db:setup:mysql
 pnpm auth:create-admin
 ```
 
+Jika database sudah pernah dibuat sebelum alur pengajuan perangkat Batch 19,
+jalankan migration tambahan ini juga:
+
+```powershell
+pnpm db:migrate:device-provisioning
+pnpm db:migrate:device-request-fields
+```
+
 Jika gagal, cek:
 
 - `MYSQL_DATABASE_URL`;
