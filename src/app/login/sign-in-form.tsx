@@ -1,7 +1,7 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -24,15 +24,24 @@ export default function SignInForm({
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [pending, setPending] = useState(false);
+  const [navigating, setNavigating] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [challengeId, setChallengeId] = useState<string | null>(null);
+  const [routePending, startRouteTransition] = useTransition();
+  const busy = pending || navigating || routePending;
+
+  useEffect(() => {
+    router.prefetch(redirectTo || "/dashboard");
+  }, [redirectTo, router]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setPending(true);
+    setNavigating(false);
     setError(null);
     setMessage(null);
+    let shouldResetPending = true;
 
     const formData = new FormData(event.currentTarget);
     const body = challengeId
@@ -83,15 +92,26 @@ export default function SignInForm({
         return;
       }
 
-      router.replace(redirectTo || result.data?.redirectTo || "/dashboard");
+      const nextPath = redirectTo || result.data?.redirectTo || "/dashboard";
+
+      setMessage("Login berhasil. Membuka dashboard...");
+      setNavigating(true);
+      shouldResetPending = false;
+      startRouteTransition(() => {
+        router.replace(nextPath);
+        router.refresh();
+      });
     } catch (caughtError) {
+      setNavigating(false);
       setError(
         caughtError instanceof Error
           ? caughtError.message
           : "Login gagal. Periksa kembali data masuk Anda.",
       );
     } finally {
-      setPending(false);
+      if (shouldResetPending) {
+        setPending(false);
+      }
     }
   }
 
@@ -136,6 +156,7 @@ export default function SignInForm({
               autoComplete="username"
               autoFocus
               className="h-12 w-full rounded-lg border border-zinc-300 bg-white pl-11 pr-4 text-[0.95rem] text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+              disabled={busy}
               id="identity"
               inputMode="email"
               name="identity"
@@ -171,6 +192,7 @@ export default function SignInForm({
             <input
               autoComplete="current-password"
               className="h-12 w-full rounded-lg border border-zinc-300 bg-white pl-11 pr-12 text-[0.95rem] text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+              disabled={busy}
               id="password"
               name="password"
               placeholder="Masukkan kata sandi"
@@ -182,6 +204,7 @@ export default function SignInForm({
                 showPassword ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"
               }
               className="absolute inset-y-0 right-0 grid w-12 place-items-center text-zinc-400 transition hover:text-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-600"
+              disabled={busy}
               onClick={() => setShowPassword((visible) => !visible)}
               type="button"
             >
@@ -204,6 +227,7 @@ export default function SignInForm({
           <input
             autoComplete="one-time-code"
             className="h-12 w-full rounded-lg border border-zinc-300 bg-white pl-11 pr-4 text-center text-[1.05rem] font-semibold text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+            disabled={busy}
             id="otp"
             inputMode="numeric"
             maxLength={6}
@@ -226,10 +250,16 @@ export default function SignInForm({
 
       <button
         className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20 disabled:cursor-not-allowed disabled:opacity-70"
-        disabled={pending}
+        disabled={busy}
         type="submit"
       >
-        {pending ? "Memproses..." : challengeId ? "Verifikasi kode" : "Masuk"}
+        {navigating || routePending
+          ? "Membuka dashboard..."
+          : pending
+            ? "Memproses..."
+            : challengeId
+              ? "Verifikasi kode"
+              : "Masuk"}
         <ArrowRight
           aria-hidden="true"
           className="size-4 transition group-hover:translate-x-0.5"

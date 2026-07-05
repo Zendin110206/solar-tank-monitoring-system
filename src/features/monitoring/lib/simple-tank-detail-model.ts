@@ -11,6 +11,7 @@ import type {
 
 export const SIMPLE_TANK_DETAIL_CHART_INTERVAL_MINUTES = 5;
 export const SIMPLE_TANK_DETAIL_CHART_MAX_POINTS = 48;
+export const SIMPLE_TANK_OFFLINE_GAP_THRESHOLD_MINUTES = 15;
 const DISPLAY_TIME_ZONE = "Asia/Jakarta";
 const DISPLAY_TIME_ZONE_OFFSET_MS = 7 * 60 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -44,12 +45,32 @@ export type SimpleTankTrendPoint = SimpleTankDetailChartPoint & {
   xRatio: number;
 };
 
+export type SimpleTankTrendSegment = {
+  id: string;
+  points: SimpleTankTrendPoint[];
+};
+
+export type SimpleTankTrendGap = {
+  id: string;
+  fromBucketStart: string;
+  toBucketStart: string;
+  fromLabel: string;
+  toLabel: string;
+  durationLabel: string;
+  thresholdMinutes: number;
+  xStartRatio: number;
+  xEndRatio: number;
+};
+
 export type SimpleTankTrendModel = {
   range: SimpleTankChartRange;
   domainStart: string;
   domainEnd: string;
+  gapThresholdMinutes: number;
   totalSlots: number;
   points: SimpleTankTrendPoint[];
+  segments: SimpleTankTrendSegment[];
+  gaps: SimpleTankTrendGap[];
   xTicks: SimpleTankTrendTick[];
 };
 
@@ -163,6 +184,23 @@ function formatFullTimeLabel(value: string) {
   return `${formatDateLabel(date)}, ${formatClockLabel(date)}`;
 }
 
+function formatDurationLabel(durationMs: number) {
+  const totalMinutes = Math.max(1, Math.round(durationMs / (60 * 1000)));
+  const days = Math.floor(totalMinutes / (24 * 60));
+  const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
+  const minutes = totalMinutes % 60;
+
+  if (days > 0) {
+    return hours > 0 ? `${days} hari ${hours} jam` : `${days} hari`;
+  }
+
+  if (hours > 0) {
+    return minutes > 0 ? `${hours} jam ${minutes} menit` : `${hours} jam`;
+  }
+
+  return `${minutes} menit`;
+}
+
 function startOfDisplayDay(time: number) {
   const date = new Date(time + DISPLAY_TIME_ZONE_OFFSET_MS);
   date.setUTCHours(0, 0, 0, 0);
@@ -183,6 +221,71 @@ function getChartRange(rangeKey: SimpleTankChartRangeKey) {
     SIMPLE_TANK_CHART_RANGES.find((range) => range.key === rangeKey) ??
     SIMPLE_TANK_CHART_RANGES[0]
   );
+}
+
+function getGapThresholdMinutes(range: SimpleTankChartRange) {
+  return Math.max(
+    SIMPLE_TANK_OFFLINE_GAP_THRESHOLD_MINUTES,
+    range.bucketMinutes * 2,
+  );
+}
+
+function buildTrendContinuity(
+  points: SimpleTankTrendPoint[],
+  gapThresholdMinutes: number,
+) {
+  if (points.length === 0) {
+    return {
+      gaps: [] satisfies SimpleTankTrendGap[],
+      segments: [] satisfies SimpleTankTrendSegment[],
+    };
+  }
+
+  const gapThresholdMs = gapThresholdMinutes * 60 * 1000;
+  const segments: SimpleTankTrendSegment[] = [
+    {
+      id: "segment-1",
+      points: [points[0]],
+    },
+  ];
+  const gaps: SimpleTankTrendGap[] = [];
+
+  for (let index = 1; index < points.length; index += 1) {
+    const previousPoint = points[index - 1];
+    const currentPoint = points[index];
+    const previousTime = parseTime(previousPoint.receivedAt);
+    const currentTime = parseTime(currentPoint.receivedAt);
+    const durationMs =
+      previousTime === null || currentTime === null
+        ? 0
+        : currentTime - previousTime;
+
+    if (durationMs > gapThresholdMs) {
+      gaps.push({
+        id: `gap-${gaps.length + 1}`,
+        durationLabel: formatDurationLabel(durationMs),
+        fromBucketStart: previousPoint.bucketStart,
+        fromLabel: previousPoint.fullTimeLabel,
+        thresholdMinutes: gapThresholdMinutes,
+        toBucketStart: currentPoint.bucketStart,
+        toLabel: currentPoint.fullTimeLabel,
+        xEndRatio: currentPoint.xRatio,
+        xStartRatio: previousPoint.xRatio,
+      });
+      segments.push({
+        id: `segment-${segments.length + 1}`,
+        points: [currentPoint],
+      });
+      continue;
+    }
+
+    segments[segments.length - 1].points.push(currentPoint);
+  }
+
+  return {
+    gaps,
+    segments,
+  };
 }
 
 function formatTrendPointLabel(date: Date, rangeKey: SimpleTankChartRangeKey) {
@@ -327,16 +430,20 @@ export function buildSimpleTankTrend(
     const now = new Date();
     const domainStart = startOfDisplayDay(now.getTime());
     const domainEnd = addDays(domainStart, range.days);
+    const gapThresholdMinutes = getGapThresholdMinutes(range);
 
     return {
       range,
       domainStart: domainStart.toISOString(),
       domainEnd: domainEnd.toISOString(),
+      gapThresholdMinutes,
       totalSlots: Math.ceil(
         (domainEnd.getTime() - domainStart.getTime()) /
           (range.bucketMinutes * 60 * 1000),
       ),
       points: [],
+      segments: [],
+      gaps: [],
       xTicks: buildTrendTicks({ domainStart, domainEnd, rangeKey }),
     };
   }
@@ -348,6 +455,7 @@ export function buildSimpleTankTrend(
   const domainEndTime = domainEnd.getTime();
   const domainDuration = domainEndTime - domainStartTime;
   const bucketMs = range.bucketMinutes * 60 * 1000;
+  const gapThresholdMinutes = getGapThresholdMinutes(range);
   const totalSlots = Math.ceil(domainDuration / bucketMs);
   const buckets = new Map<
     number,
@@ -401,13 +509,20 @@ export function buildSimpleTankTrend(
             : 0,
       };
     });
+  const continuity = buildTrendContinuity(
+    trendPoints,
+    gapThresholdMinutes,
+  );
 
   return {
     range,
     domainStart: domainStart.toISOString(),
     domainEnd: domainEnd.toISOString(),
+    gapThresholdMinutes,
     totalSlots,
     points: trendPoints,
+    segments: continuity.segments,
+    gaps: continuity.gaps,
     xTicks: buildTrendTicks({ domainStart, domainEnd, rangeKey }),
   };
 }
