@@ -28,6 +28,26 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
 }
 
+function isDefined<T>(value: T | undefined): value is T {
+  return value !== undefined;
+}
+
+function buildLinePath(points: Array<{ x: number; y: number }>) {
+  return points
+    .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`)
+    .join(" ");
+}
+
+function buildAreaPath(points: Array<{ x: number; y: number }>, bottom: number) {
+  if (points.length < 2) {
+    return "";
+  }
+
+  const linePath = buildLinePath(points);
+
+  return `${linePath} L ${points.at(-1)?.x} ${bottom} L ${points[0].x} ${bottom} Z`;
+}
+
 export function SimpleTankVolumeChart({
   trends,
   capacityLiter,
@@ -111,13 +131,42 @@ export function SimpleTankVolumeChart({
         y,
       };
     });
-    const linePath = coordinates
-      .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`)
-      .join(" ");
-    const areaPath =
-      coordinates.length > 0
-        ? `${linePath} L ${coordinates.at(-1)?.x} ${bottom} L ${coordinates[0].x} ${bottom} Z`
-        : "";
+    const coordinateByBucketStart = new Map(
+      coordinates.map((point) => [point.bucketStart, point]),
+    );
+    const segments = trend.segments
+      .map((segment) => ({
+        id: segment.id,
+        points: segment.points
+          .map((point) => coordinateByBucketStart.get(point.bucketStart))
+          .filter(isDefined),
+      }))
+      .filter((segment) => segment.points.length > 0);
+    const linePaths = segments.map((segment) => ({
+      id: segment.id,
+      path: buildLinePath(segment.points),
+    }));
+    const areaPaths = segments
+      .map((segment) => ({
+        id: segment.id,
+        path: buildAreaPath(segment.points, bottom),
+      }))
+      .filter((segment) => segment.path.length > 0);
+    const gapBridges = trend.gaps
+      .map((gap) => {
+        const start = coordinateByBucketStart.get(gap.fromBucketStart);
+        const end = coordinateByBucketStart.get(gap.toBucketStart);
+
+        if (!start || !end) {
+          return undefined;
+        }
+
+        return {
+          ...gap,
+          path: buildLinePath([start, end]),
+        };
+      })
+      .filter(isDefined);
     const yTicks = [0, 0.25, 0.5, 0.75, 1].map((ratio) => {
       const value = maxVolume * ratio;
       const y = padding.top + (1 - ratio) * innerHeight;
@@ -130,13 +179,22 @@ export function SimpleTankVolumeChart({
 
     return {
       coordinates,
-      linePath,
-      areaPath,
+      linePaths,
+      areaPaths,
+      gapBridges,
       yTicks,
       bottom,
       innerWidth,
     };
-  }, [capacityLiter, chartSize.height, chartSize.width, padding, trend.points]);
+  }, [
+    capacityLiter,
+    chartSize.height,
+    chartSize.width,
+    padding,
+    trend.gaps,
+    trend.points,
+    trend.segments,
+  ]);
 
   const activePoint =
     activeIndex === null ? null : chart.coordinates[activeIndex] ?? null;
@@ -207,22 +265,30 @@ export function SimpleTankVolumeChart({
             </button>
           ))}
         </div>
-        <span className="w-fit rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700 ring-1 ring-blue-100">
-          {trend.points.length} titik data
-        </span>
+        <div className="flex flex-wrap gap-2">
+          <span className="w-fit rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700 ring-1 ring-blue-100">
+            {trend.points.length} titik data
+          </span>
+          {trend.gaps.length > 0 ? (
+            <span className="w-fit rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-700 ring-1 ring-amber-100">
+              {trend.gaps.length} jeda data
+            </span>
+          ) : null}
+        </div>
       </div>
 
       <div className="mt-3 flex flex-col gap-1 text-sm text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
         <span>{trend.range.bucketLabel}</span>
         <span>
-          {trend.totalSlots} slot waktu, sumbu mengikuti waktu aktual
+          {trend.totalSlots} slot waktu, jeda lebih dari{" "}
+          {trend.gapThresholdMinutes} menit ditandai garis putus-putus
         </span>
       </div>
 
       <div className="mt-4 relative min-w-0 max-w-full overflow-hidden rounded-lg bg-zinc-50 p-3 ring-1 ring-zinc-100">
         <svg
           ref={svgRef}
-          className="block aspect-[640/260] h-auto w-full min-w-0 max-w-full touch-none sm:aspect-auto sm:h-72"
+          className="block aspect-[640/260] h-auto w-full min-w-0 max-w-full touch-pan-y sm:aspect-auto sm:h-72"
           role="img"
           aria-label="Grafik garis perubahan volume solar"
           viewBox={`0 0 ${chartSize.width} ${chartSize.height}`}
@@ -267,15 +333,34 @@ export function SimpleTankVolumeChart({
             </g>
           ))}
 
-          <path d={chart.areaPath} fill="url(#simple-volume-area)" />
-          <path
-            d={chart.linePath}
-            fill="none"
-            stroke="#2563eb"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2.75"
-          />
+          {chart.areaPaths.map((area) => (
+            <path d={area.path} fill="url(#simple-volume-area)" key={area.id} />
+          ))}
+
+          {chart.gapBridges.map((gap) => (
+            <path
+              d={gap.path}
+              fill="none"
+              key={gap.id}
+              stroke="#f59e0b"
+              strokeDasharray="6 7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2.25"
+            />
+          ))}
+
+          {chart.linePaths.map((line) => (
+            <path
+              d={line.path}
+              fill="none"
+              key={line.id}
+              stroke="#2563eb"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2.75"
+            />
+          ))}
 
           {chart.coordinates.map((point, index) => (
             <circle
@@ -365,6 +450,30 @@ export function SimpleTankVolumeChart({
           </div>
         ) : null}
       </div>
+
+      {trend.gaps.length > 0 ? (
+        <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <p className="font-semibold">Jeda data terdeteksi</p>
+          <div className="mt-2 grid gap-2">
+            {trend.gaps.slice(0, 3).map((gap) => (
+              <div
+                className="flex flex-col gap-1 rounded-md bg-white/70 px-3 py-2 sm:flex-row sm:items-center sm:justify-between"
+                key={gap.id}
+              >
+                <span>
+                  {gap.fromLabel} sampai {gap.toLabel}
+                </span>
+                <span className="font-semibold">{gap.durationLabel}</span>
+              </div>
+            ))}
+          </div>
+          {trend.gaps.length > 3 ? (
+            <p className="mt-2 text-xs font-medium">
+              {trend.gaps.length - 3} jeda lain tersedia pada rentang ini.
+            </p>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }

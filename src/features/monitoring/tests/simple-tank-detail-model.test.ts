@@ -183,6 +183,44 @@ describe("simple tank detail model", () => {
     expect(trend.points[0].xRatio).toBeLessThan(0.44);
   });
 
+  it("memutus segmen tren jika ada jeda data melebihi batas offline", () => {
+    const trend = buildSimpleTankTrend(
+      [
+        createChartPoint({
+          day: 2,
+          hour: 10,
+          minute: 0,
+          volumeLiter: 320,
+        }),
+        createChartPoint({
+          day: 2,
+          hour: 10,
+          minute: 5,
+          volumeLiter: 321,
+        }),
+        createChartPoint({
+          day: 2,
+          hour: 10,
+          minute: 30,
+          volumeLiter: 322,
+        }),
+      ],
+      "day",
+    );
+
+    expect(trend.gapThresholdMinutes).toBe(15);
+    expect(trend.segments).toHaveLength(2);
+    expect(trend.segments.map((segment) => segment.points.length)).toEqual([
+      2,
+      1,
+    ]);
+    expect(trend.gaps).toHaveLength(1);
+    expect(trend.gaps[0]).toMatchObject({
+      durationLabel: "25 menit",
+      thresholdMinutes: 15,
+    });
+  });
+
   it("membuat tren bulanan sebagai rata-rata per tanggal", () => {
     const trend = buildSimpleTankTrend(
       [
