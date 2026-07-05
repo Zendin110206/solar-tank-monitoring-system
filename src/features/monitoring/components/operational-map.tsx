@@ -501,7 +501,7 @@ export function OperationalMap({
                   type="search"
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Cari STO atau device"
+                  placeholder="Cari STO atau perangkat"
                   className="h-10 w-full rounded-lg border border-transparent bg-zinc-50 pl-10 pr-3 text-sm outline-none transition placeholder:text-zinc-400 focus:border-red-200 focus:bg-white focus:ring-4 focus:ring-red-50"
                 />
               </div>

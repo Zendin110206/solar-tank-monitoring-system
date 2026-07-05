@@ -1,7 +1,9 @@
-import { createHash, timingSafeEqual } from "node:crypto";
+import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import type { Device } from "../types/monitoring";
 
 const DEVICE_KEY_HASH_PREFIX = "sha256:";
+const DEVICE_KEY_PREFIX = "stk";
+const DEVICE_KEY_RANDOM_BYTES = 32;
 const SHA256_HEX_LENGTH = 64;
 const DISABLED_ENV_VALUES = new Set(["0", "false", "no", "off"]);
 
@@ -52,6 +54,10 @@ export function hashDeviceKey(deviceKey: string): string {
   return `${DEVICE_KEY_HASH_PREFIX}${createHash("sha256")
     .update(deviceKey, "utf8")
     .digest("hex")}`;
+}
+
+export function createDeviceKey(): string {
+  return `${DEVICE_KEY_PREFIX}_${randomBytes(DEVICE_KEY_RANDOM_BYTES).toString("base64url")}`;
 }
 
 export function verifyDeviceKeyHash(

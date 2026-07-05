@@ -82,7 +82,7 @@ export default async function AdminUsersPage() {
   return (
     <main className="min-h-screen bg-[#f5faf8] text-zinc-950">
       <header className="sticky top-0 z-20 border-b border-zinc-200/70 bg-white/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-[1540px] items-center gap-4 px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex min-h-16 max-w-[1540px] flex-col gap-3 px-4 py-3 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8 lg:py-0">
           <Link
             href="/dashboard"
             className="flex shrink-0 items-center gap-3"
@@ -96,19 +96,25 @@ export default async function AdminUsersPage() {
             </span>
             <span className="text-lg font-semibold">SolarTank</span>
           </Link>
-          <nav className="ml-auto flex items-center gap-2 text-sm font-semibold text-zinc-600">
+          <nav className="flex w-full min-w-0 items-center gap-2 overflow-x-auto whitespace-nowrap text-sm font-semibold text-zinc-600 lg:w-auto">
             <Link
               href="/dashboard"
-              className="rounded-lg px-3 py-2 transition hover:bg-blue-50 hover:text-blue-700"
+              className="shrink-0 rounded-lg px-3 py-2 transition hover:bg-blue-50 hover:text-blue-700"
             >
               Monitoring Tangki
             </Link>
-            <span className="rounded-lg bg-blue-600 px-3 py-2 text-white">
+            <span className="shrink-0 rounded-lg bg-blue-600 px-3 py-2 text-white">
               Manajemen Pengguna
             </span>
             <Link
+              href="/dashboard/admin/device-requests"
+              className="shrink-0 rounded-lg px-3 py-2 transition hover:bg-blue-50 hover:text-blue-700"
+            >
+              Tinjau Pengajuan
+            </Link>
+            <Link
               href="/dashboard/admin/audit"
-              className="rounded-lg px-3 py-2 transition hover:bg-blue-50 hover:text-blue-700"
+              className="shrink-0 rounded-lg px-3 py-2 transition hover:bg-blue-50 hover:text-blue-700"
             >
               Audit Keamanan
             </Link>

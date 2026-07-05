@@ -481,7 +481,7 @@ export function SimpleDashboardMap({ sites }: { sites: SimpleDashboardSite[] }) 
                 </dd>
               </div>
               <div className="flex items-center justify-between gap-3 border-b border-zinc-100 pb-3">
-                <dt className="text-zinc-500">Device</dt>
+                <dt className="text-zinc-500">Perangkat</dt>
                 <dd className="font-semibold text-zinc-950">
                   {activeSite.deviceId}
                 </dd>

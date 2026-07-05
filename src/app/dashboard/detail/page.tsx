@@ -87,7 +87,7 @@ function buildSummaryCards(dashboardOverview: DashboardOverview) {
     {
       label: "Tangki kritis",
       value: String(dashboardOverview.summary.criticalTanks),
-      note: "berdasarkan runtime, level, dan device",
+      note: "berdasarkan runtime, level, dan perangkat",
       icon: AlertTriangle,
       tone: "bg-red-50 text-red-700 ring-red-100",
     },
@@ -101,7 +101,7 @@ function buildSummaryCards(dashboardOverview: DashboardOverview) {
     {
       label: "Rata-rata update",
       value: dashboardOverview.summary.averageIntervalLabel,
-      note: "target dapat diatur per device",
+      note: "target dapat diatur per perangkat",
       icon: Clock,
       tone: "bg-zinc-100 text-zinc-700 ring-zinc-200",
     },
@@ -250,12 +250,6 @@ export default async function DashboardPage() {
             <a href="#prioritas" className="transition hover:text-red-600">
               Prioritas
             </a>
-            <Link
-              href="/dashboard/locations"
-              className="transition hover:text-red-600"
-            >
-              Lokasi dan Perangkat
-            </Link>
             <a href="#log" className="transition hover:text-red-600">
               Log Perangkat
             </a>
@@ -513,7 +507,7 @@ export default async function DashboardPage() {
               <div className="mt-6 space-y-3">
                 {[
                   [Database, "Storage aktif", "memory lokal atau MySQL"],
-                  [Activity, "API /ingest", "menerima payload perangkat"],
+                  [Activity, "API /ingest", "menerima data perangkat"],
                   [Gauge, "Runtime", "status dihitung dari volume"],
                   [Droplets, "History", "riwayat dari storage aktif"],
                 ].map(([Icon, title, body]) => (
@@ -567,7 +561,7 @@ export default async function DashboardPage() {
                   <th className="px-4 py-2 font-semibold">Volume</th>
                   <th className="px-4 py-2 font-semibold">Isi</th>
                   <th className="px-4 py-2 font-semibold">Runtime</th>
-                <th className="px-4 py-2 font-semibold">Device</th>
+                <th className="px-4 py-2 font-semibold">Perangkat</th>
                 <th className="px-4 py-2 font-semibold">Update</th>
                 <th className="px-4 py-2 font-semibold">Status</th>
                 <th className="px-4 py-2 font-semibold">Aksi</th>

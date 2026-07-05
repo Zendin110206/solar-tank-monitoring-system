@@ -18,8 +18,13 @@ import { provisionMonitoringDevice } from "./device-provisioning";
 import { normalizeCatPayload } from "./normalize-reading";
 import {
   saveMonitoringReading,
+  getMonitoringStorageDriver,
   type MonitoringStorageDriver,
 } from "./monitoring-storage";
+import {
+  activateApprovedDeviceOnFirstPingFromMysql,
+  type ActivateApprovedDeviceResult,
+} from "./mysql-device-request-repository";
 
 const DEFAULT_LOCAL_DEVICE_KEY = "local-development-key";
 
@@ -58,6 +63,7 @@ type IngestTelemetrySuccess = {
     warnings: string[];
     storage: MonitoringStorageDriver;
     provisioned: boolean;
+    activated: boolean;
   };
 };
 
@@ -120,6 +126,34 @@ export function getLocalDeviceKey(
   return trimmedValue || DEFAULT_LOCAL_DEVICE_KEY;
 }
 
+function activationFailureToIngestFailure(
+  result: Exclude<ActivateApprovedDeviceResult, { ok: true }>,
+): IngestTelemetryFailure | null {
+  switch (result.reason) {
+    case "not-found":
+      return null;
+    case "invalid-key":
+      return {
+        ok: false,
+        status: 401,
+        error: "Device key tidak valid.",
+      };
+    case "not-ready":
+      return {
+        ok: false,
+        status: 403,
+        error:
+          "Perangkat belum siap aktif. Pastikan paket firmware sudah didownload dari link resmi.",
+      };
+    case "revoked":
+      return {
+        ok: false,
+        status: 403,
+        error: "Paket firmware atau akses perangkat sudah tidak berlaku.",
+      };
+  }
+}
+
 export async function ingestTelemetry({
   deviceIdentifier,
   deviceKey,
@@ -160,24 +194,84 @@ export async function ingestTelemetry({
   }
 
   let referenceData: MonitoringReferenceData;
+  let device: Device | null = null;
+  let provisioned = false;
+  let activated = false;
+  let tank: Tank | null = null;
 
   try {
     referenceData = await getMonitoringReferenceData();
   } catch {
-    return {
-      ok: false,
-      status: 500,
-      error:
-        "Registry site/tangki/device belum bisa dibaca dari storage aktif.",
-    };
+    if (getMonitoringStorageDriver() === "mysql") {
+      const activationResult = await activateApprovedDeviceOnFirstPingFromMysql({
+        deviceIdentifier: cleanDeviceIdentifier,
+        deviceKey: cleanDeviceKey,
+        receivedAt,
+      });
+
+      if (activationResult.ok) {
+        device = activationResult.device;
+        tank = activationResult.tank;
+        activated = true;
+        referenceData = {
+          devices: [activationResult.device],
+          sites: [activationResult.site],
+          tanks: [activationResult.tank],
+        };
+      } else {
+        const activationFailure = activationFailureToIngestFailure(
+          activationResult,
+        );
+
+        if (activationFailure) {
+          return activationFailure;
+        }
+
+        return {
+          ok: false,
+          status: 500,
+          error:
+            "Registry site/tangki/device belum bisa dibaca dari storage aktif.",
+        };
+      }
+    } else {
+      return {
+        ok: false,
+        status: 500,
+        error:
+          "Registry site/tangki/device belum bisa dibaca dari storage aktif.",
+      };
+    }
   }
 
-  let device = findDeviceByIdentifier(
-    cleanDeviceIdentifier,
-    referenceData.devices,
-  );
-  let provisioned = false;
-  let tank: Tank | null = null;
+  if (!device) {
+    device = findDeviceByIdentifier(
+      cleanDeviceIdentifier,
+      referenceData.devices,
+    );
+  }
+
+  if (!device && getMonitoringStorageDriver() === "mysql") {
+    const activationResult = await activateApprovedDeviceOnFirstPingFromMysql({
+      deviceIdentifier: cleanDeviceIdentifier,
+      deviceKey: cleanDeviceKey,
+      receivedAt,
+    });
+
+    if (activationResult.ok) {
+      device = activationResult.device;
+      tank = activationResult.tank;
+      activated = true;
+    } else {
+      const activationFailure = activationFailureToIngestFailure(
+        activationResult,
+      );
+
+      if (activationFailure) {
+        return activationFailure;
+      }
+    }
+  }
 
   if (!device) {
     const payloadDeviceIdentifier = readPayloadDeviceIdentifier(payload);
@@ -332,6 +426,7 @@ export async function ingestTelemetry({
         warnings: stored.reading.quality?.warnings ?? [],
         storage: stored.storage,
         provisioned,
+        activated,
       },
     };
   } catch {

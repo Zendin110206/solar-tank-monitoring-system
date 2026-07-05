@@ -2,15 +2,63 @@ import {
   getLocalDeviceKey,
   ingestTelemetry,
 } from "@/features/monitoring/lib/ingest-telemetry";
+import { checkRateLimit } from "@/features/auth/lib/rate-limit";
 import {
   getExpectedProvisioningKey,
   isDeviceAutoProvisioningEnabled,
 } from "@/features/monitoring/lib/device-provisioning";
+import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+function getClientAddress(headers: Headers): string {
+  const forwardedFor = headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  return (
+    forwardedFor ||
+    headers.get("x-real-ip")?.trim() ||
+    headers.get("cf-connecting-ip")?.trim() ||
+    "unknown"
+  );
+}
+
+async function checkIngestRateLimit(request: Request): Promise<Response | null> {
+  if (getMonitoringStorageDriver() !== "mysql") {
+    return null;
+  }
+
+  const deviceIdentifier =
+    request.headers.get("x-device-id")?.trim() || "unknown-device";
+  const clientAddress = getClientAddress(request.headers);
+  const rateLimit = await checkRateLimit({
+    key: `ingest:${deviceIdentifier}:${clientAddress}`,
+    limit: 120,
+    windowMs: 60_000,
+  });
+
+  if (rateLimit.allowed) {
+    return null;
+  }
+
+  return Response.json(
+    {
+      ok: false,
+      error: "Terlalu banyak request device. Coba lagi sebentar.",
+    },
+    {
+      headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
+      status: 429,
+    },
+  );
+}
+
 export async function POST(request: Request) {
+  const rateLimitResponse = await checkIngestRateLimit(request);
+
+  if (rateLimitResponse) {
+    return rateLimitResponse;
+  }
+
   let payload: unknown;
 
   try {
