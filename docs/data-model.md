@@ -20,6 +20,17 @@ Artinya:
 - device mengirim banyak reading;
 - reading dipakai untuk membuat status dan grafik.
 
+Batch 19 menambah alur onboarding perangkat:
+
+```text
+User mengajukan perangkat
+  -> Admin meninjau
+  -> Sistem membuat device key dan paket firmware
+  -> User download firmware
+  -> Device kirim data pertama
+  -> Site, tangki, dan device aktif di dashboard
+```
+
 ## Site
 
 Site adalah lokasi operasional.
@@ -89,6 +100,60 @@ expectedReportIntervalSec: 300
 ```
 
 Artinya device diharapkan mengirim data setiap 5 menit.
+
+## Pengajuan Perangkat
+
+Pengajuan perangkat adalah data sementara sebelum device benar-benar aktif.
+Tujuannya agar user lapangan tidak perlu membuat kode device dan key manual.
+
+Field penting:
+
+| Field | Arti |
+|---|---|
+| `requestCode` | kode pengajuan yang mudah dilacak admin |
+| `requesterEmail` | email user yang mengajukan |
+| `status` | status review dan provisioning |
+| `siteName` / `areaLabel` | nama STO dan wilayah |
+| `latitude` / `longitude` | koordinat manual untuk peta |
+| `deviceCode` | kode device yang dibuat sistem |
+| `deviceSensorType` | tipe sensor, saat ini fokus ke sensor fuel |
+| `tankShape` | bentuk tangki, balok atau silinder horizontal |
+| `capacityLiter` | kapasitas tangki yang diinput user |
+| `lengthCm`, `widthCm`, `heightCm`, `diameterCm` | dimensi fisik tangki sesuai bentuk |
+| `sensorMountHeightCm` | tinggi sensor dari atas tangki |
+| `loadValue`, `loadUnit`, `dieselEngineCapacityKva`, `cosPhi` | parameter beban genset untuk menghitung konsumsi solar per jam |
+| `hardwareProfileId` | profile board, sensor, dan pin yang dipakai firmware |
+| `firmwareTemplateId` | template firmware yang dipakai untuk membuat ZIP |
+
+Status penting:
+
+| Status | Arti |
+|---|---|
+| `pending_admin_review` | menunggu admin approve/reject |
+| `approved_package_ready` | paket firmware sudah dibuat |
+| `waiting_firmware_download` | link firmware sudah dikirim dan menunggu download |
+| `waiting_first_valid_ping` | firmware sudah didownload, menunggu device mengirim data valid |
+| `active` | device sudah aktif dan tampil di dashboard |
+| `rejected` / `revoked` / `expired` | pengajuan tidak bisa dipakai lagi |
+
+## Paket Firmware
+
+Paket firmware adalah ZIP yang dibuat setelah admin menyetujui pengajuan.
+
+Isi paket:
+
+```text
+solar_tank_firmware.ino
+device_config.h
+hardware_profile.h
+README_LANGKAH_UPLOAD.md
+manifest.json
+```
+
+Paket firmware berisi device key dan konfigurasi yang sudah dibuat dari data
+pengajuan. Di database, isi ZIP disimpan terenkripsi memakai
+`DEVICE_PACKAGE_ENCRYPTION_KEY`. Link download punya masa berlaku dan batas
+jumlah download supaya device key tidak tersebar terlalu bebas.
 
 ## Reading
 

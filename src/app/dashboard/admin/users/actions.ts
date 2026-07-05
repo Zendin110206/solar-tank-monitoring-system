@@ -18,6 +18,7 @@ import {
   setAuthUserStatus,
   updateAuthUserRole,
 } from "@/features/auth/lib/mysql-auth-repository";
+import { getSafeErrorMessage } from "@/lib/safe-error-message";
 
 const ADMIN_USERS_PATH = "/dashboard/admin/users";
 
@@ -39,10 +40,11 @@ function getRequiredFormValue(formData: FormData, key: string): string {
 function getAdminActionError(error: unknown): AdminActionState {
   return {
     status: "error",
-    message:
-      error instanceof Error
-        ? error.message
-        : "Aksi admin belum bisa diproses.",
+    message: getSafeErrorMessage(error, {
+      fallbackMessage: "Aksi admin belum bisa diproses.",
+      internalMessage:
+        "Aksi admin belum bisa diproses karena layanan sedang disiapkan. Periksa koneksi database dan konfigurasi email.",
+    }),
   };
 }
 

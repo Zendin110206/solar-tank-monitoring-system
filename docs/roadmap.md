@@ -133,16 +133,20 @@ Sudah ada:
 - normalisasi payload real-format;
 - review config payload vs registry;
 - script smoke test ingest;
-- panduan firmware payload minimal.
+- panduan firmware payload minimal;
+- alur pengajuan perangkat oleh user;
+- review admin untuk approve/reject pengajuan;
+- pembuatan device key dan paket firmware ZIP;
+- link download firmware dengan masa berlaku dan batas download;
+- aktivasi device setelah first valid ping.
 
 Target berikutnya:
 
-- sepakati payload firmware;
-- key per device;
-- interval kirim;
+- validasi firmware final bersama tim lapangan;
+- validasi pin dan hardware profile final;
 - uji di lingkungan aman;
 - validasi akurasi sensor;
-- dokumentasi provisioning device.
+- dokumentasi operasional provisioning device setelah flow final disetujui.
 
 Catatan:
 

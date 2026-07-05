@@ -9,6 +9,7 @@ import {
 } from "@/features/monitoring/lib/mysql-device-request-repository";
 import { notifyAdminsDeviceRequestCreated } from "@/features/monitoring/lib/device-request-notifications";
 import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
+import { getSafeErrorMessage } from "@/lib/safe-error-message";
 import type {
   DeviceSensorType,
   DeviceRequestDraft,
@@ -19,6 +20,13 @@ import type {
 
 const USER_DEVICE_REQUEST_PATH = "/dashboard/devices/request";
 const ADMIN_DEVICE_REQUEST_PATH = "/dashboard/admin/device-requests";
+const DEVICE_REQUEST_SCHEMA_COLUMNS = [
+  "device_sensor_type",
+  "load_value",
+  "load_unit",
+  "diesel_engine_capacity_kva",
+  "cos_phi",
+] as const;
 
 export type DeviceRequestFormState = {
   status: "idle" | "success" | "error";
@@ -131,13 +139,37 @@ function getResultState(
   };
 }
 
+function isDeviceRequestSchemaError(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  const message = error.message.toLowerCase();
+
+  return (
+    message.includes("unknown column") &&
+    DEVICE_REQUEST_SCHEMA_COLUMNS.some((columnName) =>
+      message.includes(columnName),
+    )
+  );
+}
+
 function getErrorState(error: unknown): DeviceRequestFormState {
+  if (isDeviceRequestSchemaError(error)) {
+    return {
+      status: "error",
+      message:
+        "Pengajuan belum bisa diproses karena struktur database belum lengkap. Administrator perlu menjalankan migration Batch 19 terbaru.",
+    };
+  }
+
   return {
     status: "error",
-    message:
-      error instanceof Error
-        ? error.message
-        : "Pengajuan perangkat belum bisa diproses.",
+    message: getSafeErrorMessage(error, {
+      fallbackMessage: "Pengajuan perangkat belum bisa diproses.",
+      internalMessage:
+        "Pengajuan perangkat belum bisa diproses karena layanan database belum siap. Hubungi administrator.",
+    }),
   };
 }
 

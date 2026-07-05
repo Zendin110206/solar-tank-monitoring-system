@@ -4,6 +4,10 @@ import { checkRateLimit } from "@/features/auth/lib/rate-limit";
 import { loginWithPassword } from "@/features/auth/lib/auth-service";
 import { parseLoginPayload } from "@/features/auth/lib/auth-validation";
 import { setSessionCookie } from "@/features/auth/lib/auth-session";
+import {
+  getSafeErrorMessage,
+  getSafeErrorStatus,
+} from "@/lib/safe-error-message";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -78,12 +82,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         ok: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Login gagal. Periksa kembali data masuk Anda.",
+        error: getSafeErrorMessage(error, {
+          fallbackMessage: "Login gagal. Periksa kembali data masuk Anda.",
+          internalMessage:
+            "Login belum bisa diproses karena layanan sedang disiapkan. Coba lagi nanti.",
+        }),
       },
-      { status: 401 },
+      { status: getSafeErrorStatus(error, { defaultStatus: 401 }) },
     );
   }
 }

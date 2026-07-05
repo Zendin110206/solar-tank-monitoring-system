@@ -385,6 +385,8 @@ curl.exe -X POST http://localhost:3000/api/ingest `
 | `pnpm db:migrate:mysql` | Menjalankan migration MySQL dari folder `database/migrations` |
 | `pnpm db:migrate:auth` | Menjalankan migration core auth MySQL |
 | `pnpm db:migrate:auth-recovery` | Menjalankan migration tambahan reset password, verifikasi email, Telegram, dan audit auth |
+| `pnpm db:migrate:device-provisioning` | Menjalankan migration tabel pengajuan perangkat, firmware template, hardware profile, paket firmware, dan event provisioning |
+| `pnpm db:migrate:device-request-fields` | Menambahkan field operasional Batch 19, index, dan validasi database ke tabel pengajuan perangkat pada database yang sudah pernah menjalankan migration lama |
 | `pnpm db:seed:mysql` | Mengisi data contoh site, tangki, dan device ke MySQL |
 | `pnpm db:setup:mysql` | Menjalankan migration lalu seed MySQL |
 | `pnpm auth:create-admin` | Membuat atau memastikan admin awal dari env bootstrap |
@@ -426,6 +428,9 @@ Variabel yang relevan saat ini:
 | `AUTH_BOOTSTRAP_ADMIN_FULL_NAME` | Nama lengkap admin awal |
 | `AUTH_BOOTSTRAP_ADMIN_PASSWORD` | Password awal admin yang kuat |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `SMTP_SECURE` | Konfigurasi email untuk OTP admin, verifikasi email, dan reset password |
+| `DEVICE_PACKAGE_ENCRYPTION_KEY` | Key 32 byte base64/base64url/hex untuk mengenkripsi ZIP firmware. Wajib untuk production |
+| `DEVICE_PACKAGE_DOWNLOAD_TTL_DAYS` | Masa berlaku link download paket firmware. Default `7` hari |
+| `DEVICE_PACKAGE_MAX_DOWNLOADS` | Batas jumlah download paket firmware. Default `3` kali |
 | `AUTH_CAPTCHA_PROVIDER` | Provider verifikasi form publik: `disabled` atau `turnstile`. Nilai selain itu dianggap error konfigurasi |
 | `NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY` | Site key Turnstile yang aman untuk browser |
 | `AUTH_CAPTCHA_SECRET_KEY` | Secret key Turnstile untuk server. Jangan commit |
@@ -460,6 +465,15 @@ Jika ingin latihan data registry dan reading yang tidak hilang saat server resta
 ```powershell
 pnpm db:setup:mysql
 ```
+
+Jika database sudah pernah dipakai dan hanya perlu menyusul schema pengajuan perangkat Batch 19, jalankan urutan ini:
+
+```powershell
+pnpm db:migrate:device-provisioning
+pnpm db:migrate:device-request-fields
+```
+
+`db:migrate:device-request-fields` memperbaiki kasus database lama yang belum memiliki kolom seperti `device_sensor_type`, `load_value`, `diesel_engine_capacity_kva`, dan `cos_phi`. Script ini juga menambahkan index dan check constraint agar aturan database lama sama kuatnya dengan database baru.
 
 4. Jalankan bootstrap admin awal jika tabel auth masih kosong:
 

@@ -1,5 +1,7 @@
 import type { NextRequest } from "next/server";
 
+import { getSafeErrorMessage } from "@/lib/safe-error-message";
+
 import type { AuthSafeUser, AuthSessionUser } from "../types";
 import {
   createOtpCode,
@@ -399,7 +401,10 @@ export async function submitAccessRequest(
         ip: getRequestIp(request),
         userAgent: getRequestUserAgent(request),
         metadata: {
-          reason: error instanceof Error ? error.message : "unknown",
+          reason: getSafeErrorMessage(error, {
+            fallbackMessage: "unknown",
+            internalMessage: "email_delivery_internal_error",
+          }),
         },
       }).catch(() => undefined),
     );

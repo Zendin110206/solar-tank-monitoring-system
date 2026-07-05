@@ -4,6 +4,10 @@ import { verifyCaptchaToken } from "@/features/auth/lib/auth-captcha";
 import { resendEmailVerification } from "@/features/auth/lib/auth-service";
 import { parseResendVerificationPayload } from "@/features/auth/lib/auth-validation";
 import { checkRateLimit } from "@/features/auth/lib/rate-limit";
+import {
+  getSafeErrorMessage,
+  getSafeErrorStatus,
+} from "@/lib/safe-error-message";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -67,12 +71,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         ok: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Permintaan verifikasi belum bisa diproses.",
+        error: getSafeErrorMessage(error, {
+          fallbackMessage: "Permintaan verifikasi belum bisa diproses.",
+          internalMessage:
+            "Permintaan verifikasi belum bisa diproses karena layanan sedang disiapkan. Coba lagi nanti.",
+        }),
       },
-      { status: 400 },
+      { status: getSafeErrorStatus(error) },
     );
   }
 }

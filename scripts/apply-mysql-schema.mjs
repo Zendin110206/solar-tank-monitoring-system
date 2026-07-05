@@ -44,6 +44,30 @@ const statements = sql
   .map((statement) => statement.trim())
   .filter(Boolean);
 
+function summarizeStatement(statement) {
+  return statement.replace(/\s+/g, " ").slice(0, 140);
+}
+
+function isDuplicateSchemaObjectError(error) {
+  const code = typeof error?.code === "string" ? error.code : "";
+  const message = typeof error?.message === "string" ? error.message : "";
+
+  if (
+    [
+      "ER_DUP_FIELDNAME",
+      "ER_DUP_KEYNAME",
+      "ER_CHECK_CONSTRAINT_DUP_NAME",
+      "ER_FK_DUP_NAME",
+    ].includes(code)
+  ) {
+    return true;
+  }
+
+  return /duplicate (?:column|key|check constraint|constraint name|foreign key constraint name)/i.test(
+    message,
+  );
+}
+
 const connection = await mysql.createConnection({
   uri: databaseUrl,
   multipleStatements: false,
@@ -51,13 +75,18 @@ const connection = await mysql.createConnection({
 });
 
 try {
+  let appliedStatements = 0;
+  let skippedStatements = 0;
+
   for (const statement of statements) {
     try {
       await connection.query(statement);
+      appliedStatements += 1;
     } catch (error) {
-      if (error?.code === "ER_DUP_FIELDNAME") {
-        console.warn(
-          `[schema] kolom sudah ada, statement dilewati: ${statement.slice(0, 120)}...`,
+      if (isDuplicateSchemaObjectError(error)) {
+        skippedStatements += 1;
+        console.log(
+          `[schema] object sudah ada, statement dilewati: ${summarizeStatement(statement)}...`,
         );
         continue;
       }
@@ -66,8 +95,13 @@ try {
     }
   }
 
+  const skippedInfo =
+    skippedStatements > 0
+      ? `, ${skippedStatements} statement dilewati karena object sudah ada`
+      : "";
+
   console.log(
-    `Berhasil menjalankan ${statements.length} statement dari ${sqlFile}`,
+    `Berhasil menjalankan ${appliedStatements} statement dari ${sqlFile}${skippedInfo}`,
   );
 } finally {
   await connection.end();

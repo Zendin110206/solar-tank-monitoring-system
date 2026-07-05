@@ -15,9 +15,17 @@ import {
   revokeDeviceProvisioningInMysql,
 } from "@/features/monitoring/lib/mysql-device-request-repository";
 import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
+import { getSafeErrorMessage } from "@/lib/safe-error-message";
 
 const ADMIN_DEVICE_REQUEST_PATH = "/dashboard/admin/device-requests";
 const USER_DEVICE_REQUEST_PATH = "/dashboard/devices/request";
+const DEVICE_REQUEST_SCHEMA_COLUMNS = [
+  "device_sensor_type",
+  "load_value",
+  "load_unit",
+  "diesel_engine_capacity_kva",
+  "cos_phi",
+] as const;
 
 export type DeviceRequestAdminActionState = {
   status: "idle" | "success" | "error";
@@ -54,13 +62,37 @@ function assertValidAdminActionCsrf({
   }
 }
 
+function isDeviceRequestSchemaError(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  const message = error.message.toLowerCase();
+
+  return (
+    message.includes("unknown column") &&
+    DEVICE_REQUEST_SCHEMA_COLUMNS.some((columnName) =>
+      message.includes(columnName),
+    )
+  );
+}
+
 function getActionError(error: unknown): DeviceRequestAdminActionState {
+  if (isDeviceRequestSchemaError(error)) {
+    return {
+      status: "error",
+      message:
+        "Aksi belum bisa diproses karena struktur database Batch 19 belum lengkap. Jalankan migration device request fields lalu coba lagi.",
+    };
+  }
+
   return {
     status: "error",
-    message:
-      error instanceof Error
-        ? error.message
-        : "Aksi pengajuan perangkat belum bisa diproses.",
+    message: getSafeErrorMessage(error, {
+      fallbackMessage: "Aksi pengajuan perangkat belum bisa diproses.",
+      internalMessage:
+        "Aksi belum bisa diproses karena layanan database belum siap. Periksa migration dan koneksi database.",
+    }),
   };
 }
 
