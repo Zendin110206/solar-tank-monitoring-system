@@ -89,13 +89,13 @@ const workflowSteps = [
     title: "Perangkat mengirim pembacaan",
     description:
       "Sensor atau simulator membaca kondisi tangki, lalu mengirim data ke endpoint API dengan identitas perangkat.",
-    badge: "Device push",
+    badge: "Kirim data",
   },
   {
     number: "2",
-    title: "API menyiapkan latest dan history",
+    title: "API menyimpan pembacaan",
     description:
-      "Server menerima payload, menyimpan riwayat, dan menyiapkan data terbaru agar dashboard tidak membaca sensor secara langsung.",
+      "Server menerima data perangkat, menyimpan riwayat, dan menyiapkan data terbaru agar dashboard tidak membaca sensor secara langsung.",
     badge: "/ingest",
   },
   {
@@ -646,7 +646,7 @@ export default async function Home() {
                     <p className="mt-3 text-3xl font-semibold">API</p>
                   </div>
                   <div className="absolute right-0 top-8 w-32 rotate-6 rounded-lg border border-zinc-200 bg-zinc-50 p-4 shadow-lg shadow-zinc-200/70">
-                    <p className="text-sm font-semibold">Device</p>
+                    <p className="text-sm font-semibold">Perangkat</p>
                     <div className="mt-4 grid grid-cols-2 gap-2">
                       <span className="h-9 rounded-lg bg-cyan-400" />
                       <span className="h-9 rounded-lg bg-emerald-500" />
@@ -662,7 +662,7 @@ export default async function Home() {
                 <p className="mt-4 text-base leading-7 text-zinc-600">
                   Pengembangan tetap bisa berjalan dari data contoh dan
                   simulator, lalu disambungkan bertahap ke pembacaan perangkat
-                  yang mengirim payload ke endpoint API.
+                  yang mengirim data ke endpoint API.
                 </p>
               </div>
             </article>

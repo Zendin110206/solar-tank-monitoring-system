@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  createDeviceKey,
   hashDeviceKey,
   isGlobalDeviceKeyFallbackAllowed,
   verifyDeviceKey,
@@ -7,6 +8,15 @@ import {
 } from "../lib/device-key";
 
 describe("device key security", () => {
+  it("creates strong random device keys for firmware packages", () => {
+    const firstKey = createDeviceKey();
+    const secondKey = createDeviceKey();
+
+    expect(firstKey).toMatch(/^stk_[A-Za-z0-9_-]{40,}$/);
+    expect(secondKey).toMatch(/^stk_[A-Za-z0-9_-]{40,}$/);
+    expect(firstKey).not.toBe(secondKey);
+  });
+
   it("hashes device keys with a sha256 prefix", () => {
     const hash = hashDeviceKey("demo-tph-key");
 

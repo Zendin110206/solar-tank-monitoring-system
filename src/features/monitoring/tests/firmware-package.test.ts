@@ -1,0 +1,154 @@
+import { describe, expect, it } from "vitest";
+
+import {
+  createFirmwarePackageBundle,
+  createFirmwarePackageFilename,
+  decryptFirmwarePackage,
+  encryptFirmwarePackage,
+  findUnresolvedTemplatePlaceholders,
+  hashDownloadToken,
+  renderDeviceConfigHeader,
+  sanitizeFirmwareFileSegment,
+} from "../lib/firmware-package";
+import type {
+  MonitoringDeviceRequest,
+  MonitoringFirmwareTemplate,
+  MonitoringHardwareProfile,
+} from "../types/monitoring";
+
+const FIRMWARE_TEMPLATE: MonitoringFirmwareTemplate = {
+  displayName: "SolarTank ESP8266 Ultrasonic",
+  id: "firmware-template-esp8266-ultrasonic-v1",
+  isActive: true,
+  sourcePath: "firmware/templates/solartank-esp8266-ultrasonic-v1",
+  templateKey: "solartank-esp8266-ultrasonic",
+  version: "v1",
+};
+
+const HARDWARE_PROFILE: MonitoringHardwareProfile = {
+  boardFamily: "esp8266",
+  boardLabel: "NodeMCU 1.0 ESP-12E",
+  code: "nodemcu-hcsr04-rectangular-v1",
+  echoPin: "D6",
+  firmwareTemplateId: FIRMWARE_TEMPLATE.id,
+  id: "hardware-profile-nodemcu-hcsr04-rectangular-v1",
+  isActive: true,
+  name: "NodeMCU ESP8266 + HC-SR04 untuk tangki balok",
+  reportIntervalMs: 20000,
+  sensorType: "HC-SR04",
+  supportedTankShape: "rectangular",
+  triggerPin: "D5",
+};
+
+const DEVICE_REQUEST: MonitoringDeviceRequest = {
+  adminReviewedAt: null,
+  adminReviewedByUserId: null,
+  areaLabel: "Pasuruan",
+  capacityLiter: 540,
+  consumptionLiterPerHour: 6.2,
+  createdAt: "2026-07-05T00:00:00.000Z",
+  criticalLevelPercent: 15,
+  deviceCode: "device-tph-main",
+  deviceLabel: "NodeMCU utama STO TPH",
+  deviceSensorType: "fuel",
+  dieselEngineCapacityKva: 40,
+  firmwareTemplateId: FIRMWARE_TEMPLATE.id,
+  hardwareProfileId: HARDWARE_PROFILE.id,
+  heightCm: 60,
+  id: "device-request-1",
+  latitude: -7.72,
+  lengthCm: 150,
+  loadUnit: "kw",
+  loadValue: 20,
+  lowLevelPercent: 30,
+  cosPhi: 0.8,
+  rejectionReason: null,
+  requesterEmail: "operator@example.com",
+  requesterUserId: "user-1",
+  requestCode: "REQ-TPH-20260705-ABC123",
+  sensorMountHeightCm: 60,
+  siteCode: "TPH",
+  siteName: "STO TPH",
+  status: "pending_admin_review",
+  tankShape: "rectangular",
+  updatedAt: "2026-07-05T00:00:00.000Z",
+  validationWarnings: [],
+  widthCm: 60,
+};
+
+describe("firmware package helpers", () => {
+  it("creates safe zip filenames from device code", () => {
+    expect(
+      createFirmwarePackageFilename({
+        deviceCode: "Device TPH/Main",
+        generatedAt: new Date("2026-07-05T00:00:00.000Z"),
+      }),
+    ).toBe("solartank-device-tph-main-20260705.zip");
+  });
+
+  it("falls back when a filename segment is empty after sanitizing", () => {
+    expect(sanitizeFirmwareFileSegment("!!!", "device")).toBe("device");
+  });
+
+  it("finds unresolved firmware template placeholders", () => {
+    expect(
+      findUnresolvedTemplatePlaceholders(`
+        #define DEVICE "{{DEVICE_CODE}}"
+        #define KEY "{{ DEVICE_KEY }}"
+        #define DEVICE_AGAIN "{{DEVICE_CODE}}"
+      `),
+    ).toEqual(["DEVICE_CODE", "DEVICE_KEY"]);
+  });
+
+  it("renders device config with the generated key and normalized tank data", () => {
+    const header = renderDeviceConfigHeader({
+      appBaseUrl: "https://solartank.example.com",
+      deviceKey: "stk_test_device_key",
+      request: DEVICE_REQUEST,
+    });
+
+    expect(header).toContain('#define SOLARTANK_DEVICE_CODE "device-tph-main"');
+    expect(header).toContain('#define SOLARTANK_DEVICE_SENSOR_TYPE "fuel"');
+    expect(header).toContain('#define SOLARTANK_DEVICE_KEY "stk_test_device_key"');
+    expect(header).toContain("#define SOLARTANK_TANK_CAPACITY_LITER 540");
+    expect(header).toContain("#define SOLARTANK_CONSUMPTION_LITER_PER_HOUR 6.20");
+    expect(header).toContain("#define SOLARTANK_COS_PHI 0.80");
+    expect(header).not.toContain("{{");
+  });
+
+  it("creates a firmware zip bundle with config, readme, and manifest files", async () => {
+    const bundle = await createFirmwarePackageBundle({
+      appBaseUrl: "https://solartank.example.com",
+      deviceKey: "stk_test_device_key",
+      firmwareTemplate: FIRMWARE_TEMPLATE,
+      hardwareProfile: HARDWARE_PROFILE,
+      request: DEVICE_REQUEST,
+    });
+
+    expect(bundle.filename).toMatch(/^solartank-device-tph-main-\d{8}\.zip$/);
+    expect(bundle.zipBuffer.subarray(0, 4).toString("hex")).toBe("504b0304");
+    expect(bundle.files.map((file) => file.path)).toEqual([
+      "solar_tank_firmware.ino",
+      "device_config.h",
+      "hardware_profile.h",
+      "README_LANGKAH_UPLOAD.md",
+      "manifest.json",
+    ]);
+    expect(bundle.files.every((file) => file.content.length > 0)).toBe(true);
+  });
+
+  it("encrypts and decrypts firmware package buffers with AES-GCM", () => {
+    const payload = Buffer.from("firmware-package");
+    const encrypted = encryptFirmwarePackage(payload);
+
+    expect(encrypted.ciphertext.equals(payload)).toBe(false);
+    expect(decryptFirmwarePackage(encrypted).equals(payload)).toBe(true);
+  });
+
+  it("hashes download tokens before persistence", () => {
+    const hash = hashDownloadToken("dpt_example");
+
+    expect(hash).toMatch(/^sha256:[a-f0-9]{64}$/);
+    expect(hash).not.toContain("dpt_example");
+  });
+});

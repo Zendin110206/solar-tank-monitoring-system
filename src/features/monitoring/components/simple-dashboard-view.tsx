@@ -124,7 +124,7 @@ export function SimpleDashboardView({ sites }: SimpleDashboardViewProps) {
             <input
               className="h-12 w-full rounded-lg border border-zinc-300 bg-white pl-10 pr-3 text-sm font-medium text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Cari kode, nama, area, atau device"
+              placeholder="Cari kode, nama, area, atau perangkat"
               type="search"
               value={query}
             />

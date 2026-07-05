@@ -467,7 +467,7 @@ export default async function SimpleTankDetailPage({
   const statusTone = deviceStatusTone[tank.deviceStatus];
   const infoItems: InfoItem[] = [
     { label: "Area", value: tank.areaLabel },
-    { label: "Device", value: tank.deviceCode },
+    { label: "Perangkat", value: tank.deviceCode },
     { label: "Jenis tangki", value: tank.shapeLabel },
     { label: "Kapasitas", value: `${formatLiter(tank.capacityLiter)} L` },
     {
@@ -509,12 +509,6 @@ export default async function SimpleTankDetailPage({
                   className="shrink-0 rounded-lg px-3 py-2 text-center transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
                 >
                   Analisis Teknis
-                </Link>
-                <Link
-                  href="/dashboard/locations"
-                  className="shrink-0 rounded-lg px-3 py-2 text-center transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
-                >
-                  Lokasi dan Perangkat
                 </Link>
               </>
             ) : null}
@@ -602,7 +596,7 @@ export default async function SimpleTankDetailPage({
             />
             <SummaryCard
               icon={Database}
-              label="Device"
+              label="Perangkat"
               note={tank.deviceLabel}
               tone="bg-zinc-100 text-zinc-700 ring-zinc-200"
               value={tank.deviceCode}

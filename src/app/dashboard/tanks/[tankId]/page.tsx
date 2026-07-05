@@ -513,8 +513,8 @@ function TankVisual({ tank }: { tank: TankDetail }) {
       label: "Jarak sensor",
       value: tank.hasReading ? `${tank.sensorDistanceCm} cm` : "-",
       note: tank.hasReading
-        ? "distance dari payload"
-        : "menunggu payload perangkat",
+        ? "jarak dari data perangkat"
+        : "menunggu data perangkat",
       icon: Ruler,
     },
     {
@@ -528,7 +528,7 @@ function TankVisual({ tank }: { tank: TankDetail }) {
     {
       label: "Kapasitas tangki",
       value: `${formatLiter(tank.capacityLiter)} L`,
-      note: "kapasitas konfigurasi device",
+      note: "kapasitas konfigurasi perangkat",
       icon: Fuel,
     },
     {
@@ -783,7 +783,7 @@ function ConfigReviewPanel({ tank }: { tank: TankDetail }) {
           : "Silinder horizontal"
         : "-",
       capacity: formatSnapshotItem(payloadConfig?.capacityLiter, " L"),
-      source: "laporan device",
+      source: "laporan perangkat",
     },
     {
       label: "Dipakai pembacaan",
@@ -855,7 +855,8 @@ function ConfigReviewPanel({ tank }: { tank: TankDetail }) {
                 </span>
               </div>
               <p className="mt-2 text-xs text-zinc-500">
-                Registry: {issue.registryValue} | Payload: {issue.payloadValue}
+                Data resmi: {issue.registryValue} | Data perangkat:{" "}
+                {issue.payloadValue}
               </p>
             </div>
           ))}
@@ -970,7 +971,7 @@ function TankConfigurationPanel({ tank }: { tank: TankDetail }) {
     >
       <SectionHeading
         label="Konfigurasi"
-        title="Spesifikasi tangki dan device"
+        title="Spesifikasi tangki dan perangkat"
         description="Ringkasan config yang dipakai UI untuk memilih visual, menghitung volume, dan menentukan ambang operasional."
       />
 
@@ -1126,14 +1127,14 @@ export default async function TankDetailPage({
     {
       label: "Sinyal RSSI",
       value: formatMeasurement(tank.rssiDbm, "dBm"),
-      note: "nilai dari payload perangkat jika tersedia",
+      note: "nilai dari data perangkat jika tersedia",
       icon: Radio,
       tone: "bg-zinc-100 text-zinc-700 ring-zinc-200",
     },
   ];
   const deviceParameters: ParameterItem[] = [
     {
-      label: "Device ID",
+      label: "ID perangkat",
       value: tank.deviceId,
       note: "identitas perangkat untuk header X-Device-Id nanti",
       icon: Database,
@@ -1147,7 +1148,7 @@ export default async function TankDetailPage({
     {
       label: "Tegangan",
       value: formatMeasurement(tank.batteryVolt, "V"),
-      note: "nilai dari payload perangkat jika tersedia",
+      note: "nilai dari data perangkat jika tersedia",
       icon: Battery,
     },
     {
@@ -1225,8 +1226,8 @@ export default async function TankDetailPage({
             <a href="#konfigurasi" className="transition hover:text-red-600">
               Konfigurasi
             </a>
-            <a href="#payload" className="transition hover:text-red-600">
-              Payload
+            <a href="#data-perangkat" className="transition hover:text-red-600">
+              Data perangkat
             </a>
           </nav>
 
@@ -1403,15 +1404,15 @@ export default async function TankDetailPage({
             </div>
           </section>
 
-          {/* Payload Section */}
+          {/* Device Data Section */}
           <section
-            id="payload"
+            id="data-perangkat"
             className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
           >
             <SectionHeading
-              label="Payload"
+              label="Data perangkat"
               title="Field kompatibel CAT"
-              description="Nilai berikut menjadi jembatan dari payload lama ke bentuk data internal yang lebih rapi."
+              description="Nilai berikut menjadi jembatan dari format perangkat lama ke data internal yang lebih rapi."
             />
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">

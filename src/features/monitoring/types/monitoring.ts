@@ -1,5 +1,162 @@
 export type TankShape = "horizontal-cylinder" | "rectangular";
 
+export type DeviceSensorType = "energy" | "fuel";
+
+export type LoadPowerUnit = "kva" | "kw";
+
+export type DeviceRequestStatus =
+  | "pending_admin_review"
+  | "rejected"
+  | "approved_waiting_package"
+  | "approved_package_ready"
+  | "waiting_firmware_download"
+  | "waiting_first_valid_ping"
+  | "active"
+  | "expired"
+  | "revoked"
+  | "package_generation_failed";
+
+export type FirmwarePackageStatus =
+  | "ready"
+  | "downloaded"
+  | "expired"
+  | "revoked"
+  | "activated"
+  | "failed";
+
+export type HardwareBoardFamily = "esp8266" | "esp32" | "unknown";
+
+export type HardwareTankShapeSupport = TankShape | "any";
+
+export type DeviceRequestValidationSeverity = "error" | "warning";
+
+export type DeviceRequestValidationIssue = {
+  field: string;
+  message: string;
+  severity: DeviceRequestValidationSeverity;
+};
+
+export type MonitoringFirmwareTemplate = {
+  id: string;
+  templateKey: string;
+  version: string;
+  displayName: string;
+  sourcePath: string;
+  checksumSha256?: string | null;
+  isActive: boolean;
+};
+
+export type MonitoringHardwareProfile = {
+  id: string;
+  code: string;
+  name: string;
+  boardFamily: HardwareBoardFamily;
+  boardLabel: string;
+  sensorType: string;
+  triggerPin: string;
+  echoPin: string;
+  supportedTankShape: HardwareTankShapeSupport;
+  firmwareTemplateId: string;
+  reportIntervalMs: number;
+  isActive: boolean;
+};
+
+export type DeviceRequestDraft = {
+  siteCode?: string | null;
+  siteName: string;
+  areaLabel: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  deviceCode?: string | null;
+  deviceLabel?: string | null;
+  deviceSensorType: DeviceSensorType;
+  tankShape: TankShape;
+  capacityLiter: number;
+  lengthCm?: number | null;
+  widthCm?: number | null;
+  heightCm?: number | null;
+  diameterCm?: number | null;
+  sensorMountHeightCm?: number | null;
+  loadValue: number;
+  loadUnit: LoadPowerUnit;
+  dieselEngineCapacityKva: number;
+  cosPhi: number;
+  lowLevelPercent?: number | null;
+  criticalLevelPercent?: number | null;
+  consumptionLiterPerHour?: number | null;
+  hardwareProfileId: string;
+};
+
+export type NormalizedDeviceRequestDraft = {
+  siteCode: string;
+  siteName: string;
+  areaLabel: string;
+  deviceCode: string;
+  deviceSensorType: DeviceSensorType;
+  tankShape: TankShape;
+  capacityLiter: number;
+  sensorMountHeightCm: number;
+  loadValue: number;
+  loadUnit: LoadPowerUnit;
+  dieselEngineCapacityKva: number;
+  cosPhi: number;
+  lowLevelPercent: number;
+  criticalLevelPercent: number;
+  consumptionLiterPerHour: number;
+  hardwareProfileId: string;
+  latitude?: number;
+  longitude?: number;
+  deviceLabel: string;
+  lengthCm?: number;
+  widthCm?: number;
+  heightCm?: number;
+  diameterCm?: number;
+};
+
+export type DeviceRequestCapacityCheck = {
+  calculatedCapacityLiter: number | null;
+  declaredCapacityLiter: number;
+  differenceLiter: number | null;
+  differencePercent: number | null;
+  isConsistent: boolean;
+};
+
+export type MonitoringDeviceRequest = NormalizedDeviceRequestDraft & {
+  id: string;
+  requestCode: string;
+  requesterUserId: string;
+  requesterEmail: string;
+  status: DeviceRequestStatus;
+  firmwareTemplateId: string;
+  adminReviewedByUserId?: string | null;
+  adminReviewedAt?: string | null;
+  rejectionReason?: string | null;
+  validationWarnings: DeviceRequestValidationIssue[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type MonitoringFirmwarePackage = {
+  id: string;
+  requestId: string;
+  deviceId?: string | null;
+  packageStatus: FirmwarePackageStatus;
+  deviceKeyHash: string;
+  downloadTokenHash: string;
+  downloadExpiresAt: string;
+  downloadCount: number;
+  maxDownloadCount: number;
+  packageFilename: string;
+  packageSizeBytes: number;
+  packageChecksumSha256?: string | null;
+  firmwareTemplateId: string;
+  hardwareProfileId: string;
+  generatedAt: string;
+  firstDownloadedAt?: string | null;
+  activatedAt?: string | null;
+  revokedAt?: string | null;
+};
+
 export type RuntimeStatus =
   | "unknown"
   | "critical"
