@@ -104,7 +104,6 @@ function buildDeviceRequestDraft(formData: FormData): DeviceRequestDraft {
     longitude: parseNumberField(formData, "longitude"),
     deviceSensorType: parseDeviceSensorType(formData),
     tankShape: parseTankShape(formData),
-    capacityLiter: parseNumberField(formData, "capacityLiter") ?? 0,
     lengthCm: parseNumberField(formData, "lengthCm"),
     widthCm: parseNumberField(formData, "widthCm"),
     heightCm: parseNumberField(formData, "heightCm"),

@@ -71,7 +71,7 @@ export type DeviceRequestDraft = {
   deviceLabel?: string | null;
   deviceSensorType: DeviceSensorType;
   tankShape: TankShape;
-  capacityLiter: number;
+  capacityLiter?: number | null;
   lengthCm?: number | null;
   widthCm?: number | null;
   heightCm?: number | null;
