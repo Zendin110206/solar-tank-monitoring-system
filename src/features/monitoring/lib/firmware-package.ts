@@ -76,6 +76,14 @@ function toCppNumber(value: number | undefined, fallback = 0): string {
   return Number.isInteger(safeValue) ? String(safeValue) : safeValue.toFixed(2);
 }
 
+function toCppCoordinate(value: number | undefined, fallback = 0): string {
+  const safeValue = typeof value === "number" && Number.isFinite(value)
+    ? value
+    : fallback;
+
+  return safeValue.toFixed(7);
+}
+
 function getProductionLikeEnvironment(): boolean {
   return (
     process.env.NODE_ENV === "production" ||
@@ -458,6 +466,8 @@ export function renderDeviceConfigHeader({
 #define SOLARTANK_SITE_CODE ${toCppString(request.siteCode)}
 #define SOLARTANK_SITE_NAME ${toCppString(request.siteName)}
 #define SOLARTANK_AREA_LABEL ${toCppString(request.areaLabel)}
+#define SOLARTANK_SITE_LATITUDE ${toCppCoordinate(request.latitude)}
+#define SOLARTANK_SITE_LONGITUDE ${toCppCoordinate(request.longitude)}
 #define SOLARTANK_TANK_SHAPE ${toCppString(request.tankShape)}
 #define SOLARTANK_TANK_CAPACITY_LITER ${toCppNumber(request.capacityLiter)}
 #define SOLARTANK_TANK_LENGTH_CM ${toCppNumber(request.lengthCm)}
@@ -525,11 +535,11 @@ Paket ini dibuat untuk:
 1. Ekstrak ZIP ini ke folder lokal.
 2. Buka Arduino IDE.
 3. Buka file solar_tank_firmware.ino.
-4. Pilih board sesuai hardware profile: ${hardwareProfile.boardLabel}.
-5. Pilih port board.
-6. Klik Upload.
-7. Setelah upload selesai, buka Serial Monitor untuk mengecek koneksi.
-8. Jika firmware menyediakan mode setup WiFi, masukkan WiFi langsung dari halaman setup device.
+4. Isi SOLARTANK_WIFI_SSID dan SOLARTANK_WIFI_PASSWORD di bagian atas file firmware, atau gunakan command serial WIFI/PASS untuk uji sementara.
+5. Pilih board sesuai hardware profile: ${hardwareProfile.boardLabel}.
+6. Pilih port board.
+7. Klik Upload.
+8. Setelah upload selesai, buka Serial Monitor untuk mengecek koneksi, sensor, dan status POST.
 9. Jangan membagikan file device_config.h karena file itu berisi device key.
 
 ## Catatan Keamanan
@@ -568,6 +578,10 @@ export function renderFirmwareManifest({
       packageVersion: 1,
       requestCode: request.requestCode,
       siteCode: request.siteCode,
+      siteLocation: {
+        latitude: request.latitude ?? null,
+        longitude: request.longitude ?? null,
+      },
       tankShape: request.tankShape,
       operationalLoad: {
         unit: request.loadUnit,
