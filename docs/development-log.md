@@ -178,6 +178,18 @@ Pekerjaan:
 - menambahkan `docs/field-pilot-5-sto-guide.md` sebagai panduan lapangan untuk 5 STO;
 - menegaskan bahwa marker peta berasal dari registry manual, bukan payload GPS device.
 
+## 2026-07-06 - Maintenance Data Device/Uji
+
+Pekerjaan:
+
+- menambahkan panel admin untuk membersihkan satu data device/uji, beberapa pilihan, atau semua data device/uji sebelum uji real diulang;
+- membatasi pembersihan hanya ke data operasional monitoring dan provisioning;
+- menjaga pembersihan pilihan agar site/tangki yang masih dipakai data lain tidak ikut terhapus;
+- menjaga akun admin/user, audit auth, template firmware, dan profil hardware tetap tersimpan;
+- menambahkan konfirmasi manual agar admin tidak menghapus data tanpa sengaja;
+- menambahkan test repository untuk memastikan urutan pembersihan mengikuti relasi database;
+- memperbarui README, pilot readiness, dan data model.
+
 ## Status Verifikasi Terakhir
 
 Perintah:
