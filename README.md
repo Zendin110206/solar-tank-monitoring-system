@@ -25,6 +25,8 @@ Yang sudah tersedia:
 - halaman manajemen pengguna untuk admin: review pengajuan, aktivasi/nonaktif, ubah role, cabut sesi, kirim verifikasi, dan reset password;
 - halaman audit keamanan auth untuk admin;
 - halaman keamanan akun untuk ganti kata sandi, melihat sesi aktif, mencabut sesi lain, dan menghubungkan Telegram;
+- halaman pengajuan perangkat untuk user, review approve/reject oleh admin, pembuatan key perangkat, paket firmware ZIP, dan link download terbatas;
+- panel maintenance admin untuk membersihkan satu data device/uji, beberapa pilihan, atau semua data device/uji tanpa menghapus akun, template firmware, atau profil hardware;
 - analisis teknis untuk monitoring detail;
 - monitoring operasional dengan tampilan kartu dan peta;
 - halaman detail operasional per tangki untuk operator;
@@ -69,7 +71,7 @@ Yang belum tersedia:
 - kalibrasi tangki nyata;
 - notifikasi operasional di luar email auth;
 - rate limit khusus endpoint ingest;
-- rotasi key device lewat UI admin;
+- rotasi key device penuh di luar alur pengajuan perangkat;
 - manajemen registry site/tangki/device yang menulis database dari UI;
 - backup dan restore database production.
 
@@ -474,6 +476,30 @@ pnpm db:migrate:device-request-fields
 ```
 
 `db:migrate:device-request-fields` memperbaiki kasus database lama yang belum memiliki kolom seperti `device_sensor_type`, `load_value`, `diesel_engine_capacity_kva`, dan `cos_phi`. Script ini juga menambahkan index dan check constraint agar aturan database lama sama kuatnya dengan database baru.
+
+Jika tim perlu membersihkan data device/uji sebelum uji real, login sebagai
+admin lalu buka:
+
+```text
+/dashboard/admin/device-requests
+```
+
+Pilihan yang tersedia:
+
+- tombol **Bersihkan data ini** di tiap card pengajuan untuk menghapus satu
+  pengajuan/perangkat uji;
+- checkbox **Pilih** di tiap card lalu panel **Bersihkan beberapa pilihan**
+  untuk menghapus beberapa item sekaligus;
+- panel **Reset semua data monitoring** hanya jika tim benar-benar ingin mulai
+  ulang dari kosong.
+
+Semua opsi membersihkan data operasional monitoring yang terkait: site, tangki,
+device, reading, pengajuan perangkat, paket firmware, dan event provisioning.
+Panel ini tidak menghapus akun admin/user, session auth, audit auth, template
+firmware, atau profil hardware. Setelah reset/pembersihan, user perlu mengajukan
+perangkat lagi atau admin perlu menyiapkan ulang data device sebelum dashboard
+berisi data real. Jika semua data monitoring dikosongkan, `/api/ready` wajar
+melaporkan registry belum lengkap sampai data device dibuat kembali.
 
 4. Jalankan bootstrap admin awal jika tabel auth masih kosong:
 

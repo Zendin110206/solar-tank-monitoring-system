@@ -20,11 +20,16 @@ import type {
 } from "@/features/monitoring/types/monitoring";
 import {
   ApproveDeviceRequestForm,
+  CleanupDeviceRequestForm,
+  CleanupSelectedDeviceRequestsForm,
   ReissueDevicePackageForm,
   RejectDeviceRequestForm,
   ResendDevicePackageForm,
+  ResetMonitoringDeviceDataForm,
   RevokeDeviceProvisioningForm,
 } from "./admin-device-request-controls";
+
+const BULK_CLEANUP_FORM_ID = "device-request-bulk-cleanup-form";
 
 export const metadata: Metadata = {
   title: "Tinjau Pengajuan Perangkat | SolarTank",
@@ -96,10 +101,12 @@ function getDimensionSummary(request: MonitoringDeviceRequest) {
 }
 
 function RequestCard({
+  bulkCleanupFormId,
   csrfToken,
   profileById,
   request,
 }: {
+  bulkCleanupFormId: string;
   csrfToken: string;
   profileById: Map<string, MonitoringHardwareProfile>;
   request: MonitoringDeviceRequest;
@@ -124,6 +131,16 @@ function RequestCard({
     <article className="grid gap-5 rounded-lg border border-zinc-200 bg-zinc-50 p-4 xl:grid-cols-[1fr_320px]">
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200 transition hover:bg-blue-50 hover:text-blue-700 hover:ring-blue-100">
+            <input
+              className="size-3.5 rounded border-zinc-300 text-blue-600 focus:ring-blue-600/20"
+              form={bulkCleanupFormId}
+              name="requestIds"
+              type="checkbox"
+              value={request.id}
+            />
+            Pilih
+          </label>
           <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
             {request.requestCode}
           </span>
@@ -305,6 +322,21 @@ function RequestCard({
             halaman ini.
           </div>
         )}
+
+        <div className="grid gap-2 rounded-lg border border-red-100 bg-red-50/60 p-4">
+          <p className="text-sm font-semibold text-red-800">
+            Pembersihan data item
+          </p>
+          <p className="text-xs leading-5 text-red-700">
+            Menghapus pengajuan, paket firmware, event, reading, dan device
+            terkait item ini jika tidak dipakai data lain.
+          </p>
+          <CleanupDeviceRequestForm
+            csrfToken={csrfToken}
+            requestId={request.id}
+            requestLabel={request.requestCode}
+          />
+        </div>
       </aside>
     </article>
   );
@@ -430,6 +462,50 @@ export default async function AdminDeviceRequestsPage() {
           </section>
         ) : null}
 
+        {isMysqlEnabled ? (
+          <section className="rounded-lg border border-red-200 bg-white p-5 shadow-sm">
+            <div className="grid gap-4 xl:grid-cols-[1fr_520px] xl:items-start">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-red-600">
+                  Maintenance data uji
+                </p>
+                <h2 className="mt-2 text-xl font-semibold text-zinc-950">
+                  Bersihkan data perangkat sebelum uji real
+                </h2>
+                <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-600">
+                  Gunakan pembersihan pilihan untuk menghapus satu atau beberapa
+                  data uji dari card pengajuan. Reset semua tetap tersedia
+                  sebagai opsi terakhir ketika tim benar-benar ingin mulai dari
+                  database monitoring yang kosong. Akun pengguna, akun admin,
+                  template firmware, serta profil hardware tetap aman.
+                </p>
+                <div className="mt-4 rounded-lg border border-red-100 bg-red-50 p-3 text-sm leading-6 text-red-800">
+                  Setelah reset, user perlu mengajukan perangkat lagi atau admin
+                  perlu menyiapkan ulang data device sebelum dashboard kembali
+                  menampilkan data real.
+                </div>
+              </div>
+              <div className="grid gap-3">
+                <div className="rounded-lg border border-amber-200 bg-amber-50/70 p-4">
+                  <p className="mb-3 text-sm font-semibold text-amber-900">
+                    Bersihkan beberapa pilihan
+                  </p>
+                  <CleanupSelectedDeviceRequestsForm
+                    csrfToken={csrfToken}
+                    formId={BULK_CLEANUP_FORM_ID}
+                  />
+                </div>
+                <div className="rounded-lg border border-red-100 bg-red-50/50 p-4">
+                  <p className="mb-3 text-sm font-semibold text-red-900">
+                    Reset semua data monitoring
+                  </p>
+                  <ResetMonitoringDeviceDataForm csrfToken={csrfToken} />
+                </div>
+              </div>
+            </div>
+          </section>
+        ) : null}
+
         <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -454,6 +530,7 @@ export default async function AdminDeviceRequestsPage() {
             ) : (
               requests.map((request) => (
                 <RequestCard
+                  bulkCleanupFormId={BULK_CLEANUP_FORM_ID}
                   csrfToken={csrfToken}
                   key={request.id}
                   profileById={profileById}

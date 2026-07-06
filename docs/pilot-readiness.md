@@ -141,6 +141,58 @@ Jika gagal, cek:
 - allowlist provider jika ada;
 - koneksi internet.
 
+## 2.1 Bersihkan Data Device/Uji Jika Perlu Mulai Ulang
+
+Gunakan langkah ini ketika tim ingin menghapus data device sementara, misalnya
+setelah uji template firmware dan sebelum memasukkan data perangkat real.
+
+Langkah aman:
+
+1. Login sebagai admin.
+2. Buka halaman **Tinjau Pengajuan**:
+
+```text
+http://localhost:3000/dashboard/admin/device-requests
+```
+
+atau domain deployment yang sedang dipakai.
+
+3. Jika hanya satu item yang perlu dihapus, cari card pengajuannya lalu klik
+   **Bersihkan data ini**.
+4. Jika beberapa item perlu dihapus, centang **Pilih** pada card-card yang
+   sesuai, isi frasa konfirmasi di panel **Bersihkan beberapa pilihan**, lalu
+   klik **Bersihkan pilihan**.
+5. Jika semua data monitoring perangkat harus dikosongkan, gunakan panel
+   **Reset semua data monitoring** dan ketik frasa konfirmasi yang diminta.
+6. Baca konfirmasi browser sebelum menyetujui aksi.
+7. Cek pesan sukses.
+8. Buka dashboard untuk memastikan aplikasi tetap hidup. Jika memakai reset
+   semua, `/api/ready` wajar melaporkan registry belum lengkap sampai data
+   device dibuat lagi.
+
+Yang dibersihkan:
+
+- `monitoring_ingest_events`;
+- `monitoring_device_provisioning_events`;
+- `monitoring_device_packages`;
+- `monitoring_device_requests`;
+- `monitoring_readings`;
+- `monitoring_devices`;
+- `monitoring_tanks`;
+- `monitoring_sites` jika sudah tidak dipakai device/tangki lain.
+
+Yang tidak dibersihkan:
+
+- akun admin/user;
+- session dan audit auth;
+- template firmware;
+- profil hardware;
+- konfigurasi environment.
+
+Setelah item tertentu dibersihkan, hanya data terkait item itu yang hilang.
+Setelah reset semua, dashboard wajar kosong sampai ada pengajuan perangkat baru
+yang disetujui atau registry device dibuat ulang.
+
 ## 3. Generate Key dan Hash Device
 
 Setiap device pilot harus punya key sendiri.

@@ -14,11 +14,18 @@ import {
   reissueDevicePackageInMysql,
   revokeDeviceProvisioningInMysql,
 } from "@/features/monitoring/lib/mysql-device-request-repository";
+import {
+  cleanupMonitoringDeviceRequestsInMysql,
+  resetMonitoringDeviceDataInMysql,
+} from "@/features/monitoring/lib/mysql-maintenance-repository";
 import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
 
 const ADMIN_DEVICE_REQUEST_PATH = "/dashboard/admin/device-requests";
 const USER_DEVICE_REQUEST_PATH = "/dashboard/devices/request";
+const CLEANUP_SELECTED_CONFIRMATION = "BERSIHKAN PILIHAN DEVICE";
+const CLEANUP_SINGLE_CONFIRMATION = "BERSIHKAN ITEM DEVICE";
+const RESET_DEVICE_DATA_CONFIRMATION = "BERSIHKAN SEMUA DATA DEVICE";
 const DEVICE_REQUEST_SCHEMA_COLUMNS = [
   "device_sensor_type",
   "load_value",
@@ -103,6 +110,28 @@ function getActionSuccess(message: string): DeviceRequestAdminActionState {
   };
 }
 
+function formatResetSummary(totalRows: number): string {
+  if (totalRows === 0) {
+    return "Tidak ada data monitoring perangkat yang perlu dibersihkan.";
+  }
+
+  return `${totalRows} baris data monitoring perangkat berhasil dibersihkan. Akun, admin, template firmware, dan profil hardware tetap disimpan.`;
+}
+
+function formatCleanupSummary({
+  matchedRequestCount,
+  totalRows,
+}: {
+  matchedRequestCount: number;
+  totalRows: number;
+}): string {
+  if (matchedRequestCount === 0) {
+    return "Tidak ada pengajuan perangkat yang cocok untuk dibersihkan.";
+  }
+
+  return `${matchedRequestCount} pengajuan perangkat dibersihkan. ${totalRows} baris data terkait dihapus tanpa menghapus akun, template firmware, atau profil hardware.`;
+}
+
 function buildDevicePackageDownloadUrl(downloadToken: string): string {
   const url = new URL("/api/device-packages/download", getAppBaseUrl());
   url.searchParams.set("token", downloadToken);
@@ -113,6 +142,23 @@ function assertMysqlStorageIsReady() {
   if (getMonitoringStorageDriver() !== "mysql") {
     throw new Error("Tinjauan pengajuan perangkat memerlukan storage MySQL.");
   }
+}
+
+function revalidateMonitoringDevicePages() {
+  revalidatePath(ADMIN_DEVICE_REQUEST_PATH);
+  revalidatePath(USER_DEVICE_REQUEST_PATH);
+  revalidatePath("/dashboard");
+  revalidatePath("/dashboard/ringkasan");
+  revalidatePath("/dashboard/detail");
+  revalidatePath("/dashboard/tanks/[tankId]", "page");
+  revalidatePath("/dashboard/ringkas/tanks/[tankId]", "page");
+}
+
+function getRequestIdsFromForm(formData: FormData): string[] {
+  return formData
+    .getAll("requestIds")
+    .map((value) => String(value).trim())
+    .filter(Boolean);
 }
 
 export async function approveDeviceRequestAction(
@@ -342,6 +388,82 @@ export async function revokeDeviceProvisioningAction(
     revalidatePath("/dashboard");
 
     return getActionSuccess("Akses perangkat berhasil dicabut.");
+  } catch (error) {
+    return getActionError(error);
+  }
+}
+
+export async function resetMonitoringDeviceDataAction(
+  _state: DeviceRequestAdminActionState,
+  formData: FormData,
+): Promise<DeviceRequestAdminActionState> {
+  const admin = await requirePageAdmin();
+
+  try {
+    assertValidAdminActionCsrf({ formData, sessionId: admin.sessionId });
+    assertMysqlStorageIsReady();
+
+    const confirmation = getRequiredFormValue(formData, "confirmation");
+
+    if (confirmation !== RESET_DEVICE_DATA_CONFIRMATION) {
+      throw new Error(
+        `Ketik ${RESET_DEVICE_DATA_CONFIRMATION} untuk membersihkan data perangkat uji.`,
+      );
+    }
+
+    const result = await resetMonitoringDeviceDataInMysql();
+
+    revalidateMonitoringDevicePages();
+
+    return getActionSuccess(formatResetSummary(result.totalRows));
+  } catch (error) {
+    return getActionError(error);
+  }
+}
+
+export async function cleanupDeviceRequestsAction(
+  _state: DeviceRequestAdminActionState,
+  formData: FormData,
+): Promise<DeviceRequestAdminActionState> {
+  const admin = await requirePageAdmin();
+
+  try {
+    assertValidAdminActionCsrf({ formData, sessionId: admin.sessionId });
+    assertMysqlStorageIsReady();
+
+    const cleanupMode = getRequiredFormValue(formData, "cleanupMode");
+    const requestIds = getRequestIdsFromForm(formData);
+
+    if (requestIds.length === 0) {
+      throw new Error("Pilih minimal satu pengajuan perangkat untuk dibersihkan.");
+    }
+
+    if (cleanupMode === "single") {
+      const confirmation = getRequiredFormValue(formData, "confirmation");
+
+      if (
+        requestIds.length !== 1 ||
+        confirmation !== CLEANUP_SINGLE_CONFIRMATION
+      ) {
+        throw new Error("Aksi pembersihan satu perangkat tidak valid.");
+      }
+    } else if (cleanupMode === "selected") {
+      const confirmation = getRequiredFormValue(formData, "confirmation");
+
+      if (confirmation !== CLEANUP_SELECTED_CONFIRMATION) {
+        throw new Error(
+          `Ketik ${CLEANUP_SELECTED_CONFIRMATION} untuk membersihkan pengajuan yang dipilih.`,
+        );
+      }
+    } else {
+      throw new Error("Mode pembersihan perangkat tidak valid.");
+    }
+
+    const result = await cleanupMonitoringDeviceRequestsInMysql({ requestIds });
+
+    revalidateMonitoringDevicePages();
+
+    return getActionSuccess(formatCleanupSummary(result));
   } catch (error) {
     return getActionError(error);
   }

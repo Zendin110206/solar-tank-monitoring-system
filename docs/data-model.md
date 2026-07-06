@@ -155,6 +155,41 @@ pengajuan. Di database, isi ZIP disimpan terenkripsi memakai
 `DEVICE_PACKAGE_ENCRYPTION_KEY`. Link download punya masa berlaku dan batas
 jumlah download supaya device key tidak tersebar terlalu bebas.
 
+## Maintenance Data Device/Uji
+
+Data device/uji boleh dibersihkan dari halaman admin ketika tim memang ingin
+mulai ulang pengujian perangkat. Admin bisa membersihkan satu card pengajuan,
+beberapa card yang dipilih, atau seluruh data monitoring perangkat. Reset ini
+hanya untuk data operasional monitoring, bukan untuk data akun.
+
+Tabel yang termasuk data operasional monitoring:
+
+| Tabel | Isi |
+|---|---|
+| `monitoring_sites` | lokasi STO |
+| `monitoring_tanks` | konfigurasi tangki |
+| `monitoring_devices` | device yang aktif atau disiapkan |
+| `monitoring_readings` | histori pembacaan sensor |
+| `monitoring_device_requests` | pengajuan perangkat dari user |
+| `monitoring_device_packages` | paket firmware yang dibuat dari approval |
+| `monitoring_device_provisioning_events` | event approve, reject, reissue, revoke, dan email paket |
+| `monitoring_ingest_events` | event ingest device |
+
+Untuk pembersihan satu atau beberapa pengajuan, sistem hanya menghapus site,
+tangki, dan device yang terkait dengan pilihan tersebut. Jika site atau tangki
+masih dipakai data lain, data itu tidak ikut dihapus.
+
+Tabel yang sengaja tidak ikut dihapus:
+
+| Tabel | Alasan |
+|---|---|
+| `auth_*` | akun admin/user, session, OTP, audit auth, dan reset password harus tetap aman |
+| `monitoring_firmware_templates` | template firmware masih dibutuhkan untuk membuat paket baru |
+| `monitoring_hardware_profiles` | profil board, sensor, dan pin masih dibutuhkan oleh pengajuan berikutnya |
+
+Setelah data operasional dibersihkan, dashboard akan kosong sampai ada pengajuan
+perangkat baru yang disetujui atau registry monitoring disiapkan ulang.
+
 ## Reading
 
 Reading adalah satu catatan pembacaan.
