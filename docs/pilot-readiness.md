@@ -158,7 +158,7 @@ http://localhost:3000/dashboard/admin/device-requests
 atau domain deployment yang sedang dipakai.
 
 3. Jika data lama muncul di kartu dashboard dan tidak berasal dari pengajuan
-   baru, buka dashboard lalu klik tombol **Hapus** pada kartu STO tersebut.
+   baru, buka dashboard lalu klik ikon **X** pada kartu STO tersebut.
 4. Jika hanya satu pengajuan perangkat yang perlu dihapus, cari card
    pengajuannya lalu klik **Hapus data**.
 5. Jika pengajuan sudah banyak, gunakan kolom pencarian atau filter status di

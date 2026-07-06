@@ -486,8 +486,8 @@ admin lalu buka:
 
 Pilihan yang tersedia:
 
-- tombol **Hapus** di kartu dashboard untuk menghapus data STO/tangki lama yang
-  sudah tidak dipakai;
+- ikon **X** di kartu dashboard untuk menghapus data STO/tangki lama yang sudah
+  tidak dipakai, dengan dialog konfirmasi sebelum data dibersihkan;
 - filter pencarian dan status di halaman **Tinjau Pengajuan** supaya admin tidak
   perlu mencari manual ketika data pengajuan sudah banyak;
 - tombol **Hapus data** di tiap card pengajuan untuk menghapus satu
