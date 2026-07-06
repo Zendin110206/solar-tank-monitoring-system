@@ -18,7 +18,6 @@ import { roundTo } from "./number";
 const DEFAULT_LOW_LEVEL_PERCENT = 30;
 const DEFAULT_CRITICAL_LEVEL_PERCENT = 15;
 const DEFAULT_DEVICE_SENSOR_TYPE: DeviceSensorType = "fuel";
-const GENSET_IDLE_LITER_PER_KVA_HOUR = 0.05;
 const GENSET_LOAD_LITER_PER_KWH = 0.21;
 const DEFAULT_CAPACITY_TOLERANCE_PERCENT = 5;
 const DEFAULT_CAPACITY_TOLERANCE_LITER = 5;
@@ -296,11 +295,17 @@ export function calculateOperationalConsumptionLiterPerHour({
     loadUnit,
     loadValue,
   });
-  const idleConsumption =
-    dieselEngineCapacityKva * GENSET_IDLE_LITER_PER_KVA_HOUR;
-  const loadConsumption = effectiveLoadKw * GENSET_LOAD_LITER_PER_KWH;
+  const engineCapacityKw = dieselEngineCapacityKva * cosPhi;
 
-  return roundTo(Math.max(0.1, idleConsumption + loadConsumption), 2);
+  if (engineCapacityKw <= 0) {
+    return 0;
+  }
+
+  const loadRatio = effectiveLoadKw / engineCapacityKw;
+  const loadConsumption =
+    dieselEngineCapacityKva * loadRatio * GENSET_LOAD_LITER_PER_KWH;
+
+  return roundTo(Math.max(0, loadConsumption), 2);
 }
 
 export function createDeviceRequestCode({
@@ -348,7 +353,6 @@ export function validateDeviceRequestDraft(
   const widthCm = normalizePositiveNumber(draft.widthCm);
   const heightCm = normalizePositiveNumber(draft.heightCm);
   const diameterCm = normalizePositiveNumber(draft.diameterCm);
-  const capacityLiter = normalizePositiveNumber(draft.capacityLiter);
   const loadValue = normalizePositiveNumber(draft.loadValue);
   const loadUnit = normalizeLoadPowerUnit(draft.loadUnit);
   const dieselEngineCapacityKva = normalizePositiveNumber(
@@ -369,6 +373,13 @@ export function validateDeviceRequestDraft(
           loadValue,
         })
       : 0;
+  const capacityLiter = calculateDeviceRequestCapacityLiter({
+    tankShape: draft.tankShape,
+    lengthCm,
+    widthCm,
+    heightCm,
+    diameterCm,
+  });
 
   if (!siteName) {
     errors.push(createIssue("siteName", "Nama STO wajib diisi."));
@@ -390,12 +401,6 @@ export function validateDeviceRequestDraft(
         "deviceSensorType",
         "Mode sensor energy belum aktif di paket firmware saat ini. Gunakan Sensor fuel dulu.",
       ),
-    );
-  }
-
-  if (!capacityLiter) {
-    errors.push(
-      createIssue("capacityLiter", "Kapasitas tangki wajib lebih dari 0 liter."),
     );
   }
 
@@ -440,6 +445,15 @@ export function validateDeviceRequestDraft(
     }
   } else {
     errors.push(createIssue("tankShape", "Tipe tangki tidak dikenal."));
+  }
+
+  if (!capacityLiter) {
+    errors.push(
+      createIssue(
+        "capacityLiter",
+        "Kapasitas tangki belum bisa dihitung. Lengkapi dimensi tangki.",
+      ),
+    );
   }
 
   const inferredSensorMountHeightCm =
@@ -605,28 +619,15 @@ export function validateDeviceRequestDraft(
         }
       : null;
 
-  const calculatedCapacityLiter = normalized
-    ? calculateDeviceRequestCapacityLiter(normalized)
-    : null;
   const capacityCheck =
     normalized && capacityLiter
       ? evaluateDeviceRequestCapacity({
-          calculatedCapacityLiter,
+          calculatedCapacityLiter: capacityLiter,
           capacityToleranceLiter: options.capacityToleranceLiter,
           capacityTolerancePercent: options.capacityTolerancePercent,
           declaredCapacityLiter: capacityLiter,
         })
       : null;
-
-  if (capacityCheck && !capacityCheck.isConsistent) {
-    warnings.push(
-      createIssue(
-        "capacityLiter",
-        "Kapasitas tangki berbeda cukup jauh dari hasil hitung dimensi. Admin perlu memeriksa ulang.",
-        "warning",
-      ),
-    );
-  }
 
   return {
     ok: errors.length === 0,
