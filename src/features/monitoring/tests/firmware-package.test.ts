@@ -45,7 +45,7 @@ const DEVICE_REQUEST: MonitoringDeviceRequest = {
   adminReviewedByUserId: null,
   areaLabel: "Pasuruan",
   capacityLiter: 540,
-  consumptionLiterPerHour: 6.2,
+  consumptionLiterPerHour: 5.25,
   createdAt: "2026-07-05T00:00:00.000Z",
   criticalLevelPercent: 15,
   deviceCode: "device-tph-main",
@@ -114,7 +114,7 @@ describe("firmware package helpers", () => {
     expect(header).toContain("#define SOLARTANK_TANK_CAPACITY_LITER 540");
     expect(header).toContain("#define SOLARTANK_SITE_LATITUDE -7.7200000");
     expect(header).toContain("#define SOLARTANK_SITE_LONGITUDE 112.8800000");
-    expect(header).toContain("#define SOLARTANK_CONSUMPTION_LITER_PER_HOUR 6.20");
+    expect(header).toContain("#define SOLARTANK_CONSUMPTION_LITER_PER_HOUR 5.25");
     expect(header).toContain("#define SOLARTANK_COS_PHI 0.80");
     expect(header).not.toContain("{{");
   });

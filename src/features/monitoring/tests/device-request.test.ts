@@ -44,7 +44,6 @@ const baseDraft: DeviceRequestDraft = {
   areaLabel: "Pasuruan",
   deviceSensorType: "fuel",
   tankShape: "rectangular",
-  capacityLiter: 540,
   lengthCm: 150,
   widthCm: 60,
   heightCm: 60,
@@ -87,7 +86,8 @@ describe("device request foundation", () => {
       cosPhi: 0.8,
       lowLevelPercent: 30,
       criticalLevelPercent: 15,
-      consumptionLiterPerHour: 6.2,
+      capacityLiter: 540,
+      consumptionLiterPerHour: 5.25,
     });
     expect(validation.normalized?.deviceCode).toMatch(/^device-tph-[a-f0-9]{6}$/);
     expect(validation.capacityCheck).toMatchObject({
@@ -105,10 +105,18 @@ describe("device request foundation", () => {
         loadUnit: "kw",
         loadValue: 20,
       }),
-    ).toBe(6.2);
+    ).toBe(5.25);
+    expect(
+      calculateOperationalConsumptionLiterPerHour({
+        cosPhi: 0.8,
+        dieselEngineCapacityKva: 40,
+        loadUnit: "kva",
+        loadValue: 25,
+      }),
+    ).toBe(5.25);
   });
 
-  it("warns when declared capacity does not match the dimensions", () => {
+  it("uses calculated tank capacity even when a legacy draft sends capacity", () => {
     const validation = validateDeviceRequestDraft(
       {
         ...baseDraft,
@@ -121,13 +129,13 @@ describe("device request foundation", () => {
     );
 
     expect(validation.ok).toBe(true);
-    expect(validation.warnings).toContainEqual(
-      expect.objectContaining({
-        field: "capacityLiter",
-        severity: "warning",
-      }),
-    );
-    expect(validation.capacityCheck?.isConsistent).toBe(false);
+    expect(validation.warnings).toEqual([]);
+    expect(validation.normalized?.capacityLiter).toBe(540);
+    expect(validation.capacityCheck).toMatchObject({
+      calculatedCapacityLiter: 540,
+      declaredCapacityLiter: 540,
+      isConsistent: true,
+    });
   });
 
   it("rejects a hardware profile that does not support the selected tank shape", () => {

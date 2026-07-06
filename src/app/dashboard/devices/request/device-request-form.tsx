@@ -14,6 +14,7 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 
 import type {
+  LoadPowerUnit,
   MonitoringHardwareProfile,
   TankShape,
 } from "@/features/monitoring/types/monitoring";
@@ -79,18 +80,135 @@ function inputClassName(extra = "") {
   return `h-11 rounded-lg border border-zinc-200 bg-white px-3 text-sm font-semibold text-zinc-950 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-600/15 disabled:cursor-not-allowed disabled:bg-zinc-50 disabled:text-zinc-500 ${extra}`;
 }
 
+function parsePositiveFormNumber(value: string): number | null {
+  const parsed = Number(value.replace(",", "."));
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
+function roundMetric(value: number): number {
+  return Math.round(value * 100) / 100;
+}
+
+function formatMetric(value: number): string {
+  return new Intl.NumberFormat("id-ID", {
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
+function calculateCapacityPreview({
+  diameterCm,
+  heightCm,
+  lengthCm,
+  tankShape,
+  widthCm,
+}: {
+  diameterCm: string;
+  heightCm: string;
+  lengthCm: string;
+  tankShape: TankShape;
+  widthCm: string;
+}): number | null {
+  const length = parsePositiveFormNumber(lengthCm);
+
+  if (!length) {
+    return null;
+  }
+
+  if (tankShape === "horizontal-cylinder") {
+    const diameter = parsePositiveFormNumber(diameterCm);
+
+    if (!diameter) {
+      return null;
+    }
+
+    const radius = diameter / 2;
+    return roundMetric((Math.PI * radius * radius * length) / 1000);
+  }
+
+  const width = parsePositiveFormNumber(widthCm);
+  const height = parsePositiveFormNumber(heightCm);
+
+  if (!width || !height) {
+    return null;
+  }
+
+  return roundMetric((length * width * height) / 1000);
+}
+
+function calculateConsumptionPreview({
+  cosPhi,
+  dieselEngineCapacityKva,
+  loadUnit,
+  loadValue,
+}: {
+  cosPhi: string;
+  dieselEngineCapacityKva: string;
+  loadUnit: LoadPowerUnit;
+  loadValue: string;
+}): number | null {
+  const load = parsePositiveFormNumber(loadValue);
+  const engineCapacity = parsePositiveFormNumber(dieselEngineCapacityKva);
+  const cos = parsePositiveFormNumber(cosPhi);
+
+  if (!load || !engineCapacity || !cos || cos > 1) {
+    return null;
+  }
+
+  const effectiveLoadKw = loadUnit === "kva" ? load * cos : load;
+  const engineCapacityKw = engineCapacity * cos;
+
+  if (engineCapacityKw <= 0) {
+    return null;
+  }
+
+  const loadRatio = effectiveLoadKw / engineCapacityKw;
+  return roundMetric(Math.max(0, engineCapacity * loadRatio * 0.21));
+}
+
+function ComputedMetric({
+  emptyLabel = "otomatis",
+  help,
+  label,
+  unit,
+  value,
+}: {
+  emptyLabel?: string;
+  help?: string;
+  label: string;
+  unit: string;
+  value: number | null;
+}) {
+  return (
+    <div className="flex h-full flex-col gap-2 text-sm font-semibold text-zinc-900">
+      <span>{label}</span>
+      <output className="flex min-h-11 items-center rounded-lg border border-blue-100 bg-blue-50 px-3 text-sm font-semibold text-blue-950 shadow-sm">
+        {value === null ? emptyLabel : `${formatMetric(value)} ${unit}`}
+      </output>
+      {help ? (
+        <span className="min-h-5 text-xs font-normal leading-5 text-zinc-500">
+          {help}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
 function NumberInput({
   max,
   min = "0",
   name,
+  onValueChange,
   placeholder,
   required,
+  value,
 }: {
   max?: string;
   min?: string;
   name: string;
+  onValueChange?: (value: string) => void;
   placeholder?: string;
   required?: boolean;
+  value?: string;
 }) {
   return (
     <input
@@ -99,10 +217,12 @@ function NumberInput({
       max={max}
       min={min}
       name={name}
+      onChange={(event) => onValueChange?.(event.target.value)}
       placeholder={placeholder}
       required={required}
       step="0.01"
       type="number"
+      value={value}
     />
   );
 }
@@ -173,6 +293,14 @@ export function DeviceRequestForm({
     INITIAL_STATE,
   );
   const [tankShape, setTankShape] = useState<TankShape>("rectangular");
+  const [lengthCm, setLengthCm] = useState("");
+  const [widthCm, setWidthCm] = useState("");
+  const [heightCm, setHeightCm] = useState("");
+  const [diameterCm, setDiameterCm] = useState("");
+  const [loadValue, setLoadValue] = useState("");
+  const [loadUnit, setLoadUnit] = useState<LoadPowerUnit>("kw");
+  const [dieselEngineCapacityKva, setDieselEngineCapacityKva] = useState("");
+  const [cosPhi, setCosPhi] = useState("");
   const matchingProfiles = useMemo(
     () =>
       hardwareProfiles.filter(
@@ -183,6 +311,27 @@ export function DeviceRequestForm({
     [hardwareProfiles, tankShape],
   );
   const canSubmit = matchingProfiles.length > 0;
+  const calculatedCapacityLiter = useMemo(
+    () =>
+      calculateCapacityPreview({
+        diameterCm,
+        heightCm,
+        lengthCm,
+        tankShape,
+        widthCm,
+      }),
+    [diameterCm, heightCm, lengthCm, tankShape, widthCm],
+  );
+  const calculatedConsumptionLiterPerHour = useMemo(
+    () =>
+      calculateConsumptionPreview({
+        cosPhi,
+        dieselEngineCapacityKva,
+        loadUnit,
+        loadValue,
+      }),
+    [cosPhi, dieselEngineCapacityKva, loadUnit, loadValue],
+  );
 
   return (
     <form action={formAction} className="mx-auto grid max-w-6xl gap-6">
@@ -330,24 +479,51 @@ export function DeviceRequestForm({
         </div>
 
         <div className="grid max-w-6xl gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
-          <FormField label="Kapasitas liter">
-            <NumberInput name="capacityLiter" placeholder="540" required />
-          </FormField>
+          <ComputedMetric
+            help="Dari dimensi tangki."
+            label="Kapasitas liter"
+            unit="L"
+            value={calculatedCapacityLiter}
+          />
           <FormField label="Panjang cm">
-            <NumberInput name="lengthCm" placeholder="150" required />
+            <NumberInput
+              name="lengthCm"
+              onValueChange={setLengthCm}
+              placeholder="150"
+              required
+              value={lengthCm}
+            />
           </FormField>
           {tankShape === "rectangular" ? (
             <>
               <FormField label="Lebar cm">
-                <NumberInput name="widthCm" placeholder="60" required />
+                <NumberInput
+                  name="widthCm"
+                  onValueChange={setWidthCm}
+                  placeholder="60"
+                  required
+                  value={widthCm}
+                />
               </FormField>
               <FormField label="Tinggi cm">
-                <NumberInput name="heightCm" placeholder="60" required />
+                <NumberInput
+                  name="heightCm"
+                  onValueChange={setHeightCm}
+                  placeholder="60"
+                  required
+                  value={heightCm}
+                />
               </FormField>
             </>
           ) : (
             <FormField label="Diameter cm">
-              <NumberInput name="diameterCm" placeholder="60" required />
+              <NumberInput
+                name="diameterCm"
+                onValueChange={setDiameterCm}
+                placeholder="60"
+                required
+                value={diameterCm}
+              />
             </FormField>
           )}
           <FormField
@@ -368,12 +544,24 @@ export function DeviceRequestForm({
           diesel engine, dan cos phi.
         </SectionHeader>
 
-        <div className="grid max-w-6xl gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid max-w-6xl gap-4 sm:grid-cols-2 xl:grid-cols-5">
           <FormField label="Beban lokasi">
-            <NumberInput name="loadValue" placeholder="20" required />
+            <NumberInput
+              name="loadValue"
+              onValueChange={setLoadValue}
+              placeholder="20"
+              required
+              value={loadValue}
+            />
           </FormField>
           <FormField label="Satuan beban">
-            <select className={inputClassName()} name="loadUnit" required>
+            <select
+              className={inputClassName()}
+              name="loadUnit"
+              onChange={(event) => setLoadUnit(event.target.value as LoadPowerUnit)}
+              required
+              value={loadUnit}
+            >
               <option value="kw">kW</option>
               <option value="kva">kVA</option>
             </select>
@@ -382,11 +570,31 @@ export function DeviceRequestForm({
             label="Kapasitas diesel engine"
             help="Isi dalam kVA."
           >
-            <NumberInput name="dieselEngineCapacityKva" placeholder="40" required />
+            <NumberInput
+              name="dieselEngineCapacityKva"
+              onValueChange={setDieselEngineCapacityKva}
+              placeholder="40"
+              required
+              value={dieselEngineCapacityKva}
+            />
           </FormField>
           <FormField label="Cos phi" help="Umumnya 0,8. Isi 0 sampai 1.">
-            <NumberInput max="1" min="0.01" name="cosPhi" placeholder="0.8" required />
+            <NumberInput
+              max="1"
+              min="0.01"
+              name="cosPhi"
+              onValueChange={setCosPhi}
+              placeholder="0.8"
+              required
+              value={cosPhi}
+            />
           </FormField>
+          <ComputedMetric
+            help="Dipakai estimasi runtime."
+            label="Konsumsi solar"
+            unit="L/jam"
+            value={calculatedConsumptionLiterPerHour}
+          />
         </div>
       </section>
 
