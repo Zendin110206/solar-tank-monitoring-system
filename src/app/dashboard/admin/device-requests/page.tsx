@@ -1,6 +1,13 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { AlertTriangle, Clock3, Cpu, Database, ShieldCheck } from "lucide-react";
+import {
+  AlertTriangle,
+  Clock3,
+  Cpu,
+  Database,
+  Search,
+  ShieldCheck,
+} from "lucide-react";
 
 import { createAdminActionCsrfToken } from "@/features/auth/lib/auth-csrf";
 import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
@@ -31,6 +38,27 @@ import {
 
 const BULK_CLEANUP_FORM_ID = "device-request-bulk-cleanup-form";
 
+const DEVICE_REQUEST_STATUS_OPTIONS: Array<{
+  label: string;
+  value: DeviceRequestStatus | "all";
+}> = [
+  { label: "Semua status", value: "all" },
+  { label: "Menunggu review", value: "pending_admin_review" },
+  { label: "Disetujui", value: "approved_package_ready" },
+  { label: "Menunggu perangkat", value: "waiting_first_valid_ping" },
+  { label: "Aktif", value: "active" },
+  { label: "Ditolak", value: "rejected" },
+  { label: "Dicabut", value: "revoked" },
+  { label: "Kedaluwarsa", value: "expired" },
+];
+
+type AdminDeviceRequestsPageProps = {
+  searchParams: Promise<{
+    q?: string;
+    status?: string;
+  }>;
+};
+
 export const metadata: Metadata = {
   title: "Tinjau Pengajuan Perangkat | SolarTank",
   description:
@@ -53,6 +81,56 @@ function formatDate(value: string | null | undefined) {
     minute: "2-digit",
     timeZone: "Asia/Jakarta",
   }).format(new Date(value));
+}
+
+function normalizeFilterValue(value: string) {
+  return value.toLocaleLowerCase("id-ID").trim();
+}
+
+function getRequestedStatus(value: string | undefined) {
+  const cleanValue = String(value ?? "all").trim();
+  const matchedOption = DEVICE_REQUEST_STATUS_OPTIONS.find(
+    (option) => option.value === cleanValue,
+  );
+
+  return matchedOption?.value ?? "all";
+}
+
+function filterDeviceRequests({
+  query,
+  requests,
+  status,
+}: {
+  query: string;
+  requests: MonitoringDeviceRequest[];
+  status: DeviceRequestStatus | "all";
+}) {
+  const cleanQuery = normalizeFilterValue(query);
+
+  return requests.filter((request) => {
+    if (status !== "all" && request.status !== status) {
+      return false;
+    }
+
+    if (!cleanQuery) {
+      return true;
+    }
+
+    const haystack = [
+      request.requestCode,
+      request.siteCode,
+      request.siteName,
+      request.areaLabel,
+      request.deviceCode,
+      request.deviceLabel,
+      request.requesterEmail,
+      getDeviceRequestStatusLabel(request.status),
+    ]
+      .map(normalizeFilterValue)
+      .join(" ");
+
+    return haystack.includes(cleanQuery);
+  });
 }
 
 function getStatusClass(status: DeviceRequestStatus) {
@@ -128,7 +206,7 @@ function RequestCard({
     request.status !== "revoked";
 
   return (
-    <article className="grid gap-5 rounded-lg border border-zinc-200 bg-zinc-50 p-4 xl:grid-cols-[1fr_320px]">
+    <article className="grid gap-5 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm xl:grid-cols-[1fr_300px]">
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
           <label className="inline-flex cursor-pointer items-center gap-2 rounded-full bg-white px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200 transition hover:bg-blue-50 hover:text-blue-700 hover:ring-blue-100">
@@ -139,7 +217,7 @@ function RequestCard({
               type="checkbox"
               value={request.id}
             />
-            Pilih
+            Pilih hapus
           </label>
           <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
             {request.requestCode}
@@ -272,7 +350,7 @@ function RequestCard({
       </div>
 
       <aside className="grid content-start gap-3">
-        <div className="rounded-lg bg-white p-4 text-sm leading-6 text-zinc-600 ring-1 ring-zinc-200">
+        <div className="rounded-lg bg-zinc-50 p-4 text-sm leading-6 text-zinc-600 ring-1 ring-zinc-200">
           <p>Diajukan: {formatDate(request.createdAt)}</p>
           <p>Ditinjau: {formatDate(request.adminReviewedAt)}</p>
         </div>
@@ -317,20 +395,13 @@ function RequestCard({
             ) : null}
           </div>
         ) : (
-          <div className="rounded-lg bg-white p-4 text-sm leading-6 text-zinc-500 ring-1 ring-zinc-200">
+          <div className="rounded-lg bg-zinc-50 p-4 text-sm leading-6 text-zinc-500 ring-1 ring-zinc-200">
             Pengajuan ini sudah diproses dan tidak bisa ditinjau ulang dari
             halaman ini.
           </div>
         )}
 
-        <div className="grid gap-2 rounded-lg border border-red-100 bg-red-50/60 p-4">
-          <p className="text-sm font-semibold text-red-800">
-            Pembersihan data item
-          </p>
-          <p className="text-xs leading-5 text-red-700">
-            Menghapus pengajuan, paket firmware, event, reading, dan device
-            terkait item ini jika tidak dipakai data lain.
-          </p>
+        <div className="border-t border-zinc-100 pt-3">
           <CleanupDeviceRequestForm
             csrfToken={csrfToken}
             requestId={request.id}
@@ -342,8 +413,13 @@ function RequestCard({
   );
 }
 
-export default async function AdminDeviceRequestsPage() {
+export default async function AdminDeviceRequestsPage({
+  searchParams,
+}: AdminDeviceRequestsPageProps) {
   const admin = await requirePageAdmin();
+  const params = await searchParams;
+  const query = String(params.q ?? "").trim();
+  const statusFilter = getRequestedStatus(params.status);
   const csrfToken = createAdminActionCsrfToken(admin.sessionId);
   const isMysqlEnabled = getMonitoringStorageDriver() === "mysql";
   const [requests, hardwareProfiles] = isMysqlEnabled
@@ -358,6 +434,11 @@ export default async function AdminDeviceRequestsPage() {
   const pendingCount = requests.filter(
     (request) => request.status === "pending_admin_review",
   ).length;
+  const filteredRequests = filterDeviceRequests({
+    query,
+    requests,
+    status: statusFilter,
+  });
 
   return (
     <main className="min-h-screen bg-[#f5faf8] text-zinc-950">
@@ -462,50 +543,6 @@ export default async function AdminDeviceRequestsPage() {
           </section>
         ) : null}
 
-        {isMysqlEnabled ? (
-          <section className="rounded-lg border border-red-200 bg-white p-5 shadow-sm">
-            <div className="grid gap-4 xl:grid-cols-[1fr_520px] xl:items-start">
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-red-600">
-                  Maintenance data uji
-                </p>
-                <h2 className="mt-2 text-xl font-semibold text-zinc-950">
-                  Bersihkan data perangkat sebelum uji real
-                </h2>
-                <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-600">
-                  Gunakan pembersihan pilihan untuk menghapus satu atau beberapa
-                  data uji dari card pengajuan. Reset semua tetap tersedia
-                  sebagai opsi terakhir ketika tim benar-benar ingin mulai dari
-                  database monitoring yang kosong. Akun pengguna, akun admin,
-                  template firmware, serta profil hardware tetap aman.
-                </p>
-                <div className="mt-4 rounded-lg border border-red-100 bg-red-50 p-3 text-sm leading-6 text-red-800">
-                  Setelah reset, user perlu mengajukan perangkat lagi atau admin
-                  perlu menyiapkan ulang data device sebelum dashboard kembali
-                  menampilkan data real.
-                </div>
-              </div>
-              <div className="grid gap-3">
-                <div className="rounded-lg border border-amber-200 bg-amber-50/70 p-4">
-                  <p className="mb-3 text-sm font-semibold text-amber-900">
-                    Bersihkan beberapa pilihan
-                  </p>
-                  <CleanupSelectedDeviceRequestsForm
-                    csrfToken={csrfToken}
-                    formId={BULK_CLEANUP_FORM_ID}
-                  />
-                </div>
-                <div className="rounded-lg border border-red-100 bg-red-50/50 p-4">
-                  <p className="mb-3 text-sm font-semibold text-red-900">
-                    Reset semua data monitoring
-                  </p>
-                  <ResetMonitoringDeviceDataForm csrfToken={csrfToken} />
-                </div>
-              </div>
-            </div>
-          </section>
-        ) : null}
-
         <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -522,13 +559,74 @@ export default async function AdminDeviceRequestsPage() {
             </span>
           </div>
 
+          <form
+            action="/dashboard/admin/device-requests"
+            className="mt-5 grid gap-3 lg:grid-cols-[minmax(18rem,1fr)_16rem_auto_auto] lg:items-end"
+          >
+            <label className="grid gap-2 text-sm font-semibold text-zinc-950">
+              Cari pengajuan
+              <span className="relative block">
+                <Search
+                  aria-hidden="true"
+                  className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400"
+                />
+                <input
+                  className="h-11 w-full rounded-lg border border-zinc-300 bg-white pl-10 pr-3 text-sm font-medium text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+                  defaultValue={query}
+                  name="q"
+                  placeholder="Cari STO, device, email, atau kode"
+                  type="search"
+                />
+              </span>
+            </label>
+            <label className="grid gap-2 text-sm font-semibold text-zinc-950">
+              Status
+              <select
+                className="h-11 rounded-lg border border-zinc-300 bg-white px-3 text-sm font-semibold text-zinc-800 outline-none transition hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+                defaultValue={statusFilter}
+                name="status"
+              >
+                {DEVICE_REQUEST_STATUS_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <button
+              className="inline-flex h-11 items-center justify-center rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white shadow-lg shadow-blue-600/15 transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20"
+              type="submit"
+            >
+              Terapkan
+            </button>
+            <Link
+              className="inline-flex h-11 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-zinc-600/15"
+              href="/dashboard/admin/device-requests"
+            >
+              Reset
+            </Link>
+          </form>
+
+          {isMysqlEnabled ? (
+            <div className="mt-4 rounded-lg border border-amber-100 bg-amber-50/70 p-3">
+              <CleanupSelectedDeviceRequestsForm
+                csrfToken={csrfToken}
+                formId={BULK_CLEANUP_FORM_ID}
+              />
+            </div>
+          ) : null}
+
           <div className="mt-5 grid gap-3">
             {requests.length === 0 ? (
               <div className="rounded-lg border border-dashed border-zinc-300 p-6 text-sm leading-6 text-zinc-500">
                 Belum ada pengajuan perangkat.
               </div>
+            ) : filteredRequests.length === 0 ? (
+              <div className="rounded-lg border border-dashed border-zinc-300 p-6 text-sm leading-6 text-zinc-500">
+                Tidak ada pengajuan yang cocok dengan filter ini.
+              </div>
             ) : (
-              requests.map((request) => (
+              filteredRequests.map((request) => (
                 <RequestCard
                   bulkCleanupFormId={BULK_CLEANUP_FORM_ID}
                   csrfToken={csrfToken}
@@ -539,6 +637,22 @@ export default async function AdminDeviceRequestsPage() {
               ))
             )}
           </div>
+
+          {isMysqlEnabled ? (
+            <details className="mt-5 rounded-lg border border-red-100 bg-red-50/40 p-4">
+              <summary className="cursor-pointer text-sm font-semibold text-red-800">
+                Opsi lanjutan: reset semua data monitoring
+              </summary>
+              <div className="mt-3 max-w-3xl text-sm leading-6 text-red-700">
+                Gunakan hanya ketika tim benar-benar ingin mulai ulang dari data
+                monitoring kosong. Akun pengguna, akun admin, template firmware,
+                dan profil hardware tetap disimpan.
+              </div>
+              <div className="mt-4 max-w-xl">
+                <ResetMonitoringDeviceDataForm csrfToken={csrfToken} />
+              </div>
+            </details>
+          ) : null}
         </section>
       </div>
     </main>

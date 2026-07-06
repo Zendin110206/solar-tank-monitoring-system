@@ -157,16 +157,21 @@ http://localhost:3000/dashboard/admin/device-requests
 
 atau domain deployment yang sedang dipakai.
 
-3. Jika hanya satu item yang perlu dihapus, cari card pengajuannya lalu klik
-   **Bersihkan data ini**.
-4. Jika beberapa item perlu dihapus, centang **Pilih** pada card-card yang
-   sesuai, isi frasa konfirmasi di panel **Bersihkan beberapa pilihan**, lalu
-   klik **Bersihkan pilihan**.
-5. Jika semua data monitoring perangkat harus dikosongkan, gunakan panel
-   **Reset semua data monitoring** dan ketik frasa konfirmasi yang diminta.
-6. Baca konfirmasi browser sebelum menyetujui aksi.
-7. Cek pesan sukses.
-8. Buka dashboard untuk memastikan aplikasi tetap hidup. Jika memakai reset
+3. Jika data lama muncul di kartu dashboard dan tidak berasal dari pengajuan
+   baru, buka dashboard lalu klik tombol **Hapus** pada kartu STO tersebut.
+4. Jika hanya satu pengajuan perangkat yang perlu dihapus, cari card
+   pengajuannya lalu klik **Hapus data**.
+5. Jika pengajuan sudah banyak, gunakan kolom pencarian atau filter status di
+   halaman **Tinjau Pengajuan**.
+6. Jika beberapa pengajuan perlu dihapus, centang **Pilih hapus** pada card yang
+   sesuai, isi frasa konfirmasi di kontrol **Hapus pengajuan yang dicentang**,
+   lalu klik **Bersihkan pilihan**.
+7. Jika semua data monitoring perangkat harus dikosongkan, buka
+   **Opsi lanjutan: reset semua data monitoring** dan ketik frasa konfirmasi
+   yang diminta.
+8. Baca konfirmasi browser sebelum menyetujui aksi.
+9. Cek pesan sukses.
+10. Buka dashboard untuk memastikan aplikasi tetap hidup. Jika memakai reset
    semua, `/api/ready` wajar melaporkan registry belum lengkap sampai data
    device dibuat lagi.
 

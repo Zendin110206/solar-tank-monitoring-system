@@ -23,6 +23,7 @@ vi.mock("../lib/mysql-connection", () => ({
 
 import {
   cleanupMonitoringDeviceRequestsInMysql,
+  cleanupMonitoringTanksInMysql,
   resetMonitoringDeviceDataInMysql,
 } from "../lib/mysql-maintenance-repository";
 
@@ -116,6 +117,63 @@ describe("mysql maintenance repository", () => {
     });
     expect(statements.join(" ")).toContain("NOT EXISTS");
     expect(statements.join(" ")).toContain("DELETE t FROM monitoring_tanks t");
+    expect(statements.join(" ")).toContain("DELETE s FROM monitoring_sites s");
+    expect(statements.join(" ")).not.toContain("auth_");
+    expect(statements.join(" ")).not.toContain("monitoring_firmware_templates");
+    expect(statements.join(" ")).not.toContain("monitoring_hardware_profiles");
+    expect(mocks.connection.commit).toHaveBeenCalledTimes(1);
+    expect(mocks.connection.rollback).not.toHaveBeenCalled();
+    expect(mocks.connection.release).toHaveBeenCalledTimes(1);
+  });
+
+  it("cleans dashboard tank data even when the site came from older monitoring records", async () => {
+    mocks.connection.query.mockImplementation(async (statement: string) => {
+      const cleanStatement = statement.replace(/\s+/g, " ").trim();
+
+      if (
+        cleanStatement.startsWith("SELECT") &&
+        cleanStatement.includes("FROM monitoring_tanks")
+      ) {
+        return [[{ id: "tank-1", site_id: "site-1" }]];
+      }
+
+      if (
+        cleanStatement.startsWith("SELECT") &&
+        cleanStatement.includes("FROM monitoring_devices")
+      ) {
+        return [[{ id: "device-1", site_id: "site-1", tank_id: "tank-1" }]];
+      }
+
+      if (
+        cleanStatement.startsWith("SELECT") &&
+        cleanStatement.includes("FROM monitoring_device_packages")
+      ) {
+        return [
+          [{ device_id: "device-1", id: "package-1", request_id: "request-1" }],
+        ];
+      }
+
+      return [{ affectedRows: 1 }];
+    });
+
+    const result = await cleanupMonitoringTanksInMysql({
+      tankIds: ["tank-1"],
+    });
+    const statements = mocks.connection.query.mock.calls.map(([statement]) =>
+      String(statement).replace(/\s+/g, " ").trim(),
+    );
+    const ingestDelete = statements.find((statement) =>
+      statement.startsWith("DELETE FROM monitoring_ingest_events"),
+    );
+
+    expect(result).toMatchObject({
+      matchedTankCount: 1,
+      totalRows: 8,
+    });
+    expect(ingestDelete).toContain("device_id IN");
+    expect(ingestDelete).toContain("request_id IN");
+    expect(ingestDelete).not.toContain("tank_id");
+    expect(statements.join(" ")).toContain("DELETE FROM monitoring_tanks");
     expect(statements.join(" ")).toContain("DELETE s FROM monitoring_sites s");
     expect(statements.join(" ")).not.toContain("auth_");
     expect(statements.join(" ")).not.toContain("monitoring_firmware_templates");

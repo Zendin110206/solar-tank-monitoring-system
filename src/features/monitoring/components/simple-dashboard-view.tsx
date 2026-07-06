@@ -15,6 +15,7 @@ import { SimpleDashboardCards } from "./simple-dashboard-cards";
 import { SimpleDashboardMap } from "./simple-dashboard-map";
 
 type SimpleDashboardViewProps = {
+  adminCleanupToken?: string;
   sites: SimpleDashboardSite[];
 };
 
@@ -78,7 +79,10 @@ function SummaryValue({
   );
 }
 
-export function SimpleDashboardView({ sites }: SimpleDashboardViewProps) {
+export function SimpleDashboardView({
+  adminCleanupToken,
+  sites,
+}: SimpleDashboardViewProps) {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] =
     useState<SimpleDashboardStatusFilter>("all");
@@ -223,7 +227,10 @@ export function SimpleDashboardView({ sites }: SimpleDashboardViewProps) {
       </div>
 
       {viewMode === "cards" ? (
-        <SimpleDashboardCards sites={visibleSites} />
+        <SimpleDashboardCards
+          adminCleanupToken={adminCleanupToken}
+          sites={visibleSites}
+        />
       ) : (
         <SimpleDashboardMap key={mapViewKey} sites={visibleSites} />
       )}

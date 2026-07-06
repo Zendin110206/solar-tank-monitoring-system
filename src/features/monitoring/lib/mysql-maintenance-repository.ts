@@ -31,12 +31,18 @@ type IdRow = RowDataPacket & {
 type PackageLinkRow = RowDataPacket & {
   device_id: string | null;
   id: string;
+  request_id: string;
 };
 
 type DeviceLinkRow = RowDataPacket & {
   id: string;
   site_id: string;
   tank_id: string;
+};
+
+type TankLinkRow = RowDataPacket & {
+  id: string;
+  site_id: string;
 };
 
 export type ResetMonitoringDeviceDataResult = {
@@ -47,6 +53,12 @@ export type ResetMonitoringDeviceDataResult = {
 export type CleanupMonitoringDeviceRequestsResult = {
   counts: Partial<Record<ResetMonitoringDeviceDataTable, number>>;
   matchedRequestCount: number;
+  totalRows: number;
+};
+
+export type CleanupMonitoringTanksResult = {
+  counts: Partial<Record<ResetMonitoringDeviceDataTable, number>>;
+  matchedTankCount: number;
   totalRows: number;
 };
 
@@ -357,6 +369,226 @@ export async function cleanupMonitoringDeviceRequestsInMysql({
     return {
       counts,
       matchedRequestCount: matchedRequestIds.length,
+      totalRows: Object.values(counts).reduce(
+        (total, count) => total + (count ?? 0),
+        0,
+      ),
+    };
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+}
+
+export async function cleanupMonitoringTanksInMysql({
+  tankIds,
+}: {
+  tankIds: string[];
+}): Promise<CleanupMonitoringTanksResult> {
+  const cleanTankIds = uniqueNonEmpty(tankIds);
+
+  if (cleanTankIds.length === 0) {
+    return {
+      counts: {},
+      matchedTankCount: 0,
+      totalRows: 0,
+    };
+  }
+
+  const pool = getMysqlPool();
+  const connection = await pool.getConnection();
+  const counts: CleanupMonitoringTanksResult["counts"] = {};
+
+  try {
+    await connection.beginTransaction();
+
+    const [tankRows] = await connection.query<TankLinkRow[]>(
+      `
+        SELECT id, site_id
+        FROM monitoring_tanks
+        WHERE id IN (${buildPlaceholders(cleanTankIds)})
+        FOR UPDATE
+      `,
+      cleanTankIds,
+    );
+    const matchedTankIds = getIds(tankRows);
+
+    if (matchedTankIds.length === 0) {
+      await connection.commit();
+
+      return {
+        counts,
+        matchedTankCount: 0,
+        totalRows: 0,
+      };
+    }
+
+    const candidateSiteIds = uniqueNonEmpty(
+      tankRows.map((row) => row.site_id),
+    );
+    const [deviceRows] = await connection.query<DeviceLinkRow[]>(
+      `
+        SELECT id, site_id, tank_id
+        FROM monitoring_devices
+        WHERE tank_id IN (${buildPlaceholders(matchedTankIds)})
+        FOR UPDATE
+      `,
+      matchedTankIds,
+    );
+    const deviceIds = uniqueNonEmpty(deviceRows.map((row) => row.id));
+    const packageRows =
+      deviceIds.length > 0
+        ? await (async () => {
+            const [rows] = await connection.query<PackageLinkRow[]>(
+              `
+                SELECT id, request_id, device_id
+                FROM monitoring_device_packages
+                WHERE device_id IN (${buildPlaceholders(deviceIds)})
+                FOR UPDATE
+              `,
+              deviceIds,
+            );
+
+            return rows;
+          })()
+        : [];
+    const requestIds = uniqueNonEmpty(
+      packageRows.map((row) => row.request_id),
+    );
+    const allPackageRows =
+      requestIds.length > 0
+        ? await (async () => {
+            const packageWhere = buildWhereFromIdGroups([
+              { column: "device_id", values: deviceIds },
+              { column: "request_id", values: requestIds },
+            ]);
+
+            if (!packageWhere) {
+              return packageRows;
+            }
+
+            const [rows] = await connection.query<PackageLinkRow[]>(
+              `
+                SELECT id, request_id, device_id
+                FROM monitoring_device_packages
+                WHERE ${packageWhere.where}
+                FOR UPDATE
+              `,
+              packageWhere.params,
+            );
+
+            return rows;
+          })()
+        : packageRows;
+    const packageIds = uniqueNonEmpty(allPackageRows.map((row) => row.id));
+    const allRequestIds = uniqueNonEmpty(
+      allPackageRows.map((row) => row.request_id),
+    );
+    const ingestWhere = buildWhereFromIdGroups([
+      { column: "device_id", values: deviceIds },
+      { column: "request_id", values: allRequestIds },
+    ]);
+
+    if (ingestWhere) {
+      counts.monitoring_ingest_events = await deleteWhere({
+        connection,
+        params: ingestWhere.params,
+        tableName: "monitoring_ingest_events",
+        where: ingestWhere.where,
+      });
+    }
+
+    const provisioningWhere = buildWhereFromIdGroups([
+      { column: "request_id", values: allRequestIds },
+      { column: "package_id", values: packageIds },
+    ]);
+
+    if (provisioningWhere) {
+      counts.monitoring_device_provisioning_events = await deleteWhere({
+        connection,
+        params: provisioningWhere.params,
+        tableName: "monitoring_device_provisioning_events",
+        where: provisioningWhere.where,
+      });
+    }
+
+    const readingWhere = buildWhereFromIdGroups([
+      { column: "tank_id", values: matchedTankIds },
+      { column: "device_id", values: deviceIds },
+    ]);
+
+    if (readingWhere) {
+      counts.monitoring_readings = await deleteWhere({
+        connection,
+        params: readingWhere.params,
+        tableName: "monitoring_readings",
+        where: readingWhere.where,
+      });
+    }
+
+    if (packageIds.length > 0) {
+      counts.monitoring_device_packages = await deleteWhere({
+        connection,
+        params: packageIds,
+        tableName: "monitoring_device_packages",
+        where: `id IN (${buildPlaceholders(packageIds)})`,
+      });
+    }
+
+    if (allRequestIds.length > 0) {
+      counts.monitoring_device_requests = await deleteWhere({
+        connection,
+        params: allRequestIds,
+        tableName: "monitoring_device_requests",
+        where: `id IN (${buildPlaceholders(allRequestIds)})`,
+      });
+    }
+
+    if (deviceIds.length > 0) {
+      counts.monitoring_devices = await deleteWhere({
+        connection,
+        params: deviceIds,
+        tableName: "monitoring_devices",
+        where: `id IN (${buildPlaceholders(deviceIds)})`,
+      });
+    }
+
+    counts.monitoring_tanks = await deleteWhere({
+      connection,
+      params: matchedTankIds,
+      tableName: "monitoring_tanks",
+      where: `id IN (${buildPlaceholders(matchedTankIds)})`,
+    });
+
+    if (candidateSiteIds.length > 0) {
+      const [siteResult] = await connection.query<ResultSetHeader>(
+        `
+          DELETE s
+          FROM monitoring_sites s
+          WHERE s.id IN (${buildPlaceholders(candidateSiteIds)})
+            AND NOT EXISTS (
+              SELECT 1
+              FROM monitoring_tanks t
+              WHERE t.site_id = s.id
+            )
+            AND NOT EXISTS (
+              SELECT 1
+              FROM monitoring_devices d
+              WHERE d.site_id = s.id
+            )
+        `,
+        candidateSiteIds,
+      );
+      counts.monitoring_sites = siteResult.affectedRows;
+    }
+
+    await connection.commit();
+
+    return {
+      counts,
+      matchedTankCount: matchedTankIds.length,
       totalRows: Object.values(counts).reduce(
         (total, count) => total + (count ?? 0),
         0,
