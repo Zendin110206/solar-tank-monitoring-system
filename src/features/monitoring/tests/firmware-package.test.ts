@@ -58,6 +58,7 @@ const DEVICE_REQUEST: MonitoringDeviceRequest = {
   id: "device-request-1",
   latitude: -7.72,
   lengthCm: 150,
+  longitude: 112.88,
   loadUnit: "kw",
   loadValue: 20,
   lowLevelPercent: 30,
@@ -111,6 +112,8 @@ describe("firmware package helpers", () => {
     expect(header).toContain('#define SOLARTANK_DEVICE_SENSOR_TYPE "fuel"');
     expect(header).toContain('#define SOLARTANK_DEVICE_KEY "stk_test_device_key"');
     expect(header).toContain("#define SOLARTANK_TANK_CAPACITY_LITER 540");
+    expect(header).toContain("#define SOLARTANK_SITE_LATITUDE -7.7200000");
+    expect(header).toContain("#define SOLARTANK_SITE_LONGITUDE 112.8800000");
     expect(header).toContain("#define SOLARTANK_CONSUMPTION_LITER_PER_HOUR 6.20");
     expect(header).toContain("#define SOLARTANK_COS_PHI 0.80");
     expect(header).not.toContain("{{");
@@ -135,6 +138,16 @@ describe("firmware package helpers", () => {
       "manifest.json",
     ]);
     expect(bundle.files.every((file) => file.content.length > 0)).toBe(true);
+    expect(
+      bundle.files
+        .find((file) => file.path === "solar_tank_firmware.ino")
+        ?.content.toString("utf8"),
+    ).toContain("POST OK");
+    expect(
+      bundle.files
+        .find((file) => file.path === "README_LANGKAH_UPLOAD.md")
+        ?.content.toString("utf8"),
+    ).toContain("SOLARTANK_WIFI_SSID");
   });
 
   it("encrypts and decrypts firmware package buffers with AES-GCM", () => {
