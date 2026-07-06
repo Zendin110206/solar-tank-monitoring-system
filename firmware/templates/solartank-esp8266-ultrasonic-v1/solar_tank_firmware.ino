@@ -51,7 +51,7 @@
 /* ===================== Network and API ===================== */
 String wifiSsid = SOLARTANK_WIFI_SSID;
 String wifiPass = SOLARTANK_WIFI_PASSWORD;
-String apiUrl = "";
+String apiUrl = SOLARTANK_API_BASE_URL;
 
 String deviceId = SOLARTANK_DEVICE_CODE;
 String apiKey = SOLARTANK_DEVICE_KEY;
