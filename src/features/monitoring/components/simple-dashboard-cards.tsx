@@ -1,11 +1,26 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect } from "react";
+import {
+  cleanupDashboardTankAction,
+  type DashboardAdminActionState,
+} from "@/app/dashboard/actions";
 import type { SimpleDashboardSite } from "@/features/monitoring/lib/simple-dashboard-model";
 
 type SimpleDashboardCardsProps = {
+  adminCleanupToken?: string;
   sites: SimpleDashboardSite[];
 };
+
+const INITIAL_ACTION_STATE: DashboardAdminActionState = {
+  status: "idle",
+  message: "",
+};
+const DELETE_TANK_CONFIRMATION = "HAPUS DATA STO";
 
 function formatLiter(value: number) {
   return new Intl.NumberFormat("id-ID", {
@@ -46,7 +61,67 @@ function EmptyState() {
   );
 }
 
-export function SimpleDashboardCards({ sites }: SimpleDashboardCardsProps) {
+function DeleteTankForm({
+  csrfToken,
+  site,
+}: {
+  csrfToken: string;
+  site: SimpleDashboardSite;
+}) {
+  const router = useRouter();
+  const [state, formAction, pending] = useActionState(
+    cleanupDashboardTankAction,
+    INITIAL_ACTION_STATE,
+  );
+  const siteLabel = `${site.name} (${site.code})`;
+
+  useEffect(() => {
+    if (state.status === "success") {
+      router.refresh();
+    }
+  }, [router, state.status]);
+
+  return (
+    <form action={formAction} className="grid gap-1">
+      <input name="csrfToken" type="hidden" value={csrfToken} />
+      <input name="tankId" type="hidden" value={site.tankId} />
+      <input name="siteLabel" type="hidden" value={siteLabel} />
+      <input
+        name="confirmation"
+        type="hidden"
+        value={DELETE_TANK_CONFIRMATION}
+      />
+      <button
+        className="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-red-100 bg-red-50 px-3 text-xs font-semibold text-red-700 transition hover:border-red-200 hover:bg-red-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-600/15 disabled:cursor-wait disabled:opacity-60"
+        disabled={pending}
+        onClick={(event) => {
+          if (
+            !window.confirm(
+              `Hapus ${siteLabel} dari monitoring?\n\nData reading, perangkat, tangki, dan event terkait STO ini akan dibersihkan. Akun, admin, template firmware, dan profil hardware tidak ikut dihapus.`,
+            )
+          ) {
+            event.preventDefault();
+          }
+        }}
+        title={`Hapus data monitoring ${siteLabel}`}
+        type="submit"
+      >
+        <Trash2 className="size-3.5" aria-hidden="true" />
+        {pending ? "Menghapus" : "Hapus"}
+      </button>
+      {state.status === "error" && state.message ? (
+        <p className="max-w-48 text-xs font-semibold leading-5 text-red-700">
+          {state.message}
+        </p>
+      ) : null}
+    </form>
+  );
+}
+
+export function SimpleDashboardCards({
+  adminCleanupToken,
+  sites,
+}: SimpleDashboardCardsProps) {
   if (sites.length === 0) {
     return <EmptyState />;
   }
@@ -54,10 +129,8 @@ export function SimpleDashboardCards({ sites }: SimpleDashboardCardsProps) {
   return (
     <div className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-4">
       {sites.map((site) => (
-        <Link
-          aria-label={`Buka detail tangki ${site.name}`}
+        <article
           className="group relative overflow-hidden rounded-lg border border-zinc-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-100"
-          href={`/dashboard/ringkas/tanks/${site.tankId}`}
           key={`${site.code}-${site.tankId}`}
         >
           <span
@@ -111,12 +184,21 @@ export function SimpleDashboardCards({ sites }: SimpleDashboardCardsProps) {
                 {site.updateLabel}
               </p>
             </div>
-            <span className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 transition group-hover:bg-blue-600 group-hover:text-white">
-              Detail
-              <ArrowUpRight className="size-3.5" aria-hidden="true" />
-            </span>
+            <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+              {adminCleanupToken ? (
+                <DeleteTankForm csrfToken={adminCleanupToken} site={site} />
+              ) : null}
+              <Link
+                aria-label={`Buka detail tangki ${site.name}`}
+                className="inline-flex h-9 shrink-0 items-center gap-1 rounded-lg bg-blue-50 px-3 text-xs font-semibold text-blue-700 transition hover:bg-blue-600 hover:text-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
+                href={`/dashboard/ringkas/tanks/${site.tankId}`}
+              >
+                Detail
+                <ArrowUpRight className="size-3.5" aria-hidden="true" />
+              </Link>
+            </div>
           </div>
-        </Link>
+        </article>
       ))}
     </div>
   );

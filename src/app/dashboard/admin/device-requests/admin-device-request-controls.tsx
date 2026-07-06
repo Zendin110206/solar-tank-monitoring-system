@@ -297,7 +297,7 @@ export function CleanupDeviceRequestForm({
         icon="trash"
         variant="dangerOutline"
       >
-        Bersihkan data ini
+        Hapus data
       </SubmitButton>
       <ActionMessage state={state} />
     </form>
@@ -317,11 +317,15 @@ export function CleanupSelectedDeviceRequestsForm({
   );
 
   return (
-    <form action={formAction} className="grid gap-3" id={formId}>
+    <form
+      action={formAction}
+      className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-end"
+      id={formId}
+    >
       <input name="csrfToken" type="hidden" value={csrfToken} />
       <input name="cleanupMode" type="hidden" value="selected" />
       <label className="grid gap-2 text-sm font-semibold text-zinc-950">
-        Frasa konfirmasi pilihan
+        Hapus pengajuan yang dicentang
         <input
           autoComplete="off"
           className="h-11 rounded-lg border border-amber-200 bg-white px-3 text-sm font-semibold text-zinc-950 outline-none transition placeholder:text-zinc-400 focus:border-amber-500 focus:ring-4 focus:ring-amber-600/15"
@@ -330,11 +334,6 @@ export function CleanupSelectedDeviceRequestsForm({
           required
         />
       </label>
-      <p className="text-xs leading-5 text-zinc-500">
-        Centang satu atau beberapa card pengajuan di daftar, lalu ketik tepat{" "}
-        <span className="font-semibold">{CLEANUP_SELECTED_CONFIRMATION}</span>.
-        Sistem hanya membersihkan data yang berhubungan dengan pengajuan pilihan.
-      </p>
       <SubmitButton
         confirmMessage="Bersihkan semua pengajuan yang sedang dicentang?"
         icon="trash"
@@ -342,7 +341,14 @@ export function CleanupSelectedDeviceRequestsForm({
       >
         Bersihkan pilihan
       </SubmitButton>
-      <ActionMessage state={state} />
+      <p className="text-xs leading-5 text-zinc-500 lg:col-span-2">
+        Centang satu atau beberapa pengajuan, ketik tepat{" "}
+        <span className="font-semibold">{CLEANUP_SELECTED_CONFIRMATION}</span>,
+        lalu bersihkan. Sistem hanya menghapus data yang terkait pilihan.
+      </p>
+      <div className="lg:col-span-2">
+        <ActionMessage state={state} />
+      </div>
     </form>
   );
 }

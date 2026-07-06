@@ -26,7 +26,7 @@ Yang sudah tersedia:
 - halaman audit keamanan auth untuk admin;
 - halaman keamanan akun untuk ganti kata sandi, melihat sesi aktif, mencabut sesi lain, dan menghubungkan Telegram;
 - halaman pengajuan perangkat untuk user, review approve/reject oleh admin, pembuatan key perangkat, paket firmware ZIP, dan link download terbatas;
-- panel maintenance admin untuk membersihkan satu data device/uji, beberapa pilihan, atau semua data device/uji tanpa menghapus akun, template firmware, atau profil hardware;
+- kontrol admin untuk menghapus data STO langsung dari kartu dashboard, membersihkan pengajuan perangkat terpilih, atau reset data monitoring tanpa menghapus akun, template firmware, atau profil hardware;
 - analisis teknis untuk monitoring detail;
 - monitoring operasional dengan tampilan kartu dan peta;
 - halaman detail operasional per tangki untuk operator;
@@ -486,12 +486,16 @@ admin lalu buka:
 
 Pilihan yang tersedia:
 
-- tombol **Bersihkan data ini** di tiap card pengajuan untuk menghapus satu
+- tombol **Hapus** di kartu dashboard untuk menghapus data STO/tangki lama yang
+  sudah tidak dipakai;
+- filter pencarian dan status di halaman **Tinjau Pengajuan** supaya admin tidak
+  perlu mencari manual ketika data pengajuan sudah banyak;
+- tombol **Hapus data** di tiap card pengajuan untuk menghapus satu
   pengajuan/perangkat uji;
-- checkbox **Pilih** di tiap card lalu panel **Bersihkan beberapa pilihan**
-  untuk menghapus beberapa item sekaligus;
-- panel **Reset semua data monitoring** hanya jika tim benar-benar ingin mulai
-  ulang dari kosong.
+- checkbox **Pilih hapus** di tiap card lalu kontrol **Bersihkan pilihan**
+  untuk menghapus beberapa pengajuan sekaligus;
+- area lipat **Opsi lanjutan: reset semua data monitoring** hanya jika tim
+  benar-benar ingin mulai ulang dari kosong.
 
 Semua opsi membersihkan data operasional monitoring yang terkait: site, tangki,
 device, reading, pengajuan perangkat, paket firmware, dan event provisioning.

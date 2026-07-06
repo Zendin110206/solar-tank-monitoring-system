@@ -1,4 +1,5 @@
 import { LogoutButton } from "@/features/auth/components/logout-button";
+import { createAdminActionCsrfToken } from "@/features/auth/lib/auth-csrf";
 import { requirePageUser } from "@/features/auth/lib/auth-guards";
 import { SimpleDashboardView } from "@/features/monitoring/components/simple-dashboard-view";
 import { buildDashboardOverview } from "@/features/monitoring/lib/dashboard-view-model";
@@ -25,6 +26,9 @@ export default async function SimpleDashboardPage() {
   await connection();
   const user = await requirePageUser();
   const isAdmin = user.role === "admin";
+  const adminCleanupToken = isAdmin
+    ? createAdminActionCsrfToken(user.sessionId)
+    : undefined;
 
   const now = new Date();
   const [monitoringReadingsResult, monitoringReferenceResult] =
@@ -140,7 +144,10 @@ export default async function SimpleDashboardPage() {
             ) : null}
           </div>
         </section>
-        <SimpleDashboardView sites={simpleSites} />
+        <SimpleDashboardView
+          adminCleanupToken={adminCleanupToken}
+          sites={simpleSites}
+        />
       </div>
     </main>
   );
