@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { HelpdeskWidget } from "@/features/helpdesk/components/helpdesk-widget";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -21,6 +22,7 @@ export default function RootLayout({
     <html lang="id" className="h-full antialiased">
       <body className="flex min-h-full flex-col" suppressHydrationWarning>
         {children}
+        <HelpdeskWidget />
       </body>
     </html>
   );

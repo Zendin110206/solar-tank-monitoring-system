@@ -36,6 +36,7 @@ import {
   buildTelegramDeepLink,
   sendTelegramMessage,
 } from "./auth-telegram";
+import { notifyAdminsAccessRequestSubmitted } from "./admin-telegram-notifications";
 import {
   createAuthSession,
   createEmailVerificationTokenRecord,
@@ -408,6 +409,44 @@ export async function submitAccessRequest(
         },
       }).catch(() => undefined),
     );
+    try {
+      const telegramNotification = await notifyAdminsAccessRequestSubmitted({
+        accessRequestId: result.accessRequestId,
+        payload,
+        userId: result.userId,
+      });
+
+      await recordAuthAuditEvent({
+        eventType:
+          telegramNotification.attempted > 0 &&
+          telegramNotification.delivered === 0
+            ? "access_request_telegram_notify_failed"
+            : "access_request_telegram_notified",
+        targetUserId: result.userId,
+        ip: getRequestIp(request),
+        userAgent: getRequestUserAgent(request),
+        metadata: {
+          accessRequestId: result.accessRequestId,
+          attempted: telegramNotification.attempted,
+          delivered: telegramNotification.delivered,
+          failed: telegramNotification.failed,
+        },
+      }).catch(() => undefined);
+    } catch (error) {
+      await recordAuthAuditEvent({
+        eventType: "access_request_telegram_notify_failed",
+        targetUserId: result.userId,
+        ip: getRequestIp(request),
+        userAgent: getRequestUserAgent(request),
+        metadata: {
+          accessRequestId: result.accessRequestId,
+          reason: getSafeErrorMessage(error, {
+            fallbackMessage: "unknown",
+            internalMessage: "telegram_delivery_internal_error",
+          }),
+        },
+      }).catch(() => undefined);
+    }
   }
 }
 

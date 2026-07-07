@@ -214,3 +214,46 @@ export function getTelegramBotUsername(): string | null {
   const username = process.env.TELEGRAM_BOT_USERNAME?.trim().replace(/^@/, "");
   return username || null;
 }
+
+export type TelegramAdminTopic =
+  | "live-chat"
+  | "new-account"
+  | "new-device"
+  | "system";
+
+export function getTelegramAdminGroupChatId(): string | null {
+  const chatId = process.env.TELEGRAM_ADMIN_GROUP_CHAT_ID?.trim();
+  return chatId || null;
+}
+
+function getTelegramTopicThreadIdFromEnv(key: string): number | null {
+  const rawValue = process.env[key]?.trim();
+  const parsed = Number(rawValue);
+
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    return null;
+  }
+
+  return parsed;
+}
+
+export function getTelegramAdminTopicThreadId(
+  topic: TelegramAdminTopic,
+): number | null {
+  switch (topic) {
+    case "live-chat":
+      return getTelegramTopicThreadIdFromEnv(
+        "TELEGRAM_TOPIC_LIVE_CHAT_THREAD_ID",
+      );
+    case "new-account":
+      return getTelegramTopicThreadIdFromEnv(
+        "TELEGRAM_TOPIC_NEW_ACCOUNT_THREAD_ID",
+      );
+    case "new-device":
+      return getTelegramTopicThreadIdFromEnv(
+        "TELEGRAM_TOPIC_NEW_DEVICE_THREAD_ID",
+      );
+    case "system":
+      return getTelegramTopicThreadIdFromEnv("TELEGRAM_TOPIC_SYSTEM_THREAD_ID");
+  }
+}
