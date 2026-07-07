@@ -7,7 +7,6 @@ const navItems = [
   { label: "Alur Data", href: "#alur-data" },
   { label: "Operasional", href: "#operasional" },
   { label: "Cara Kerja", href: "#cara-kerja" },
-  { label: "Kontak", href: "/contact" },
   { label: "Akses", href: "#daftar" },
   { label: "Dashboard", href: "/dashboard" },
 ];

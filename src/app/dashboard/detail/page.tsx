@@ -6,7 +6,6 @@ import { connection } from "next/server";
 import {
   Activity,
   AlertTriangle,
-  Bell,
   Clock,
   Database,
   Droplets,
@@ -15,6 +14,7 @@ import {
   Wifi,
 } from "lucide-react";
 
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { DashboardMapOverview } from "@/features/monitoring/components/dashboard-map-overview";
 import { LiveClock } from "@/features/monitoring/components/live-clock";
 import { LiveRefreshControl } from "@/features/monitoring/components/live-refresh-control";
@@ -185,7 +185,7 @@ function SectionHeader({
 
 export default async function DashboardPage() {
   await connection();
-  await requirePageAdmin();
+  const admin = await requirePageAdmin();
 
   const now = new Date();
   const refreshIntervalMs = getMonitoringRefreshIntervalMs();
@@ -217,64 +217,23 @@ export default async function DashboardPage() {
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#f5faf8] text-zinc-950">
-      {/* Dashboard Header */}
-      <header className="sticky top-0 z-50 overflow-hidden border-b border-zinc-200/70 bg-white/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-[1540px] items-center gap-4 px-4 sm:px-6 lg:px-8">
-          <Link
-            href="/dashboard"
-            className="flex shrink-0 items-center gap-3"
-            aria-label="Kembali ke dashboard SolarTank"
-          >
-            <span className="relative grid size-8 place-items-center">
-              <span className="absolute size-8 rounded-full border-2 border-red-500" />
-              <span className="absolute right-0 top-1 size-3 rounded-full bg-cyan-400" />
-              <span className="absolute bottom-1 left-0 size-2.5 rounded-full bg-zinc-950" />
-              <span className="size-2.5 rounded-full bg-red-500" />
-            </span>
-            <span className="text-lg font-semibold">SolarTank</span>
-          </Link>
-
-          <nav className="hidden items-center gap-7 text-sm font-medium text-zinc-600 lg:flex">
-            <Link
-              href="/dashboard"
-              className="transition hover:text-red-600"
-            >
-              Monitoring Tangki
-            </Link>
-            <a href="#ringkasan" className="text-zinc-950">
-              Analisis Teknis
-            </a>
-            <a href="#peta" className="transition hover:text-red-600">
-              Peta STO
-            </a>
-            <a href="#prioritas" className="transition hover:text-red-600">
-              Prioritas
-            </a>
-            <a href="#log" className="transition hover:text-red-600">
-              Log Perangkat
-            </a>
-          </nav>
-
-          <div className="ml-auto flex items-center gap-3">
-            <LiveRefreshControl
-              intervalMs={refreshIntervalMs}
-              lastSyncedLabel={dashboardOverview.summary.syncLabel}
-              className="hidden md:inline-flex"
-            />
-            <button
-              type="button"
-              className="relative hidden size-10 place-items-center rounded-full border border-zinc-200 bg-white text-zinc-700 shadow-sm transition hover:border-red-200 hover:text-red-600 sm:grid"
-              aria-label="Notifikasi"
-            >
-              <Bell className="size-4" aria-hidden="true" />
-              <span className="absolute right-2 top-2 size-2 rounded-full bg-red-500" />
-            </button>
-            <div className="grid size-10 place-items-center rounded-full bg-red-600 text-sm font-semibold text-white">
-              ZA
-            </div>
-          </div>
-        </div>
-      </header>
+      <DashboardHeader
+        navItems={[
+          { href: "/dashboard", label: "Monitoring Tangki" },
+          { current: true, label: "Analisis Teknis" },
+          { href: "#peta", label: "Peta STO" },
+          { href: "#prioritas", label: "Prioritas" },
+          { href: "#log", label: "Log Perangkat" },
+        ]}
+        rightSlot={
+          <LiveRefreshControl
+            intervalMs={refreshIntervalMs}
+            lastSyncedLabel={dashboardOverview.summary.syncLabel}
+            className="hidden md:inline-flex"
+          />
+        }
+        user={admin}
+      />
 
       <div className="mx-auto max-w-[1540px] px-4 py-5 sm:px-6 lg:px-8">
         {/* Dashboard Toolbar */}

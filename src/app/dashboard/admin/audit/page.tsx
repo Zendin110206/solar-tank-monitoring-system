@@ -1,7 +1,7 @@
-import Link from "next/link";
 import type { Metadata } from "next";
 import { ClipboardList } from "lucide-react";
 
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
 import { listAuthAuditEvents } from "@/features/auth/lib/mysql-auth-repository";
 
@@ -33,39 +33,19 @@ function formatMetadata(metadata: Record<string, unknown> | null) {
 }
 
 export default async function AdminAuditPage() {
-  await requirePageAdmin();
+  const admin = await requirePageAdmin();
   const events = await listAuthAuditEvents();
 
   return (
     <main className="min-h-screen bg-[#f5faf8] text-zinc-950">
-      <header className="sticky top-0 z-20 border-b border-zinc-200/70 bg-white/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-[1540px] items-center gap-4 px-4 sm:px-6 lg:px-8">
-          <Link
-            href="/dashboard"
-            className="flex shrink-0 items-center gap-3"
-            aria-label="Kembali ke dashboard SolarTank"
-          >
-            <span className="relative grid size-8 place-items-center">
-              <span className="absolute size-8 rounded-full border-2 border-red-500" />
-              <span className="absolute right-0 top-1 size-3 rounded-full bg-cyan-400" />
-              <span className="absolute bottom-1 left-0 size-2.5 rounded-full bg-zinc-950" />
-              <span className="size-2.5 rounded-full bg-red-500" />
-            </span>
-            <span className="text-lg font-semibold">SolarTank</span>
-          </Link>
-          <nav className="ml-auto flex items-center gap-2 text-sm font-semibold text-zinc-600">
-            <Link
-              href="/dashboard/admin/users"
-              className="rounded-lg px-3 py-2 transition hover:bg-blue-50 hover:text-blue-700"
-            >
-              Manajemen Pengguna
-            </Link>
-            <span className="rounded-lg bg-blue-600 px-3 py-2 text-white">
-              Audit Keamanan
-            </span>
-          </nav>
-        </div>
-      </header>
+      <DashboardHeader
+        navItems={[
+          { href: "/dashboard", label: "Monitoring Tangki" },
+          { href: "/dashboard/admin/users", label: "Manajemen Pengguna" },
+          { current: true, label: "Audit Keamanan" },
+        ]}
+        user={admin}
+      />
 
       <div className="mx-auto flex max-w-[1540px] flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
         <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">

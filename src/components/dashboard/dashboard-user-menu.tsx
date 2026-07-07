@@ -1,0 +1,157 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { KeyRound, LogOut, UserRound } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+
+import type { AuthSafeUser } from "@/features/auth/types";
+
+type DashboardUserMenuProps = {
+  user: Pick<AuthSafeUser, "email" | "fullName" | "role" | "username">;
+};
+
+function getAvatarLabel(user: DashboardUserMenuProps["user"]) {
+  const nameParts = user.fullName
+    .split(" ")
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  if (nameParts.length >= 2) {
+    return `${nameParts[0][0] ?? ""}${nameParts[1][0] ?? ""}`.toUpperCase();
+  }
+
+  return (nameParts[0]?.slice(0, 2) || user.username.slice(0, 2) || "ST")
+    .toUpperCase()
+    .slice(0, 2);
+}
+
+function getRoleLabel(role: AuthSafeUser["role"]) {
+  return role === "admin" ? "Administrator" : "Pengguna";
+}
+
+export function DashboardUserMenu({ user }: DashboardUserMenuProps) {
+  const router = useRouter();
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const avatarLabel = getAvatarLabel(user);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    function handlePointerDown(event: PointerEvent) {
+      if (!menuRef.current?.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsOpen(false);
+      }
+    }
+
+    window.addEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isOpen]);
+
+  async function handleLogout() {
+    if (isLoggingOut) {
+      return;
+    }
+
+    setIsLoggingOut(true);
+
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    } finally {
+      router.replace("/login");
+      router.refresh();
+    }
+  }
+
+  return (
+    <div className="relative shrink-0" ref={menuRef}>
+      <button
+        aria-expanded={isOpen}
+        aria-haspopup="menu"
+        aria-label="Buka menu akun"
+        className="grid size-10 place-items-center rounded-full bg-zinc-950 text-sm font-semibold text-white shadow-sm ring-1 ring-zinc-950/10 transition hover:scale-[1.03] hover:bg-blue-600 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20"
+        onClick={() => setIsOpen((current) => !current)}
+        type="button"
+      >
+        {avatarLabel}
+      </button>
+
+      {isOpen ? (
+        <div
+          className="absolute right-0 top-full z-50 mt-3 w-72 overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-2xl shadow-zinc-950/15"
+          role="menu"
+          style={{
+            animation:
+              "login-shell-enter 180ms cubic-bezier(0.22, 1, 0.36, 1) both",
+          }}
+        >
+          {/* Account identity */}
+          <div className="bg-[#f3ebe7] px-5 py-5 text-center">
+            <div className="mx-auto grid size-16 place-items-center rounded-full bg-blue-600 text-xl font-semibold text-white shadow-sm ring-4 ring-white">
+              {avatarLabel}
+            </div>
+            <p className="mt-3 truncate text-sm font-semibold text-zinc-950">
+              {user.fullName}
+            </p>
+            <p className="mt-0.5 truncate text-xs text-zinc-600">{user.email}</p>
+            <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+              {getRoleLabel(user.role)}
+            </p>
+          </div>
+
+          {/* Account actions */}
+          <div className="grid gap-1 p-2">
+            <Link
+              className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-zinc-700 transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
+              href="/dashboard/profile"
+              onClick={() => setIsOpen(false)}
+              role="menuitem"
+            >
+              <UserRound className="size-4" aria-hidden="true" />
+              Profile
+            </Link>
+            <Link
+              className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-zinc-700 transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
+              href="/dashboard/account/security"
+              onClick={() => setIsOpen(false)}
+              role="menuitem"
+            >
+              <KeyRound className="size-4" aria-hidden="true" />
+              Keamanan Akun
+            </Link>
+            <button
+              className="flex items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold text-red-700 transition hover:bg-red-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-600/15 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={isLoggingOut}
+              onClick={handleLogout}
+              role="menuitem"
+              type="button"
+            >
+              <LogOut className="size-4" aria-hidden="true" />
+              {isLoggingOut ? "Logout..." : "Logout"}
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
