@@ -8,9 +8,12 @@ type TelegramSendResult =
   | { delivered: true }
   | { delivered: false; reason: string };
 
-type TelegramMessage = {
-  text: string;
+export type TelegramMessage = {
   chatId: string;
+  chatType: string;
+  fromUserId: string | null;
+  messageThreadId: number | null;
+  text: string;
   username: string | null;
 };
 
@@ -23,8 +26,10 @@ type TelegramUpdate = {
       username?: string;
     };
     from?: {
+      id?: number | string;
       username?: string;
     };
+    message_thread_id?: number;
   };
 };
 
@@ -55,19 +60,32 @@ export function verifyTelegramWebhookSecret(headers: Headers): boolean {
 export function parseTelegramPrivateMessage(
   payload: unknown,
 ): TelegramMessage | null {
+  const message = parseTelegramMessage(payload);
+
+  if (!message || message.chatType !== "private") {
+    return null;
+  }
+
+  return message;
+}
+
+export function parseTelegramMessage(payload: unknown): TelegramMessage | null {
   const update = payload as TelegramUpdate;
   const message = update.message;
   const chatId = message?.chat?.id;
   const text = message?.text?.trim();
-  const chatType = message?.chat?.type;
+  const chatType = message?.chat?.type?.trim();
 
-  if (!chatId || !text || chatType !== "private") {
+  if (!chatId || !text || !chatType) {
     return null;
   }
 
   return {
-    text,
     chatId: String(chatId),
+    chatType,
+    fromUserId: message.from?.id ? String(message.from.id) : null,
+    messageThreadId: message.message_thread_id ?? null,
+    text,
     username: message.chat?.username ?? message.from?.username ?? null,
   };
 }
@@ -79,9 +97,11 @@ export function extractTelegramStartToken(text: string): string | null {
 
 export async function sendTelegramMessage({
   chatId,
+  messageThreadId,
   text,
 }: {
   chatId: string;
+  messageThreadId?: number | null;
   text: string;
 }): Promise<TelegramSendResult> {
   const token = getTelegramBotToken();
@@ -99,6 +119,7 @@ export async function sendTelegramMessage({
       },
       body: JSON.stringify({
         chat_id: chatId,
+        ...(messageThreadId ? { message_thread_id: messageThreadId } : {}),
         text,
         disable_web_page_preview: true,
       }),

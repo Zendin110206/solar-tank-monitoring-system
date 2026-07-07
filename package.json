@@ -21,8 +21,9 @@
     "db:migrate:auth-recovery": "node scripts/apply-mysql-schema.mjs database/migrations/003_extend_auth_recovery_mysql.sql",
     "db:migrate:device-provisioning": "node scripts/apply-mysql-schema.mjs database/migrations/004_create_device_firmware_provisioning_mysql.sql",
     "db:migrate:device-request-fields": "node scripts/apply-mysql-schema.mjs database/migrations/005_extend_device_request_operational_fields_mysql.sql",
+    "db:migrate:helpdesk": "node scripts/apply-mysql-schema.mjs database/migrations/006_create_helpdesk_mysql.sql",
     "db:seed:mysql": "node scripts/apply-mysql-schema.mjs database/seeds/001_seed_demo_monitoring_reference_mysql.sql",
-    "db:setup:mysql": "pnpm db:migrate:mysql && pnpm db:migrate:auth && pnpm db:migrate:auth-recovery && pnpm db:migrate:device-provisioning && pnpm db:migrate:device-request-fields && pnpm db:seed:mysql",
+    "db:setup:mysql": "pnpm db:migrate:mysql && pnpm db:migrate:auth && pnpm db:migrate:auth-recovery && pnpm db:migrate:device-provisioning && pnpm db:migrate:device-request-fields && pnpm db:migrate:helpdesk && pnpm db:seed:mysql",
     "db:backup:mysql": "node scripts/backup-mysql.mjs",
     "auth:create-admin": "node scripts/create-auth-admin.mjs",
     "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
