@@ -1,4 +1,4 @@
-import { LogoutButton } from "@/features/auth/components/logout-button";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { createAdminActionCsrfToken } from "@/features/auth/lib/auth-csrf";
 import { requirePageUser } from "@/features/auth/lib/auth-guards";
 import { SimpleDashboardView } from "@/features/monitoring/components/simple-dashboard-view";
@@ -64,55 +64,21 @@ export default async function SimpleDashboardPage() {
 
   return (
     <main className="min-h-screen w-full min-w-0 overflow-x-hidden bg-[#f5faf8] text-zinc-950">
-      <header className="sticky top-0 z-20 border-b border-zinc-200/70 bg-white/90 backdrop-blur-xl">
-        <div className="mx-auto flex w-full max-w-[1540px] min-w-0 flex-col gap-3 px-4 py-3 sm:px-6 lg:h-16 lg:flex-row lg:items-center lg:justify-between lg:px-8 lg:py-0">
-          <Link
-            href="/dashboard"
-            className="flex w-fit shrink-0 items-center gap-3"
-            aria-label="Kembali ke dashboard SolarTank"
-          >
-            <span className="relative grid size-8 place-items-center">
-              <span className="absolute size-8 rounded-full border-2 border-red-500" />
-              <span className="absolute right-0 top-1 size-3 rounded-full bg-cyan-400" />
-              <span className="absolute bottom-1 left-0 size-2.5 rounded-full bg-zinc-950" />
-              <span className="size-2.5 rounded-full bg-red-500" />
-            </span>
-            <span className="text-lg font-semibold">SolarTank</span>
-          </Link>
-
-          <nav className="flex w-full min-w-0 items-center gap-2 overflow-x-auto whitespace-nowrap py-1 text-sm font-semibold text-zinc-600 lg:w-auto">
-            <span className="shrink-0 rounded-lg bg-blue-600 px-3 py-2 text-center text-white shadow-lg shadow-blue-600/15">
-              Monitoring Tangki
-            </span>
-            {isAdmin ? (
-              <>
-                <Link
-                  href="/dashboard/detail"
-                  className="shrink-0 rounded-lg px-3 py-2 text-center transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
-                >
-                  Analisis Teknis
-                </Link>
-                <Link
-                  href="/dashboard/admin/users"
-                  className="shrink-0 rounded-lg px-3 py-2 text-center transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
-                >
-                  Manajemen Pengguna
-                </Link>
-              </>
-            ) : null}
-            <span className="shrink-0 rounded-lg bg-zinc-100 px-3 py-2 text-center text-zinc-700">
-              {user.fullName}
-            </span>
-            <Link
-              href="/dashboard/account/security"
-              className="shrink-0 rounded-lg px-3 py-2 text-center transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
-            >
-              Keamanan Akun
-            </Link>
-            <LogoutButton />
-          </nav>
-        </div>
-      </header>
+      <DashboardHeader
+        navItems={[
+          { current: true, label: "Monitoring Tangki" },
+          ...(isAdmin
+            ? [
+                { href: "/dashboard/detail", label: "Analisis Teknis" },
+                {
+                  href: "/dashboard/admin/users",
+                  label: "Manajemen Pengguna",
+                },
+              ]
+            : []),
+        ]}
+        user={user}
+      />
 
       <div className="mx-auto flex w-full max-w-[1540px] min-w-0 flex-col px-4 py-5 sm:px-6 lg:px-8">
         <section className="mb-4 flex flex-col gap-3 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">

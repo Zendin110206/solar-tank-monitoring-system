@@ -53,11 +53,16 @@ export function SimpleTankVolumeChart({
   capacityLiter,
 }: SimpleTankVolumeChartProps) {
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const rangeMenuRef = useRef<HTMLDivElement | null>(null);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const [selectedRange, setSelectedRange] =
     useState<SimpleTankChartRangeKey>("day");
+  const [isRangeMenuOpen, setIsRangeMenuOpen] = useState(false);
   const [chartSize, setChartSize] = useState(FALLBACK_CHART_SIZE);
   const trend = trends[selectedRange] ?? trends.day;
+  const selectedRangeOption =
+    SIMPLE_TANK_CHART_RANGES.find((option) => option.key === selectedRange) ??
+    SIMPLE_TANK_CHART_RANGES[0];
   const padding = useMemo(
     () => ({
       top: 20,
@@ -108,6 +113,32 @@ export function SimpleTankVolumeChart({
       resizeObserver.disconnect();
     };
   }, []);
+
+  useEffect(() => {
+    if (!isRangeMenuOpen) {
+      return;
+    }
+
+    function handlePointerDown(event: globalThis.PointerEvent) {
+      if (!rangeMenuRef.current?.contains(event.target as Node)) {
+        setIsRangeMenuOpen(false);
+      }
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setIsRangeMenuOpen(false);
+      }
+    }
+
+    window.addEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [isRangeMenuOpen]);
 
   const chart = useMemo(() => {
     const maxVolume = Math.max(
@@ -224,6 +255,12 @@ export function SimpleTankVolumeChart({
     setActiveIndex(nearestIndex);
   }
 
+  function handleSelectRange(rangeKey: SimpleTankChartRangeKey) {
+    setSelectedRange(rangeKey);
+    setActiveIndex(null);
+    setIsRangeMenuOpen(false);
+  }
+
   if (trend.points.length === 0) {
     return (
       <div className="mt-5 grid min-h-72 place-items-center rounded-lg border border-dashed border-zinc-200 bg-zinc-50 p-6 text-center">
@@ -242,28 +279,64 @@ export function SimpleTankVolumeChart({
   return (
     <div className="mt-5 min-w-0 max-w-full">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div
-          className="grid grid-cols-3 rounded-lg border border-zinc-300 bg-zinc-50 p-1"
-          aria-label="Pilih rentang grafik"
-        >
-          {SIMPLE_TANK_CHART_RANGES.map((option) => (
-            <button
-              aria-pressed={selectedRange === option.key}
-              className={`h-10 rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15 ${
-                selectedRange === option.key
-                  ? "bg-blue-600 text-white shadow-sm"
-                  : "text-zinc-600 hover:bg-white hover:text-blue-700"
+        {/* Filter rentang tren */}
+        <div className="relative w-full sm:w-56" ref={rangeMenuRef}>
+          <button
+            aria-expanded={isRangeMenuOpen}
+            aria-haspopup="listbox"
+            aria-label="Pilih rentang grafik"
+            className="flex h-12 w-full items-center justify-between gap-3 rounded-lg border border-zinc-300 bg-white px-4 text-left text-sm font-semibold text-zinc-950 shadow-sm transition hover:border-blue-200 hover:bg-blue-50/40 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
+            onClick={() => setIsRangeMenuOpen((current) => !current)}
+            type="button"
+          >
+            <span className="min-w-0">
+              <span className="block text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-400">
+                Rentang waktu
+              </span>
+              <span className="mt-0.5 block truncate">
+                {selectedRangeOption.label}
+              </span>
+            </span>
+            <span
+              className={`grid size-7 shrink-0 place-items-center rounded-full bg-zinc-100 text-zinc-600 transition ${
+                isRangeMenuOpen ? "rotate-180 bg-blue-100 text-blue-700" : ""
               }`}
-              key={option.key}
-              onClick={() => {
-                setSelectedRange(option.key);
-                setActiveIndex(null);
-              }}
-              type="button"
+              aria-hidden="true"
             >
-              {option.label}
-            </button>
-          ))}
+              ▾
+            </span>
+          </button>
+
+          {isRangeMenuOpen ? (
+            <div
+              className="absolute left-0 top-full z-20 mt-2 w-full overflow-hidden rounded-xl border border-zinc-200 bg-white p-1 shadow-2xl shadow-zinc-950/10"
+              role="listbox"
+              style={{
+                animation:
+                  "login-shell-enter 160ms cubic-bezier(0.22, 1, 0.36, 1) both",
+              }}
+            >
+              {SIMPLE_TANK_CHART_RANGES.map((option) => (
+                <button
+                  aria-selected={selectedRange === option.key}
+                  className={`flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15 ${
+                    selectedRange === option.key
+                      ? "bg-blue-600 text-white"
+                      : "text-zinc-700 hover:bg-blue-50 hover:text-blue-700"
+                  }`}
+                  key={option.key}
+                  onClick={() => handleSelectRange(option.key)}
+                  role="option"
+                  type="button"
+                >
+                  {option.label}
+                  {selectedRange === option.key ? (
+                    <span className="text-xs text-white/80">Aktif</span>
+                  ) : null}
+                </button>
+              ))}
+            </div>
+          ) : null}
         </div>
         <div className="flex flex-wrap gap-2">
           <span className="w-fit rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700 ring-1 ring-blue-100">

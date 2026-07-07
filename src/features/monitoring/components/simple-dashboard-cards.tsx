@@ -189,16 +189,21 @@ export function SimpleDashboardCards({
       <div className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {sites.map((site) => (
           <article
-            className="group relative overflow-hidden rounded-lg border border-zinc-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-blue-100"
+            className="group relative cursor-pointer overflow-hidden rounded-lg border border-zinc-200 bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg hover:shadow-blue-950/10 focus-within:border-blue-300 focus-within:ring-4 focus-within:ring-blue-100"
             key={`${site.code}-${site.tankId}`}
           >
+            <Link
+              aria-label={`Buka detail tangki ${site.name}`}
+              className="absolute inset-0 z-0 rounded-lg focus-visible:outline-none"
+              href={`/dashboard/ringkas/tanks/${site.tankId}`}
+            />
             <span
-              className={`absolute inset-x-0 top-0 h-1 ${
+              className={`pointer-events-none absolute inset-x-0 top-0 h-1 ${
                 site.isOnline ? "bg-emerald-500" : "bg-red-500"
               }`}
             />
 
-            <div className="flex flex-col items-start gap-3 sm:flex-row sm:justify-between">
+            <div className="pointer-events-none relative z-10 flex flex-col items-start gap-3 sm:flex-row sm:justify-between">
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase text-zinc-500">
                   {site.code} - {site.areaLabel}
@@ -212,7 +217,7 @@ export function SimpleDashboardCards({
                 {adminCleanupToken ? (
                   <button
                     aria-label={`Hapus data monitoring ${site.name}`}
-                    className="grid size-8 place-items-center rounded-full border border-red-100 bg-red-50 text-red-600 transition hover:border-red-200 hover:bg-red-100 hover:text-red-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-600/15"
+                    className="pointer-events-auto grid size-8 place-items-center rounded-full border border-red-100 bg-red-50 text-red-600 transition hover:border-red-200 hover:bg-red-100 hover:text-red-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-600/15"
                     onClick={() => setSiteToDelete(site)}
                     title={`Hapus data monitoring ${site.name}`}
                     type="button"
@@ -223,7 +228,7 @@ export function SimpleDashboardCards({
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
+            <div className="pointer-events-none relative z-10 mt-6 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
               <div className="min-w-0">
                 <p className="text-sm font-medium text-zinc-500">Isi tangki</p>
                 <p className="mt-2 text-2xl font-semibold tracking-normal text-zinc-950">
@@ -247,7 +252,7 @@ export function SimpleDashboardCards({
               </span>
             </div>
 
-            <div className="mt-5 flex items-center justify-between gap-3 border-t border-zinc-100 pt-4 text-sm">
+            <div className="pointer-events-none relative z-10 mt-5 flex items-center justify-between gap-3 border-t border-zinc-100 pt-4 text-sm">
               <div className="min-w-0">
                 <p className="text-xs font-medium text-zinc-500">
                   Update terakhir
@@ -256,14 +261,10 @@ export function SimpleDashboardCards({
                   {site.updateLabel}
                 </p>
               </div>
-              <Link
-                aria-label={`Buka detail tangki ${site.name}`}
-                className="inline-flex h-9 shrink-0 items-center gap-1 rounded-lg bg-blue-50 px-3 text-xs font-semibold text-blue-700 transition hover:bg-blue-600 hover:text-white focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
-                href={`/dashboard/ringkas/tanks/${site.tankId}`}
-              >
-                Detail
+              <span className="inline-flex h-9 shrink-0 items-center gap-1 rounded-lg bg-blue-50 px-3 text-xs font-semibold text-blue-700 transition group-hover:bg-blue-600 group-hover:text-white">
+                Buka detail
                 <ArrowUpRight className="size-3.5" aria-hidden="true" />
-              </Link>
+              </span>
             </div>
           </article>
         ))}
