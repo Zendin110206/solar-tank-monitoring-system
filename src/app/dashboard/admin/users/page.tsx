@@ -1,7 +1,7 @@
-import Link from "next/link";
 import type { Metadata } from "next";
 import { Clock3, ShieldCheck, UserRound } from "lucide-react";
 
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import type { AuthUserStatus } from "@/features/auth/types";
 import { createAdminActionCsrfToken } from "@/features/auth/lib/auth-csrf";
 import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
@@ -81,46 +81,18 @@ export default async function AdminUsersPage() {
 
   return (
     <main className="min-h-screen bg-[#f5faf8] text-zinc-950">
-      <header className="sticky top-0 z-20 border-b border-zinc-200/70 bg-white/90 backdrop-blur-xl">
-        <div className="mx-auto flex min-h-16 max-w-[1540px] flex-col gap-3 px-4 py-3 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8 lg:py-0">
-          <Link
-            href="/dashboard"
-            className="flex shrink-0 items-center gap-3"
-            aria-label="Kembali ke dashboard SolarTank"
-          >
-            <span className="relative grid size-8 place-items-center">
-              <span className="absolute size-8 rounded-full border-2 border-red-500" />
-              <span className="absolute right-0 top-1 size-3 rounded-full bg-cyan-400" />
-              <span className="absolute bottom-1 left-0 size-2.5 rounded-full bg-zinc-950" />
-              <span className="size-2.5 rounded-full bg-red-500" />
-            </span>
-            <span className="text-lg font-semibold">SolarTank</span>
-          </Link>
-          <nav className="flex w-full min-w-0 items-center gap-2 overflow-x-auto whitespace-nowrap text-sm font-semibold text-zinc-600 lg:w-auto">
-            <Link
-              href="/dashboard"
-              className="shrink-0 rounded-lg px-3 py-2 transition hover:bg-blue-50 hover:text-blue-700"
-            >
-              Monitoring Tangki
-            </Link>
-            <span className="shrink-0 rounded-lg bg-blue-600 px-3 py-2 text-white">
-              Manajemen Pengguna
-            </span>
-            <Link
-              href="/dashboard/admin/device-requests"
-              className="shrink-0 rounded-lg px-3 py-2 transition hover:bg-blue-50 hover:text-blue-700"
-            >
-              Tinjau Pengajuan
-            </Link>
-            <Link
-              href="/dashboard/admin/audit"
-              className="shrink-0 rounded-lg px-3 py-2 transition hover:bg-blue-50 hover:text-blue-700"
-            >
-              Audit Keamanan
-            </Link>
-          </nav>
-        </div>
-      </header>
+      <DashboardHeader
+        navItems={[
+          { href: "/dashboard", label: "Monitoring Tangki" },
+          { current: true, label: "Manajemen Pengguna" },
+          {
+            href: "/dashboard/admin/device-requests",
+            label: "Tinjau Pengajuan",
+          },
+          { href: "/dashboard/admin/audit", label: "Audit Keamanan" },
+        ]}
+        user={admin}
+      />
 
       <div className="mx-auto flex max-w-[1540px] flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
         <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">

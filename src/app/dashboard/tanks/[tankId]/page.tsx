@@ -21,6 +21,7 @@ import {
   Zap,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { LiveRefreshControl } from "@/features/monitoring/components/live-refresh-control";
 import { TankLocationMap } from "@/features/monitoring/components/tank-location-map";
 import {
@@ -1069,7 +1070,7 @@ export default async function TankDetailPage({
   const { tankId } = await params;
 
   await connection();
-  await requirePageAdmin();
+  const admin = await requirePageAdmin();
 
   const now = new Date();
   const [latestReadingsResult, tankHistoryReadings, referenceData] =
@@ -1193,45 +1194,17 @@ export default async function TankDetailPage({
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#f5faf8] text-zinc-950">
-      {/* Detail Header */}
-      <header className="sticky top-0 z-50 overflow-hidden border-b border-zinc-200/70 bg-white/90 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-[1540px] items-center gap-4 px-4 sm:px-6 lg:px-8">
-          <Link
-            href="/dashboard"
-            className="flex shrink-0 items-center gap-3"
-            aria-label="Kembali ke dashboard SolarTank"
-          >
-            <span className="relative grid size-8 place-items-center">
-              <span className="absolute size-8 rounded-full border-2 border-red-500" />
-              <span className="absolute right-0 top-1 size-3 rounded-full bg-cyan-400" />
-              <span className="absolute bottom-1 left-0 size-2.5 rounded-full bg-zinc-950" />
-              <span className="size-2.5 rounded-full bg-red-500" />
-            </span>
-            <span className="text-lg font-semibold">SolarTank</span>
-          </Link>
-
-          <nav className="hidden items-center gap-7 text-sm font-medium text-zinc-600 lg:flex">
-            <Link href="/dashboard" className="transition hover:text-red-600">
-              Dashboard
-            </Link>
-            <a href="#visual" className="text-zinc-950">
-              Detail Tangki
-            </a>
-            <a href="#riwayat" className="transition hover:text-red-600">
-              Riwayat
-            </a>
-            <a href="#lokasi" className="transition hover:text-red-600">
-              Lokasi
-            </a>
-            <a href="#konfigurasi" className="transition hover:text-red-600">
-              Konfigurasi
-            </a>
-            <a href="#data-perangkat" className="transition hover:text-red-600">
-              Data perangkat
-            </a>
-          </nav>
-
-          <div className="ml-auto flex items-center gap-3">
+      <DashboardHeader
+        navItems={[
+          { href: "/dashboard", label: "Monitoring Tangki" },
+          { current: true, label: "Detail Tangki" },
+          { href: "#riwayat", label: "Riwayat" },
+          { href: "#lokasi", label: "Lokasi" },
+          { href: "#konfigurasi", label: "Konfigurasi" },
+          { href: "#data-perangkat", label: "Data perangkat" },
+        ]}
+        rightSlot={
+          <>
             <LiveRefreshControl
               intervalMs={refreshIntervalMs}
               lastSyncedLabel={`Update ${tank.lastUpdateLabel}`}
@@ -1240,12 +1213,10 @@ export default async function TankDetailPage({
             <div className="hidden sm:block">
               <StatusBadge status={tank.status} />
             </div>
-            <div className="grid size-10 place-items-center rounded-full bg-red-600 text-sm font-semibold text-white">
-              ZA
-            </div>
-          </div>
-        </div>
-      </header>
+          </>
+        }
+        user={admin}
+      />
 
       <div className="mx-auto max-w-[1540px] px-4 py-5 sm:px-6 lg:px-8">
         {/* Detail Toolbar */}

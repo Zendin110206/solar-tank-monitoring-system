@@ -15,6 +15,7 @@ import {
   Wifi,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { SimpleTankVolumeChart } from "@/features/monitoring/components/simple-tank-volume-chart";
 import {
   TankHorizontalCylinderScene3D,
@@ -479,42 +480,16 @@ export default async function SimpleTankDetailPage({
 
   return (
     <main className="min-h-screen w-full min-w-0 overflow-x-hidden bg-[#f5faf8] text-zinc-950">
-      <header className="sticky top-0 z-20 border-b border-zinc-200/70 bg-white/90 backdrop-blur-xl">
-        <div className="mx-auto flex w-full max-w-[1540px] min-w-0 flex-col gap-3 px-4 py-3 sm:px-6 lg:h-16 lg:flex-row lg:items-center lg:justify-between lg:px-8 lg:py-0">
-          <Link
-            href="/dashboard"
-            className="flex w-fit shrink-0 items-center gap-3"
-            aria-label="Kembali ke dashboard SolarTank"
-          >
-            <span className="relative grid size-8 place-items-center">
-              <span className="absolute size-8 rounded-full border-2 border-red-500" />
-              <span className="absolute right-0 top-1 size-3 rounded-full bg-cyan-400" />
-              <span className="absolute bottom-1 left-0 size-2.5 rounded-full bg-zinc-950" />
-              <span className="size-2.5 rounded-full bg-red-500" />
-            </span>
-            <span className="text-lg font-semibold">SolarTank</span>
-          </Link>
-
-          <nav className="grid w-full min-w-0 grid-cols-1 items-center gap-2 py-1 text-sm font-semibold text-zinc-600 sm:flex sm:w-auto">
-            <Link
-              href="/dashboard"
-              className="shrink-0 rounded-lg bg-blue-600 px-3 py-2 text-center text-white shadow-lg shadow-blue-600/15"
-            >
-              Monitoring Tangki
-            </Link>
-            {isAdmin ? (
-              <>
-                <Link
-                  href="/dashboard/detail"
-                  className="shrink-0 rounded-lg px-3 py-2 text-center transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
-                >
-                  Analisis Teknis
-                </Link>
-              </>
-            ) : null}
-          </nav>
-        </div>
-      </header>
+      <DashboardHeader
+        navItems={[
+          { href: "/dashboard", label: "Monitoring Tangki" },
+          { current: true, label: "Detail Operasional" },
+          ...(isAdmin
+            ? [{ href: "/dashboard/detail", label: "Analisis Teknis" }]
+            : []),
+        ]}
+        user={user}
+      />
 
       <div className="mx-auto w-full max-w-[1540px] px-4 py-5 sm:px-6 lg:px-8">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

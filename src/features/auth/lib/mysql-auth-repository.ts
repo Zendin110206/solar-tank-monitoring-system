@@ -1223,6 +1223,25 @@ export async function setAuthUserTelegramChatId({
   );
 }
 
+export async function updateAuthUserProfile({
+  fullName,
+  phone,
+  userId,
+}: {
+  fullName: string;
+  phone: string | null;
+  userId: string;
+}): Promise<void> {
+  const pool = getMysqlPool();
+  await pool.execute(
+    `UPDATE auth_users
+        SET full_name = ?,
+            phone = ?
+      WHERE id = ?`,
+    [fullName, phone, userId],
+  );
+}
+
 export async function recordAuthAuditEvent({
   actorUserId,
   eventType,

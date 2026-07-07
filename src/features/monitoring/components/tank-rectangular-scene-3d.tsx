@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
 type TankRectangularScene3DProps = {
@@ -24,6 +24,98 @@ type TankHorizontalCylinderScene3DProps = {
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
+}
+
+type WebGlContext = WebGLRenderingContext | WebGL2RenderingContext;
+
+function createSafeWebGlRenderer(canvas: HTMLCanvasElement) {
+  const contextAttributes: WebGLContextAttributes = {
+    alpha: true,
+    antialias: true,
+    depth: true,
+    failIfMajorPerformanceCaveat: false,
+    powerPreference: "high-performance",
+    preserveDrawingBuffer: false,
+    stencil: false,
+  };
+
+  let context: WebGlContext | null = null;
+
+  try {
+    context = (canvas.getContext("webgl2", contextAttributes) ??
+      canvas.getContext("webgl", contextAttributes) ??
+      canvas.getContext(
+        "experimental-webgl",
+        contextAttributes,
+      )) as WebGlContext | null;
+  } catch {
+    return null;
+  }
+
+  if (!context) {
+    return null;
+  }
+
+  try {
+    return new THREE.WebGLRenderer({
+      alpha: true,
+      antialias: true,
+      canvas,
+      context: context as WebGLRenderingContext,
+    });
+  } catch {
+    return null;
+  }
+}
+
+function TankFallbackVisual({
+  fillPercent,
+  shape,
+}: {
+  fillPercent: number;
+  shape: "rectangular" | "cylinder";
+}) {
+  const safeFillPercent = clamp(fillPercent, 0, 100);
+  const fillStyle = { height: `${safeFillPercent}%` };
+  const surfaceStyle = { bottom: `${safeFillPercent}%` };
+
+  return (
+    <div
+      className="absolute inset-0 overflow-hidden bg-slate-50"
+      aria-label={`Visual tangki fallback dengan isi ${safeFillPercent}%`}
+    >
+      <div className="absolute inset-x-6 top-6 bottom-7 flex items-center justify-center">
+        <div
+          className={
+            shape === "rectangular"
+              ? "relative h-[74%] w-[82%] overflow-hidden rounded-[1.7rem] border border-slate-300 bg-white/80 shadow-[0_18px_45px_rgba(15,23,42,0.12)]"
+              : "relative h-[68%] w-[86%] overflow-hidden rounded-full border border-slate-300 bg-white/80 shadow-[0_18px_45px_rgba(15,23,42,0.12)]"
+          }
+        >
+          <div
+            className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-cyan-700 via-sky-500 to-cyan-300 transition-[height] duration-700 ease-out"
+            style={fillStyle}
+          />
+          <div
+            className="absolute inset-x-0 h-px bg-cyan-200/80"
+            style={surfaceStyle}
+          />
+          <div className="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-white/95 via-white/45 to-transparent" />
+          {shape === "cylinder" ? (
+            <>
+              <div className="absolute inset-y-0 left-0 w-[18%] rounded-full border-r border-slate-300/70 bg-white/20" />
+              <div className="absolute inset-y-0 right-0 w-[18%] rounded-full border-l border-slate-300/70 bg-white/20" />
+            </>
+          ) : null}
+        </div>
+
+        <div className="absolute left-1/2 top-8 -translate-x-1/2">
+          <span className="block size-6 rounded-full border-4 border-red-100 bg-red-600 shadow-[0_0_0_7px_rgba(239,68,68,0.12)]" />
+          <span className="mx-auto block h-20 w-px border-l border-dashed border-red-500" />
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function disposeObject(object: THREE.Object3D) {
@@ -197,6 +289,7 @@ export function TankRectangularScene3D({
 }: TankRectangularScene3DProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [renderMode, setRenderMode] = useState<"webgl" | "fallback">("webgl");
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -206,11 +299,14 @@ export function TankRectangularScene3D({
       return;
     }
 
-    const renderer = new THREE.WebGLRenderer({
-      canvas,
-      antialias: true,
-      alpha: true,
-    });
+    const renderer = createSafeWebGlRenderer(canvas);
+
+    if (!renderer) {
+      setRenderMode("fallback");
+      return;
+    }
+
+    setRenderMode("webgl");
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
@@ -407,11 +503,18 @@ export function TankRectangularScene3D({
 
   return (
     <div ref={containerRef} className="absolute inset-0">
-      <canvas
-        ref={canvasRef}
-        className="h-full w-full cursor-grab touch-none active:cursor-grabbing"
-        aria-label={`Visual 3D tangki balok dengan isi ${fillPercent}%`}
-      />
+      {renderMode === "fallback" ? (
+        <TankFallbackVisual
+          fillPercent={fillPercent}
+          shape="rectangular"
+        />
+      ) : (
+        <canvas
+          ref={canvasRef}
+          className="h-full w-full cursor-grab touch-none active:cursor-grabbing"
+          aria-label={`Visual 3D tangki balok dengan isi ${fillPercent}%`}
+        />
+      )}
       {showMeasurementBadges ? (
         <>
           <div className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
@@ -436,6 +539,7 @@ export function TankHorizontalCylinderScene3D({
 }: TankHorizontalCylinderScene3DProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const [renderMode, setRenderMode] = useState<"webgl" | "fallback">("webgl");
   const displayFillPercent = clamp(fillPercent, 0, 100);
 
   useEffect(() => {
@@ -446,11 +550,14 @@ export function TankHorizontalCylinderScene3D({
       return;
     }
 
-    const renderer = new THREE.WebGLRenderer({
-      canvas,
-      antialias: true,
-      alpha: true,
-    });
+    const renderer = createSafeWebGlRenderer(canvas);
+
+    if (!renderer) {
+      setRenderMode("fallback");
+      return;
+    }
+
+    setRenderMode("webgl");
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
 
@@ -743,11 +850,18 @@ export function TankHorizontalCylinderScene3D({
 
   return (
     <div ref={containerRef} className="absolute inset-0">
-      <canvas
-        ref={canvasRef}
-        className="h-full w-full cursor-grab touch-none active:cursor-grabbing"
-        aria-label={`Visual 3D tangki silinder horizontal dengan isi ${displayFillPercent}%`}
-      />
+      {renderMode === "fallback" ? (
+        <TankFallbackVisual
+          fillPercent={displayFillPercent}
+          shape="cylinder"
+        />
+      ) : (
+        <canvas
+          ref={canvasRef}
+          className="h-full w-full cursor-grab touch-none active:cursor-grabbing"
+          aria-label={`Visual 3D tangki silinder horizontal dengan isi ${displayFillPercent}%`}
+        />
+      )}
       {showMeasurementBadges ? (
         <>
           <div className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
