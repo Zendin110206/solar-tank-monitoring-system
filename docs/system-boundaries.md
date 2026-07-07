@@ -21,6 +21,12 @@ Yang masuk:
 - script validasi/apply registry pilot lokal;
 - script smoke test payload real-format;
 - validasi key per device untuk data dummy;
+- auth database untuk login, session, OTP admin, reset password, email verification, Telegram binding, audit auth, dan rate limit;
+- pengajuan perangkat baru dari user;
+- review pengajuan perangkat dari admin lewat web;
+- pembuatan device key dan paket firmware ZIP setelah approval;
+- first valid ping activation;
+- cleanup data monitoring/device/uji oleh admin tanpa menghapus akun;
 - unit test;
 - dokumentasi Bahasa Indonesia.
 
@@ -31,11 +37,14 @@ Yang belum masuk:
 - database production lengkap;
 - konfigurasi auth production final, termasuk SMTP, CAPTCHA, backup, dan prosedur recovery;
 - role operasional yang lebih rinci di luar `admin` dan `user`;
-- firmware final;
+- firmware final yang sudah hardening TLS dan one-click compile;
 - deployment production;
 - data real di Git;
-- notifikasi;
-- integrasi hardware;
+- alert operasional level kritis/offline;
+- approval/reject device lewat Telegram;
+- integrasi hardware yang sudah dikalibrasi final;
+- integrasi RTU/Modbus/OPNIMUS;
+- detail deployment production final;
 - laporan PDF;
 - mobile app.
 
@@ -111,12 +120,13 @@ Yang sudah masuk:
 - query riwayat terbaru.
 - registry site, tangki, device, dan hash key;
 - script apply registry pilot dari file lokal yang tidak di-commit.
+- tabel auth, session, OTP, audit, dan rate limit;
+- tabel pengajuan perangkat, firmware package, hardware profile, firmware template, event provisioning, dan event ingest.
 
 Yang belum final:
 
-- rotasi key;
+- rotasi key device dari UI admin;
 - backup dan restore;
-- audit log;
-- rate limit;
-- aturan akses user;
+- role operasional lebih rinci;
 - SOP pemisahan data dummy dan data real untuk operasional harian.
+- monitoring server dan alerting.

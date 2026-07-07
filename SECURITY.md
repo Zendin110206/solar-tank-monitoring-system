@@ -69,19 +69,25 @@ Yang sudah ada:
 - verifikasi email, reset password, dan perubahan password memakai token sekali pakai berbasis hash;
 - form publik bisa dilindungi Cloudflare Turnstile melalui `AUTH_CAPTCHA_PROVIDER="turnstile"`;
 - rate limit tersedia untuk login, pengajuan akses, lupa password, dan pengiriman ulang verifikasi email;
+- endpoint ingest memiliki rate limit saat storage MySQL aktif;
 - audit event auth mencatat login, OTP, reset password, verifikasi email, perubahan role, aktivasi/nonaktif akun, dan aksi sesi;
 - halaman keamanan akun tersedia untuk ganti kata sandi, melihat sesi aktif, mencabut sesi lain, dan binding Telegram.
+- alur pengajuan perangkat membuat device key dan firmware package setelah admin approve;
+- paket firmware disimpan terenkripsi dan didownload lewat token terbatas;
+- device baru tidak aktif sebelum first valid ping dengan key yang cocok;
+- admin cleanup data device/uji tidak menghapus akun user/admin, template firmware, atau hardware profile.
 
 Yang belum ada:
 
-- rate limit khusus endpoint ingest;
+- proteksi request tambahan di perimeter/CDN pada deployment final;
 - rotasi key device dari UI admin;
 - manajemen registry site/tangki/device yang menulis database dari UI;
 - database production dengan backup;
 - HTTPS produksi;
 - monitoring server.
 - prosedur recovery akun dan database yang sudah diuji berkala;
-- hardening reverse proxy untuk deployment self-hosted.
+- hardening perimeter deployment final.
+- approval/reject device request lewat Telegram.
 
 ## Pelaporan Masalah Keamanan
 
@@ -107,7 +113,8 @@ Sebelum deployment nyata:
 - set `AUTH_COOKIE_SECURE="true"` pada domain HTTPS;
 - aktifkan HTTPS;
 - batasi akses halaman admin hanya untuk role admin;
-- tambah rate limit untuk endpoint ingest;
+- pastikan endpoint ingest berjalan pada mode MySQL sehingga rate limit aplikasi aktif;
+- pastikan environment final memiliki TLS, timeout, payload limit, dan logging pada perimeter yang disepakati;
 - gunakan database dengan backup;
 - uji restore backup database;
 - review audit log keamanan secara berkala;
