@@ -200,6 +200,7 @@ function NumberInput({
   onValueChange,
   placeholder,
   required,
+  step = "0.01",
   value,
 }: {
   max?: string;
@@ -208,6 +209,7 @@ function NumberInput({
   onValueChange?: (value: string) => void;
   placeholder?: string;
   required?: boolean;
+  step?: string;
   value?: string;
 }) {
   return (
@@ -220,7 +222,7 @@ function NumberInput({
       onChange={(event) => onValueChange?.(event.target.value)}
       placeholder={placeholder}
       required={required}
-      step="0.01"
+      step={step}
       type="number"
       value={value}
     />
@@ -378,20 +380,28 @@ export function DeviceRequestForm({
               required
             />
           </FormField>
-          <FormField label="Latitude" help="Boleh dikosongkan jika belum ada.">
+          <FormField
+            label="Latitude"
+            help="Opsional. Mendukung hingga 7 angka desimal."
+          >
             <NumberInput
               max="90"
               min="-90"
               name="latitude"
-              placeholder="-7.7200"
+              placeholder="-7.7201234"
+              step="0.0000001"
             />
           </FormField>
-          <FormField label="Longitude" help="Boleh dikosongkan jika belum ada.">
+          <FormField
+            label="Longitude"
+            help="Opsional. Mendukung hingga 7 angka desimal."
+          >
             <NumberInput
               max="180"
               min="-180"
               name="longitude"
-              placeholder="112.8800"
+              placeholder="112.8801234"
+              step="0.0000001"
             />
           </FormField>
         </div>

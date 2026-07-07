@@ -17,6 +17,7 @@ import {
   isDeviceAutoProvisioningEnabled,
 } from "./device-provisioning";
 import { isGlobalDeviceKeyFallbackAllowed } from "./device-key";
+import { getDevicePackageEncryptionKey } from "./firmware-package";
 import { checkMysqlConnection } from "./mysql-connection";
 import { countMonitoringReferenceRowsFromMysql } from "./mysql-reference-repository";
 import {
@@ -437,6 +438,84 @@ function checkAutoProvisioningReadiness(): DeploymentCheck {
   };
 }
 
+function checkDevicePackageEncryptionReadiness(): DeploymentCheck {
+  try {
+    getDevicePackageEncryptionKey();
+
+    if (!process.env.DEVICE_PACKAGE_ENCRYPTION_KEY?.trim()) {
+      return {
+        name: "device-package-encryption",
+        ok: true,
+        status: "degraded",
+        message:
+          "DEVICE_PACKAGE_ENCRYPTION_KEY belum diisi. Development fallback aktif dan tidak boleh dipakai untuk production.",
+      };
+    }
+
+    return {
+      name: "device-package-encryption",
+      ok: true,
+      status: "ok",
+      message: "DEVICE_PACKAGE_ENCRYPTION_KEY aktif untuk paket firmware.",
+    };
+  } catch {
+    return {
+      name: "device-package-encryption",
+      ok: false,
+      status: "error",
+      message:
+        "DEVICE_PACKAGE_ENCRYPTION_KEY wajib valid untuk production dan harus berupa key 32 byte base64/base64url/hex.",
+    };
+  }
+}
+
+function checkDatabaseBackupReadiness(
+  storageDriver: MonitoringStorageDriver,
+): DeploymentCheck {
+  if (storageDriver !== "mysql") {
+    return {
+      name: "database-backup",
+      ok: true,
+      status: "degraded",
+      message:
+        "Backup MySQL belum relevan karena storage memory aktif. Gunakan storage mysql untuk data permanen.",
+    };
+  }
+
+  const outputDir = process.env.MYSQL_BACKUP_OUTPUT_DIR?.trim();
+  const retentionDays = process.env.MYSQL_BACKUP_RETENTION_DAYS?.trim();
+
+  if (!outputDir) {
+    return {
+      name: "database-backup",
+      ok: !isProductionLikeEnvironment(),
+      status: isProductionLikeEnvironment() ? "error" : "degraded",
+      message:
+        "MYSQL_BACKUP_OUTPUT_DIR belum diisi. Tentukan folder backup sebelum production.",
+    };
+  }
+
+  if (
+    retentionDays &&
+    (!Number.isFinite(Number(retentionDays)) || Number(retentionDays) < 0)
+  ) {
+    return {
+      name: "database-backup",
+      ok: false,
+      status: "error",
+      message: "MYSQL_BACKUP_RETENTION_DAYS harus angka 0 atau lebih.",
+    };
+  }
+
+  return {
+    name: "database-backup",
+    ok: true,
+    status: "ok",
+    message:
+      "Target backup MySQL sudah dikonfigurasi. Jadwalkan pnpm db:backup:mysql dan uji restore berkala.",
+  };
+}
+
 export async function getDeploymentReadiness(
   now = new Date(),
 ): Promise<DeploymentReadiness> {
@@ -452,6 +531,8 @@ export async function getDeploymentReadiness(
     checkTelegramReadiness(),
     checkDeviceKeyPolicyReadiness(),
     checkAutoProvisioningReadiness(),
+    checkDevicePackageEncryptionReadiness(),
+    checkDatabaseBackupReadiness(storageDriver),
   ];
 
   if (storageDriver === "mysql" && storageCheck.ok) {

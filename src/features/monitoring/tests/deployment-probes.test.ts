@@ -24,6 +24,11 @@ const originalSmtpHost = process.env.SMTP_HOST;
 const originalSmtpUser = process.env.SMTP_USER;
 const originalSmtpPass = process.env.SMTP_PASS;
 const originalSmtpFrom = process.env.SMTP_FROM;
+const originalDevicePackageEncryptionKey =
+  process.env.DEVICE_PACKAGE_ENCRYPTION_KEY;
+const originalMysqlBackupOutputDir = process.env.MYSQL_BACKUP_OUTPUT_DIR;
+const originalMysqlBackupRetentionDays =
+  process.env.MYSQL_BACKUP_RETENTION_DAYS;
 
 function restoreEnv() {
   if (typeof originalStorageDriver === "undefined") {
@@ -127,6 +132,26 @@ function restoreEnv() {
     delete process.env.SMTP_FROM;
   } else {
     process.env.SMTP_FROM = originalSmtpFrom;
+  }
+
+  if (typeof originalDevicePackageEncryptionKey === "undefined") {
+    delete process.env.DEVICE_PACKAGE_ENCRYPTION_KEY;
+  } else {
+    process.env.DEVICE_PACKAGE_ENCRYPTION_KEY =
+      originalDevicePackageEncryptionKey;
+  }
+
+  if (typeof originalMysqlBackupOutputDir === "undefined") {
+    delete process.env.MYSQL_BACKUP_OUTPUT_DIR;
+  } else {
+    process.env.MYSQL_BACKUP_OUTPUT_DIR = originalMysqlBackupOutputDir;
+  }
+
+  if (typeof originalMysqlBackupRetentionDays === "undefined") {
+    delete process.env.MYSQL_BACKUP_RETENTION_DAYS;
+  } else {
+    process.env.MYSQL_BACKUP_RETENTION_DAYS =
+      originalMysqlBackupRetentionDays;
   }
 }
 
@@ -309,5 +334,40 @@ describe("deployment probes", () => {
 
     expect(readiness.ok).toBe(false);
     expect(captcha).toMatchObject({ ok: false, status: "error" });
+  });
+
+  it("marks production as not ready when firmware encryption or backup target is missing", async () => {
+    process.env.SOLAR_TANK_STORAGE_DRIVER = "mysql";
+    process.env.SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK = "false";
+    process.env.SOLAR_TANK_AUTO_PROVISION_DEVICES = "false";
+    process.env.NEXT_PUBLIC_APP_ENV = "production";
+    process.env.APP_BASE_URL = "https://solar-tank.example.com";
+    process.env.AUTH_SECRET = "x".repeat(32);
+    process.env.AUTH_CAPTCHA_PROVIDER = "turnstile";
+    process.env.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY = "site-key";
+    process.env.AUTH_CAPTCHA_SECRET_KEY = "secret-key";
+    process.env.SMTP_HOST = "smtp.example.com";
+    process.env.SMTP_USER = "user";
+    process.env.SMTP_PASS = "pass";
+    process.env.SMTP_FROM = "SolarTank <noreply@example.com>";
+    delete process.env.DEVICE_PACKAGE_ENCRYPTION_KEY;
+    delete process.env.MYSQL_BACKUP_OUTPUT_DIR;
+
+    const readiness = await getDeploymentReadiness(
+      new Date("2026-06-27T02:30:00.000Z"),
+    );
+    const devicePackageEncryption = readiness.checks.find(
+      (check) => check.name === "device-package-encryption",
+    );
+    const databaseBackup = readiness.checks.find(
+      (check) => check.name === "database-backup",
+    );
+
+    expect(readiness.ok).toBe(false);
+    expect(devicePackageEncryption).toMatchObject({
+      ok: false,
+      status: "error",
+    });
+    expect(databaseBackup).toMatchObject({ ok: false, status: "error" });
   });
 });

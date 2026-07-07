@@ -701,7 +701,7 @@ Sebelum dipakai dengan perangkat dan tangki nyata, perlu validasi:
 - konfigurasi Turnstile untuk form pengajuan akses dan lupa password;
 - akses user, role, approval admin, dan prosedur deaktivasi akun;
 - keputusan deployment production final dan SOP operasional;
-- backup database;
+- backup database dan restore drill, lihat `docs/database-backup.md`;
 - rate limit ingest pada mode MySQL dan proteksi tambahan endpoint ingest di environment final;
 - rotasi key per device;
 - cara menonaktifkan fallback data dummy;

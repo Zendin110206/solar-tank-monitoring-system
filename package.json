@@ -23,6 +23,7 @@
     "db:migrate:device-request-fields": "node scripts/apply-mysql-schema.mjs database/migrations/005_extend_device_request_operational_fields_mysql.sql",
     "db:seed:mysql": "node scripts/apply-mysql-schema.mjs database/seeds/001_seed_demo_monitoring_reference_mysql.sql",
     "db:setup:mysql": "pnpm db:migrate:mysql && pnpm db:migrate:auth && pnpm db:migrate:auth-recovery && pnpm db:migrate:device-provisioning && pnpm db:migrate:device-request-fields && pnpm db:seed:mysql",
+    "db:backup:mysql": "node scripts/backup-mysql.mjs",
     "auth:create-admin": "node scripts/create-auth-admin.mjs",
     "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
   },

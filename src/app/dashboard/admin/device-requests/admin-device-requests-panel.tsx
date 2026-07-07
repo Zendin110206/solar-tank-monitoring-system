@@ -10,6 +10,7 @@ import type {
   MonitoringHardwareProfile,
   TankShape,
 } from "@/features/monitoring/types/monitoring";
+import { formatCoordinatePair } from "@/features/monitoring/lib/number";
 import {
   ApproveDeviceRequestForm,
   CleanupDeviceRequestForm,
@@ -120,7 +121,7 @@ function getCoordinateSummary(request: MonitoringDeviceRequest) {
     return "-";
   }
 
-  return `${request.latitude}, ${request.longitude}`;
+  return formatCoordinatePair(request.latitude, request.longitude);
 }
 
 function DetailItem({

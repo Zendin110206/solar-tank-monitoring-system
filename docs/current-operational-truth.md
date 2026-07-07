@@ -6,9 +6,9 @@ Dokumen ini menjadi ringkasan kebenaran operasional saat ini. Jika dokumen lama 
 
 ## Status Produk Saat Ini
 
-SolarTank masih prototipe aktif, tetapi sudah melewati fase dashboard dummy. Sistem sekarang sudah memiliki alur monitoring, auth, pengajuan device, pembuatan paket firmware, first valid ping activation, dan cleanup data device.
+SolarTank masih prototipe aktif, tetapi sudah melewati fase dashboard dummy. Sistem sekarang sudah memiliki alur monitoring, auth, pengajuan device, pembuatan paket firmware, first valid ping activation, reset reading aman, export CSV reading, backup MySQL manual, dan cleanup data device.
 
-Sistem belum boleh disebut production-ready penuh karena deployment production final, backup/restore, kalibrasi device lapangan, dan SOP operasional belum selesai diuji.
+Sistem belum boleh disebut production-ready penuh karena deployment production final, restore drill, kalibrasi device lapangan, dan SOP operasional belum selesai diuji.
 
 ## Yang Sudah Ada
 
@@ -31,14 +31,17 @@ Sistem belum boleh disebut production-ready penuh karena deployment production f
 - `POST /api/ingest` menerima payload device dan menyimpan reading.
 - Ingest punya rate limit saat storage MySQL aktif.
 - Dashboard ringkas, dashboard detail, peta, detail tangki, dan grafik trend.
+- Download CSV reading dari halaman detail tangki.
+- Admin reset reading per STO dan reset semua reading tanpa menghapus registry/device.
 - Admin cleanup untuk data STO/device/uji tanpa menghapus akun user/admin, template firmware, atau hardware profile.
+- Script backup MySQL manual `pnpm db:backup:mysql`.
 - Health check `/api/health` dan readiness check `/api/ready`.
 - Test suite dan CI `pnpm check`.
 
 ## Yang Belum Final
 
 - Deployment production final dan SOP operasional server pilihan akhir.
-- Backup dan restore database yang diuji rutin.
+- Jadwal backup otomatis dan restore database yang diuji rutin.
 - Monitoring/log service production.
 - Alert operasional level kritis/offline.
 - Telegram approve/reject device request. Saat ini Telegram untuk binding dan notifikasi, bukan approval utama.
@@ -92,9 +95,10 @@ Untuk pilot/operasional:
 
 - gunakan `SOLAR_TANK_STORAGE_DRIVER=mysql`;
 - matikan fallback global device key;
-- siapkan SMTP, auth secret, package encryption key, dan admin bootstrap;
+- siapkan SMTP, auth secret, package encryption key, backup output dir, dan admin bootstrap;
 - cek `/api/ready` sebelum menganggap sistem siap;
-- backup database sebelum migration besar, cleanup besar, atau deploy.
+- jalankan `pnpm db:backup:mysql` sebelum migration besar, cleanup besar, atau deploy;
+- uji restore backup ke database staging/lokal sebelum mengklaim SOP backup final.
 
 Detail deployment pilihan akhir belum dipublikasikan di repo utama pada status ini. Jalur tersebut ditunda sampai keputusan tim berikutnya.
 

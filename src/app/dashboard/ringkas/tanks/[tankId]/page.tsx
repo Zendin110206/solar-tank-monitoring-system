@@ -8,6 +8,7 @@ import {
   ArrowLeft,
   Clock3,
   Database,
+  Download,
   MapPin,
   Ruler,
   Server,
@@ -594,6 +595,13 @@ export default async function SimpleTankDetailPage({
                   melihat pola perubahan volume.
                 </p>
               </div>
+              <Link
+                className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-xs font-semibold text-zinc-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
+                href={`/api/tanks/${tank.id}/readings/export`}
+              >
+                <Download className="size-4" aria-hidden="true" />
+                Download CSV
+              </Link>
             </div>
 
             <SimpleTankVolumeChart

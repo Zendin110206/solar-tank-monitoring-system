@@ -62,6 +62,12 @@ export type CleanupMonitoringTanksResult = {
   totalRows: number;
 };
 
+export type ResetMonitoringReadingsResult = {
+  matchedTankCount: number;
+  readingRows: number;
+  totalRows: number;
+};
+
 function uniqueNonEmpty(values: string[]): string[] {
   return Array.from(new Set(values.map((value) => value.trim()).filter(Boolean)));
 }
@@ -133,6 +139,25 @@ async function countRows({
   return Number(rows[0]?.count ?? 0);
 }
 
+async function countRowsWhere({
+  connection,
+  params,
+  tableName,
+  where,
+}: {
+  connection: PoolConnection;
+  params: string[];
+  tableName: ResetMonitoringDeviceDataTable;
+  where: string;
+}) {
+  const [rows] = await connection.query<CountRow[]>(
+    `SELECT COUNT(*) AS count FROM ${tableName} WHERE ${where}`,
+    params,
+  );
+
+  return Number(rows[0]?.count ?? 0);
+}
+
 async function getDeletableDeviceRows({
   connection,
   deviceIds,
@@ -182,6 +207,98 @@ export async function resetMonitoringDeviceDataInMysql(): Promise<ResetMonitorin
     return {
       counts,
       totalRows: Object.values(counts).reduce((total, count) => total + count, 0),
+    };
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
+}
+
+export async function resetMonitoringReadingsInMysql({
+  tankIds,
+}: {
+  tankIds?: string[];
+} = {}): Promise<ResetMonitoringReadingsResult> {
+  const cleanTankIds =
+    typeof tankIds === "undefined" ? null : uniqueNonEmpty(tankIds);
+
+  if (Array.isArray(cleanTankIds) && cleanTankIds.length === 0) {
+    return {
+      matchedTankCount: 0,
+      readingRows: 0,
+      totalRows: 0,
+    };
+  }
+
+  const pool = getMysqlPool();
+  const connection = await pool.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    if (!cleanTankIds) {
+      const matchedTankCount = await countRows({
+        connection,
+        tableName: "monitoring_tanks",
+      });
+      const readingRows = await countRows({
+        connection,
+        tableName: "monitoring_readings",
+      });
+
+      await connection.query("DELETE FROM monitoring_readings");
+      await connection.commit();
+
+      return {
+        matchedTankCount,
+        readingRows,
+        totalRows: readingRows,
+      };
+    }
+
+    const [tankRows] = await connection.query<IdRow[]>(
+      `
+        SELECT id
+        FROM monitoring_tanks
+        WHERE id IN (${buildPlaceholders(cleanTankIds)})
+        FOR UPDATE
+      `,
+      cleanTankIds,
+    );
+    const matchedTankIds = getIds(tankRows);
+
+    if (matchedTankIds.length === 0) {
+      await connection.commit();
+
+      return {
+        matchedTankCount: 0,
+        readingRows: 0,
+        totalRows: 0,
+      };
+    }
+
+    const where = `tank_id IN (${buildPlaceholders(matchedTankIds)})`;
+    const readingRows = await countRowsWhere({
+      connection,
+      params: matchedTankIds,
+      tableName: "monitoring_readings",
+      where,
+    });
+
+    await deleteWhere({
+      connection,
+      params: matchedTankIds,
+      tableName: "monitoring_readings",
+      where,
+    });
+    await connection.commit();
+
+    return {
+      matchedTankCount: matchedTankIds.length,
+      readingRows,
+      totalRows: readingRows,
     };
   } catch (error) {
     await connection.rollback();

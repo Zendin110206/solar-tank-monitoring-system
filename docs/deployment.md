@@ -19,6 +19,7 @@ Yang sudah aman dilakukan:
 - membuat hash key device pilot lewat `pnpm pilot:hash-key`;
 - memvalidasi dan apply registry pilot lokal lewat `pnpm pilot:registry`;
 - mengirim smoke payload real-format lewat `pnpm pilot:smoke`;
+- membuat backup MySQL manual lewat `pnpm db:backup:mysql`;
 - menjalankan migration auth lewat `pnpm db:migrate:auth` dan `pnpm db:migrate:auth-recovery`;
 - membuat admin awal lewat `pnpm auth:create-admin`;
 - menguji login, pengajuan akses, verifikasi email, reset password, dan halaman admin jika env auth lengkap;
@@ -39,6 +40,7 @@ Untuk status operasional terbaru, baca juga:
 
 ```text
 docs/current-operational-truth.md
+docs/database-backup.md
 ```
 
 ## Menjalankan Lokal

@@ -97,6 +97,26 @@ describe("device request foundation", () => {
     });
   });
 
+  it("preserves precise latitude and longitude values", () => {
+    const validation = validateDeviceRequestDraft(
+      {
+        ...baseDraft,
+        latitude: -7.7201234,
+        longitude: 112.8809876,
+      },
+      {
+        firmwareTemplates: [firmwareTemplate],
+        hardwareProfiles: [rectangularProfile],
+      },
+    );
+
+    expect(validation.ok).toBe(true);
+    expect(validation.normalized).toMatchObject({
+      latitude: -7.7201234,
+      longitude: 112.8809876,
+    });
+  });
+
   it("calculates hourly diesel consumption from load, engine capacity, and cos phi", () => {
     expect(
       calculateOperationalConsumptionLiterPerHour({
