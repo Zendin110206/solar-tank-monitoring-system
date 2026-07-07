@@ -136,7 +136,7 @@ function parseEncryptionKeyFromEnv(value: string): Buffer | null {
   return null;
 }
 
-function getDevicePackageEncryptionKey(): Buffer {
+export function getDevicePackageEncryptionKey(): Buffer {
   const configuredKey = process.env.DEVICE_PACKAGE_ENCRYPTION_KEY;
 
   if (configuredKey) {

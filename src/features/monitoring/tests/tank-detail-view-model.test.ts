@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { mockSites } from "../data/mock-sites";
 import { mockTanks } from "../data/mock-tanks";
 import {
   buildTankDetail,
@@ -57,6 +58,23 @@ describe("tank detail view model", () => {
       receivedAtLabel: "belum ada data",
       readings: [],
     });
+  });
+
+  it("keeps precise manual coordinates in detail labels", () => {
+    const sites = mockSites.map((site) =>
+      site.id === "site-tph"
+        ? {
+            ...site,
+            latitude: -7.7201234,
+            longitude: 112.8809876,
+          }
+        : site,
+    );
+    const detail = buildTankDetail("tank-tph-main", { now, sites });
+
+    expect(detail?.coordinate.label).toBe(
+      "-7.7201234, 112.8809876 (koordinat manual)",
+    );
   });
 
   it("surfaces config mismatch review when latest payload conflicts with registry", () => {

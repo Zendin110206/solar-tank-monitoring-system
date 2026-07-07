@@ -23,3 +23,18 @@ export function roundTo(value: number, digits = 2): number {
   const factor = 10 ** digits;
   return Math.round((value + Number.EPSILON) * factor) / factor;
 }
+
+export function formatCoordinate(value: number, maxFractionDigits = 7): string {
+  if (!Number.isFinite(value)) {
+    return "-";
+  }
+
+  return value
+    .toFixed(maxFractionDigits)
+    .replace(/(\.\d*?[1-9])0+$/, "$1")
+    .replace(/\.0+$/, "");
+}
+
+export function formatCoordinatePair(latitude: number, longitude: number): string {
+  return `${formatCoordinate(latitude)}, ${formatCoordinate(longitude)}`;
+}

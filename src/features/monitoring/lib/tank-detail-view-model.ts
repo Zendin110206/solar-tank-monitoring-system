@@ -14,7 +14,7 @@ import type {
   Tank,
   TankConfigReview,
 } from "../types/monitoring";
-import { roundTo } from "./number";
+import { formatCoordinatePair, roundTo } from "./number";
 import {
   compareRegistryVsPayloadConfig,
   pickPayloadNumber,
@@ -415,7 +415,7 @@ function toReadingPoint(reading: Reading): TankReadingPoint {
 
 function getCoordinateLabel(site: Site): string {
   if (typeof site.latitude === "number" && typeof site.longitude === "number") {
-    return `${site.latitude.toFixed(4)}, ${site.longitude.toFixed(4)} (koordinat manual)`;
+    return `${formatCoordinatePair(site.latitude, site.longitude)} (koordinat manual)`;
   }
 
   return "koordinat manual belum diisi";

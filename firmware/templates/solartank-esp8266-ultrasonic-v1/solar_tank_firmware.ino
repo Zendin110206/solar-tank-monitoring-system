@@ -167,9 +167,9 @@ void printConfig() {
   Serial.print(" / ");
   Serial.println(siteName);
   Serial.print("  GPS: ");
-  Serial.print(LAT_FIXED, 6);
+  Serial.print(LAT_FIXED, 7);
   Serial.print(", ");
-  Serial.println(LNG_FIXED, 6);
+  Serial.println(LNG_FIXED, 7);
   Serial.print("  Tank: ");
   Serial.print(tankShape);
   Serial.print(" ");
@@ -399,8 +399,8 @@ String buildPayload(float battVoltage) {
   payload += "\"site_code\":\"" + siteCode + "\",";
   payload += "\"site_name\":\"" + siteName + "\",";
   payload += "\"area_label\":\"" + areaLabel + "\",";
-  payload += "\"lat\":" + String(LAT_FIXED, 6) + ",";
-  payload += "\"lng\":" + String(LNG_FIXED, 6) + ",";
+  payload += "\"lat\":" + String(LAT_FIXED, 7) + ",";
+  payload += "\"lng\":" + String(LNG_FIXED, 7) + ",";
   payload += "\"tank_shape\":\"" + tankShape + "\",";
   payload += "\"tank_type\":\"" + tankShape + "\",";
   payload += "\"capacity_liter\":" + String(TANK_CAPACITY_LITER, 2) + ",";
@@ -433,8 +433,8 @@ String buildPayload(float battVoltage) {
   payload += "\"code\":\"" + siteCode + "\",";
   payload += "\"name\":\"" + siteName + "\",";
   payload += "\"area_label\":\"" + areaLabel + "\",";
-  payload += "\"lat\":" + String(LAT_FIXED, 6) + ",";
-  payload += "\"lng\":" + String(LNG_FIXED, 6);
+  payload += "\"lat\":" + String(LAT_FIXED, 7) + ",";
+  payload += "\"lng\":" + String(LNG_FIXED, 7);
   payload += "},";
   payload += "\"tank\":{";
   payload += "\"shape\":\"" + tankShape + "\",";
@@ -603,8 +603,8 @@ void handleAPI() {
   json += "\"percent\":" + String(fillPercent) + ",";
   json += "\"ip\":\"" + WiFi.localIP().toString() + "\",";
   json += "\"rssi\":" + String(WiFi.RSSI()) + ",";
-  json += "\"lat\":" + String(LAT_FIXED, 6) + ",";
-  json += "\"lng\":" + String(LNG_FIXED, 6);
+  json += "\"lat\":" + String(LAT_FIXED, 7) + ",";
+  json += "\"lng\":" + String(LNG_FIXED, 7);
   json += "}";
   server.send(200, "application/json", json);
 }

@@ -15,6 +15,7 @@ import {
   useState,
   type PointerEvent,
 } from "react";
+import { formatCoordinatePair } from "@/features/monitoring/lib/number";
 import type { SimpleDashboardSite } from "@/features/monitoring/lib/simple-dashboard-model";
 
 type LatLng = {
@@ -490,7 +491,10 @@ export function SimpleDashboardMap({ sites }: { sites: SimpleDashboardSite[] }) 
                 <dt className="text-zinc-500">Koordinat</dt>
                 <dd className="font-semibold text-zinc-950">
                   {isValidCoordinate(activeSite)
-                    ? `${activeSite.latitude.toFixed(4)}, ${activeSite.longitude.toFixed(4)}`
+                    ? formatCoordinatePair(
+                        activeSite.latitude,
+                        activeSite.longitude,
+                      )
                     : "-"}
                 </dd>
               </div>

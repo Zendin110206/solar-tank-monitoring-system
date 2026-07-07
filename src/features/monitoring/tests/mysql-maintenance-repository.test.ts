@@ -25,6 +25,7 @@ import {
   cleanupMonitoringDeviceRequestsInMysql,
   cleanupMonitoringTanksInMysql,
   resetMonitoringDeviceDataInMysql,
+  resetMonitoringReadingsInMysql,
 } from "../lib/mysql-maintenance-repository";
 
 describe("mysql maintenance repository", () => {
@@ -178,6 +179,53 @@ describe("mysql maintenance repository", () => {
     expect(statements.join(" ")).not.toContain("auth_");
     expect(statements.join(" ")).not.toContain("monitoring_firmware_templates");
     expect(statements.join(" ")).not.toContain("monitoring_hardware_profiles");
+    expect(mocks.connection.commit).toHaveBeenCalledTimes(1);
+    expect(mocks.connection.rollback).not.toHaveBeenCalled();
+    expect(mocks.connection.release).toHaveBeenCalledTimes(1);
+  });
+
+  it("resets only readings for selected dashboard tanks", async () => {
+    mocks.connection.query.mockImplementation(async (statement: string) => {
+      const cleanStatement = statement.replace(/\s+/g, " ").trim();
+
+      if (
+        cleanStatement.startsWith("SELECT") &&
+        cleanStatement.includes("FROM monitoring_tanks")
+      ) {
+        return [[{ id: "tank-1" }]];
+      }
+
+      if (
+        cleanStatement.startsWith("SELECT COUNT(*)") &&
+        cleanStatement.includes("FROM monitoring_readings")
+      ) {
+        return [[{ count: 3 }]];
+      }
+
+      return [{ affectedRows: 3 }];
+    });
+
+    const result = await resetMonitoringReadingsInMysql({
+      tankIds: ["tank-1"],
+    });
+    const statements = mocks.connection.query.mock.calls.map(([statement]) =>
+      String(statement).replace(/\s+/g, " ").trim(),
+    );
+
+    expect(result).toEqual({
+      matchedTankCount: 1,
+      readingRows: 3,
+      totalRows: 3,
+    });
+    expect(statements).toContain(
+      "SELECT COUNT(*) AS count FROM monitoring_readings WHERE tank_id IN (?)",
+    );
+    expect(statements).toContain(
+      "DELETE FROM monitoring_readings WHERE tank_id IN (?)",
+    );
+    expect(statements.join(" ")).not.toContain("monitoring_devices");
+    expect(statements.join(" ")).not.toContain("monitoring_tanks t");
+    expect(statements.join(" ")).not.toContain("auth_");
     expect(mocks.connection.commit).toHaveBeenCalledTimes(1);
     expect(mocks.connection.rollback).not.toHaveBeenCalled();
     expect(mocks.connection.release).toHaveBeenCalledTimes(1);
