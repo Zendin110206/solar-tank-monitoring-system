@@ -69,8 +69,8 @@ Yang belum tersedia:
 
 - deployment produksi;
 - kalibrasi tangki nyata;
-- notifikasi operasional di luar email auth;
-- rate limit khusus endpoint ingest;
+- notifikasi operasional level kritis/offline di luar email auth dan notifikasi pengajuan device;
+- keputusan deployment produksi final dan proteksi perimeter endpoint ingest pada environment final;
 - rotasi key device penuh di luar alur pengajuan perangkat;
 - manajemen registry site/tangki/device yang menulis database dari UI;
 - backup dan restore database production.
@@ -78,7 +78,7 @@ Yang belum tersedia:
 Catatan penting:
 
 ```text
-Saat ini dashboard dan detail sudah membaca storage aktif lewat layer aplikasi. Mode default tetap `memory` agar mudah dicoba. Mode `mysql` sudah tersedia untuk persistent storage, registry monitoring, dan auth database. Sistem belum boleh dianggap production-ready sampai environment production, SMTP, CAPTCHA, HTTPS, backup, prosedur restore, rate limit ingest, dan prosedur operasional final sudah divalidasi.
+Saat ini dashboard dan detail sudah membaca storage aktif lewat layer aplikasi. Mode default tetap `memory` agar mudah dicoba. Mode `mysql` sudah tersedia untuk persistent storage, registry monitoring, auth database, pengajuan device, firmware package, dan rate limit server-side. Sistem belum boleh dianggap production-ready sampai environment production, SMTP, CAPTCHA, HTTPS, backup, prosedur restore, dan prosedur operasional final sudah divalidasi.
 ```
 
 ## Tujuan Produk
@@ -180,6 +180,7 @@ Struktur aktif saat ini:
 │   ├── device-ingestion.md
 │   ├── domain-model.md
 │   ├── field-pilot-5-sto-guide.md
+│   ├── current-operational-truth.md
 │   ├── pilot-readiness.md
 │   ├── reviewer-quickstart.md
 │   ├── roadmap.md
@@ -588,10 +589,11 @@ Catatan penting:
 | `docs/reviewer-quickstart.md` | Panduan cepat menjalankan dan mengecek repo |
 | `docs/architecture.md` | Gambaran arsitektur saat ini dan target berikutnya |
 | `docs/api-contract.md` | Kontrak endpoint API |
+| `docs/current-operational-truth.md` | Status operasional terbaru agar dokumen lama yang stale tidak menjadi acuan salah |
 | `docs/device-ingestion.md` | Format payload device dan simulator |
 | `docs/data-model.md` | Entitas data utama |
 | `docs/domain-model.md` | Rumus volume, persen, runtime, dan status |
-| `docs/deployment.md` | Catatan deployment lokal, demo, dan self-hosted |
+| `docs/deployment.md` | Catatan deployment development, demo, dan pilot sementara |
 | `docs/pilot-readiness.md` | Panduan pilot 5 STO dengan registry real, hash key, dan smoke test |
 | `docs/field-pilot-5-sto-guide.md` | Panduan lapangan 5 STO: koordinat, peta, firmware, endpoint, dan checklist demo |
 | `docs/roadmap.md` | Rencana pengembangan bertahap |
@@ -698,9 +700,9 @@ Sebelum dipakai dengan perangkat dan tangki nyata, perlu validasi:
 - konfigurasi SMTP untuk OTP admin, verifikasi email, dan reset password;
 - konfigurasi Turnstile untuk form pengajuan akses dan lupa password;
 - akses user, role, approval admin, dan prosedur deaktivasi akun;
-- deployment server;
+- keputusan deployment production final dan SOP operasional;
 - backup database;
-- rate limit dan audit log endpoint ingest;
+- rate limit ingest pada mode MySQL dan proteksi tambahan endpoint ingest di environment final;
 - rotasi key per device;
 - cara menonaktifkan fallback data dummy;
 - prosedur keselamatan lapangan.

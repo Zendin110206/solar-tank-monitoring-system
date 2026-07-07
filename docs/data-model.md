@@ -118,12 +118,20 @@ Field penting:
 | `deviceCode` | kode device yang dibuat sistem |
 | `deviceSensorType` | tipe sensor, saat ini fokus ke sensor fuel |
 | `tankShape` | bentuk tangki, balok atau silinder horizontal |
-| `capacityLiter` | kapasitas tangki yang diinput user |
+| `capacityLiter` | kapasitas tangki hasil hitung sistem dari dimensi, bukan input manual user |
 | `lengthCm`, `widthCm`, `heightCm`, `diameterCm` | dimensi fisik tangki sesuai bentuk |
-| `sensorMountHeightCm` | tinggi sensor dari atas tangki |
+| `sensorMountHeightCm` | acuan tinggi sensor yang harus diisi konsisten dengan panduan firmware/lapangan |
 | `loadValue`, `loadUnit`, `dieselEngineCapacityKva`, `cosPhi` | parameter beban genset untuk menghitung konsumsi solar per jam |
 | `hardwareProfileId` | profile board, sensor, dan pin yang dipakai firmware |
 | `firmwareTemplateId` | template firmware yang dipakai untuk membuat ZIP |
+
+Catatan penting:
+
+- user tidak mengisi kode STO, kode device, device key, kapasitas liter, konsumsi liter per jam, low level, critical level, atau interval kirim secara bebas;
+- kode dan key dibuat oleh sistem;
+- kapasitas dihitung dari dimensi tangki;
+- konsumsi dihitung dari beban lokasi, kapasitas diesel engine, dan cos phi;
+- low/critical level dan interval kirim mengikuti standar sistem atau hardware profile.
 
 Status penting:
 

@@ -190,6 +190,22 @@ Pekerjaan:
 - menambahkan test repository untuk memastikan urutan pembersihan mengikuti relasi database;
 - memperbarui README, pilot readiness, dan data model.
 
+## 2026-07-07 - Sinkronisasi Dokumentasi Operasional
+
+Pekerjaan:
+
+- menambahkan `docs/current-operational-truth.md` sebagai sumber ringkas kondisi project terkini;
+- menyelaraskan README, SECURITY, deployment, safety, system boundaries, data model, dan roadmap agar tidak menyebut fitur yang sudah ada sebagai belum ada;
+- menegaskan bahwa approval device tetap melalui web admin, sementara Telegram masih untuk binding/notifikasi;
+- menegaskan bahwa RTU/Modbus, alert production, backup/restore teruji, dan hardening deployment final masih pekerjaan lanjutan;
+- mencatat bahwa kapasitas tangki dan konsumsi estimasi berasal dari perhitungan sistem, bukan input manual bebas user.
+
+Catatan:
+
+```text
+Perubahan ini hanya dokumentasi. Detail deployment pilihan akhir tidak dipublikasikan di repo utama pada tahap ini.
+```
+
 ## Status Verifikasi Terakhir
 
 Perintah:
