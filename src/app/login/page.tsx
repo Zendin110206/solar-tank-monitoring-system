@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import SignInForm from "./sign-in-form";
+import { getSafeLoginRedirectPath } from "@/features/auth/lib/auth-redirect";
 
 export const metadata: Metadata = {
   title: "Masuk | SolarTank",
@@ -51,29 +52,4 @@ export default async function LoginPage({
       />
     </AuthShell>
   );
-}
-
-function getSafeLoginRedirectPath(value: string | undefined): string {
-  if (!value) {
-    return "/dashboard";
-  }
-
-  try {
-    const parsed = new URL(value, "https://solar-tank.local");
-
-    if (
-      parsed.origin !== "https://solar-tank.local" ||
-      !isDashboardPath(parsed.pathname)
-    ) {
-      return "/dashboard";
-    }
-
-    return `${parsed.pathname}${parsed.search}${parsed.hash}`;
-  } catch {
-    return "/dashboard";
-  }
-}
-
-function isDashboardPath(pathname: string): boolean {
-  return pathname === "/dashboard" || pathname.startsWith("/dashboard/");
 }

@@ -215,6 +215,11 @@ export function getTelegramBotUsername(): string | null {
   return username || null;
 }
 
+export function getReadinessCheckToken(): string | null {
+  const token = process.env.READINESS_CHECK_TOKEN?.trim();
+  return token || null;
+}
+
 export type TelegramAdminTopic =
   | "live-chat"
   | "new-account"

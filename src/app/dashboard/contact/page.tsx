@@ -3,6 +3,7 @@ import { Mail, MapPin, Send, ShieldCheck } from "lucide-react";
 
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { requirePageUser } from "@/features/auth/lib/auth-guards";
+import { ContactMessageTemplate } from "./contact-message-template";
 
 export const metadata: Metadata = {
   title: "Kontak Operasional | SolarTank",
@@ -33,8 +34,52 @@ const contactItems = [
   },
 ];
 
+function formatRole(role: string) {
+  return role === "admin" ? "Admin" : "User";
+}
+
+function buildContactMessage({
+  email,
+  fullName,
+  role,
+  username,
+}: {
+  email: string;
+  fullName: string;
+  role: string;
+  username: string;
+}) {
+  return [
+    "Halo Pak Astra, saya butuh bantuan terkait SolarTank.",
+    "",
+    `Nama: ${fullName}`,
+    `Username: ${username}`,
+    `Email: ${email}`,
+    `Role akun: ${formatRole(role)}`,
+    "Halaman terkait: /dashboard/contact",
+    "",
+    "Kebutuhan/kendala:",
+    "- ",
+    "",
+    "STO/tangki/perangkat terkait:",
+    "- ",
+    "",
+    "Langkah yang sudah dicoba:",
+    "- ",
+    "",
+    "Waktu kejadian:",
+    "- ",
+  ].join("\n");
+}
+
 export default async function DashboardContactPage() {
   const user = await requirePageUser();
+  const contactMessage = buildContactMessage({
+    email: user.email,
+    fullName: user.fullName || user.email,
+    role: user.role,
+    username: user.username,
+  });
 
   return (
     <main className="min-h-screen overflow-hidden bg-[#f5faf8] text-zinc-950">
@@ -117,6 +162,11 @@ export default async function DashboardContactPage() {
               );
             })}
           </div>
+
+          <ContactMessageTemplate
+            message={contactMessage}
+            telegramHref="https://t.me/Astraata"
+          />
         </div>
       </section>
     </main>

@@ -415,7 +415,9 @@ export async function findActiveAdminByTelegramChatId(
 
 export function summarizeHelpdeskSession(session: HelpdeskSession): string {
   const requester =
-    session.requesterName || session.requesterEmail || "Visitor web";
+    session.requesterName && session.requesterEmail
+      ? `${session.requesterName} <${session.requesterEmail}>`
+      : (session.requesterName ?? session.requesterEmail ?? "Visitor web");
 
   return [
     `Session: ${session.sessionCode}`,

@@ -169,8 +169,10 @@ describe("deployment probes", () => {
       status: "ok",
       service: "solar-tank-monitoring-system",
       timestamp: "2026-06-27T02:30:00.000Z",
-      storageDriver: "memory",
     });
+    expect(health).not.toHaveProperty("storageDriver");
+    expect(health).not.toHaveProperty("appEnv");
+    expect(health).not.toHaveProperty("nodeEnv");
     expect(JSON.stringify(health)).not.toContain("MYSQL_DATABASE_URL");
     expect(JSON.stringify(health)).not.toContain("local-development-key");
   });

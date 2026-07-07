@@ -12,7 +12,7 @@ Yang sudah aman dilakukan:
 - menjalankan simulator lokal;
 - menguji API lokal;
 - mengecek aplikasi hidup lewat `/api/health`;
-- mengecek kesiapan storage aktif lewat `/api/ready`;
+- mengecek kesiapan storage aktif lewat `/api/ready` memakai session admin atau token operasional di production;
 - menguji mode memory store;
 - menyiapkan migration dan seed MySQL untuk latihan registry monitoring dan persistent storage;
 - menjalankan setup MySQL lewat `pnpm db:setup:mysql`;
@@ -72,7 +72,9 @@ Perbedaan penting:
 
 ```text
 /api/health hanya membuktikan aplikasi hidup.
-/api/ready membuktikan storage aktif siap.
+/api/ready membuktikan storage aktif siap dan berisi detail operasional. Di production,
+akses endpoint ini hanya untuk admin yang login atau request dengan header
+`x-solar-tank-readiness-token`.
 ```
 
 Jika `/api/health` sukses tetapi `/api/ready` gagal, biasanya masalah ada pada
@@ -206,7 +208,8 @@ Batasan:
 - tidak otomatis cocok untuk perangkat lapangan;
 - memory store tidak stabil di serverless;
 - perlu database jika ingin history bertahan.
-- `/api/ready` harus sukses sebelum URL demo dianggap siap dipakai reviewer.
+- `/api/ready` harus sukses sebelum URL demo dianggap siap dipakai reviewer. Jangan
+  membuka endpoint ini sebagai URL publik tanpa session admin atau token readiness.
 
 ## Environment Variable
 

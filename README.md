@@ -345,7 +345,7 @@ Catatan:
 
 ```text
 /api/health menjawab apakah aplikasi hidup.
-/api/ready menjawab apakah storage aktif siap. Jika mode mysql dan database gagal, endpoint ini mengembalikan HTTP 503.
+/api/ready menjawab apakah storage aktif siap. Di production endpoint ini hanya untuk admin/session operasional atau header token readiness. Jika mode mysql dan database gagal, endpoint ini mengembalikan HTTP 503.
 ```
 
 Cek detail tangki:

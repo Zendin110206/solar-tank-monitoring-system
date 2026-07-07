@@ -26,7 +26,6 @@ import {
 } from "./monitoring-storage";
 
 const SERVICE_NAME = "solar-tank-monitoring-system";
-const serviceStartedAt = new Date();
 
 export type DeploymentCheckStatus = "ok" | "degraded" | "error";
 export type DeploymentReadinessStatus = "ready" | "degraded" | "not_ready";
@@ -35,11 +34,6 @@ export type DeploymentHealth = {
   status: "ok";
   service: string;
   timestamp: string;
-  startedAt: string;
-  uptimeSec: number;
-  appEnv: string;
-  nodeEnv: string;
-  storageDriver: MonitoringStorageDriver;
 };
 
 export type DeploymentCheck = {
@@ -73,13 +67,6 @@ function getNodeEnv(): string {
   return process.env.NODE_ENV || "development";
 }
 
-function getUptimeSec(now: Date): number {
-  return Math.max(
-    0,
-    Math.floor((now.getTime() - serviceStartedAt.getTime()) / 1000),
-  );
-}
-
 function getElapsedMs(startedAtMs: number): number {
   return Math.max(0, Date.now() - startedAtMs);
 }
@@ -89,11 +76,6 @@ export function getDeploymentHealth(now = new Date()): DeploymentHealth {
     status: "ok",
     service: SERVICE_NAME,
     timestamp: now.toISOString(),
-    startedAt: serviceStartedAt.toISOString(),
-    uptimeSec: getUptimeSec(now),
-    appEnv: getAppEnv(),
-    nodeEnv: getNodeEnv(),
-    storageDriver: getMonitoringStorageDriver(),
   };
 }
 

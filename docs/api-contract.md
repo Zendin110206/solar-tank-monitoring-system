@@ -58,7 +58,7 @@ Response sukses:
   "data": {
     "status": "ok",
     "service": "solar-tank-monitoring-system",
-    "storageDriver": "mysql"
+    "timestamp": "2026-07-08T00:00:00.000Z"
   }
 }
 ```
@@ -70,6 +70,9 @@ Fungsi:
 ```text
 Mengecek apakah storage aktif siap dipakai dashboard dan API baca.
 ```
+
+Endpoint ini berisi detail operasional dan di production hanya boleh dibuka
+dengan session admin atau token readiness.
 
 Jika `SOLAR_TANK_STORAGE_DRIVER="memory"`, endpoint ini tetap sukses tetapi
 statusnya `degraded` karena data memory tidak permanen.
