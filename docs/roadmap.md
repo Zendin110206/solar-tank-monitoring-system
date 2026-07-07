@@ -154,7 +154,7 @@ Endpoint ingest dan key per device sudah disiapkan untuk latihan dan pilot awal.
 
 ## Fase 10 - Deployment Demo atau Pilot
 
-Status: jalur Vercel + cloud MySQL tersedia untuk demo/pilot ringan.
+Status: jalur Vercel + cloud MySQL tersedia untuk demo/pilot ringan. Detail deployment pilihan akhir ditunda sampai keputusan tim berikutnya.
 
 Sudah ada:
 
@@ -162,17 +162,15 @@ Sudah ada:
 - readiness check;
 - panduan MySQL cloud;
 - alat registry pilot;
-- smoke ingest ke URL lokal atau Vercel.
+- smoke ingest ke URL lokal atau Vercel;
+- dokumen kebenaran operasional terkini.
 
 Target berikutnya:
 
-- deployment demo public-safe;
-- atau deployment internal/self-hosted;
-- env var aman;
-- HTTPS;
-- backup;
-- monitoring dasar;
-- checklist operasional.
+- uji backup dan restore MySQL ke database staging/lokal;
+- prosedur update aplikasi tanpa menghapus data;
+- monitoring dasar untuk health, readiness, disk, CPU, RAM, dan log error;
+- checklist go-live 5 device/STO.
 
 ## Prinsip Roadmap
 

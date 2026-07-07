@@ -35,6 +35,12 @@ Yang belum final:
 - monitoring server;
 - integrasi device fisik yang sudah divalidasi lapangan.
 
+Untuk status operasional terbaru, baca juga:
+
+```text
+docs/current-operational-truth.md
+```
+
 ## Menjalankan Lokal
 
 ```powershell
@@ -200,29 +206,6 @@ Batasan:
 - perlu database jika ingin history bertahan.
 - `/api/ready` harus sukses sebelum URL demo dianggap siap dipakai reviewer.
 
-## Opsi Deployment Self-hosted
-
-Untuk penggunaan internal atau pilot yang lebih serius, arah yang lebih sehat:
-
-```text
-Next.js app
-  -> reverse proxy
-  -> MySQL database
-  -> backup
-  -> monitoring server
-```
-
-Komponen yang mungkin dibutuhkan:
-
-- Node.js runtime;
-- MySQL database;
-- Nginx atau Caddy;
-- HTTPS;
-- environment variable;
-- backup terjadwal;
-- log aplikasi.
-- health check dan readiness check untuk dipantau dari luar aplikasi.
-
 ## Environment Variable
 
 Jangan upload `.env.local`.
@@ -299,4 +282,4 @@ Memory store saat ini hanya untuk development.
 
 Jika server restart, data hasil simulator hilang.
 
-Untuk deployment yang perlu history, storage harus memakai database. Fondasi MySQL sudah tersedia untuk registry monitoring, reading, dan auth. Production tetap membutuhkan SMTP, Turnstile, HTTPS, backup/restore, rate limit ingest, rotasi key device, monitoring server, dan prosedur operasional.
+Untuk deployment yang perlu history, storage harus memakai database. Fondasi MySQL sudah tersedia untuk registry monitoring, reading, dan auth. Production tetap membutuhkan SMTP, Turnstile, HTTPS, backup/restore, rate limit ingest, rotasi key device, monitoring server, dan prosedur operasional. Detail deployment pilihan akhir ditunda sampai keputusan tim berikutnya.

@@ -23,6 +23,12 @@ Yang sudah ada:
 - memory store;
 - fondasi MySQL untuk reading;
 - registry MySQL untuk pilot;
+- auth user/admin berbasis MySQL;
+- session, OTP admin, email verification, reset password, dan audit auth;
+- rate limit untuk auth dan endpoint ingest saat storage MySQL aktif;
+- pengajuan perangkat, review admin, pembuatan device key, dan paket firmware ZIP;
+- first valid ping activation agar device baru tidak langsung aktif sebelum key cocok;
+- cleanup data device/uji dari admin tanpa menghapus akun atau template firmware;
 - validasi registry pilot dari file lokal yang tidak di-commit;
 - smoke test payload real-format;
 - simulator;
@@ -31,14 +37,14 @@ Yang sudah ada:
 Yang belum ada:
 
 - database production lengkap dengan backup;
-- auth user final;
-- role access;
-- rate limit;
-- audit log;
-- backup;
+- role operasional rinci di luar `admin` dan `user`;
+- backup dan restore yang diuji rutin;
 - monitoring server;
-- integrasi hardware real;
-- halaman admin untuk mengelola registry device.
+- alert operasional level kritis/offline;
+- integrasi hardware real yang sudah dikalibrasi dan disetujui lapangan;
+- halaman admin untuk mengelola registry device, hardware profile, dan firmware template secara penuh;
+- keputusan deployment production final dan proteksi perimeter environment final;
+- approval/reject device lewat Telegram.
 
 ## Batas Data
 
@@ -120,7 +126,8 @@ Checklist minimum:
 - security review;
 - database dan backup;
 - HTTPS;
-- rate limit;
+- proteksi perimeter pada environment final;
+- rate limit aplikasi dan proteksi request di proxy;
 - role user;
 - audit log;
 - rotasi key device;
