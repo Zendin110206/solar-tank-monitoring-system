@@ -17,6 +17,7 @@ http://localhost:3000
 | `GET` | `/api/dashboard/overview` | Ringkasan semua lokasi/tangki |
 | `GET` | `/api/tanks/[tankId]` | Detail satu tangki |
 | `GET` | `/api/tanks/[tankId]/readings` | Riwayat pembacaan satu tangki |
+| `GET` | `/api/tanks/[tankId]/readings/export` | Download CSV reading satu tangki |
 | `POST` | `/api/ingest` | Menerima data device atau simulator |
 | `POST` | `/api/auth/login` | Login dengan email/username dan password |
 | `POST` | `/api/auth/login/verify-otp` | Verifikasi OTP login admin |
@@ -267,6 +268,51 @@ Response sukses:
       }
     ]
   }
+}
+```
+
+## GET /api/tanks/[tankId]/readings/export
+
+Fungsi:
+
+```text
+Mengunduh CSV reading satu tangki sesuai periode yang dipilih.
+```
+
+Endpoint ini wajib memakai session user/admin aktif. Data CSV memakai header
+bahasa Indonesia, menyertakan waktu UTC dan WIB, dan nama file otomatis memuat
+site, tangki, rentang, serta tanggal periode.
+
+Query:
+
+| Parameter | Nilai | Default | Keterangan |
+|---|---|---|---|
+| `range` | `day`, `week`, `month` | `day` | Periode 1 hari, 7 hari, atau 30 hari berbasis kalender WIB |
+
+Alias yang juga diterima:
+
+- `1d` dan `24h` untuk `day`;
+- `7d` untuk `week`;
+- `30d` untuk `month`.
+
+Contoh:
+
+```powershell
+curl.exe -L "http://localhost:3000/api/tanks/tank-tph-main/readings/export?range=week"
+```
+
+Contoh nama file:
+
+```text
+solartank_tph_tangki-utama_reading_7-hari_2026-07-01_sampai_2026-07-07.csv
+```
+
+Jika `range` tidak dikenal:
+
+```json
+{
+  "ok": false,
+  "error": "Range export tidak dikenal. Gunakan day, week, atau month."
 }
 ```
 

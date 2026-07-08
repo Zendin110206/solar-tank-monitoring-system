@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { createTankReadingsCsv } from "../lib/readings-export";
+import {
+  buildReadingExportPeriod,
+  createTankReadingsCsv,
+  createTankReadingsCsvFilename,
+  filterReadingsForExportPeriod,
+  parseReadingExportRange,
+} from "../lib/readings-export";
 import type { Reading } from "../types/monitoring";
 
 const baseReading: Reading = {
@@ -17,7 +23,7 @@ const baseReading: Reading = {
 };
 
 describe("readings export", () => {
-  it("creates stable csv output sorted by received time", () => {
+  it("creates stable Indonesian csv output sorted by received time", () => {
     const csv = createTankReadingsCsv([
       {
         ...baseReading,
@@ -45,11 +51,60 @@ describe("readings export", () => {
     const lines = csv.trimEnd().split("\r\n");
 
     expect(lines[0]).toBe(
-      "reading_id,tank_id,device_id,measured_at,received_at,sensor_distance_cm,fuel_height_cm,volume_liter,fill_percent,runtime_hour,battery_volt,rssi_dbm,config_status,needs_review,warnings",
+      "id_reading,id_tangki,id_perangkat,waktu_pengukuran_utc,waktu_pengukuran_wib,waktu_diterima_utc,waktu_diterima_wib,jarak_sensor_cm,tinggi_solar_cm,volume_liter,persentase_isi,sisa_runtime_jam,baterai_volt,sinyal_rssi_dbm,status_konfigurasi,perlu_review,peringatan,periode_unduhan",
     );
     expect(lines[1]).toContain("reading-1");
     expect(lines[2]).toContain("reading-2");
     expect(lines[1]).toContain('"nilai ""uji"", aman"');
+    expect(lines[1]).toContain("1 hari (7 Juli 2026)");
+  });
+
+  it("filters export data by the selected calendar range in WIB", () => {
+    const readings: Reading[] = [
+      {
+        ...baseReading,
+        id: "before-period",
+        receivedAt: "2026-07-06T16:59:59.000Z",
+      },
+      {
+        ...baseReading,
+        id: "first-period-reading",
+        receivedAt: "2026-07-06T17:00:00.000Z",
+      },
+      {
+        ...baseReading,
+        id: "latest-period-reading",
+        receivedAt: "2026-07-07T03:00:00.000Z",
+      },
+    ];
+    const period = buildReadingExportPeriod(readings, "day");
+    const filteredReadings = filterReadingsForExportPeriod(readings, period);
+    const csv = createTankReadingsCsv(readings, { rangeKey: "day" });
+
+    expect(period.label).toBe("1 hari (7 Juli 2026)");
+    expect(filteredReadings.map((reading) => reading.id)).toEqual([
+      "first-period-reading",
+      "latest-period-reading",
+    ]);
+    expect(csv).toContain("first-period-reading");
+    expect(csv).not.toContain("before-period");
+  });
+
+  it("normalizes export ranges and creates predictable filenames", () => {
+    const period = buildReadingExportPeriod([baseReading], "week");
+    const filename = createTankReadingsCsvFilename({
+      period,
+      siteCode: "STO Psr-01",
+      tankId: "tank-1",
+      tankName: "Tangki Utama",
+    });
+
+    expect(parseReadingExportRange(null)).toBe("day");
+    expect(parseReadingExportRange("7d")).toBe("week");
+    expect(parseReadingExportRange("unknown")).toBeNull();
+    expect(period.label).toBe("7 hari (1 Juli 2026 sampai 7 Juli 2026)");
+    expect(filename).toBe(
+      "solartank_sto-psr-01_tangki-utama_reading_7-hari_2026-07-01_sampai_2026-07-07.csv",
+    );
   });
 });
-

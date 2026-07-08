@@ -257,3 +257,41 @@ export async function listMonitoringReadingsForTankFromMysql(
 
   return rows.map(rowToReading).reverse();
 }
+
+export async function listMonitoringReadingsForTankInRangeFromMysql({
+  end,
+  start,
+  tankId,
+}: {
+  end: string;
+  start: string;
+  tankId: string;
+}): Promise<Reading[]> {
+  const pool = getMysqlPool();
+  const [rows] = await pool.query<ReadingRow[]>(
+    `
+      SELECT
+        id,
+        device_id,
+        tank_id,
+        measured_at,
+        received_at,
+        sensor_distance_cm,
+        fuel_height_cm,
+        volume_liter,
+        fill_percent,
+        runtime_hour,
+        battery_volt,
+        rssi_dbm,
+        raw_payload
+      FROM monitoring_readings
+      WHERE tank_id = ?
+        AND received_at >= ?
+        AND received_at < ?
+      ORDER BY received_at ASC, id ASC
+    `,
+    [tankId, formatMysqlUtcDateTime(start), formatMysqlUtcDateTime(end)],
+  );
+
+  return rows.map(rowToReading);
+}

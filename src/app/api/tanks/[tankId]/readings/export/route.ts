@@ -1,20 +1,19 @@
 import { requireApiUser } from "@/features/auth/lib/auth-guards";
 import { getMonitoringReferenceData } from "@/features/monitoring/lib/monitoring-registry";
-import { listMonitoringReadingsForTank } from "@/features/monitoring/lib/monitoring-storage";
-import { createTankReadingsCsv } from "@/features/monitoring/lib/readings-export";
+import {
+  listMonitoringReadingsForTank,
+  listMonitoringReadingsForTankInRange,
+} from "@/features/monitoring/lib/monitoring-storage";
+import {
+  buildReadingExportPeriod,
+  createTankReadingsCsv,
+  createTankReadingsCsvFilename,
+  parseReadingExportRange,
+} from "@/features/monitoring/lib/readings-export";
 import type { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-
-function sanitizeFilenameSegment(value: string): string {
-  const clean = value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-
-  return clean || "tank";
-}
 
 export async function GET(
   request: NextRequest,
@@ -27,8 +26,22 @@ export async function GET(
   }
 
   const { tankId } = await params;
+  const rangeKey = parseReadingExportRange(
+    request.nextUrl.searchParams.get("range"),
+  );
+
+  if (rangeKey === null) {
+    return Response.json(
+      {
+        ok: false,
+        error: "Range export tidak dikenal. Gunakan day, week, atau month.",
+      },
+      { status: 400 },
+    );
+  }
+
   const [readings, referenceData] = await Promise.all([
-    listMonitoringReadingsForTank(tankId),
+    listMonitoringReadingsForTank(tankId, 1),
     getMonitoringReferenceData(),
   ]);
   const tank = referenceData.tanks.find((item) => item.id === tankId);
@@ -44,17 +57,28 @@ export async function GET(
   }
 
   const site = referenceData.sites.find((item) => item.id === tank.siteId);
-  const filename = `solartank-${sanitizeFilenameSegment(
-    site?.code ?? tank.id,
-  )}-${sanitizeFilenameSegment(tank.name)}-readings.csv`;
-
-  return new Response(createTankReadingsCsv(readings), {
-    headers: {
-      "Cache-Control": "no-store",
-      "Content-Disposition": `attachment; filename="${filename}"`,
-      "Content-Type": "text/csv; charset=utf-8",
-      "X-Content-Type-Options": "nosniff",
-    },
+  const period = buildReadingExportPeriod(readings, rangeKey);
+  const periodReadings = await listMonitoringReadingsForTankInRange({
+    end: period.end.toISOString(),
+    start: period.start.toISOString(),
+    tankId,
   });
-}
+  const filename = createTankReadingsCsvFilename({
+    period,
+    siteCode: site?.code,
+    tankId: tank.id,
+    tankName: tank.name,
+  });
 
+  return new Response(
+    createTankReadingsCsv(periodReadings, { period, rangeKey }),
+    {
+      headers: {
+        "Cache-Control": "no-store",
+        "Content-Disposition": `attachment; filename="${filename}"; filename*=UTF-8''${encodeURIComponent(filename)}`,
+        "Content-Type": "text/csv; charset=utf-8",
+        "X-Content-Type-Options": "nosniff",
+      },
+    },
+  );
+}

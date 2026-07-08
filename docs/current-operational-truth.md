@@ -6,7 +6,7 @@ Dokumen ini menjadi ringkasan kebenaran operasional saat ini. Jika dokumen lama 
 
 ## Status Produk Saat Ini
 
-SolarTank masih prototipe aktif, tetapi sudah melewati fase dashboard dummy. Sistem sekarang sudah memiliki alur monitoring, auth, pengajuan device, pembuatan paket firmware, first valid ping activation, reset reading aman, export CSV reading, backup MySQL manual, dan cleanup data device.
+SolarTank masih prototipe aktif, tetapi sudah melewati fase dashboard dummy. Sistem sekarang sudah memiliki alur monitoring, auth, pengajuan device, pembuatan paket firmware, first valid ping activation, reset reading aman, export CSV reading berbasis periode, dukungan backup MySQL manual/terjadwal, dan cleanup data device.
 
 Sistem belum boleh disebut production-ready penuh karena deployment production final, restore drill, kalibrasi device lapangan, dan SOP operasional belum selesai diuji.
 
@@ -31,17 +31,17 @@ Sistem belum boleh disebut production-ready penuh karena deployment production f
 - `POST /api/ingest` menerima payload device dan menyimpan reading.
 - Ingest punya rate limit saat storage MySQL aktif.
 - Dashboard ringkas, dashboard detail, peta, detail tangki, dan grafik trend.
-- Download CSV reading dari halaman detail tangki.
+- Download CSV reading dari halaman detail tangki dengan periode 1 hari, 7 hari, atau 30 hari mengikuti pilihan grafik.
 - Admin reset reading per STO dan reset semua reading tanpa menghapus registry/device.
 - Admin cleanup untuk data STO/device/uji tanpa menghapus akun user/admin, template firmware, atau hardware profile.
-- Script backup MySQL manual `pnpm db:backup:mysql`.
+- Script backup MySQL `pnpm db:backup:mysql` dan wrapper Task Scheduler `scripts/run-mysql-backup-task.ps1`.
 - Health check `/api/health` dan readiness check `/api/ready`.
 - Test suite dan CI `pnpm check`.
 
 ## Yang Belum Final
 
 - Deployment production final dan SOP operasional server pilihan akhir.
-- Jadwal backup otomatis dan restore database yang diuji rutin.
+- Restore database yang diuji rutin.
 - Monitoring/log service production.
 - Alert operasional level kritis/offline.
 - Telegram approve/reject device request. Saat ini Telegram untuk binding dan notifikasi, bukan approval utama.

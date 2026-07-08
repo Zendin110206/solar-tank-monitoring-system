@@ -10,7 +10,6 @@ import {
   Battery,
   Clock,
   Database,
-  Download,
   Droplets,
   Fuel,
   Gauge,
@@ -1299,24 +1298,13 @@ export default async function TankDetailPage({
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <SectionHeading
                   label="Riwayat"
-                  title="Pembacaan 24 jam"
-                  description="Grafik ini membaca riwayat dari storage/API lokal dan strukturnya sudah mengikuti endpoint history."
+                  title="Tren pembacaan"
+                  description="Pilih rentang grafik, lalu unduh CSV dengan periode data yang sama."
                 />
-                <div className="flex max-w-full flex-wrap items-center gap-2 sm:justify-end">
-                  <Link
-                    className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-xs font-semibold text-zinc-700 shadow-sm transition hover:border-red-200 hover:text-red-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-600/15"
-                    href={`/api/tanks/${tank.id}/readings/export`}
-                  >
-                    <Download className="size-4" aria-hidden="true" />
-                    Download CSV
-                  </Link>
-                  <span className="block max-w-full truncate rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100 sm:w-fit">
-                    {`/api/tanks/${tank.id}/readings?range=24h`}
-                  </span>
-                </div>
               </div>
               <SimpleTankVolumeChart
                 capacityLiter={tank.capacityLiter}
+                exportHrefBase={`/api/tanks/${tank.id}/readings/export`}
                 trends={tank.chartTrends}
               />
               <ReadingTable tank={tank} />

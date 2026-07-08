@@ -5,6 +5,7 @@ import {
 } from "./telemetry-store";
 import {
   listLatestMonitoringReadingsByTankFromMysql,
+  listMonitoringReadingsForTankInRangeFromMysql,
   listMonitoringReadingsForTankFromMysql,
   listMonitoringReadingsFromMysql,
   saveMonitoringReadingToMysql,
@@ -150,6 +151,45 @@ export async function listMonitoringReadingsForTank(
 
   return getMonitoringReadings()
     .filter((reading) => reading.tankId === tankId)
+    .sort((first, second) => {
+      return (
+        new Date(first.receivedAt).getTime() -
+        new Date(second.receivedAt).getTime()
+      );
+    });
+}
+
+export async function listMonitoringReadingsForTankInRange({
+  end,
+  start,
+  tankId,
+}: {
+  end: string;
+  start: string;
+  tankId: string;
+}): Promise<Reading[]> {
+  if (getMonitoringStorageDriver() === "mysql") {
+    return listMonitoringReadingsForTankInRangeFromMysql({
+      end,
+      start,
+      tankId,
+    });
+  }
+
+  const startTime = Date.parse(start);
+  const endTime = Date.parse(end);
+
+  return getMonitoringReadings()
+    .filter((reading) => {
+      const receivedTime = Date.parse(reading.receivedAt);
+
+      return (
+        reading.tankId === tankId &&
+        Number.isFinite(receivedTime) &&
+        receivedTime >= startTime &&
+        receivedTime < endTime
+      );
+    })
     .sort((first, second) => {
       return (
         new Date(first.receivedAt).getTime() -

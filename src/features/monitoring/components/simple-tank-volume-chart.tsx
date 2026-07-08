@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PointerEvent } from "react";
+import { Download } from "lucide-react";
 import {
   SIMPLE_TANK_CHART_RANGES,
   type SimpleTankChartRangeKey,
@@ -11,6 +12,7 @@ import {
 type SimpleTankVolumeChartProps = {
   trends: SimpleTankTrendByRange;
   capacityLiter: number;
+  exportHrefBase?: string;
 };
 
 const FALLBACK_CHART_SIZE = {
@@ -48,9 +50,16 @@ function buildAreaPath(points: Array<{ x: number; y: number }>, bottom: number) 
   return `${linePath} L ${points.at(-1)?.x} ${bottom} L ${points[0].x} ${bottom} Z`;
 }
 
+function buildExportHref(base: string, rangeKey: SimpleTankChartRangeKey) {
+  const separator = base.includes("?") ? "&" : "?";
+
+  return `${base}${separator}range=${rangeKey}`;
+}
+
 export function SimpleTankVolumeChart({
   trends,
   capacityLiter,
+  exportHrefBase,
 }: SimpleTankVolumeChartProps) {
   const svgRef = useRef<SVGSVGElement | null>(null);
   const rangeMenuRef = useRef<HTMLDivElement | null>(null);
@@ -60,6 +69,9 @@ export function SimpleTankVolumeChart({
   const [isRangeMenuOpen, setIsRangeMenuOpen] = useState(false);
   const [chartSize, setChartSize] = useState(FALLBACK_CHART_SIZE);
   const trend = trends[selectedRange] ?? trends.day;
+  const exportHref = exportHrefBase
+    ? buildExportHref(exportHrefBase, selectedRange)
+    : null;
   const selectedRangeOption =
     SIMPLE_TANK_CHART_RANGES.find((option) => option.key === selectedRange) ??
     SIMPLE_TANK_CHART_RANGES[0];
@@ -338,7 +350,7 @@ export function SimpleTankVolumeChart({
             </div>
           ) : null}
         </div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <span className="w-fit rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700 ring-1 ring-blue-100">
             {trend.points.length} titik data
           </span>
@@ -346,6 +358,16 @@ export function SimpleTankVolumeChart({
             <span className="w-fit rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-700 ring-1 ring-amber-100">
               {trend.gaps.length} jeda data
             </span>
+          ) : null}
+          {exportHref ? (
+            <a
+              aria-label={`Unduh CSV untuk rentang ${selectedRangeOption.label}`}
+              className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-3 text-xs font-semibold text-zinc-700 shadow-sm transition hover:border-blue-200 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
+              href={exportHref}
+            >
+              <Download className="size-4" aria-hidden="true" />
+              Unduh CSV
+            </a>
           ) : null}
         </div>
       </div>
