@@ -59,7 +59,7 @@ function EmptyState() {
         Tidak ada STO yang cocok dengan filter ini.
       </p>
       <p className="mt-2 text-sm text-zinc-500">
-        Coba ubah kata kunci, status, atau area yang dipilih.
+        Coba ubah kata kunci, status, area, atau STO yang dipilih.
       </p>
     </div>
   );

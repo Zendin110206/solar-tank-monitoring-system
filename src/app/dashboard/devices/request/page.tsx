@@ -74,13 +74,13 @@ function RequestHistory({
   requests: MonitoringDeviceRequest[];
 }) {
   return (
-    <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+    <section className="w-full min-w-0 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm sm:p-5">
+      <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
           <p className="text-sm font-semibold uppercase text-zinc-500">
             Riwayat pengajuan
           </p>
-          <h2 className="mt-1 text-xl font-semibold">
+          <h2 className="mt-1 break-words text-xl font-semibold">
             Status perangkat yang pernah diajukan
           </h2>
         </div>
@@ -90,16 +90,16 @@ function RequestHistory({
         </span>
       </div>
 
-      <div className="mt-5 grid gap-3">
+      <div className="mt-5 grid min-w-0 gap-3">
         {requests.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-zinc-300 p-6 text-sm leading-6 text-zinc-500">
+          <div className="min-w-0 rounded-lg border border-dashed border-zinc-300 p-4 text-sm leading-6 text-zinc-500 sm:p-6">
             Belum ada pengajuan perangkat dari akun ini.
           </div>
         ) : (
           requests.map((request) => (
             <article
               key={request.id}
-              className="grid gap-4 rounded-lg border border-zinc-200 bg-zinc-50 p-4 lg:grid-cols-[1fr_auto]"
+              className="grid min-w-0 gap-4 rounded-lg border border-zinc-200 bg-zinc-50 p-4 lg:grid-cols-[minmax(0,1fr)_auto]"
             >
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
@@ -114,24 +114,24 @@ function RequestHistory({
                     {getDeviceRequestStatusLabel(request.status)}
                   </span>
                 </div>
-                <h3 className="mt-3 text-lg font-semibold text-zinc-950">
+                <h3 className="mt-3 break-words text-lg font-semibold text-zinc-950">
                   {request.siteName}
                 </h3>
-                <div className="mt-2 grid gap-2 text-sm text-zinc-600 sm:grid-cols-3">
-                  <p>Wilayah: {request.areaLabel}</p>
-                  <p>Perangkat: {request.deviceCode}</p>
+                <div className="mt-2 grid min-w-0 gap-2 text-sm text-zinc-600 sm:grid-cols-3">
+                  <p className="min-w-0 break-words">Wilayah: {request.areaLabel}</p>
+                  <p className="min-w-0 break-words">Perangkat: {request.deviceCode}</p>
                   <p>{getTankShapeLabel(request)}</p>
                   <p>{getDeviceSensorTypeLabel(request.deviceSensorType)}</p>
                   <p>Kapasitas: {request.capacityLiter} L</p>
                   <p>Konsumsi: {request.consumptionLiterPerHour} L/jam</p>
                 </div>
                 {request.rejectionReason ? (
-                  <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm leading-6 text-red-700 ring-1 ring-red-100">
+                  <p className="mt-3 min-w-0 break-words rounded-lg bg-red-50 px-3 py-2 text-sm leading-6 text-red-700 ring-1 ring-red-100">
                     {request.rejectionReason}
                   </p>
                 ) : null}
               </div>
-              <div className="grid gap-1 text-sm text-zinc-500 lg:text-right">
+              <div className="grid min-w-0 gap-1 text-sm text-zinc-500 lg:text-right">
                 <p>Diajukan: {formatDate(request.createdAt)}</p>
                 <p>Ditinjau: {formatDate(request.adminReviewedAt)}</p>
               </div>
@@ -154,7 +154,7 @@ export default async function DeviceRequestPage() {
     : [[], []];
 
   return (
-    <main className="min-h-screen bg-[#f5faf8] text-zinc-950">
+    <main className="min-h-screen overflow-x-hidden bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
         navItems={[
           { href: "/dashboard", label: "Monitoring Tangki" },
@@ -170,23 +170,23 @@ export default async function DeviceRequestPage() {
         user={user}
       />
 
-      <div className="mx-auto flex max-w-[1540px] flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
-        <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
-          <div className="grid gap-5 xl:grid-cols-[1fr_0.9fr] xl:items-center">
-            <div>
+      <div className="mx-auto flex w-full max-w-[1540px] min-w-0 flex-col gap-5 px-3 py-4 sm:px-6 sm:py-5 lg:px-8">
+        <section className="w-full min-w-0 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm sm:p-5">
+          <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] xl:items-center">
+            <div className="min-w-0">
               <p className="text-sm font-semibold uppercase text-zinc-500">
                 Pengajuan perangkat
               </p>
-              <h1 className="mt-2 max-w-3xl text-2xl font-semibold sm:text-4xl">
+              <h1 className="mt-2 max-w-3xl break-words text-2xl font-semibold sm:text-4xl">
                 Siapkan perangkat baru untuk ditinjau admin
               </h1>
-              <p className="mt-3 max-w-3xl text-sm leading-6 text-zinc-500 sm:text-base">
+              <p className="mt-3 max-w-3xl break-words text-sm leading-6 text-zinc-500 sm:text-base">
                 Isi data STO, tangki, mode sensor, dan beban genset. Setelah
                 admin menyetujui, sistem membuat kode device, device key, paket
                 firmware, dan link download ke email kerja akun ini.
               </p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-3">
+            <div className="grid min-w-0 gap-3 sm:grid-cols-3">
               {[
                 {
                   label: "Data STO",
@@ -209,15 +209,15 @@ export default async function DeviceRequestPage() {
                 return (
                   <div
                     key={item.label}
-                    className="rounded-lg border border-zinc-200 bg-zinc-50 p-4"
+                    className="min-w-0 rounded-lg border border-zinc-200 bg-zinc-50 p-4"
                   >
                     <span className="grid size-10 place-items-center rounded-lg bg-white text-blue-700 ring-1 ring-zinc-200">
                       <Icon className="size-5" aria-hidden="true" />
                     </span>
-                    <p className="mt-3 text-sm font-semibold text-zinc-950">
+                    <p className="mt-3 break-words text-sm font-semibold text-zinc-950">
                       {item.label}
                     </p>
-                    <p className="mt-2 text-xs leading-5 text-zinc-500">
+                    <p className="mt-2 break-words text-xs leading-5 text-zinc-500">
                       {item.body}
                     </p>
                   </div>
@@ -228,19 +228,19 @@ export default async function DeviceRequestPage() {
         </section>
 
         {!isMysqlEnabled ? (
-          <section className="rounded-lg border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-800">
+          <section className="w-full min-w-0 break-words rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-800 sm:p-5">
             Fitur pengajuan perangkat memerlukan storage MySQL. Aktifkan
             <span className="font-semibold"> SOLAR_TANK_STORAGE_DRIVER=mysql </span>
             dan jalankan migrasi provisioning perangkat sebelum dipakai.
           </section>
         ) : null}
 
-        <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
-          <div className="mb-5">
+        <section className="w-full min-w-0 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm sm:p-5">
+          <div className="mb-5 min-w-0">
             <p className="text-sm font-semibold uppercase text-zinc-500">
               Form pengajuan
             </p>
-            <h2 className="mt-1 text-xl font-semibold">
+            <h2 className="mt-1 break-words text-xl font-semibold">
               Data perangkat dan tangki
             </h2>
           </div>

@@ -26,6 +26,8 @@ type StatusFilterOption = {
 
 type DashboardViewMode = "cards" | "map";
 
+const SIMPLE_DASHBOARD_ALL_STOS = "all";
+
 const STATUS_FILTERS: StatusFilterOption[] = [
   { value: "all", label: "Semua" },
   { value: "online", label: "Online" },
@@ -87,20 +89,34 @@ export function SimpleDashboardView({
   const [statusFilter, setStatusFilter] =
     useState<SimpleDashboardStatusFilter>("all");
   const [areaFilter, setAreaFilter] = useState(SIMPLE_DASHBOARD_ALL_AREAS);
+  const [selectedSto, setSelectedSto] = useState(SIMPLE_DASHBOARD_ALL_STOS);
   const [viewMode, setViewMode] = useState<DashboardViewMode>("cards");
 
   const summary = useMemo(() => getSimpleDashboardSummary(sites), [sites]);
   const areas = useMemo(() => getSimpleDashboardAreas(sites), [sites]);
+  const stoOptions = useMemo(
+    () =>
+      [...sites].sort(
+        (first, second) =>
+          first.name.localeCompare(second.name, "id-ID") ||
+          first.code.localeCompare(second.code, "id-ID"),
+      ),
+    [sites],
+  );
   const visibleSites = useMemo(
     () =>
-      sortSimpleDashboardSites(
-        filterSimpleDashboardSites(sites, {
-          query,
-          status: statusFilter,
-          area: areaFilter,
-        }),
-      ),
-    [areaFilter, query, sites, statusFilter],
+      selectedSto === SIMPLE_DASHBOARD_ALL_STOS
+        ? sortSimpleDashboardSites(
+            filterSimpleDashboardSites(sites, {
+              query,
+              status: statusFilter,
+              area: areaFilter,
+            }),
+          )
+        : sortSimpleDashboardSites(
+            sites.filter((site) => site.tankId === selectedSto),
+          ),
+    [areaFilter, query, selectedSto, sites, statusFilter],
   );
   const mapViewKey = useMemo(
     () => visibleSites.map((site) => site.tankId).join("|"),
@@ -115,7 +131,7 @@ export function SimpleDashboardView({
         <SummaryValue label="Offline" tone="red" value={summary.offline} />
       </div>
 
-      <div className="grid min-w-0 gap-4 rounded-lg border border-zinc-200 bg-white p-3 shadow-sm xl:grid-cols-[minmax(20rem,1fr)_17rem_18rem] xl:items-end">
+      <div className="grid min-w-0 gap-4 rounded-lg border border-zinc-200 bg-white p-3 shadow-sm lg:grid-cols-2 xl:grid-cols-[minmax(18rem,1fr)_17rem_15rem_18rem] xl:items-end">
         <label className="block min-w-0">
           <span className="mb-2 block text-xs font-semibold uppercase text-zinc-500">
             Cari STO
@@ -135,11 +151,11 @@ export function SimpleDashboardView({
           </span>
         </label>
 
-        <div>
+        <div className="min-w-0">
           <p className="mb-2 text-xs font-semibold uppercase text-zinc-500">
             Status
           </p>
-          <div className="grid h-12 grid-cols-3 rounded-lg border border-zinc-300 bg-zinc-50 p-1">
+          <div className="grid h-12 min-w-0 grid-cols-3 rounded-lg border border-zinc-300 bg-zinc-50 p-1">
             {STATUS_FILTERS.map((filter) => (
               <button
                 aria-pressed={statusFilter === filter.value}
@@ -158,7 +174,7 @@ export function SimpleDashboardView({
           </div>
         </div>
 
-        <label className="block">
+        <label className="block min-w-0">
           <span className="mb-2 block text-xs font-semibold uppercase text-zinc-500">
             Area
           </span>
@@ -172,6 +188,30 @@ export function SimpleDashboardView({
               {areas.map((area) => (
                 <option key={area} value={area}>
                   {area}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              aria-hidden="true"
+              className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-zinc-700"
+            />
+          </span>
+        </label>
+
+        <label className="block min-w-0">
+          <span className="mb-2 block text-xs font-semibold uppercase text-zinc-500">
+            Pilih STO
+          </span>
+          <span className="relative block">
+            <select
+              className="h-12 w-full appearance-none truncate rounded-lg border border-zinc-300 bg-white pl-3 pr-11 text-sm font-semibold text-zinc-800 outline-none transition hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+              onChange={(event) => setSelectedSto(event.target.value)}
+              value={selectedSto}
+            >
+              <option value={SIMPLE_DASHBOARD_ALL_STOS}>Semua STO</option>
+              {stoOptions.map((site) => (
+                <option key={site.tankId} value={site.tankId}>
+                  {site.name} ({site.code})
                 </option>
               ))}
             </select>
