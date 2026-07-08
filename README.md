@@ -22,7 +22,7 @@ Yang sudah tersedia:
 - OTP email untuk login admin jika `AUTH_REQUIRE_ADMIN_OTP` aktif;
 - rate limit untuk login, pengajuan akses, lupa password, dan pengiriman ulang verifikasi email;
 - audit event untuk login, OTP, reset password, verifikasi email, perubahan role, aktivasi, dan aksi keamanan akun;
-- halaman manajemen pengguna untuk admin: review pengajuan, aktivasi/nonaktif, ubah role, cabut sesi, kirim verifikasi, dan reset password;
+- halaman manajemen pengguna untuk admin: review pengajuan, aktivasi/nonaktif, ubah role, cabut sesi, kirim verifikasi, reset password, dan hapus akun yang tidak punya jejak pengajuan perangkat;
 - halaman audit keamanan auth untuk admin;
 - halaman keamanan akun untuk ganti kata sandi, melihat sesi aktif, mencabut sesi lain, dan menghubungkan Telegram;
 - halaman pengajuan perangkat untuk user, review approve/reject oleh admin, pembuatan key perangkat, paket firmware ZIP, dan link download terbatas;

@@ -12,6 +12,7 @@ import {
 } from "@/features/auth/lib/auth-service";
 import {
   approveAccessRequest,
+  deleteAuthUser,
   recordAuthAuditEvent,
   rejectAccessRequest,
   revokeAllUserSessions,
@@ -312,6 +313,42 @@ export async function sendUserPasswordResetAction(
     revalidatePath(ADMIN_USERS_PATH);
 
     return getAdminActionSuccess("Link reset password berhasil dikirim.");
+  } catch (error) {
+    return getAdminActionError(error);
+  }
+}
+
+export async function deleteAuthUserAction(
+  _state: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
+  const admin = await requirePageAdmin();
+
+  try {
+    assertValidAdminActionCsrf({ sessionId: admin.sessionId, formData });
+    const targetUserId = getRequiredFormValue(formData, "targetUserId");
+
+    if (targetUserId === admin.id) {
+      throw new Error("Admin tidak bisa menghapus akun sendiri.");
+    }
+
+    const deletedUser = await deleteAuthUser({ targetUserId });
+
+    await recordAuthAuditEvent({
+      actorUserId: admin.id,
+      eventType: "auth_user_deleted",
+      metadata: {
+        deletedUserEmail: deletedUser.email,
+        deletedUserId: deletedUser.id,
+        deletedUserRole: deletedUser.role,
+        deletedUserStatus: deletedUser.status,
+        deletedUsername: deletedUser.username,
+      },
+    }).catch(() => undefined);
+
+    revalidatePath(ADMIN_USERS_PATH);
+
+    return getAdminActionSuccess("Pengguna berhasil dihapus.");
   } catch (error) {
     return getAdminActionError(error);
   }

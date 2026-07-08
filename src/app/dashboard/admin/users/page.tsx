@@ -1,18 +1,30 @@
+import Link from "next/link";
 import type { Metadata } from "next";
-import { Clock3, ShieldCheck, UserRound } from "lucide-react";
+import {
+  Clock3,
+  Filter,
+  MailWarning,
+  Search,
+  ShieldCheck,
+  UserCheck,
+  UserRound,
+  UsersRound,
+} from "lucide-react";
 
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import type { AuthUserStatus } from "@/features/auth/types";
+import type { AuthRole, AuthUserStatus } from "@/features/auth/types";
 import { createAdminActionCsrfToken } from "@/features/auth/lib/auth-csrf";
 import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
 import {
-  listAuthUsers,
+  listAuthUsersForAdmin,
   listPendingAccessRequests,
+  type AuthUserDirectoryItem,
 } from "@/features/auth/lib/mysql-auth-repository";
 import {
   activateAuthUserAction,
   approveAccessRequestAction,
   changeAuthUserRoleAction,
+  deleteAuthUserAction,
   disableAuthUserAction,
   rejectAccessRequestAction,
   resendUserVerificationEmailAction,
@@ -30,6 +42,109 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
+const USER_STATUS_OPTIONS: Array<{
+  label: string;
+  value: AuthUserStatus | "all";
+}> = [
+  { label: "Semua status", value: "all" },
+  { label: "Aktif", value: "active" },
+  { label: "Pending", value: "pending" },
+  { label: "Ditahan", value: "suspended" },
+  { label: "Nonaktif", value: "disabled" },
+];
+
+const ROLE_OPTIONS: Array<{ label: string; value: AuthRole | "all" }> = [
+  { label: "Semua role", value: "all" },
+  { label: "Admin", value: "admin" },
+  { label: "User", value: "user" },
+];
+
+const VERIFICATION_OPTIONS = [
+  { label: "Semua email", value: "all" },
+  { label: "Terverifikasi", value: "verified" },
+  { label: "Belum verifikasi", value: "unverified" },
+] as const;
+
+const SORT_OPTIONS = [
+  { label: "Terbaru dibuat", value: "created_desc" },
+  { label: "Login terakhir", value: "last_login_desc" },
+  { label: "Nama A-Z", value: "name_asc" },
+] as const;
+
+const PAGE_SIZE_OPTIONS = [10, 25, 50] as const;
+const FILTER_CONTROL_CLASS =
+  "h-9 w-full rounded-lg border border-zinc-300 bg-white px-3 text-sm font-semibold text-zinc-800 outline-none transition hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10";
+const FILTER_BUTTON_CLASS =
+  "inline-flex h-9 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white shadow-lg shadow-blue-600/15 transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20";
+const FILTER_RESET_CLASS =
+  "inline-flex h-9 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-zinc-600/15";
+
+type VerificationFilter = (typeof VERIFICATION_OPTIONS)[number]["value"];
+type SortFilter = (typeof SORT_OPTIONS)[number]["value"];
+
+type AdminUsersPageProps = {
+  searchParams: Promise<{
+    page?: string | string[];
+    pageSize?: string | string[];
+    q?: string | string[];
+    role?: string | string[];
+    sort?: string | string[];
+    status?: string | string[];
+    verification?: string | string[];
+  }>;
+};
+
+type UsersUrlState = {
+  page: number;
+  pageSize: number;
+  query: string;
+  role: AuthRole | "all";
+  sort: SortFilter;
+  status: AuthUserStatus | "all";
+  verification: VerificationFilter;
+};
+
+function getParam(value: string | string[] | undefined): string {
+  return Array.isArray(value) ? String(value[0] ?? "") : String(value ?? "");
+}
+
+function getRoleFilter(value: string): AuthRole | "all" {
+  return value === "admin" || value === "user" ? value : "all";
+}
+
+function getStatusFilter(value: string): AuthUserStatus | "all" {
+  return value === "active" ||
+    value === "disabled" ||
+    value === "pending" ||
+    value === "suspended"
+    ? value
+    : "all";
+}
+
+function getVerificationFilter(value: string): VerificationFilter {
+  return value === "verified" || value === "unverified" ? value : "all";
+}
+
+function getSortFilter(value: string): SortFilter {
+  return value === "last_login_desc" || value === "name_asc"
+    ? value
+    : "created_desc";
+}
+
+function getPositiveInteger(value: string, fallback: number): number {
+  const parsed = Number(value);
+
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback;
+}
+
+function getPageSize(value: string): number {
+  const parsed = getPositiveInteger(value, PAGE_SIZE_OPTIONS[0]);
+
+  return PAGE_SIZE_OPTIONS.includes(parsed as (typeof PAGE_SIZE_OPTIONS)[number])
+    ? parsed
+    : PAGE_SIZE_OPTIONS[0];
+}
+
 function formatDate(value: string | null) {
   if (!value) {
     return "-";
@@ -37,11 +152,11 @@ function formatDate(value: string | null) {
 
   return new Intl.DateTimeFormat("id-ID", {
     day: "2-digit",
-    month: "short",
-    year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
+    month: "short",
     timeZone: "Asia/Jakarta",
+    year: "numeric",
   }).format(new Date(value));
 }
 
@@ -58,6 +173,10 @@ function getStatusLabel(status: AuthUserStatus) {
   }
 }
 
+function getRoleLabel(role: AuthRole) {
+  return role === "admin" ? "Admin" : "User";
+}
+
 function getStatusClass(status: AuthUserStatus) {
   switch (status) {
     case "active":
@@ -71,13 +190,523 @@ function getStatusClass(status: AuthUserStatus) {
   }
 }
 
-export default async function AdminUsersPage() {
+function getInitials(user: Pick<AuthUserDirectoryItem, "fullName" | "username">) {
+  const source = user.fullName.trim() || user.username.trim();
+  const parts = source.split(/\s+/).filter(Boolean);
+  const initials = parts
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase())
+    .join("");
+
+  return initials || "U";
+}
+
+function getUsersHref(
+  current: UsersUrlState,
+  overrides: Partial<UsersUrlState>,
+) {
+  const next = { ...current, ...overrides };
+  const params = new URLSearchParams();
+
+  if (next.query) {
+    params.set("q", next.query);
+  }
+
+  if (next.status !== "all") {
+    params.set("status", next.status);
+  }
+
+  if (next.role !== "all") {
+    params.set("role", next.role);
+  }
+
+  if (next.verification !== "all") {
+    params.set("verification", next.verification);
+  }
+
+  if (next.sort !== "created_desc") {
+    params.set("sort", next.sort);
+  }
+
+  if (next.pageSize !== PAGE_SIZE_OPTIONS[0]) {
+    params.set("pageSize", String(next.pageSize));
+  }
+
+  if (next.page > 1) {
+    params.set("page", String(next.page));
+  }
+
+  const queryString = params.toString();
+
+  return queryString
+    ? `/dashboard/admin/users?${queryString}`
+    : "/dashboard/admin/users";
+}
+
+function getPageNumbers(page: number, pageCount: number) {
+  const windowSize = 5;
+  const start = Math.max(1, Math.min(page - 2, pageCount - windowSize + 1));
+  const end = Math.min(pageCount, start + windowSize - 1);
+
+  return Array.from({ length: end - start + 1 }, (_, index) => start + index);
+}
+
+function StatusBadge({ status }: { status: AuthUserStatus }) {
+  return (
+    <span
+      className={`inline-flex min-w-[5.5rem] justify-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ${getStatusClass(status)}`}
+    >
+      {getStatusLabel(status)}
+    </span>
+  );
+}
+
+function EmailVerificationBadge({ verified }: { verified: boolean }) {
+  return (
+    <span
+      className={`inline-flex min-w-[7.25rem] justify-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ${
+        verified
+          ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
+          : "bg-amber-50 text-amber-700 ring-amber-100"
+      }`}
+    >
+      {verified ? "Terverifikasi" : "Belum verifikasi"}
+    </span>
+  );
+}
+
+function UserIdentity({
+  isCurrentUser,
+  user,
+}: {
+  isCurrentUser: boolean;
+  user: AuthUserDirectoryItem;
+}) {
+  return (
+    <div className="flex min-w-0 items-center gap-2">
+      <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-blue-50 text-sm font-semibold text-blue-700 ring-1 ring-blue-100">
+        {getInitials(user)}
+      </span>
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="truncate text-sm font-semibold text-zinc-950">
+            {user.fullName}
+          </p>
+          {isCurrentUser ? (
+            <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700 ring-1 ring-blue-100">
+              akun Anda
+            </span>
+          ) : null}
+        </div>
+        <p className="truncate text-xs leading-5 text-zinc-500">
+          @{user.username}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function UserActionStack({
+  adminId,
+  csrfToken,
+  user,
+}: {
+  adminId: string;
+  csrfToken: string;
+  user: AuthUserDirectoryItem;
+}) {
+  const isCurrentUser = user.id === adminId;
+  const canUseDirectActions = user.status !== "pending";
+  const canDisable =
+    canUseDirectActions && !isCurrentUser && user.status === "active";
+  const canActivate =
+    canUseDirectActions && !isCurrentUser && user.status !== "active";
+  const canRevokeSessions = canUseDirectActions && !isCurrentUser;
+  const canSendReset = canUseDirectActions && !isCurrentUser;
+  const canDelete = !isCurrentUser;
+
+  if (isCurrentUser) {
+    return (
+      <p className="rounded-lg bg-zinc-100 px-3 py-2 text-xs font-semibold text-zinc-500">
+        Akun sendiri dikunci dari aksi admin.
+      </p>
+    );
+  }
+
+  return (
+    <div className="inline-flex w-max flex-nowrap items-center gap-1.5 whitespace-nowrap">
+      {canDisable ? (
+        <AdminActionForm
+          action={disableAuthUserAction}
+          compact
+          csrfToken={csrfToken}
+          fields={{ targetUserId: user.id }}
+          hideMessage
+          icon="ban"
+          variant="dangerOutline"
+        >
+          Nonaktifkan
+        </AdminActionForm>
+      ) : null}
+
+      {canActivate ? (
+        <AdminActionForm
+          action={activateAuthUserAction}
+          compact
+          csrfToken={csrfToken}
+          fields={{ targetUserId: user.id }}
+          hideMessage
+          icon="refresh"
+          variant="success"
+        >
+          Aktifkan
+        </AdminActionForm>
+      ) : null}
+
+      {canRevokeSessions ? (
+        <AdminActionForm
+          action={revokeAuthUserSessionsAction}
+          compact
+          csrfToken={csrfToken}
+          fields={{ targetUserId: user.id }}
+          hideMessage
+          icon="logout"
+          variant="neutralOutline"
+        >
+          Cabut sesi
+        </AdminActionForm>
+      ) : null}
+
+      {!user.emailVerifiedAt ? (
+        <AdminActionForm
+          action={resendUserVerificationEmailAction}
+          compact
+          csrfToken={csrfToken}
+          fields={{ targetUserId: user.id }}
+          hideMessage
+          icon="send"
+          variant="neutralOutline"
+        >
+          Kirim verifikasi
+        </AdminActionForm>
+      ) : null}
+
+      {canSendReset ? (
+        <AdminActionForm
+          action={sendUserPasswordResetAction}
+          compact
+          csrfToken={csrfToken}
+          fields={{ targetUserId: user.id }}
+          hideMessage
+          icon="key"
+          variant="neutralOutline"
+        >
+          Reset password
+        </AdminActionForm>
+      ) : null}
+
+      {canDelete ? (
+        <AdminActionForm
+          action={deleteAuthUserAction}
+          compact
+          confirmMessage={`Hapus akun ${user.fullName}? Aksi ini hanya berhasil jika akun tidak punya jejak pengajuan perangkat.`}
+          csrfToken={csrfToken}
+          fields={{ targetUserId: user.id }}
+          hideMessage
+          icon="trash"
+          variant="dangerOutline"
+        >
+          Hapus
+        </AdminActionForm>
+      ) : null}
+    </div>
+  );
+}
+
+function SearchField({ query }: { query: string }) {
+  return (
+    <label className="block">
+      <span className="sr-only">Cari pengguna</span>
+      <span className="relative block">
+        <Search
+          aria-hidden="true"
+          className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400"
+        />
+        <input
+          className="h-9 w-full rounded-lg border border-zinc-300 bg-white pl-10 pr-3 text-sm font-medium text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+          defaultValue={query}
+          name="q"
+          placeholder="Cari nama, email, username"
+          type="search"
+        />
+      </span>
+    </label>
+  );
+}
+
+function UserFilterControls({
+  pageSize,
+  roleFilter,
+  sortFilter,
+  statusFilter,
+  verificationFilter,
+}: {
+  pageSize: number;
+  roleFilter: AuthRole | "all";
+  sortFilter: SortFilter;
+  statusFilter: AuthUserStatus | "all";
+  verificationFilter: VerificationFilter;
+}) {
+  return (
+    <>
+      <label className="block">
+        <span className="sr-only">Status</span>
+        <select
+          className={FILTER_CONTROL_CLASS}
+          defaultValue={statusFilter}
+          name="status"
+        >
+          {USER_STATUS_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="block">
+        <span className="sr-only">Role</span>
+        <select
+          className={FILTER_CONTROL_CLASS}
+          defaultValue={roleFilter}
+          name="role"
+        >
+          {ROLE_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="block">
+        <span className="sr-only">Verifikasi</span>
+        <select
+          className={FILTER_CONTROL_CLASS}
+          defaultValue={verificationFilter}
+          name="verification"
+        >
+          {VERIFICATION_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="block">
+        <span className="sr-only">Urutkan</span>
+        <select
+          className={FILTER_CONTROL_CLASS}
+          defaultValue={sortFilter}
+          name="sort"
+        >
+          {SORT_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="block">
+        <span className="sr-only">Per halaman</span>
+        <select
+          className={FILTER_CONTROL_CLASS}
+          defaultValue={pageSize}
+          name="pageSize"
+        >
+          {PAGE_SIZE_OPTIONS.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </label>
+    </>
+  );
+}
+
+function PendingAccessRequests({
+  accessRequests,
+  csrfToken,
+}: {
+  accessRequests: Awaited<ReturnType<typeof listPendingAccessRequests>>;
+  csrfToken: string;
+}) {
+  return (
+    <section className="rounded-lg border border-zinc-200 bg-white shadow-sm">
+      <div className="flex flex-col gap-2 border-b border-zinc-200 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-amber-600">
+            Perlu review
+          </p>
+          <h2 className="mt-0.5 text-base font-semibold">
+            Pengajuan akses pending
+          </h2>
+        </div>
+        <span className="inline-flex w-fit items-center gap-2 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 ring-1 ring-amber-100">
+          <Clock3 className="size-4" aria-hidden="true" />
+          {accessRequests.length} pending
+        </span>
+      </div>
+
+      <div className="max-h-64 overflow-y-auto p-2">
+        {accessRequests.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-zinc-300 p-4 text-sm text-zinc-500">
+            Belum ada pengajuan akses baru.
+          </div>
+        ) : (
+          <div className="grid gap-2">
+            {accessRequests.map((request) => (
+              <article
+                className="grid gap-3 rounded-lg border border-zinc-200 bg-white p-3 lg:grid-cols-[minmax(0,1fr)_minmax(18rem,28rem)] lg:items-center"
+                key={request.id}
+              >
+                <div className="min-w-0">
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-white text-blue-700 ring-1 ring-zinc-200">
+                      <UserRound className="size-4" aria-hidden="true" />
+                    </span>
+                    <div className="min-w-0">
+                      <h3 className="truncate font-semibold text-zinc-950">
+                        {request.user.fullName}
+                      </h3>
+                      <p className="truncate text-xs text-zinc-500">
+                        {request.user.email} / @{request.user.username}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-2 grid gap-1 text-xs text-zinc-600 sm:grid-cols-3">
+                    <p>
+                      Role:{" "}
+                      <span className="font-semibold text-zinc-950">
+                        {getRoleLabel(request.requestedRole)}
+                      </span>
+                    </p>
+                    <p>Diajukan: {formatDate(request.createdAt)}</p>
+                    <p>
+                      Email:{" "}
+                      {request.user.emailVerifiedAt
+                        ? "terverifikasi"
+                        : "belum verifikasi"}
+                    </p>
+                  </div>
+                  {request.accessReason ? (
+                    <p className="mt-2 truncate text-sm text-zinc-600">
+                      <span className="font-semibold text-zinc-950">
+                        Alasan:
+                      </span>{" "}
+                      {request.accessReason}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="grid grid-cols-2 gap-1.5 sm:grid-cols-3">
+                  <AdminActionForm
+                    action={approveAccessRequestAction}
+                    className="min-w-0"
+                    csrfToken={csrfToken}
+                    fields={{ accessRequestId: request.id }}
+                    icon="check"
+                    variant="primary"
+                  >
+                    Setujui
+                  </AdminActionForm>
+                  <AdminActionForm
+                    action={rejectAccessRequestAction}
+                    className="min-w-0"
+                    csrfToken={csrfToken}
+                    fields={{ accessRequestId: request.id }}
+                    icon="x"
+                    variant="dangerOutline"
+                  >
+                    Tolak
+                  </AdminActionForm>
+                  {!request.user.emailVerifiedAt ? (
+                    <AdminActionForm
+                      action={resendUserVerificationEmailAction}
+                      className="col-span-2 min-w-0 sm:col-span-1"
+                      csrfToken={csrfToken}
+                      fields={{ targetUserId: request.user.id }}
+                      icon="send"
+                      variant="neutralOutline"
+                    >
+                      Verifikasi
+                    </AdminActionForm>
+                  ) : null}
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+export default async function AdminUsersPage({
+  searchParams,
+}: AdminUsersPageProps) {
   const admin = await requirePageAdmin();
+  const params = await searchParams;
+  const query = getParam(params.q).trim();
+  const statusFilter = getStatusFilter(getParam(params.status));
+  const roleFilter = getRoleFilter(getParam(params.role));
+  const verificationFilter = getVerificationFilter(
+    getParam(params.verification),
+  );
+  const sortFilter = getSortFilter(getParam(params.sort));
+  const pageSize = getPageSize(getParam(params.pageSize));
+  const requestedPage = getPositiveInteger(getParam(params.page), 1);
   const csrfToken = createAdminActionCsrfToken(admin.sessionId);
-  const [accessRequests, users] = await Promise.all([
+  const [accessRequests, directory] = await Promise.all([
     listPendingAccessRequests(),
-    listAuthUsers(),
+    listAuthUsersForAdmin({
+      page: requestedPage,
+      pageSize,
+      query,
+      role: roleFilter,
+      sort: sortFilter,
+      status: statusFilter,
+      verification: verificationFilter,
+    }),
   ]);
+  const urlState: UsersUrlState = {
+    page: directory.page,
+    pageSize: directory.pageSize,
+    query,
+    role: roleFilter,
+    sort: sortFilter,
+    status: statusFilter,
+    verification: verificationFilter,
+  };
+  const showingStart =
+    directory.filteredCount === 0
+      ? 0
+      : (directory.page - 1) * directory.pageSize + 1;
+  const showingEnd = Math.min(
+    directory.filteredCount,
+    directory.page * directory.pageSize,
+  );
+  const pageNumbers = getPageNumbers(directory.page, directory.pageCount);
+  const activeFilterCount = [
+    statusFilter !== "all",
+    roleFilter !== "all",
+    verificationFilter !== "all",
+    sortFilter !== "created_desc",
+    directory.pageSize !== PAGE_SIZE_OPTIONS[0],
+  ].filter(Boolean).length;
 
   return (
     <main className="min-h-screen bg-[#f5faf8] text-zinc-950">
@@ -94,295 +723,383 @@ export default async function AdminUsersPage() {
         user={admin}
       />
 
-      <div className="mx-auto flex max-w-[1540px] flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
-        <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase text-zinc-500">
-                Akses pengguna
+      <div className="mx-auto flex max-w-[1540px] flex-col gap-3 px-4 py-3 pb-20 sm:px-6 lg:px-8 lg:pb-6">
+        <section className="rounded-lg border border-zinc-200 bg-white p-3 shadow-sm">
+          <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-red-600">
+                User management
               </p>
-              <h1 className="mt-2 text-2xl font-semibold sm:text-3xl">
-                Pengguna dan pengajuan akses
+              <h1 className="mt-1 text-xl font-semibold sm:text-2xl">
+                Pengguna dan akses admin
               </h1>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
-                Halaman ini hanya untuk admin. Pengajuan baru ditahan sampai
-                disetujui agar dashboard tidak terbuka untuk akun sembarang.
-              </p>
             </div>
-            <div className="rounded-lg bg-blue-50 px-4 py-3 text-sm text-blue-800 ring-1 ring-blue-100">
-              Masuk sebagai <span className="font-semibold">{admin.fullName}</span>
+
+            <div className="flex flex-wrap gap-2 xl:justify-end">
+              {[
+                {
+                  icon: UsersRound,
+                  label: "Total",
+                  value: directory.counts.total,
+                },
+                {
+                  icon: UserCheck,
+                  label: "Aktif",
+                  value: directory.counts.active,
+                },
+                {
+                  icon: Clock3,
+                  label: "Pending",
+                  value: directory.counts.pending,
+                },
+                {
+                  icon: ShieldCheck,
+                  label: "Admin",
+                  value: directory.counts.admin,
+                },
+                {
+                  icon: MailWarning,
+                  label: "Email",
+                  value: directory.counts.unverified,
+                },
+              ].map((item) => {
+                const Icon = item.icon;
+
+                return (
+                  <div
+                    className="inline-flex h-10 items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-3"
+                    key={item.label}
+                  >
+                    <span className="grid size-7 place-items-center rounded-lg bg-white text-blue-700 ring-1 ring-zinc-200">
+                      <Icon className="size-4" aria-hidden="true" />
+                    </span>
+                    <span className="text-xs font-semibold uppercase tracking-[0.1em] text-zinc-500">
+                      {item.label}
+                    </span>
+                    <span className="text-sm font-semibold text-zinc-950">
+                      {item.value}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>
 
-        <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
-          <div className="flex items-center justify-between gap-3">
+        <PendingAccessRequests
+          accessRequests={accessRequests}
+          csrfToken={csrfToken}
+        />
+
+        <section className="rounded-lg border border-zinc-200 bg-white p-2 shadow-sm">
+          <form
+            action="/dashboard/admin/users"
+            className="grid gap-2 xl:hidden"
+            method="get"
+          >
+            <input name="page" type="hidden" value="1" />
+            <SearchField query={query} />
+
+            <details className="group rounded-lg border border-zinc-200 bg-zinc-50">
+              <summary className="flex h-9 cursor-pointer list-none items-center justify-between gap-3 px-3 text-sm font-semibold text-zinc-800 [&::-webkit-details-marker]:hidden">
+                <span className="inline-flex items-center gap-2">
+                  <Filter className="size-4 text-blue-700" aria-hidden="true" />
+                  Filter dan urutan
+                </span>
+                <span className="rounded-full bg-white px-2 py-0.5 text-[11px] font-semibold text-zinc-500 ring-1 ring-zinc-200">
+                  {activeFilterCount > 0
+                    ? `${activeFilterCount} aktif`
+                    : "Buka"}
+                </span>
+              </summary>
+              <div className="grid gap-2 border-t border-zinc-200 p-2">
+                <UserFilterControls
+                  pageSize={directory.pageSize}
+                  roleFilter={roleFilter}
+                  sortFilter={sortFilter}
+                  statusFilter={statusFilter}
+                  verificationFilter={verificationFilter}
+                />
+              </div>
+            </details>
+
+            <div className="grid grid-cols-[1fr_auto] gap-2">
+              <button className={FILTER_BUTTON_CLASS} type="submit">
+                <Filter className="size-4" aria-hidden="true" />
+                Terapkan
+              </button>
+              <Link className={FILTER_RESET_CLASS} href="/dashboard/admin/users">
+                Reset
+              </Link>
+            </div>
+          </form>
+
+          <form
+            action="/dashboard/admin/users"
+            className="hidden gap-2 xl:grid xl:grid-cols-[minmax(16rem,1fr)_10rem_9rem_11rem_10rem_8rem_auto_auto] xl:items-center"
+            method="get"
+          >
+            <input name="page" type="hidden" value="1" />
+            <SearchField query={query} />
+            <UserFilterControls
+              pageSize={directory.pageSize}
+              roleFilter={roleFilter}
+              sortFilter={sortFilter}
+              statusFilter={statusFilter}
+              verificationFilter={verificationFilter}
+            />
+            <button className={FILTER_BUTTON_CLASS} type="submit">
+              <Filter className="size-4" aria-hidden="true" />
+              Terapkan
+            </button>
+            <Link className={FILTER_RESET_CLASS} href="/dashboard/admin/users">
+              Reset
+            </Link>
+          </form>
+        </section>
+
+        <section className="overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
+          <div className="flex flex-col gap-2 border-b border-zinc-200 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase text-zinc-500">
-                Perlu review
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-red-600">
+                Daftar pengguna
               </p>
-              <h2 className="mt-1 text-xl font-semibold">
-                Pengajuan akses pending
+              <h2 className="mt-0.5 text-base font-semibold">
+                {showingStart}-{showingEnd} dari {directory.filteredCount} akun
               </h2>
             </div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-700 ring-1 ring-amber-100">
-              <Clock3 className="size-4" aria-hidden="true" />
-              {accessRequests.length} pending
+            <span className="w-fit rounded-full bg-zinc-50 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
+              Halaman {directory.page} dari {directory.pageCount}
             </span>
           </div>
 
-          <div className="mt-5 grid gap-3">
-            {accessRequests.length === 0 ? (
-              <div className="rounded-lg border border-dashed border-zinc-300 p-6 text-sm text-zinc-500">
-                Belum ada pengajuan akses baru.
+          {directory.users.length === 0 ? (
+            <div className="grid min-h-64 place-items-center p-6 text-center">
+              <div>
+                <p className="text-sm font-semibold text-zinc-950">
+                  Tidak ada pengguna yang cocok.
+                </p>
+                <p className="mt-1 text-sm text-zinc-500">
+                  Ubah kata kunci atau reset filter untuk melihat semua akun.
+                </p>
               </div>
-            ) : (
-              accessRequests.map((request) => (
-                <article
-                  key={request.id}
-                  className="grid gap-4 rounded-lg border border-zinc-200 bg-zinc-50 p-4 lg:grid-cols-[1fr_auto]"
-                >
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="grid size-9 place-items-center rounded-lg bg-white text-blue-700 ring-1 ring-zinc-200">
-                        <UserRound className="size-4" aria-hidden="true" />
-                      </span>
-                      <div>
-                        <h3 className="font-semibold text-zinc-950">
-                          {request.user.fullName}
-                        </h3>
-                        <p className="text-sm text-zinc-500">
-                          {request.user.email} / {request.user.username}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="mt-3 grid gap-2 text-sm text-zinc-600 sm:grid-cols-3">
-                      <p>
-                        Role diminta:{" "}
-                        <span className="font-semibold text-zinc-950">
-                          {request.requestedRole}
-                        </span>
-                      </p>
-                      <p>Diajukan: {formatDate(request.createdAt)}</p>
-                      <p>
-                        Email:{" "}
-                        {request.user.emailVerifiedAt
-                          ? "terverifikasi"
-                          : "belum verifikasi"}
-                      </p>
-                    </div>
-                    {request.accessReason ? (
-                      <p className="mt-3 rounded-lg bg-white px-3 py-2 text-sm leading-6 text-zinc-600 ring-1 ring-zinc-200">
-                        {request.accessReason}
-                      </p>
-                    ) : null}
-                  </div>
-
-                  <div className="flex flex-col gap-2 sm:flex-row lg:flex-col">
-                    <AdminActionForm
-                      action={approveAccessRequestAction}
-                      csrfToken={csrfToken}
-                      fields={{ accessRequestId: request.id }}
-                      icon="check"
-                      variant="primary"
-                    >
-                      Setujui
-                    </AdminActionForm>
-                    <AdminActionForm
-                      action={rejectAccessRequestAction}
-                      csrfToken={csrfToken}
-                      fields={{ accessRequestId: request.id }}
-                      icon="x"
-                      variant="dangerOutline"
-                    >
-                      Tolak
-                    </AdminActionForm>
-                    {!request.user.emailVerifiedAt ? (
-                      <AdminActionForm
-                        action={resendUserVerificationEmailAction}
-                        csrfToken={csrfToken}
-                        fields={{ targetUserId: request.user.id }}
-                        icon="send"
-                        variant="neutralOutline"
-                      >
-                        Kirim verifikasi
-                      </AdminActionForm>
-                    ) : null}
-                  </div>
-                </article>
-              ))
-            )}
-          </div>
-        </section>
-
-        <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold uppercase text-zinc-500">
-                Akun terdaftar
-              </p>
-              <h2 className="mt-1 text-xl font-semibold">Daftar pengguna</h2>
             </div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700 ring-1 ring-emerald-100">
-              <ShieldCheck className="size-4" aria-hidden="true" />
-              {users.length} akun
-            </span>
-          </div>
+          ) : (
+            <>
+              <div className="hidden overflow-x-auto lg:block">
+                <table className="w-full min-w-[1180px] text-left text-sm">
+                  <thead className="border-b border-zinc-200 bg-zinc-50 text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-400">
+                    <tr>
+                      <th className="w-[22%] px-4 py-2.5">User</th>
+                      <th className="w-[22%] px-4 py-2.5">Email</th>
+                      <th className="w-[13rem] px-4 py-2.5">Role</th>
+                      <th className="w-[7rem] px-4 py-2.5">Status</th>
+                      <th className="w-[9rem] px-4 py-2.5">Login</th>
+                      <th className="w-[9rem] px-4 py-2.5">Dibuat</th>
+                      <th className="w-[14rem] min-w-[14rem] px-4 py-2.5">
+                        Aksi
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-200">
+                    {directory.users.map((user) => {
+                      const isCurrentUser = user.id === admin.id;
+                      const canSaveRole =
+                        user.status !== "pending" && !isCurrentUser;
 
-          <div className="mt-5 overflow-x-auto">
-            <table className="w-full min-w-[1240px] border-separate border-spacing-y-2 text-left text-sm">
-              <thead className="text-xs uppercase text-zinc-500">
-                <tr>
-                  <th className="px-3 py-2">Nama</th>
-                  <th className="px-3 py-2">Email</th>
-                  <th className="px-3 py-2">Verifikasi</th>
-                  <th className="px-3 py-2">Role</th>
-                  <th className="px-3 py-2">Status</th>
-                  <th className="px-3 py-2">Login terakhir</th>
-                  <th className="px-3 py-2">Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((user) => {
+                      return (
+                        <tr
+                          className="align-middle transition hover:bg-blue-50/40"
+                          key={user.id}
+                        >
+                          <td className="px-4 py-2.5">
+                            <UserIdentity
+                              isCurrentUser={isCurrentUser}
+                              user={user}
+                            />
+                          </td>
+                          <td className="px-4 py-2.5">
+                            <p className="max-w-56 truncate text-sm font-medium text-zinc-800">
+                              {user.email}
+                            </p>
+                            <div className="mt-1">
+                              <EmailVerificationBadge
+                                verified={Boolean(user.emailVerifiedAt)}
+                              />
+                            </div>
+                          </td>
+                          <td className="px-4 py-2.5">
+                            <AdminRoleForm
+                              action={changeAuthUserRoleAction}
+                              compact
+                              csrfToken={csrfToken}
+                              currentRole={user.role}
+                              disabled={!canSaveRole}
+                              hideMessage
+                              targetUserId={user.id}
+                            />
+                          </td>
+                          <td className="px-4 py-2.5">
+                            <StatusBadge status={user.status} />
+                          </td>
+                          <td className="whitespace-nowrap px-4 py-2.5 text-xs text-zinc-600">
+                            {formatDate(user.lastLoginAt)}
+                          </td>
+                          <td className="whitespace-nowrap px-4 py-2.5 text-xs text-zinc-600">
+                            {formatDate(user.createdAt)}
+                          </td>
+                          <td className="min-w-[14rem] whitespace-nowrap px-4 py-2.5">
+                            <UserActionStack
+                              adminId={admin.id}
+                              csrfToken={csrfToken}
+                              user={user}
+                            />
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="grid gap-3 p-3 lg:hidden">
+                {directory.users.map((user) => {
                   const isCurrentUser = user.id === admin.id;
-                  const canUseDirectActions = user.status !== "pending";
-                  const canSaveRole = canUseDirectActions && !isCurrentUser;
-                  const canDisable =
-                    canUseDirectActions &&
-                    !isCurrentUser &&
-                    user.status === "active";
-                  const canActivate =
-                    canUseDirectActions &&
-                    !isCurrentUser &&
-                    user.status !== "active";
-                  const canRevokeSessions =
-                    canUseDirectActions && !isCurrentUser;
+                  const canSaveRole =
+                    user.status !== "pending" && !isCurrentUser;
 
                   return (
-                    <tr key={user.id} className="bg-zinc-50">
-                      <td className="rounded-l-lg px-3 py-3 font-semibold text-zinc-950">
-                        {user.fullName}
-                        <span className="block text-xs font-normal text-zinc-500">
-                          {user.username}
-                        </span>
-                        {isCurrentUser ? (
-                          <span className="mt-1 inline-flex rounded-full bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">
-                            akun Anda
-                          </span>
-                        ) : null}
-                      </td>
-                      <td className="px-3 py-3 text-zinc-600">
-                        {user.email}
-                      </td>
-                      <td className="px-3 py-3">
-                        <span
-                          className={`rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${
-                            user.emailVerifiedAt
-                              ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
-                              : "bg-amber-50 text-amber-700 ring-amber-100"
-                          }`}
-                        >
-                          {user.emailVerifiedAt ? "Terverifikasi" : "Belum"}
-                        </span>
-                      </td>
-                      <td className="px-3 py-3">
-                        <AdminRoleForm
-                          action={changeAuthUserRoleAction}
-                          csrfToken={csrfToken}
-                          currentRole={user.role}
-                          disabled={!canSaveRole}
-                          targetUserId={user.id}
+                    <article
+                      className="rounded-lg border border-zinc-200 bg-white p-3 shadow-sm"
+                      key={user.id}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <UserIdentity
+                          isCurrentUser={isCurrentUser}
+                          user={user}
                         />
-                      </td>
-                      <td className="px-3 py-3">
-                        <span
-                          className={`rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${getStatusClass(user.status)}`}
-                        >
-                          {getStatusLabel(user.status)}
-                        </span>
-                      </td>
-                      <td className="px-3 py-3 text-zinc-600">
-                        {formatDate(user.lastLoginAt)}
-                      </td>
-                      <td className="rounded-r-lg px-3 py-3">
-                        {user.status === "pending" ? (
-                          <span className="text-sm font-medium text-zinc-500">
-                            Proses lewat review
-                          </span>
-                        ) : isCurrentUser ? (
-                          <span className="text-sm font-medium text-zinc-500">
-                            Tidak bisa ubah akun sendiri
-                          </span>
-                        ) : (
-                          <div className="flex flex-wrap gap-2">
-                            {canDisable ? (
-                              <AdminActionForm
-                                action={disableAuthUserAction}
-                                csrfToken={csrfToken}
-                                fields={{ targetUserId: user.id }}
-                                icon="ban"
-                                variant="dangerOutline"
-                              >
-                                Nonaktifkan
-                              </AdminActionForm>
-                            ) : null}
+                        <StatusBadge status={user.status} />
+                      </div>
 
-                            {canActivate ? (
-                              <AdminActionForm
-                                action={activateAuthUserAction}
-                                csrfToken={csrfToken}
-                                fields={{ targetUserId: user.id }}
-                                icon="refresh"
-                                variant="success"
-                              >
-                                Aktifkan
-                              </AdminActionForm>
-                            ) : null}
+                      <div className="mt-3 min-w-0">
+                        <p className="break-all text-sm font-medium text-zinc-800">
+                          {user.email}
+                        </p>
+                        <div className="mt-1.5">
+                          <EmailVerificationBadge
+                            verified={Boolean(user.emailVerifiedAt)}
+                          />
+                        </div>
+                      </div>
 
-                            {canRevokeSessions ? (
-                              <AdminActionForm
-                                action={revokeAuthUserSessionsAction}
-                                csrfToken={csrfToken}
-                                fields={{ targetUserId: user.id }}
-                                icon="logout"
-                                variant="neutralOutline"
-                              >
-                                Cabut sesi
-                              </AdminActionForm>
-                            ) : null}
+                      <div className="mt-3 grid grid-cols-2 gap-2 border-t border-zinc-200 pt-3 text-xs text-zinc-600">
+                        <div>
+                          <p className="font-semibold uppercase tracking-[0.14em] text-zinc-400">
+                            Login
+                          </p>
+                          <p className="mt-1 leading-5">
+                            {formatDate(user.lastLoginAt)}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="font-semibold uppercase tracking-[0.14em] text-zinc-400">
+                            Dibuat
+                          </p>
+                          <p className="mt-1 leading-5">
+                            {formatDate(user.createdAt)}
+                          </p>
+                        </div>
+                      </div>
 
-                            {!user.emailVerifiedAt ? (
-                              <AdminActionForm
-                                action={resendUserVerificationEmailAction}
-                                csrfToken={csrfToken}
-                                fields={{ targetUserId: user.id }}
-                                icon="send"
-                                variant="neutralOutline"
-                              >
-                                Kirim verifikasi
-                              </AdminActionForm>
-                            ) : null}
+                      <div className="mt-3 border-t border-zinc-200 pt-3">
+                        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
+                          Role
+                        </p>
+                        <div className="mt-2">
+                          <AdminRoleForm
+                            action={changeAuthUserRoleAction}
+                            csrfToken={csrfToken}
+                            currentRole={user.role}
+                            disabled={!canSaveRole}
+                            targetUserId={user.id}
+                          />
+                        </div>
+                      </div>
 
-                            {canUseDirectActions ? (
-                              <AdminActionForm
-                                action={sendUserPasswordResetAction}
-                                csrfToken={csrfToken}
-                                disabled={isCurrentUser}
-                                fields={{ targetUserId: user.id }}
-                                icon="key"
-                                variant="neutralOutline"
-                              >
-                                Reset password
-                              </AdminActionForm>
-                            ) : null}
-                          </div>
-                        )}
-                      </td>
-                    </tr>
+                      <div className="mt-3 border-t border-zinc-200 pt-3">
+                        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
+                          Aksi
+                        </p>
+                        <div className="mt-2">
+                          <UserActionStack
+                            adminId={admin.id}
+                            csrfToken={csrfToken}
+                            user={user}
+                          />
+                        </div>
+                      </div>
+                    </article>
                   );
                 })}
-              </tbody>
-            </table>
+              </div>
+            </>
+          )}
+
+          <div className="grid gap-3 border-t border-zinc-200 px-4 pb-8 pt-3 text-center sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:pb-5 sm:text-left lg:pb-4">
+            <p className="text-sm text-zinc-500 sm:justify-self-start">
+              Menampilkan {showingStart}-{showingEnd} dari{" "}
+              {directory.filteredCount} hasil.
+            </p>
+            <nav
+              aria-label="Pagination pengguna"
+              className="flex max-w-full flex-wrap items-center justify-center gap-2 sm:justify-self-center"
+            >
+              <Link
+                aria-disabled={directory.page <= 1}
+                className={`inline-flex h-9 items-center justify-center rounded-lg border px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-zinc-600/15 ${
+                  directory.page <= 1
+                    ? "pointer-events-none border-zinc-100 bg-zinc-50 text-zinc-300"
+                    : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
+                }`}
+                href={getUsersHref(urlState, {
+                  page: Math.max(1, directory.page - 1),
+                })}
+              >
+                Previous
+              </Link>
+
+              {pageNumbers.map((pageNumber) => (
+                <Link
+                  aria-current={
+                    pageNumber === directory.page ? "page" : undefined
+                  }
+                  className={`grid size-9 place-items-center rounded-lg text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20 ${
+                    pageNumber === directory.page
+                      ? "bg-blue-600 text-white shadow-lg shadow-blue-600/15"
+                      : "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
+                  }`}
+                  href={getUsersHref(urlState, { page: pageNumber })}
+                  key={pageNumber}
+                >
+                  {pageNumber}
+                </Link>
+              ))}
+
+              <Link
+                aria-disabled={directory.page >= directory.pageCount}
+                className={`inline-flex h-9 items-center justify-center rounded-lg border px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-zinc-600/15 ${
+                  directory.page >= directory.pageCount
+                    ? "pointer-events-none border-zinc-100 bg-zinc-50 text-zinc-300"
+                    : "border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50"
+                }`}
+                href={getUsersHref(urlState, {
+                  page: Math.min(directory.pageCount, directory.page + 1),
+                })}
+              >
+                Next
+              </Link>
+            </nav>
+            <span aria-hidden="true" className="hidden sm:block" />
           </div>
         </section>
       </div>
