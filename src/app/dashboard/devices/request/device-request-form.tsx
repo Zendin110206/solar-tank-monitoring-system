@@ -41,12 +41,12 @@ function FormField({
 }) {
   return (
     <label
-      className={`flex h-full flex-col gap-2 text-sm font-semibold text-zinc-900 ${className}`}
+      className={`flex h-full w-full min-w-0 flex-col gap-2 text-sm font-semibold text-zinc-900 ${className}`}
     >
-      <span>{label}</span>
+      <span className="break-words">{label}</span>
       {children}
       {help ? (
-        <span className="min-h-5 text-xs font-normal leading-5 text-zinc-500">
+        <span className="min-h-5 break-words text-xs font-normal leading-5 text-zinc-500">
           {help}
         </span>
       ) : null}
@@ -64,20 +64,22 @@ function SectionHeader({
   title: string;
 }) {
   return (
-    <div className="flex items-start gap-3">
+    <div className="flex min-w-0 items-start gap-3">
       <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-700 ring-1 ring-blue-100">
         {icon}
       </span>
-      <div>
+      <div className="min-w-0">
         <h3 className="text-base font-semibold text-zinc-950">{title}</h3>
-        <p className="mt-1 text-sm leading-6 text-zinc-500">{children}</p>
+        <p className="mt-1 break-words text-sm leading-6 text-zinc-500">
+          {children}
+        </p>
       </div>
     </div>
   );
 }
 
 function inputClassName(extra = "") {
-  return `h-11 rounded-lg border border-zinc-200 bg-white px-3 text-sm font-semibold text-zinc-950 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-600/15 disabled:cursor-not-allowed disabled:bg-zinc-50 disabled:text-zinc-500 ${extra}`;
+  return `h-11 w-full min-w-0 max-w-full rounded-lg border border-zinc-200 bg-white px-3 text-sm font-semibold text-zinc-950 shadow-sm outline-none transition placeholder:text-zinc-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-600/15 disabled:cursor-not-allowed disabled:bg-zinc-50 disabled:text-zinc-500 ${extra}`;
 }
 
 function parsePositiveFormNumber(value: string): number | null {
@@ -179,13 +181,13 @@ function ComputedMetric({
   value: number | null;
 }) {
   return (
-    <div className="flex h-full flex-col gap-2 text-sm font-semibold text-zinc-900">
-      <span>{label}</span>
-      <output className="flex min-h-11 items-center rounded-lg border border-blue-100 bg-blue-50 px-3 text-sm font-semibold text-blue-950 shadow-sm">
+    <div className="flex h-full w-full min-w-0 flex-col gap-2 text-sm font-semibold text-zinc-900">
+      <span className="break-words">{label}</span>
+      <output className="flex min-h-11 w-full min-w-0 max-w-full items-center rounded-lg border border-blue-100 bg-blue-50 px-3 text-sm font-semibold text-blue-950 shadow-sm">
         {value === null ? emptyLabel : `${formatMetric(value)} ${unit}`}
       </output>
       {help ? (
-        <span className="min-h-5 text-xs font-normal leading-5 text-zinc-500">
+        <span className="min-h-5 break-words text-xs font-normal leading-5 text-zinc-500">
           {help}
         </span>
       ) : null}
@@ -336,15 +338,18 @@ export function DeviceRequestForm({
   );
 
   return (
-    <form action={formAction} className="mx-auto grid max-w-6xl gap-6">
-      <div className="grid gap-3 sm:grid-cols-3">
+    <form
+      action={formAction}
+      className="mx-auto grid w-full min-w-0 max-w-6xl gap-6"
+    >
+      <div className="grid w-full min-w-0 gap-3 sm:grid-cols-3">
         {[
           "Kode STO dan kode device dibuat otomatis",
           "Device key dibuat setelah admin approve",
           "Batas level dan interval kirim memakai standar sistem",
         ].map((item) => (
           <div
-            className="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm font-semibold leading-6 text-zinc-700"
+            className="min-w-0 break-words rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm font-semibold leading-6 text-zinc-700"
             key={item}
           >
             {item}
@@ -352,7 +357,7 @@ export function DeviceRequestForm({
         ))}
       </div>
 
-      <section className="grid gap-5 border-t border-zinc-100 pt-5">
+      <section className="grid min-w-0 gap-5 border-t border-zinc-100 pt-5">
         <SectionHeader
           icon={<MapPin className="size-5" aria-hidden="true" />}
           title="Lokasi STO"
@@ -360,7 +365,7 @@ export function DeviceRequestForm({
           Data ini dipakai untuk nama lokasi, wilayah kerja, dan titik peta.
         </SectionHeader>
 
-        <div className="grid max-w-5xl gap-4 lg:grid-cols-2">
+        <div className="grid w-full min-w-0 max-w-5xl gap-4 lg:grid-cols-2">
           <FormField label="Nama STO" help="Contoh: STO Bangil atau STO TPH">
             <input
               className={inputClassName()}
@@ -407,7 +412,7 @@ export function DeviceRequestForm({
         </div>
       </section>
 
-      <section className="grid gap-5 border-t border-zinc-100 pt-5">
+      <section className="grid min-w-0 gap-5 border-t border-zinc-100 pt-5">
         <SectionHeader
           icon={<Fuel className="size-5" aria-hidden="true" />}
           title="Sensor dan Tangki"
@@ -416,9 +421,9 @@ export function DeviceRequestForm({
           yang dipakai di lokasi.
         </SectionHeader>
 
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid w-full min-w-0 gap-3 sm:grid-cols-2">
           <button
-            className={`rounded-lg border p-4 text-left transition ${
+            className={`w-full min-w-0 rounded-lg border p-4 text-left transition ${
               tankShape === "rectangular"
                 ? "border-blue-500 bg-blue-50 ring-4 ring-blue-600/10"
                 : "border-zinc-200 bg-white hover:border-blue-200"
@@ -434,7 +439,7 @@ export function DeviceRequestForm({
             </span>
           </button>
           <button
-            className={`rounded-lg border p-4 text-left transition ${
+            className={`w-full min-w-0 rounded-lg border p-4 text-left transition ${
               tankShape === "horizontal-cylinder"
                 ? "border-blue-500 bg-blue-50 ring-4 ring-blue-600/10"
                 : "border-zinc-200 bg-white hover:border-blue-200"
@@ -452,7 +457,7 @@ export function DeviceRequestForm({
           <input name="tankShape" type="hidden" value={tankShape} />
         </div>
 
-        <div className="grid max-w-5xl gap-4 lg:grid-cols-[minmax(18rem,0.8fr)_minmax(20rem,1fr)]">
+        <div className="grid w-full min-w-0 max-w-5xl gap-4 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1fr)]">
           <FormField
             label="Mode sensor"
             help="Paket firmware aktif saat ini untuk sensor fuel."
@@ -488,7 +493,7 @@ export function DeviceRequestForm({
           </FormField>
         </div>
 
-        <div className="grid max-w-6xl gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+        <div className="grid w-full min-w-0 max-w-6xl gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
           <ComputedMetric
             help="Dari dimensi tangki."
             label="Kapasitas liter"
@@ -545,7 +550,7 @@ export function DeviceRequestForm({
         </div>
       </section>
 
-      <section className="grid gap-5 border-t border-zinc-100 pt-5">
+      <section className="grid min-w-0 gap-5 border-t border-zinc-100 pt-5">
         <SectionHeader
           icon={<Gauge className="size-5" aria-hidden="true" />}
           title="Beban Genset"
@@ -554,7 +559,7 @@ export function DeviceRequestForm({
           diesel engine, dan cos phi.
         </SectionHeader>
 
-        <div className="grid max-w-6xl gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="grid w-full min-w-0 max-w-6xl gap-4 sm:grid-cols-2 xl:grid-cols-5">
           <FormField label="Beban lokasi">
             <NumberInput
               name="loadValue"
@@ -609,7 +614,7 @@ export function DeviceRequestForm({
       </section>
 
       {!canSubmit ? (
-        <div className="max-w-5xl rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-800">
+        <div className="w-full min-w-0 max-w-5xl break-words rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-800">
           Profil perangkat aktif belum tersedia untuk tipe tangki ini. Admin
           perlu mengaktifkan template firmware dan profil hardware di database
           setelah konfigurasi pin dikonfirmasi.
@@ -617,7 +622,7 @@ export function DeviceRequestForm({
       ) : null}
 
       <ActionMessage state={state} />
-      <div className="flex justify-end border-t border-zinc-100 pt-5">
+      <div className="flex w-full min-w-0 justify-end border-t border-zinc-100 pt-5">
         <SubmitButton disabled={!canSubmit} />
       </div>
     </form>

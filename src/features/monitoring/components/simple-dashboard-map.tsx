@@ -216,7 +216,7 @@ function MapEmptyState({ hasSites }: { hasSites: boolean }) {
         <p className="mt-2 text-sm leading-6 text-zinc-500">
           {hasSites
             ? "Isi latitude dan longitude di data lokasi agar titik STO muncul."
-            : "Coba ubah pencarian, status, atau area yang sedang dipilih."}
+            : "Coba ubah pencarian, status, area, atau STO yang sedang dipilih."}
         </p>
       </div>
     </div>
