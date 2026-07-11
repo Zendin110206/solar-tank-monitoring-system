@@ -219,6 +219,7 @@ Pekerjaan:
 - menambahkan readiness check schema rollup;
 - menambah pengujian regresi untuk snapshot stale versus raw yang lebih baru;
 - memperbarui dokumentasi storage, deployment, API, model data, dan pilot.
+- memperbarui action CI ke major stabil berbasis runtime Node 24 agar tidak bergantung pada action Node 20 yang sudah deprecated.
 
 Verifikasi sebelum publikasi:
 
