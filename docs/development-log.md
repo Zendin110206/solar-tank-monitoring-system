@@ -206,6 +206,28 @@ Catatan:
 Perubahan ini hanya dokumentasi. Detail deployment pilihan akhir tidak dipublikasikan di repo utama pada tahap ini.
 ```
 
+## 2026-07-11 - Snapshot Live dan Rollup Reading 5 Menit
+
+Pekerjaan:
+
+- menambahkan migration 007 untuk metadata rollup dan tabel snapshot terbaru;
+- mengubah ingest MySQL menjadi dua upsert atomik: snapshot live dan bucket 5 menit;
+- menyimpan mean, min, max, sample count, dan quality pada history ringkas;
+- membuat overview, detail, dan API memilih reading paling segar secara konsisten selama transisi writer;
+- memperbarui grafik dan CSV agar memahami agregat;
+- memastikan reset/cleanup juga menghapus snapshot terkait;
+- menambahkan readiness check schema rollup;
+- menambah pengujian regresi untuk snapshot stale versus raw yang lebih baru;
+- memperbarui dokumentasi storage, deployment, API, model data, dan pilot.
+
+Verifikasi sebelum publikasi:
+
+```text
+backup MySQL berhasil dan tidak masuk Git
+migration 007 berhasil serta aman diulang pada object yang sudah ada
+typecheck, lint, seluruh test, dan build production wajib lulus
+```
+
 ## Status Verifikasi Terakhir
 
 Perintah:

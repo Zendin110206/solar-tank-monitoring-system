@@ -96,10 +96,12 @@ Contoh device aktif:
 ```text
 code: demo-tph-01
 tankId: tank-tph-main
-expectedReportIntervalSec: 300
+expectedReportIntervalSec: 20
 ```
 
-Artinya device diharapkan mengirim data setiap 5 menit.
+Artinya device operasional diharapkan mengirim data setiap 20 detik. Interval
+ini tidak menentukan jumlah row history karena history tetap di-rollup per 5
+menit.
 
 ## Pengajuan Perangkat
 
@@ -220,6 +222,11 @@ Field penting:
 | `rssiDbm` | sinyal WiFi jika ada |
 | `rawPayload` | payload mentah untuk audit development |
 | `quality` | catatan sumber angka dan status review config jika payload membawa config tangki |
+| `resolution` | `raw`, `5m`, atau `latest` pada model baca aplikasi |
+| `bucketStart`, `bucketEnd` | batas waktu bucket agregat |
+| `sampleCount` | jumlah sampel yang diwakili satu row agregat |
+| `volumeLiterMin`, `volumeLiterMax` | volume minimum dan maksimum dalam bucket |
+| `fillPercentMin`, `fillPercentMax` | persentase minimum dan maksimum dalam bucket |
 
 `quality` membantu menjawab:
 
@@ -277,9 +284,14 @@ Karakteristik memory store:
 Karakteristik MySQL saat ini:
 
 - sudah memiliki migration dan seed demo;
-- menyimpan reading dari endpoint ingest;
+- `monitoring_latest_readings` menyimpan tepat satu snapshot terbaru per device untuk dashboard live;
+- `monitoring_readings` menyimpan raw lama dan history agregat 5 menit baru;
+- setiap ingest baru meng-upsert snapshot dan bucket 5 menit dalam satu transaksi;
+- nilai utama row `5m` adalah mean berjalan, didampingi min, max, dan `sample_count`;
+- raw payload lengkap hanya berada pada snapshot terbaru; row rollup baru tidak menumpuk raw payload;
 - query history tangki mengambil riwayat per tangki;
 - query overview mengambil reading terbaru per tangki agar tank yang jarang mengirim tidak tersisih oleh data tank lain yang lebih sering masuk;
+- selama transisi deployment, query overview membandingkan snapshot dengan history terbaru dan memilih `receivedAt` paling baru;
 - nilai `DATETIME` MySQL diperlakukan sebagai UTC oleh repository aplikasi;
 - sudah dapat membaca registry site, tank, device, dan hash key dari database;
 - dapat diisi registry pilot melalui file lokal yang tidak di-commit;

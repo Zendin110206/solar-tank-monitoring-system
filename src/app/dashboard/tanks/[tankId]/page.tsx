@@ -46,8 +46,8 @@ import {
   buildSimpleTankDetail,
   type SimpleTankTrendByRange,
 } from "@/features/monitoring/lib/simple-tank-detail-model";
+import { mergeMonitoringReadingsById } from "@/features/monitoring/lib/latest-reading";
 import type {
-  Reading,
   ReadingQuality,
   ReadingValueSource,
   TankConfigReview,
@@ -308,21 +308,6 @@ function formatRuntimeHour(value: number | null) {
 
 function clampPercent(value: number) {
   return Math.min(Math.max(value, 0), 100);
-}
-
-function mergeReadingsById(readings: Reading[], additionalReadings: Reading[]) {
-  const readingById = new Map<string, Reading>();
-
-  [...readings, ...additionalReadings].forEach((reading) => {
-    readingById.set(reading.id, reading);
-  });
-
-  return Array.from(readingById.values()).sort((first, second) => {
-    return (
-      new Date(first.receivedAt).getTime() -
-      new Date(second.receivedAt).getTime()
-    );
-  });
 }
 
 function getRuntimeLevelParameter(
@@ -1084,7 +1069,7 @@ export default async function TankDetailPage({
     sites: referenceData.sites,
     tanks: referenceData.tanks,
     devices: referenceData.devices,
-    readings: mergeReadingsById(
+    readings: mergeMonitoringReadingsById(
       latestReadingsResult.readings,
       tankHistoryReadings,
     ),

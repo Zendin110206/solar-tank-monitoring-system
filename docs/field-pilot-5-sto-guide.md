@@ -40,7 +40,7 @@ Siapkan tabel sederhana seperti ini sebelum menyentuh kode atau device.
 | Batas kritis | `15` | persen |
 | Konsumsi | `25` | liter per jam |
 | Kode device | `pilot-tph-01` | Harus sama dengan firmware |
-| Interval kirim | `300` | detik, berarti 5 menit |
+| Interval kirim | `20` | detik untuk monitoring live; history tetap diringkas per 5 menit |
 | Hash key | `sha256:...` | Bukan key asli |
 
 ## Cara Mengambil Koordinat
@@ -283,7 +283,7 @@ X-Device-Key: key-asli-device
 ```
 
 5. Device mengirim body JSON.
-6. Device mengirim tiap interval yang disepakati, misalnya 5 menit.
+6. Device mengirim tiap interval yang disepakati. Profil operasional saat ini memakai 20 detik, sedangkan history database diringkas per 5 menit.
 7. Device mencatat response HTTP.
 
 Arti response umum:

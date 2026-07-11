@@ -36,6 +36,7 @@ export type SimpleTankDetailChartPoint = {
   timeLabel: string;
   fullTimeLabel: string;
   volumeLiter: number;
+  sampleCount?: number;
 };
 
 export type SimpleTankTrendPoint = SimpleTankDetailChartPoint & {
@@ -363,6 +364,7 @@ function toSimpleChartPoint(reading: ChartPointInput): SimpleTankDetailChartPoin
         ? reading.timeLabel
         : formatClockLabel(new Date(reading.receivedAt)),
     fullTimeLabel: formatFullTimeLabel(reading.receivedAt),
+    sampleCount: "sampleCount" in reading ? reading.sampleCount : undefined,
     volumeLiter: reading.volumeLiter,
   };
 }
@@ -481,9 +483,13 @@ export function buildSimpleTankTrend(
       totalVolume: 0,
       sampleCount: 0,
     };
+    const pointSampleCount = Math.max(
+      1,
+      Math.round(point.sampleCount ?? 1),
+    );
 
-    bucket.totalVolume += point.volumeLiter;
-    bucket.sampleCount += 1;
+    bucket.totalVolume += point.volumeLiter * pointSampleCount;
+    bucket.sampleCount += pointSampleCount;
     buckets.set(bucketIndex, bucket);
   });
 

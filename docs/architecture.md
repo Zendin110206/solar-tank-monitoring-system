@@ -97,7 +97,7 @@ yang terjadi:
 4. API membaca X-Api-Key.
 5. API mencari device di registry aktif, yaitu memory atau MySQL.
 6. Payload dinormalisasi.
-7. Reading disimpan ke storage aktif, yaitu memory atau MySQL.
+7. Reading disimpan ke storage aktif. Memory menambah reading biasa; MySQL menjalankan satu transaksi untuk meng-upsert snapshot live per device dan bucket history 5 menit.
 8. Response HTTP 201 dikirim.
 ```
 
@@ -112,6 +112,12 @@ GET /api/dashboard/overview
 GET /api/tanks/[tankId]
 GET /api/tanks/[tankId]/readings
 ```
+
+Overview dan detail memakai aturan freshness yang sama. Repository mengambil
+snapshot `monitoring_latest_readings` dan kandidat history terbaru, lalu memilih
+`receivedAt` paling baru per tangki. Fallback history ini menjaga kompatibilitas
+selama deployment lama masih menulis raw. Setelah writer baru aktif, snapshot
+menjadi sumber live utama dan `monitoring_readings` menjadi history agregat.
 
 `GET /api/health` tidak menyentuh database. Endpoint ini hanya memastikan
 aplikasi hidup.

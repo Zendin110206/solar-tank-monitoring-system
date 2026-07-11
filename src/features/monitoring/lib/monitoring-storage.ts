@@ -10,6 +10,7 @@ import {
   listMonitoringReadingsFromMysql,
   saveMonitoringReadingToMysql,
 } from "./mysql-reading-repository";
+import { selectLatestReadingPerTank } from "./latest-reading";
 
 export type MonitoringStorageDriver = "memory" | "mysql";
 
@@ -99,27 +100,8 @@ export async function listLatestMonitoringReadingsByTankWithSource(): Promise<Li
   const configuredDriver = getMonitoringStorageDriver();
 
   if (configuredDriver !== "mysql") {
-    const latestByTankId = new Map<string, Reading>();
-
-    getMonitoringReadings().forEach((reading) => {
-      const currentReading = latestByTankId.get(reading.tankId);
-
-      if (
-        !currentReading ||
-        new Date(reading.receivedAt).getTime() >
-          new Date(currentReading.receivedAt).getTime()
-      ) {
-        latestByTankId.set(reading.tankId, reading);
-      }
-    });
-
     return {
-      readings: Array.from(latestByTankId.values()).sort((first, second) => {
-        return (
-          new Date(first.receivedAt).getTime() -
-          new Date(second.receivedAt).getTime()
-        );
-      }),
+      readings: selectLatestReadingPerTank(getMonitoringReadings()),
       source: createStorageSource({
         configuredDriver,
         activeDriver: "memory",

@@ -174,6 +174,7 @@ pnpm db:migrate:auth
 pnpm db:migrate:auth-recovery
 pnpm db:migrate:device-provisioning
 pnpm db:migrate:device-request-fields
+pnpm db:migrate:reading-rollup
 ```
 
 Catatan:
@@ -183,6 +184,8 @@ Catatan:
 - key asli device tidak boleh masuk repo;
 - fallback global key harus `false` untuk pilot;
 - jika `/api/ready` gagal, jangan lanjut uji device sebelum storage diperbaiki;
+- jalankan `pnpm db:backup:mysql` sebelum migration pada database operasional;
+- check readiness `mysql-reading-rollup` harus lulus sebelum writer rollup dianggap siap;
 - setelah mengubah env Vercel, lakukan redeploy.
 
 ## Opsi Deployment Demo

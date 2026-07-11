@@ -108,6 +108,12 @@ Response MySQL siap:
         "ok": true,
         "status": "ok",
         "message": "Registry MySQL berisi site, tangki, dan device aktif."
+      },
+      {
+        "name": "mysql-reading-rollup",
+        "ok": true,
+        "status": "ok",
+        "message": "Snapshot live dan rollup reading 5 menit siap digunakan."
       }
     ]
   }
@@ -191,7 +197,7 @@ Response sukses:
 Catatan:
 
 ```text
-Field data berisi isi dashboard. Field meta.storage membantu melihat apakah reading sedang dibaca dari MySQL atau memory lokal. Jika mode MySQL aktif tetapi tabel reading masih kosong, API tetap memakai MySQL dan mengembalikan daftar reading kosong; dashboard akan menampilkan STO dari registry dengan status belum ada data. Field meta.registry membantu melihat apakah referensi site/tangki/device sedang dibaca dari memory lokal atau MySQL.
+Field data berisi isi dashboard. Field meta.storage membantu melihat apakah reading sedang dibaca dari MySQL atau memory lokal. Jika mode MySQL aktif tetapi tabel reading masih kosong, API tetap memakai MySQL dan mengembalikan daftar reading kosong; dashboard akan menampilkan STO dari registry dengan status belum ada data. Field meta.registry membantu melihat apakah referensi site/tangki/device sedang dibaca dari memory lokal atau MySQL. Pada MySQL, overview membandingkan snapshot live dengan kandidat history terbaru lalu memilih `receivedAt` paling baru agar status konsisten selama transisi deployment.
 ```
 
 ## GET /api/tanks/[tankId]
@@ -243,6 +249,7 @@ Catatan:
 - `measuredAt` dan `receivedAt` adalah ISO UTC.
 - UI boleh menampilkan label WIB, tetapi API tetap mengirim waktu standar UTC.
 - Endpoint ini membaca history tank terkait, bukan daftar global dashboard.
+- Setelah migration rollup, item history baru mewakili bucket 5 menit dan dapat membawa `resolution`, `bucketStart`, `bucketEnd`, `sampleCount`, nilai mean, min, dan max.
 
 Contoh:
 
@@ -282,6 +289,10 @@ Mengunduh CSV reading satu tangki sesuai periode yang dipilih.
 Endpoint ini wajib memakai session user/admin aktif. Data CSV memakai header
 bahasa Indonesia, menyertakan waktu UTC dan WIB, dan nama file otomatis memuat
 site, tangki, rentang, serta tanggal periode.
+
+CSV juga menyertakan resolusi reading, batas bucket, jumlah sampel, mean pada
+kolom nilai utama, serta min/max volume dan persentase. Raw history lama tetap
+dapat diekspor berdampingan dengan row rollup.
 
 Query:
 
@@ -323,6 +334,10 @@ Fungsi:
 ```text
 Menerima payload dari device, simulator, atau smoke test pilot.
 ```
+
+Pada storage MySQL, satu request yang valid memperbarui snapshot live dan
+agregat 5 menit dalam satu transaksi. Response sukses hanya dikirim setelah
+kedua operasi berhasil di-commit.
 
 Header wajib:
 

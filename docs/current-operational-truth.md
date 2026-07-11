@@ -1,6 +1,6 @@
 # Current Operational Truth
 
-Tanggal status: 2026-07-07
+Tanggal status: 2026-07-11
 
 Dokumen ini menjadi ringkasan kebenaran operasional saat ini. Jika dokumen lama di repo atau `local_context` bertentangan dengan dokumen ini, gunakan dokumen ini sebagai acuan sementara lalu update dokumen lama yang tertinggal.
 
@@ -29,6 +29,8 @@ Sistem belum boleh disebut production-ready penuh karena deployment production f
 - Firmware ZIP disimpan terenkripsi dan didownload lewat token terbatas.
 - Device baru aktif setelah first valid ping dengan key yang cocok.
 - `POST /api/ingest` menerima payload device dan menyimpan reading.
+- Ingest MySQL menyimpan satu snapshot live per device dan satu rollup history per bucket 5 menit dalam satu transaksi.
+- Overview, detail, dan API memilih timestamp paling baru secara konsisten selama transisi writer lama ke writer rollup.
 - Ingest punya rate limit saat storage MySQL aktif.
 - Dashboard ringkas, dashboard detail, peta, detail tangki, dan grafik trend.
 - Download CSV reading dari halaman detail tangki dengan periode 1 hari, 7 hari, atau 30 hari mengikuti pilihan grafik.
@@ -78,7 +80,9 @@ Device atau simulator
   -> aktivasi first ping jika memenuhi lifecycle request
   -> normalisasi payload
   -> review config payload vs registry
-  -> simpan reading ke memory atau MySQL
+  -> simpan ke memory; atau pada MySQL:
+       -> UPSERT snapshot live per device
+       -> UPSERT agregat history 5 menit
   -> dashboard/detail membaca registry dan reading
 ```
 
@@ -98,6 +102,7 @@ Untuk pilot/operasional:
 - siapkan SMTP, auth secret, package encryption key, backup output dir, dan admin bootstrap;
 - cek `/api/ready` sebelum menganggap sistem siap;
 - jalankan `pnpm db:backup:mysql` sebelum migration besar, cleanup besar, atau deploy;
+- jalankan `pnpm db:migrate:reading-rollup` sebelum men-deploy writer snapshot/rollup;
 - uji restore backup ke database staging/lokal sebelum mengklaim SOP backup final.
 
 Detail deployment pilihan akhir belum dipublikasikan di repo utama pada status ini. Jalur tersebut ditunda sampai keputusan tim berikutnya.

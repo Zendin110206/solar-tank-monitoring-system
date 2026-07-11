@@ -11,6 +11,7 @@ const RESET_MONITORING_DEVICE_DATA_TABLES = [
   "monitoring_device_provisioning_events",
   "monitoring_device_packages",
   "monitoring_device_requests",
+  "monitoring_latest_readings",
   "monitoring_readings",
   "monitoring_devices",
   "monitoring_tanks",
@@ -243,11 +244,17 @@ export async function resetMonitoringReadingsInMysql({
         connection,
         tableName: "monitoring_tanks",
       });
-      const readingRows = await countRows({
-        connection,
-        tableName: "monitoring_readings",
-      });
+      const readingRows =
+        (await countRows({
+          connection,
+          tableName: "monitoring_latest_readings",
+        })) +
+        (await countRows({
+          connection,
+          tableName: "monitoring_readings",
+        }));
 
+      await connection.query("DELETE FROM monitoring_latest_readings");
       await connection.query("DELETE FROM monitoring_readings");
       await connection.commit();
 
@@ -280,13 +287,26 @@ export async function resetMonitoringReadingsInMysql({
     }
 
     const where = `tank_id IN (${buildPlaceholders(matchedTankIds)})`;
-    const readingRows = await countRowsWhere({
+    const readingRows =
+      (await countRowsWhere({
+        connection,
+        params: matchedTankIds,
+        tableName: "monitoring_latest_readings",
+        where,
+      })) +
+      (await countRowsWhere({
+        connection,
+        params: matchedTankIds,
+        tableName: "monitoring_readings",
+        where,
+      }));
+
+    await deleteWhere({
       connection,
       params: matchedTankIds,
-      tableName: "monitoring_readings",
+      tableName: "monitoring_latest_readings",
       where,
     });
-
     await deleteWhere({
       connection,
       params: matchedTankIds,
@@ -412,6 +432,12 @@ export async function cleanupMonitoringDeviceRequestsInMysql({
     }
 
     if (deletableDeviceIds.length > 0) {
+      counts.monitoring_latest_readings = await deleteWhere({
+        connection,
+        params: deletableDeviceIds,
+        tableName: "monitoring_latest_readings",
+        where: `device_id IN (${buildPlaceholders(deletableDeviceIds)})`,
+      });
       counts.monitoring_readings = await deleteWhere({
         connection,
         params: deletableDeviceIds,
@@ -637,6 +663,12 @@ export async function cleanupMonitoringTanksInMysql({
     ]);
 
     if (readingWhere) {
+      counts.monitoring_latest_readings = await deleteWhere({
+        connection,
+        params: readingWhere.params,
+        tableName: "monitoring_latest_readings",
+        where: readingWhere.where,
+      });
       counts.monitoring_readings = await deleteWhere({
         connection,
         params: readingWhere.params,

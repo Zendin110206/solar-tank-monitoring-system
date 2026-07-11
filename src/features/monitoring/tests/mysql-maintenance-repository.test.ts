@@ -34,7 +34,7 @@ describe("mysql maintenance repository", () => {
   });
 
   it("clears only operational monitoring data in foreign-key-safe order", async () => {
-    const counts = [1, 2, 3, 4, 5, 6, 7, 8];
+    const counts = [1, 2, 3, 4, 5, 6, 7, 8, 9];
     let countIndex = 0;
 
     mocks.connection.query.mockImplementation(async (statement: string) => {
@@ -50,12 +50,13 @@ describe("mysql maintenance repository", () => {
       String(statement).replace(/\s+/g, " ").trim(),
     );
 
-    expect(result.totalRows).toBe(36);
+    expect(result.totalRows).toBe(45);
     expect(statements).toEqual([
       "SELECT COUNT(*) AS count FROM monitoring_ingest_events",
       "SELECT COUNT(*) AS count FROM monitoring_device_provisioning_events",
       "SELECT COUNT(*) AS count FROM monitoring_device_packages",
       "SELECT COUNT(*) AS count FROM monitoring_device_requests",
+      "SELECT COUNT(*) AS count FROM monitoring_latest_readings",
       "SELECT COUNT(*) AS count FROM monitoring_readings",
       "SELECT COUNT(*) AS count FROM monitoring_devices",
       "SELECT COUNT(*) AS count FROM monitoring_tanks",
@@ -64,6 +65,7 @@ describe("mysql maintenance repository", () => {
       "DELETE FROM monitoring_device_provisioning_events",
       "DELETE FROM monitoring_device_packages",
       "DELETE FROM monitoring_device_requests",
+      "DELETE FROM monitoring_latest_readings",
       "DELETE FROM monitoring_readings",
       "DELETE FROM monitoring_devices",
       "DELETE FROM monitoring_tanks",
@@ -114,7 +116,7 @@ describe("mysql maintenance repository", () => {
 
     expect(result).toMatchObject({
       matchedRequestCount: 1,
-      totalRows: 8,
+      totalRows: 9,
     });
     expect(statements.join(" ")).toContain("NOT EXISTS");
     expect(statements.join(" ")).toContain("DELETE t FROM monitoring_tanks t");
@@ -169,7 +171,7 @@ describe("mysql maintenance repository", () => {
 
     expect(result).toMatchObject({
       matchedTankCount: 1,
-      totalRows: 8,
+      totalRows: 9,
     });
     expect(ingestDelete).toContain("device_id IN");
     expect(ingestDelete).toContain("request_id IN");
@@ -197,6 +199,13 @@ describe("mysql maintenance repository", () => {
 
       if (
         cleanStatement.startsWith("SELECT COUNT(*)") &&
+        cleanStatement.includes("FROM monitoring_latest_readings")
+      ) {
+        return [[{ count: 1 }]];
+      }
+
+      if (
+        cleanStatement.startsWith("SELECT COUNT(*)") &&
         cleanStatement.includes("FROM monitoring_readings")
       ) {
         return [[{ count: 3 }]];
@@ -214,14 +223,20 @@ describe("mysql maintenance repository", () => {
 
     expect(result).toEqual({
       matchedTankCount: 1,
-      readingRows: 3,
-      totalRows: 3,
+      readingRows: 4,
+      totalRows: 4,
     });
+    expect(statements).toContain(
+      "SELECT COUNT(*) AS count FROM monitoring_latest_readings WHERE tank_id IN (?)",
+    );
     expect(statements).toContain(
       "SELECT COUNT(*) AS count FROM monitoring_readings WHERE tank_id IN (?)",
     );
     expect(statements).toContain(
       "DELETE FROM monitoring_readings WHERE tank_id IN (?)",
+    );
+    expect(statements).toContain(
+      "DELETE FROM monitoring_latest_readings WHERE tank_id IN (?)",
     );
     expect(statements.join(" ")).not.toContain("monitoring_devices");
     expect(statements.join(" ")).not.toContain("monitoring_tanks t");

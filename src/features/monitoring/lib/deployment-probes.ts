@@ -20,6 +20,7 @@ import { isGlobalDeviceKeyFallbackAllowed } from "./device-key";
 import { getDevicePackageEncryptionKey } from "./firmware-package";
 import { checkMysqlConnection } from "./mysql-connection";
 import { countMonitoringReferenceRowsFromMysql } from "./mysql-reference-repository";
+import { checkMonitoringReadingStorageSchemaFromMysql } from "./mysql-reading-repository";
 import {
   getMonitoringStorageDriver,
   type MonitoringStorageDriver,
@@ -139,6 +140,31 @@ async function checkReferenceRegistryReadiness(): Promise<DeploymentCheck> {
       status: "error",
       message:
         "Registry MySQL gagal dicek. Cek migration, tabel reference, permission user database, dan MYSQL_DATABASE_URL.",
+      latencyMs: getElapsedMs(startedAtMs),
+    };
+  }
+}
+
+async function checkReadingStorageSchemaReadiness(): Promise<DeploymentCheck> {
+  const startedAtMs = Date.now();
+
+  try {
+    await checkMonitoringReadingStorageSchemaFromMysql();
+
+    return {
+      name: "mysql-reading-rollup",
+      ok: true,
+      status: "ok",
+      message: "Snapshot live dan rollup reading 5 menit siap digunakan.",
+      latencyMs: getElapsedMs(startedAtMs),
+    };
+  } catch {
+    return {
+      name: "mysql-reading-rollup",
+      ok: false,
+      status: "error",
+      message:
+        "Schema rollup reading belum siap. Jalankan migration 007 sebelum menerima telemetry MySQL.",
       latencyMs: getElapsedMs(startedAtMs),
     };
   }
@@ -518,7 +544,11 @@ export async function getDeploymentReadiness(
   ];
 
   if (storageDriver === "mysql" && storageCheck.ok) {
-    checks.push(await checkReferenceRegistryReadiness());
+    const [registryCheck, readingRollupCheck] = await Promise.all([
+      checkReferenceRegistryReadiness(),
+      checkReadingStorageSchemaReadiness(),
+    ]);
+    checks.push(registryCheck, readingRollupCheck);
   }
 
   const hasError = checks.some((check) => !check.ok);

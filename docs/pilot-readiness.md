@@ -5,7 +5,7 @@ Dokumen ini menjelaskan cara menyiapkan uji pilot 5 STO dengan data yang sudah d
 ```text
 device real atau smoke test
   -> POST /api/ingest
-  -> MySQL
+  -> MySQL snapshot live + rollup 5 menit
   -> dashboard
   -> detail tangki
 ```
@@ -131,7 +131,13 @@ jalankan migration tambahan ini juga:
 ```powershell
 pnpm db:migrate:device-provisioning
 pnpm db:migrate:device-request-fields
+pnpm db:migrate:reading-rollup
 ```
+
+Untuk database operasional yang sudah berisi data, jalankan
+`pnpm db:backup:mysql` sebelum migration. Migration rollup tidak menghapus raw
+lama; ia menambah schema, backfill snapshot terbaru, dan menyiapkan history 5
+menit untuk writer baru.
 
 Jika gagal, cek:
 
@@ -280,7 +286,7 @@ Contoh bagian penting:
   },
   "device": {
     "code": "pilot-tph-01",
-    "expectedReportIntervalSec": 300,
+    "expectedReportIntervalSec": 20,
     "apiKeyHash": "sha256:hasil_hash_di_sini"
   }
 }
@@ -350,6 +356,7 @@ status: ready
 storageDriver: mysql
 mysql: ok
 mysql-reference-registry: aktif
+mysql-reading-rollup: aktif
 ```
 
 ## 8. Smoke Test Payload

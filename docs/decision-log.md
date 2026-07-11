@@ -146,3 +146,26 @@ Alasan:
 - menjaga JavaScript client tetap ringan;
 - data tetap dibaca di server;
 - interaksi browser seperti timer dan visibility state tetap berjalan benar.
+
+## 2026-07-11 - Pisahkan Snapshot Live dan History Rollup 5 Menit
+
+Keputusan:
+
+```text
+Telemetry MySQL setiap ±20 detik memperbarui satu snapshot terbaru per device,
+sedangkan history hanya menambah satu bucket agregat setiap 5 menit.
+```
+
+Alasan:
+
+- dashboard tetap menampilkan data terbaru tanpa menunggu bucket selesai;
+- pertumbuhan row history berkurang sekitar 15 kali dibanding raw 20 detik;
+- mean tetap didampingi min, max, dan sample count agar lonjakan singkat tidak hilang;
+- kedua upsert berada dalam satu transaksi supaya snapshot dan history tidak berbeda diam-diam;
+- raw history lama tidak dihapus otomatis agar migrasi tidak merusak data audit.
+
+Catatan kompatibilitas:
+
+Overview dan detail membandingkan snapshot dengan history terbaru berdasarkan
+`receivedAt`. Ini mencegah status berbeda ketika database sudah dimigrasi tetapi
+deployment lama masih menulis raw selama rollout.

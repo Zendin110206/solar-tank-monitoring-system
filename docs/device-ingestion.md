@@ -141,7 +141,11 @@ API mengecek:
 - tangki untuk device ditemukan.
 - config payload tidak dipakai diam-diam tanpa review jika berbeda jauh dari registry.
 
-Jika semua lolos, payload dinormalisasi dan disimpan ke storage aktif. Default development memakai memory store. Mode MySQL dapat diaktifkan lewat `SOLAR_TANK_STORAGE_DRIVER="mysql"`.
+Jika semua lolos, payload dinormalisasi dan disimpan ke storage aktif. Default
+development memakai memory store. Pada mode MySQL, satu transaksi meng-upsert
+snapshot terbaru per device untuk dashboard live dan bucket agregat 5 menit
+untuk history. Row agregat menyimpan mean, min, max, dan jumlah sampel; raw
+payload lengkap tidak ditumpuk pada setiap row history baru.
 
 ## Simulator
 

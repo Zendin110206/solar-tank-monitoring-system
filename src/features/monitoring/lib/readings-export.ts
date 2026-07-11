@@ -23,6 +23,16 @@ const TANK_READING_CSV_HEADERS = [
   "status_konfigurasi",
   "perlu_review",
   "peringatan",
+  "resolusi",
+  "bucket_mulai_utc",
+  "bucket_mulai_wib",
+  "bucket_selesai_utc",
+  "bucket_selesai_wib",
+  "jumlah_sampel",
+  "volume_min_liter",
+  "volume_max_liter",
+  "persentase_min",
+  "persentase_max",
   "periode_unduhan",
 ] as const;
 
@@ -264,6 +274,16 @@ export function createTankReadingsCsv(
     reading.quality?.configStatus,
     reading.quality?.needsReview,
     reading.quality?.warnings.join(" | "),
+    reading.resolution ?? "raw",
+    reading.bucketStart,
+    reading.bucketStart ? formatCsvDateTime(reading.bucketStart) : undefined,
+    reading.bucketEnd,
+    reading.bucketEnd ? formatCsvDateTime(reading.bucketEnd) : undefined,
+    reading.sampleCount ?? 1,
+    reading.volumeLiterMin ?? reading.volumeLiter,
+    reading.volumeLiterMax ?? reading.volumeLiter,
+    reading.fillPercentMin ?? reading.fillPercent,
+    reading.fillPercentMax ?? reading.fillPercent,
     period.label,
   ]);
 

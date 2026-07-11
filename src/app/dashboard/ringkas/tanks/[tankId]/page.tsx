@@ -33,7 +33,8 @@ import {
   type SimpleTankDetail,
 } from "@/features/monitoring/lib/simple-tank-detail-model";
 import { buildTankDetail } from "@/features/monitoring/lib/tank-detail-view-model";
-import type { DeviceStatus, Reading } from "@/features/monitoring/types/monitoring";
+import { mergeMonitoringReadingsById } from "@/features/monitoring/lib/latest-reading";
+import type { DeviceStatus } from "@/features/monitoring/types/monitoring";
 
 export const metadata: Metadata = {
   title: "Detail Operasional Tangki | SolarTank",
@@ -195,21 +196,6 @@ function getRuntimeLevelParameter(
 
 function clampPercent(value: number) {
   return Math.min(Math.max(value, 0), 100);
-}
-
-function mergeReadingsById(readings: Reading[], additionalReadings: Reading[]) {
-  const readingById = new Map<string, Reading>();
-
-  [...readings, ...additionalReadings].forEach((reading) => {
-    readingById.set(reading.id, reading);
-  });
-
-  return Array.from(readingById.values()).sort((first, second) => {
-    return (
-      new Date(first.receivedAt).getTime() -
-      new Date(second.receivedAt).getTime()
-    );
-  });
 }
 
 function StatusBadge({ tank }: { tank: SimpleTankDetail }) {
@@ -454,7 +440,7 @@ export default async function SimpleTankDetailPage({
     sites: referenceData.sites,
     tanks: referenceData.tanks,
     devices: referenceData.devices,
-    readings: mergeReadingsById(
+    readings: mergeMonitoringReadingsById(
       latestReadingsResult.readings,
       tankHistoryReadings,
     ),

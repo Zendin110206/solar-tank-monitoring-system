@@ -142,10 +142,13 @@ Device dinilai dari umur data terakhir dibanding interval kirim yang diharapkan.
 Contoh:
 
 ```text
-expectedReportIntervalSec = 300
+expectedReportIntervalSec = 20
 ```
 
-Artinya device diharapkan mengirim setiap 5 menit.
+Artinya device diharapkan mengirim setiap 20 detik. Nilai ini berasal dari
+registry/profile perangkat dan dapat berbeda untuk perangkat demo atau mode
+hemat bandwidth. Status online/delayed/offline selalu memakai nilai device
+terdaftar, bukan angka yang di-hardcode di UI.
 
 Jika data terakhir terlalu lama, status bisa menjadi delayed atau offline.
 

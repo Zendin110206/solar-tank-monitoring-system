@@ -172,6 +172,8 @@ export type OperationalStatus = "critical" | "warning" | "safe";
 
 export type ReadingValueSource = "device" | "backend" | "server" | "unknown";
 
+export type ReadingResolution = "raw" | "5m" | "latest";
+
 export type TankConfigSource = "registry" | "payload" | "mixed";
 
 export type TankConfigStatus =
@@ -281,6 +283,14 @@ export type Reading = {
   runtimeHour: number;
   batteryVolt?: number;
   rssiDbm?: number;
+  resolution?: ReadingResolution;
+  bucketStart?: string;
+  bucketEnd?: string;
+  sampleCount?: number;
+  volumeLiterMin?: number;
+  volumeLiterMax?: number;
+  fillPercentMin?: number;
+  fillPercentMax?: number;
   rawPayload?: unknown;
   quality?: ReadingQuality;
 };

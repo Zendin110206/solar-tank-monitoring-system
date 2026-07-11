@@ -181,6 +181,7 @@ khusus pengajuan perangkat agar kolom operasional terbaru tersedia:
 ```powershell
 pnpm db:migrate:device-provisioning
 pnpm db:migrate:device-request-fields
+pnpm db:migrate:reading-rollup
 ```
 
 Setelah mengubah `.env.local`, restart `pnpm dev`, lalu cek:

@@ -33,6 +33,14 @@ describe("readings export", () => {
       {
         ...baseReading,
         id: "reading-1",
+        bucketEnd: "2026-07-07T01:05:00.000Z",
+        bucketStart: "2026-07-07T01:00:00.000Z",
+        fillPercentMax: 52,
+        fillPercentMin: 48,
+        resolution: "5m",
+        sampleCount: 15,
+        volumeLiterMax: 520,
+        volumeLiterMin: 480,
         quality: {
           configMismatchReasons: [],
           configSource: "registry",
@@ -51,11 +59,13 @@ describe("readings export", () => {
     const lines = csv.trimEnd().split("\r\n");
 
     expect(lines[0]).toBe(
-      "id_reading,id_tangki,id_perangkat,waktu_pengukuran_utc,waktu_pengukuran_wib,waktu_diterima_utc,waktu_diterima_wib,jarak_sensor_cm,tinggi_solar_cm,volume_liter,persentase_isi,sisa_runtime_jam,baterai_volt,sinyal_rssi_dbm,status_konfigurasi,perlu_review,peringatan,periode_unduhan",
+      "id_reading,id_tangki,id_perangkat,waktu_pengukuran_utc,waktu_pengukuran_wib,waktu_diterima_utc,waktu_diterima_wib,jarak_sensor_cm,tinggi_solar_cm,volume_liter,persentase_isi,sisa_runtime_jam,baterai_volt,sinyal_rssi_dbm,status_konfigurasi,perlu_review,peringatan,resolusi,bucket_mulai_utc,bucket_mulai_wib,bucket_selesai_utc,bucket_selesai_wib,jumlah_sampel,volume_min_liter,volume_max_liter,persentase_min,persentase_max,periode_unduhan",
     );
     expect(lines[1]).toContain("reading-1");
     expect(lines[2]).toContain("reading-2");
     expect(lines[1]).toContain('"nilai ""uji"", aman"');
+    expect(lines[1]).toContain(",5m,");
+    expect(lines[1]).toContain(",15,480,520,48,52,");
     expect(lines[1]).toContain("1 hari (7 Juli 2026)");
   });
 

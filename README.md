@@ -43,10 +43,12 @@ Yang sudah tersedia:
 - API ingest:
   - `POST /api/ingest`
 - memory store lokal untuk menerima data simulator selama dev server hidup;
-- fondasi MySQL untuk registry site/tangki/device dan penyimpanan reading pada mode pengembangan lanjutan;
+- MySQL untuk registry site/tangki/device, snapshot live per device, dan history rollup 5 menit;
 - dashboard dan detail membaca storage aktif yang sama dengan endpoint API;
 - detail ringkas mengambil riwayat MySQL per tangki agar grafik tren tidak terpotong oleh limit dashboard global;
 - overview dashboard mengambil reading terbaru per tangki agar STO yang jarang mengirim tidak hilang ketika device lain lebih sering mengirim;
+- dashboard memilih reading dengan `receivedAt` paling baru dari snapshot dan history selama transisi deployment, sehingga overview dan detail tidak berbeda status;
+- ingest MySQL memperbarui satu snapshot terbaru per device dan satu bucket agregat 5 menit secara atomik; history menyimpan mean, min, max, dan jumlah sampel tanpa menumpuk raw payload setiap 20 detik;
 - timestamp reading disimpan dan dikirim sebagai ISO UTC, lalu label UI ditampilkan dalam WIB agar lokal dan Vercel konsisten;
 - health check dan readiness check untuk membedakan aplikasi hidup dengan storage benar-benar siap;
 - auto-refresh ringan pada dashboard dan detail, dengan tombol refresh manual serta pause/resume;
@@ -67,13 +69,13 @@ Yang sudah tersedia:
 
 Yang belum tersedia:
 
-- deployment produksi;
+- penetapan deployment production final beserta SOP observasi dan rollback;
 - kalibrasi tangki nyata;
 - notifikasi operasional level kritis/offline di luar email auth dan notifikasi pengajuan device;
 - keputusan deployment produksi final dan proteksi perimeter endpoint ingest pada environment final;
 - rotasi key device penuh di luar alur pengajuan perangkat;
 - manajemen registry site/tangki/device yang menulis database dari UI;
-- backup dan restore database production.
+- restore drill database yang diuji rutin.
 
 Catatan penting:
 
@@ -110,6 +112,8 @@ Perangkat atau simulator
   -> validasi device dan key
   -> normalisasi payload
   -> storage aktif: memory atau MySQL
+       -> snapshot terbaru per device untuk dashboard live
+       -> agregat 5 menit untuk history, grafik, dan CSV
   -> API dashboard/detail
   -> tampilan web
 ```
@@ -120,7 +124,7 @@ Penjelasan singkat:
 2. Device mengirim data ke API, bukan langsung ke dashboard.
 3. API mengecek identitas device dan key.
 4. Data mentah diubah menjadi format yang konsisten.
-5. Data disimpan ke storage aktif. Default development memakai memory; mode MySQL bisa diaktifkan lewat env.
+5. Data disimpan ke storage aktif. Pada MySQL, satu transaksi memperbarui snapshot live dan bucket agregat 5 menit.
 6. Endpoint baca mengambil data terbaru dan riwayat.
 7. Dashboard menampilkan status yang lebih mudah dipahami.
 
@@ -390,8 +394,10 @@ curl.exe -X POST http://localhost:3000/api/ingest `
 | `pnpm db:migrate:auth-recovery` | Menjalankan migration tambahan reset password, verifikasi email, Telegram, dan audit auth |
 | `pnpm db:migrate:device-provisioning` | Menjalankan migration tabel pengajuan perangkat, firmware template, hardware profile, paket firmware, dan event provisioning |
 | `pnpm db:migrate:device-request-fields` | Menambahkan field operasional Batch 19, index, dan validasi database ke tabel pengajuan perangkat pada database yang sudah pernah menjalankan migration lama |
+| `pnpm db:migrate:reading-rollup` | Menambahkan snapshot live dan metadata agregat history 5 menit |
 | `pnpm db:seed:mysql` | Mengisi data contoh site, tangki, dan device ke MySQL |
 | `pnpm db:setup:mysql` | Menjalankan migration lalu seed MySQL |
+| `pnpm db:backup:mysql` | Membuat dump MySQL konsisten ke folder backup yang di-ignore Git |
 | `pnpm auth:create-admin` | Membuat atau memastikan admin awal dari env bootstrap |
 | `pnpm check` | Menjalankan typecheck, lint, test, dan build |
 
@@ -474,9 +480,15 @@ Jika database sudah pernah dipakai dan hanya perlu menyusul schema pengajuan per
 ```powershell
 pnpm db:migrate:device-provisioning
 pnpm db:migrate:device-request-fields
+pnpm db:migrate:reading-rollup
 ```
 
 `db:migrate:device-request-fields` memperbaiki kasus database lama yang belum memiliki kolom seperti `device_sensor_type`, `load_value`, `diesel_engine_capacity_kva`, dan `cos_phi`. Script ini juga menambahkan index dan check constraint agar aturan database lama sama kuatnya dengan database baru.
+
+`db:migrate:reading-rollup` bersifat additive dan dapat dijalankan ulang melalui
+runner migration project. Migration ini tidak menghapus raw history lama. Untuk
+database operasional, jalankan `pnpm db:backup:mysql` terlebih dahulu, lalu cek
+`/api/ready` setelah migration dan deployment.
 
 Jika tim perlu membersihkan data device/uji sebelum uji real, login sebagai
 admin lalu buka:

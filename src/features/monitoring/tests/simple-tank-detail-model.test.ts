@@ -183,6 +183,37 @@ describe("simple tank detail model", () => {
     expect(trend.points[0].xRatio).toBeLessThan(0.44);
   });
 
+  it("menghitung tren lanjutan memakai bobot jumlah sampel rollup", () => {
+    const trend = buildSimpleTankTrend(
+      [
+        {
+          ...createChartPoint({
+            day: 2,
+            hour: 10,
+            minute: 21,
+            volumeLiter: 100,
+          }),
+          sampleCount: 15,
+        },
+        {
+          ...createChartPoint({
+            day: 2,
+            hour: 10,
+            minute: 24,
+            volumeLiter: 200,
+          }),
+          sampleCount: 5,
+        },
+      ],
+      "day",
+    );
+
+    expect(trend.points[0]).toMatchObject({
+      sampleCount: 20,
+      volumeLiter: 125,
+    });
+  });
+
   it("memutus segmen tren jika ada jeda data melebihi batas offline", () => {
     const trend = buildSimpleTankTrend(
       [
