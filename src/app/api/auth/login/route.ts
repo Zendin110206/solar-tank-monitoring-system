@@ -66,7 +66,6 @@ export async function POST(request: NextRequest) {
       ok: true,
       data: {
         requiresOtp: false,
-        user: loginResult.user,
         redirectTo: "/dashboard",
       },
     });
