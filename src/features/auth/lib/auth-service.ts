@@ -119,6 +119,26 @@ function buildSessionExpiry(user: AuthSafeUser): Date {
   return new Date(Date.now() + getSessionTtlSeconds(user.role) * 1000);
 }
 
+function buildSessionUser(
+  user: AuthSafeUser,
+  sessionId: string,
+): AuthSessionUser {
+  return {
+    id: user.id,
+    email: user.email,
+    username: user.username,
+    fullName: user.fullName,
+    phone: user.phone,
+    role: user.role,
+    status: user.status,
+    emailVerifiedAt: user.emailVerifiedAt,
+    telegramVerifiedAt: user.telegramVerifiedAt,
+    passwordChangedAt: user.passwordChangedAt,
+    lastLoginAt: user.lastLoginAt,
+    sessionId,
+  };
+}
+
 function buildAppUrl(path: string, params?: Record<string, string>): string {
   const url = new URL(path, getAppBaseUrl());
 
@@ -155,10 +175,7 @@ async function createSessionForUser(
   });
 
   return {
-    user: {
-      ...user,
-      sessionId,
-    },
+    user: buildSessionUser(user, sessionId),
     sessionToken,
     expiresAt,
   };
@@ -836,7 +853,9 @@ export async function completeTelegramBinding({
   });
   await sendTelegramMessage({
     chatId,
-    text: "Akun Telegram berhasil terhubung ke SolarTank.",
+    text:
+      "Akun Telegram berhasil terhubung ke FTM. " +
+      "Kembali ke dashboard lalu klik Cek status Telegram untuk memperbarui status akun.",
   }).catch(() => undefined);
   await recordAuthAuditEvent({
     eventType: "telegram_bound",

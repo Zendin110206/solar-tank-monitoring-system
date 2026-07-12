@@ -365,6 +365,26 @@ export async function findAuthUserById(
   return row ? rowToSafeUser(row) : null;
 }
 
+export async function findAuthUserByVerifiedTelegramChatId(
+  chatId: string,
+): Promise<AuthSafeUser | null> {
+  const pool = getMysqlPool();
+  const [rows] = await pool.execute<AuthUserRow[]>(
+    `SELECT id, email, username, full_name, phone, role, status, password_hash,
+            password_changed_at, password_reset_required_at, email_verified_at,
+            telegram_chat_id, telegram_verified_at, failed_login_count,
+            locked_until, last_login_at
+       FROM auth_users
+      WHERE telegram_chat_id = ?
+        AND telegram_verified_at IS NOT NULL
+      LIMIT 1`,
+    [chatId],
+  );
+  const row = rows[0];
+
+  return row ? rowToSafeUser(row) : null;
+}
+
 export async function findAuthSessionByTokenHash(
   sessionTokenHash: string,
 ): Promise<AuthSessionUser | null> {

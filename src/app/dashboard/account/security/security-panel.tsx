@@ -2,6 +2,7 @@
 
 import type { FormEvent } from "react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { KeyRound, Link2, LogOut, RefreshCcw, Send } from "lucide-react";
 
 import type { AuthSessionSummary, AuthSessionUser } from "@/features/auth/types";
@@ -29,13 +30,19 @@ export default function AccountSecurityPanel({
   initialSessions: AuthSessionSummary[];
   user: AuthSessionUser;
 }) {
+  const router = useRouter();
   const [sessions, setSessions] = useState(initialSessions);
   const [passwordPending, setPasswordPending] = useState(false);
   const [telegramPending, setTelegramPending] = useState(false);
+  const [telegramStatusPending, setTelegramStatusPending] = useState(false);
+  const [telegramVerifiedAt, setTelegramVerifiedAt] = useState(
+    user.telegramVerifiedAt,
+  );
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [telegramLink, setTelegramLink] = useState<string | null>(null);
   const [telegramToken, setTelegramToken] = useState<string | null>(null);
+  const telegramConnected = Boolean(telegramVerifiedAt);
 
   async function refreshSessions() {
     const response = await fetch("/api/auth/sessions", { cache: "no-store" });
@@ -118,6 +125,11 @@ export default function AccountSecurityPanel({
   }
 
   async function startTelegramBinding() {
+    if (telegramConnected) {
+      setMessage("Telegram sudah terhubung ke akun ini.");
+      return;
+    }
+
     setTelegramPending(true);
     setMessage(null);
     setError(null);
@@ -142,7 +154,9 @@ export default function AccountSecurityPanel({
 
       setTelegramLink(result.data?.deepLink ?? null);
       setTelegramToken(result.data?.token ?? null);
-      setMessage("Token Telegram dibuat. Buka link atau kirim token ke bot.");
+      setMessage(
+        "Token Telegram dibuat. Buka bot Telegram atau kirim perintah /start TOKEN ke bot.",
+      );
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
@@ -151,6 +165,49 @@ export default function AccountSecurityPanel({
       );
     } finally {
       setTelegramPending(false);
+    }
+  }
+
+  async function refreshTelegramStatus() {
+    setTelegramStatusPending(true);
+    setMessage(null);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/auth/me", { cache: "no-store" });
+      const result = (await readJson(response)) as
+        | {
+            ok?: boolean;
+            error?: string;
+            data?: { user?: AuthSessionUser };
+          }
+        | null;
+
+      if (!response.ok || !result?.ok || !result.data?.user) {
+        throw new Error(result?.error ?? "Status Telegram belum bisa dicek.");
+      }
+
+      const nextVerifiedAt = result.data.user.telegramVerifiedAt;
+      setTelegramVerifiedAt(nextVerifiedAt);
+
+      if (nextVerifiedAt) {
+        setTelegramLink(null);
+        setTelegramToken(null);
+        setMessage("Telegram sudah terhubung ke akun ini.");
+        router.refresh();
+      } else {
+        setMessage(
+          "Telegram belum terhubung. Selesaikan instruksi dari bot, lalu cek status lagi.",
+        );
+      }
+    } catch (caughtError) {
+      setError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "Status Telegram belum bisa dicek.",
+      );
+    } finally {
+      setTelegramStatusPending(false);
     }
   }
 
@@ -212,20 +269,37 @@ export default function AccountSecurityPanel({
             <div>
               <h3 className="font-semibold">Telegram</h3>
               <p className="text-sm text-zinc-500">
-                Status:{" "}
-                {user.telegramVerifiedAt ? "terhubung" : "belum terhubung"}
+                Status: {telegramConnected ? "terhubung" : "belum terhubung"}
               </p>
+              {telegramVerifiedAt ? (
+                <p className="mt-0.5 text-xs text-zinc-500">
+                  Terhubung {formatDate(telegramVerifiedAt)}.
+                </p>
+              ) : null}
             </div>
           </div>
-          <button
-            className="mt-4 inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-70"
-            disabled={telegramPending}
-            onClick={startTelegramBinding}
-            type="button"
-          >
-            <Send className="size-4" aria-hidden="true" />
-            {telegramPending ? "Membuat token..." : "Hubungkan Telegram"}
-          </button>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {!telegramConnected ? (
+              <button
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-70"
+                disabled={telegramPending || telegramStatusPending}
+                onClick={startTelegramBinding}
+                type="button"
+              >
+                <Send className="size-4" aria-hidden="true" />
+                {telegramPending ? "Membuat token..." : "Hubungkan Telegram"}
+              </button>
+            ) : null}
+            <button
+              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-100 disabled:opacity-70"
+              disabled={telegramPending || telegramStatusPending}
+              onClick={refreshTelegramStatus}
+              type="button"
+            >
+              <RefreshCcw className="size-4" aria-hidden="true" />
+              {telegramStatusPending ? "Mengecek..." : "Cek status Telegram"}
+            </button>
+          </div>
           {telegramLink || telegramToken ? (
             <div className="mt-3 rounded-lg bg-white p-3 text-sm leading-6 text-zinc-700 ring-1 ring-zinc-200">
               {telegramLink ? (
@@ -240,8 +314,10 @@ export default function AccountSecurityPanel({
               ) : null}
               {telegramToken ? (
                 <p className="mt-2 break-all">
-                  Token manual:{" "}
-                  <span className="font-semibold">{telegramToken}</span>
+                  Kirim ke bot:{" "}
+                  <code className="rounded bg-zinc-100 px-1.5 py-1 font-semibold text-zinc-950">
+                    /start {telegramToken}
+                  </code>
                 </p>
               ) : null}
             </div>

@@ -7,6 +7,7 @@ import {
   sendTelegramMessage,
   verifyTelegramWebhookSecret,
 } from "@/features/auth/lib/auth-telegram";
+import { handlePrivateTelegramCommand } from "@/features/auth/lib/auth-telegram-commands";
 import {
   handleTelegramHelpdeskCommand,
   handleTelegramTopicInfoCommand,
@@ -63,12 +64,26 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true });
   }
 
+  const privateCommandHandled = await handlePrivateTelegramCommand(
+    message,
+  ).catch(async () => {
+    await sendTelegramMessage({
+      chatId: message.chatId,
+      text: "Command Telegram belum bisa diproses. Coba lagi sebentar lagi.",
+    }).catch(() => undefined);
+    return true;
+  });
+
+  if (privateCommandHandled) {
+    return NextResponse.json({ ok: true });
+  }
+
   const token = extractTelegramStartToken(message.text);
 
   if (!token) {
     await sendTelegramMessage({
       chatId: message.chatId,
-      text: "Buka link binding dari halaman Keamanan Akun SolarTank.",
+      text: "Buka link binding dari halaman Keamanan Akun FTM.",
     }).catch(() => undefined);
     return NextResponse.json({ ok: true });
   }
@@ -82,7 +97,7 @@ export async function POST(request: NextRequest) {
   } catch {
     await sendTelegramMessage({
       chatId: message.chatId,
-      text: "Token binding SolarTank tidak valid atau sudah kedaluwarsa.",
+      text: "Token binding FTM tidak valid atau sudah kedaluwarsa.",
     }).catch(() => undefined);
   }
 
