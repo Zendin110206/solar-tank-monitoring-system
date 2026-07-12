@@ -94,10 +94,16 @@ export async function POST(request: NextRequest) {
       chatId: message.chatId,
       request,
     });
-  } catch {
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error &&
+      error.message === "Telegram ini sudah terhubung ke akun FTM lain."
+        ? error.message
+        : "Token binding FTM tidak valid atau sudah kedaluwarsa.";
+
     await sendTelegramMessage({
       chatId: message.chatId,
-      text: "Token binding FTM tidak valid atau sudah kedaluwarsa.",
+      text: errorMessage,
     }).catch(() => undefined);
   }
 

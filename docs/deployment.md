@@ -89,6 +89,12 @@ pnpm start
 
 Jika ingin mencoba storage MySQL lokal atau cloud, isi `.env.local` dengan `MYSQL_DATABASE_URL`, jalankan `pnpm db:setup:mysql`, lalu set `SOLAR_TANK_STORAGE_DRIVER="mysql"`.
 
+Untuk database lama yang sudah aktif, jalankan `pnpm db:migrate:auth-telegram`
+sebelum men-deploy command Telegram baru. Migration ini menambahkan invariant
+satu chat Telegram untuk satu akun FTM dan diperiksa oleh `/api/ready`. Jika ada
+binding ganda dari versi lama, binding yang paling baru diverifikasi dipertahankan
+dan pelepasan binding lama dicatat pada audit log.
+
 Setelah mengubah `.env.local`, restart `pnpm dev`. Perubahan environment tidak
 selalu terbaca hanya dengan menekan tombol refresh dashboard.
 
@@ -129,7 +135,7 @@ SMTP_HOST="..."
 SMTP_PORT="587"
 SMTP_USER="..."
 SMTP_PASS="..."
-SMTP_FROM="SolarTank <noreply@example.com>"
+SMTP_FROM="FTM <noreply@example.com>"
 SMTP_SECURE="false"
 ```
 

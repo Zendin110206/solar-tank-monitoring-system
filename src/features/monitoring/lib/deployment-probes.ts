@@ -1,3 +1,5 @@
+import type { RowDataPacket } from "mysql2/promise";
+
 import {
   canLogOtpInDevelopment,
   getAppBaseUrl,
@@ -18,7 +20,7 @@ import {
 } from "./device-provisioning";
 import { isGlobalDeviceKeyFallbackAllowed } from "./device-key";
 import { getDevicePackageEncryptionKey } from "./firmware-package";
-import { checkMysqlConnection } from "./mysql-connection";
+import { checkMysqlConnection, getMysqlPool } from "./mysql-connection";
 import { countMonitoringReferenceRowsFromMysql } from "./mysql-reference-repository";
 import { checkMonitoringReadingStorageSchemaFromMysql } from "./mysql-reading-repository";
 import {
@@ -165,6 +167,45 @@ async function checkReadingStorageSchemaReadiness(): Promise<DeploymentCheck> {
       status: "error",
       message:
         "Schema rollup reading belum siap. Jalankan migration 007 sebelum menerima telemetry MySQL.",
+      latencyMs: getElapsedMs(startedAtMs),
+    };
+  }
+}
+
+async function checkAuthTelegramSchemaReadiness(): Promise<DeploymentCheck> {
+  const startedAtMs = Date.now();
+
+  try {
+    const pool = getMysqlPool();
+    const [rows] = await pool.execute<Array<RowDataPacket & { count: number }>>(
+      `SELECT COUNT(*) AS count
+         FROM information_schema.statistics
+        WHERE table_schema = DATABASE()
+          AND table_name = 'auth_users'
+          AND index_name = 'uniq_auth_users_telegram_chat_id'
+          AND non_unique = 0
+          AND column_name = 'telegram_chat_id'
+          AND seq_in_index = 1`,
+    );
+
+    if (Number(rows[0]?.count ?? 0) !== 1) {
+      throw new Error("Unique index Telegram binding belum tersedia.");
+    }
+
+    return {
+      name: "mysql-auth-telegram",
+      ok: true,
+      status: "ok",
+      message: "Relasi satu akun untuk satu Telegram siap digunakan.",
+      latencyMs: getElapsedMs(startedAtMs),
+    };
+  } catch {
+    return {
+      name: "mysql-auth-telegram",
+      ok: false,
+      status: "error",
+      message:
+        "Schema binding Telegram belum siap. Jalankan migration 008 sebelum mengaktifkan command Telegram.",
       latencyMs: getElapsedMs(startedAtMs),
     };
   }
@@ -544,11 +585,13 @@ export async function getDeploymentReadiness(
   ];
 
   if (storageDriver === "mysql" && storageCheck.ok) {
-    const [registryCheck, readingRollupCheck] = await Promise.all([
-      checkReferenceRegistryReadiness(),
-      checkReadingStorageSchemaReadiness(),
-    ]);
-    checks.push(registryCheck, readingRollupCheck);
+    const [registryCheck, readingRollupCheck, authTelegramCheck] =
+      await Promise.all([
+        checkReferenceRegistryReadiness(),
+        checkReadingStorageSchemaReadiness(),
+        checkAuthTelegramSchemaReadiness(),
+      ]);
+    checks.push(registryCheck, readingRollupCheck, authTelegramCheck);
   }
 
   const hasError = checks.some((check) => !check.ok);

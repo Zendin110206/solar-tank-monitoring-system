@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Panduan User Manual SolarTank Monitoring System</title>
+    <title>Panduan User Manual FTM - Fuel Tank Management</title>
     <style>
       :root {
         color-scheme: light;
@@ -59,8 +59,10 @@
       }
 
       h3 {
+        break-after: avoid-page;
         font-size: 13pt;
         margin-top: 18px;
+        page-break-after: avoid;
       }
 
       p {
@@ -136,34 +138,9 @@
       }
 
       .logo {
-        border: 3px solid #ef4444;
-        border-radius: 50%;
-        display: inline-block;
         height: 34px;
-        position: relative;
+        object-fit: contain;
         width: 34px;
-      }
-
-      .logo::before {
-        background: #22d3ee;
-        border-radius: 50%;
-        content: "";
-        height: 11px;
-        position: absolute;
-        right: -1px;
-        top: 4px;
-        width: 11px;
-      }
-
-      .logo::after {
-        background: #111827;
-        border-radius: 50%;
-        bottom: 3px;
-        content: "";
-        height: 9px;
-        left: 1px;
-        position: absolute;
-        width: 9px;
       }
 
       .cover-main {
@@ -328,6 +305,11 @@
         page-break-inside: avoid;
       }
 
+      .keep-together {
+        break-inside: avoid-page;
+        page-break-inside: avoid;
+      }
+
       .check-card h3 {
         margin-top: 0;
       }
@@ -370,10 +352,13 @@
   </head>
   <body>
     <section class="cover">
-      <div class="brand"><span class="logo"></span><span>SolarTank</span></div>
+      <div class="brand">
+        <img class="logo" src="../public/logo/android-icon-192x192.png" alt="" />
+        <span>FTM</span>
+      </div>
       <div class="cover-main">
         <p class="eyebrow">User Manual</p>
-        <h1>Panduan Operasional SolarTank Monitoring System</h1>
+        <h1>Panduan Operasional FTM - Fuel Tank Management</h1>
         <p class="subtitle">
           Pedoman penggunaan web untuk registrasi akun, pengajuan perangkat baru,
           peninjauan admin, dan monitoring tangki solar di lokasi/STO.
@@ -381,7 +366,7 @@
         <div class="meta-grid">
           <div class="meta-card">
             <strong>Versi dokumen</strong>
-            <span>1.0 - 8 Juli 2026</span>
+            <span>1.1 - 13 Juli 2026</span>
           </div>
           <div class="meta-card">
             <strong>Target pembaca</strong>
@@ -389,7 +374,7 @@
           </div>
           <div class="meta-card">
             <strong>Sistem</strong>
-            <span>SolarTank Monitoring System</span>
+            <span>FTM - Fuel Tank Management</span>
           </div>
           <div class="meta-card">
             <strong>Fokus panduan</strong>
@@ -398,8 +383,8 @@
         </div>
       </div>
       <p class="footer-note">
-        Dokumen ini dibuat dari alur aplikasi yang aktif pada repository
-        SolarTank. Gunakan bersama SOP internal dan hasil validasi lapangan.
+        Dokumen ini dibuat dari alur aplikasi FTM yang aktif pada repository.
+        Gunakan bersama SOP internal dan hasil validasi lapangan.
       </p>
     </section>
 
@@ -427,7 +412,7 @@
       <section>
         <h2>1. Ringkasan Alur Sistem</h2>
         <p>
-          SolarTank dipakai untuk memantau level solar pada tangki di beberapa
+          FTM dipakai untuk mengelola dan memantau level bahan bakar pada tangki di beberapa
           lokasi/STO. Device membaca sensor, mengirim data ke endpoint server,
           lalu dashboard menampilkan volume, persentase isi, sisa runtime, status
           perangkat, grafik, dan lokasi.
@@ -1125,6 +1110,12 @@ beban_kw = beban_kva x cos_phi</div>
           Halaman detail operasional dapat diakses oleh user aktif. Halaman ini
           dipakai untuk memantau kondisi harian satu STO.
         </p>
+        <div class="callout info">
+          <strong>Resolusi data:</strong> nilai terbaru pada dashboard diperbarui
+          sekitar setiap 20 detik. Untuk menjaga kapasitas penyimpanan, histori
+          jangka panjang diringkas per 5 menit dengan jumlah sampel, nilai
+          rata-rata, minimum, dan maksimum.
+        </div>
         <table>
           <thead>
             <tr>
@@ -1151,11 +1142,11 @@ beban_kw = beban_kva x cos_phi</div>
             </tr>
             <tr>
               <td>Tren volume</td>
-              <td>Grafik perubahan volume dan opsi rentang harian/mingguan/bulanan.</td>
+              <td>Grafik perubahan volume dari ringkasan berbobot per 5 menit dan opsi rentang harian/mingguan/bulanan.</td>
             </tr>
             <tr>
               <td>Download CSV</td>
-              <td>Mengunduh data reading untuk analisis atau laporan.</td>
+              <td>Mengunduh waktu bucket, jumlah sampel, mean, minimum, dan maksimum untuk analisis atau laporan.</td>
             </tr>
             <tr>
               <td>Dimensi tangki</td>
@@ -1227,15 +1218,16 @@ beban_kw = beban_kva x cos_phi</div>
             <h3>Reset reading per STO</h3>
             <p>
               Pada kartu dashboard, admin dapat memilih tombol reset reading
-              untuk mengosongkan history pembacaan satu STO. Data STO, tangki,
-              device, pengajuan, dan firmware tetap ada.
+              untuk mengosongkan histori serta snapshot terbaru satu STO. Data
+              STO, tangki, device, pengajuan, dan firmware tetap ada.
             </p>
           </div>
           <div class="check-card">
             <h3>Reset semua reading</h3>
             <p>
-              Admin dapat mengosongkan semua row reading agar dashboard mulai
-              membaca data baru. Aksi ini membutuhkan frasa konfirmasi.
+              Admin dapat mengosongkan seluruh histori dan snapshot reading agar
+              dashboard mulai membaca data baru. Aksi ini membutuhkan frasa
+              konfirmasi.
             </p>
           </div>
           <div class="check-card">
@@ -1257,7 +1249,8 @@ beban_kw = beban_kva x cos_phi</div>
         <div class="callout warn">
           Aksi reset dan hapus data harus dilakukan setelah ada persetujuan
           operasional. Gunakan fitur ini untuk koreksi data uji coba atau data
-          yang memang sudah tidak relevan.
+          yang memang sudah tidak relevan. FTM menampilkan modal konfirmasi yang
+          menjelaskan target dan dampak sebelum aksi sensitif dijalankan.
         </div>
       </section>
 
@@ -1320,6 +1313,31 @@ Format menutup sesi:
         <div class="callout info">
           Pisahkan topic Telegram agar admin tidak bingung antara notifikasi akun,
           device baru, dan chat helpdesk.
+        </div>
+        <div class="keep-together">
+          <h3>11.3 Command pribadi setelah binding</h3>
+          <table>
+          <thead>
+            <tr>
+              <th>Command</th>
+              <th>Fungsi</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>/help</code></td>
+              <td>Menampilkan command bot FTM yang tersedia.</td>
+            </tr>
+            <tr>
+              <td><code>/status</code></td>
+              <td>Memeriksa akun, role, status, dan waktu binding tanpa menampilkan email, telepon, password, OTP, session, atau token.</td>
+            </tr>
+            <tr>
+              <td><code>/dashboard</code></td>
+              <td>Mengirim tautan dashboard FTM. Proses login tetap dilakukan secara aman di browser.</td>
+            </tr>
+          </tbody>
+          </table>
         </div>
       </section>
 

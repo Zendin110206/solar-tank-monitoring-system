@@ -44,20 +44,19 @@ import {
   createPasswordResetTokenRecord,
   createPendingAccessRequest,
   createTelegramBindTokenRecord,
+  completeTelegramBindingInMysql,
   findAuthSessionByTokenHash,
   findAuthUserByIdentity,
   findAuthUserById,
   findEmailVerificationTokenRecord,
   findOtpCodeRecord,
   findPasswordResetTokenRecord,
-  findTelegramBindTokenRecord,
   listAuthSessionsForUser,
   markAuthUserEmailVerified,
   markEmailVerificationTokenUsed,
   markOtpAttempt,
   markOtpUsed,
   markPasswordResetTokenUsed,
-  markTelegramBindTokenUsed,
   recordAuthAuditEvent,
   recordFailedLogin,
   resetFailedLogin,
@@ -65,7 +64,6 @@ import {
   revokeAuthSessionForUser,
   revokeAuthSession,
   revokeOtherUserSessions,
-  setAuthUserTelegramChatId,
   touchAuthSessionIfStale,
   updateAuthUserPasswordHash,
 } from "./mysql-auth-repository";
@@ -837,20 +835,14 @@ export async function completeTelegramBinding({
   chatId: string;
   request: AuthRequestContext;
 }): Promise<void> {
-  const record = await findTelegramBindTokenRecord(hashOneTimeToken(token));
+  const binding = await completeTelegramBindingInMysql({
+    tokenHash: hashOneTimeToken(token),
+    chatId,
+  });
 
-  if (!record || !isTokenUsable(record)) {
+  if (!binding) {
     throw new Error("Token Telegram sudah tidak valid.");
   }
-
-  await markTelegramBindTokenUsed({
-    tokenId: record.id,
-    chatId,
-  });
-  await setAuthUserTelegramChatId({
-    userId: record.user_id,
-    chatId,
-  });
   await sendTelegramMessage({
     chatId,
     text:
@@ -859,8 +851,8 @@ export async function completeTelegramBinding({
   }).catch(() => undefined);
   await recordAuthAuditEvent({
     eventType: "telegram_bound",
-    actorUserId: record.user_id,
-    targetUserId: record.user_id,
+    actorUserId: binding.userId,
+    targetUserId: binding.userId,
     ip: getRequestIp(request),
     userAgent: getRequestUserAgent(request),
   }).catch(() => undefined);

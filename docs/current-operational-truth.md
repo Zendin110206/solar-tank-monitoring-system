@@ -6,7 +6,7 @@ Dokumen ini menjadi ringkasan kebenaran operasional saat ini. Jika dokumen lama 
 
 ## Status Produk Saat Ini
 
-SolarTank masih prototipe aktif, tetapi sudah melewati fase dashboard dummy. Sistem sekarang sudah memiliki alur monitoring, auth, pengajuan device, pembuatan paket firmware, first valid ping activation, reset reading aman, export CSV reading berbasis periode, dukungan backup MySQL manual/terjadwal, dan cleanup data device.
+FTM masih dalam pengembangan aktif, tetapi sudah melewati fase dashboard dummy. Sistem sekarang sudah memiliki alur monitoring, auth, pengajuan device, pembuatan paket firmware, first valid ping activation, reset reading aman, export CSV reading berbasis periode, dukungan backup MySQL manual/terjadwal, dan cleanup data device.
 
 Sistem belum boleh disebut production-ready penuh karena deployment production final, restore drill, kalibrasi device lapangan, dan SOP operasional belum selesai diuji.
 

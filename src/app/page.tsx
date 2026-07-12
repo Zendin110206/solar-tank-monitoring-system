@@ -29,7 +29,7 @@ const tankStatus = [
 
 const siteStats = [
   ["13", "STO terpantau"],
-  ["5 mnt", "interval baca"],
+  ["20 dtk", "refresh dashboard"],
   ["24/7", "pantauan"],
 ];
 
