@@ -30,6 +30,10 @@ type HelpdeskApiResponse = {
 
 const SESSION_TOKEN_KEY = "solartank_helpdesk_session_token";
 const POLL_INTERVAL_MS = 5000;
+const openWidgetFrameClassName =
+  "fixed inset-x-3 bottom-[calc(0.75rem_+_env(safe-area-inset-bottom))] top-[calc(0.75rem_+_env(safe-area-inset-top))] z-50 flex flex-col items-stretch sm:inset-auto sm:top-auto sm:bottom-[calc(1rem_+_env(safe-area-inset-bottom))] sm:right-[calc(1rem_+_env(safe-area-inset-right))] sm:max-w-[calc(100vw_-_2rem)] sm:items-end";
+const closedWidgetFrameClassName =
+  "fixed bottom-[calc(1rem_+_env(safe-area-inset-bottom))] right-[calc(1rem_+_env(safe-area-inset-right))] z-50 flex max-w-[calc(100vw_-_2rem)] flex-col items-end";
 
 function getPagePath(): string {
   return `${window.location.pathname}${window.location.search}`;
@@ -198,10 +202,14 @@ export function HelpdeskWidget() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex max-w-[calc(100vw-2rem)] flex-col items-end gap-3">
+    <div
+      className={
+        isOpen ? openWidgetFrameClassName : closedWidgetFrameClassName
+      }
+    >
       {isOpen ? (
-        <section className="flex h-[min(38rem,calc(100vh-2rem))] w-[min(24rem,calc(100vw-2rem))] flex-col overflow-hidden rounded-lg border border-zinc-200 bg-white text-zinc-950 shadow-2xl shadow-zinc-900/15">
-          <header className="flex min-h-16 items-center justify-between border-b border-zinc-200 bg-zinc-950 px-4 text-white">
+        <section className="flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-lg border border-zinc-200 bg-white text-zinc-950 shadow-2xl shadow-zinc-900/15 sm:h-[min(38rem,calc(100dvh_-_2rem))] sm:w-[min(24rem,calc(100vw_-_2rem))] sm:flex-none">
+          <header className="flex min-h-16 shrink-0 items-center justify-between border-b border-zinc-200 bg-zinc-950 px-4 text-white">
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <span className="size-2.5 shrink-0 rounded-full bg-emerald-400" />
@@ -210,7 +218,7 @@ export function HelpdeskWidget() {
                 </p>
               </div>
               <p className="mt-0.5 truncate text-xs text-zinc-300">
-                {session?.sessionCode || "SolarTank Helpdesk"}
+                {session?.sessionCode || "FTM Helpdesk"}
               </p>
             </div>
             <button
@@ -223,7 +231,7 @@ export function HelpdeskWidget() {
             </button>
           </header>
 
-          <div className="flex-1 space-y-3 overflow-y-auto bg-[#f7faf9] px-4 py-4">
+          <div className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain bg-[#f7faf9] px-4 py-4">
             {messages.map((message) => {
               const ownMessage = isOwnMessage(message);
 
@@ -264,13 +272,13 @@ export function HelpdeskWidget() {
           </div>
 
           {error ? (
-            <div className="border-t border-red-100 bg-red-50 px-4 py-2 text-xs font-medium text-red-700">
+            <div className="shrink-0 border-t border-red-100 bg-red-50 px-4 py-2 text-xs font-medium text-red-700">
               {error}
             </div>
           ) : null}
 
           {session?.status === "closed" ? (
-            <div className="border-t border-zinc-200 bg-white p-3">
+            <div className="shrink-0 border-t border-zinc-200 bg-white p-3">
               <button
                 className="h-11 w-full rounded-lg bg-zinc-950 px-4 text-sm font-semibold text-white transition hover:bg-zinc-800"
                 onClick={startNewSession}
@@ -281,7 +289,7 @@ export function HelpdeskWidget() {
             </div>
           ) : (
             <form
-              className="grid grid-cols-[1fr_auto] gap-2 border-t border-zinc-200 bg-white p-3"
+              className="grid shrink-0 grid-cols-[1fr_auto] gap-2 border-t border-zinc-200 bg-white p-3"
               onSubmit={handleSubmit}
             >
               <textarea
@@ -304,14 +312,16 @@ export function HelpdeskWidget() {
         </section>
       ) : null}
 
-      <button
-        aria-label="Buka helpdesk"
-        className="grid size-14 place-items-center rounded-full bg-blue-600 text-white shadow-2xl shadow-blue-700/30 ring-1 ring-blue-400/50 transition hover:bg-blue-700"
-        onClick={toggleWidget}
-        type="button"
-      >
-        <MessageCircle className="size-6" aria-hidden="true" />
-      </button>
+      {!isOpen ? (
+        <button
+          aria-label="Buka helpdesk"
+          className="grid size-14 place-items-center rounded-full bg-blue-600 text-white shadow-2xl shadow-blue-700/30 ring-1 ring-blue-400/50 transition hover:bg-blue-700"
+          onClick={toggleWidget}
+          type="button"
+        >
+          <MessageCircle className="size-6" aria-hidden="true" />
+        </button>
+      ) : null}
     </div>
   );
 }
