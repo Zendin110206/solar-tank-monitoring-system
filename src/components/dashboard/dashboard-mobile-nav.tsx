@@ -106,7 +106,7 @@ export function DashboardMobileNav({ navItems }: DashboardMobileNavProps) {
               Navigasi
             </p>
             <p className="mt-1 text-sm font-semibold text-zinc-950">
-              SolarTank Monitoring
+              FTM
             </p>
           </div>
           <nav className="mt-2 grid gap-1" aria-label="Navigasi mobile">

@@ -382,7 +382,7 @@ function buildStatusNote({
     return `Perlu dipantau berkala. Isi ${fillPercent}% dan status perangkat ${deviceStatus}.`;
   }
 
-  return "Pembacaan terbaru masih segar dan level solar berada di zona aman.";
+  return "Pembacaan terbaru masih segar dan level bahan bakar berada di zona aman.";
 }
 
 function getReadingPointStatus(

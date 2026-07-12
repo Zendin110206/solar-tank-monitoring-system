@@ -56,7 +56,7 @@ function buildPackageEmailHtml({
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Firmware SolarTank siap</title>
+    <title>Firmware FTM siap</title>
   </head>
   <body style="margin:0;background:#f5faf8;color:#18181b;font-family:Arial,Helvetica,sans-serif;">
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f5faf8;padding:24px 12px;">
@@ -65,8 +65,8 @@ function buildPackageEmailHtml({
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;overflow:hidden;">
             <tr>
               <td style="padding:22px 24px;border-bottom:1px solid #eef2f7;">
-                <div style="font-size:18px;font-weight:700;color:#18181b;">SolarTank</div>
-                <div style="margin-top:4px;font-size:13px;color:#64748b;">Paket firmware perangkat monitoring</div>
+                <div style="font-size:18px;font-weight:700;color:#18181b;">FTM</div>
+                <div style="margin-top:4px;font-size:13px;color:#64748b;">Paket firmware perangkat telemetri</div>
               </td>
             </tr>
             <tr>
@@ -83,7 +83,7 @@ function buildPackageEmailHtml({
             </tr>
             <tr>
               <td style="padding:16px 24px;background:#f8fafc;border-top:1px solid #eef2f7;font-size:12px;line-height:1.6;color:#64748b;">
-                Email ini dikirim otomatis oleh SolarTank. Jangan balas email ini.
+                Email ini dikirim otomatis oleh FTM. Jangan balas email ini.
               </td>
             </tr>
           </table>
@@ -121,7 +121,7 @@ export async function sendDevicePackageReadyEmail({
   siteName: string;
 }): Promise<DevicePackageEmailDeliveryResult> {
   const expiresAtLabel = formatExpiresAt(downloadExpiresAt);
-  const subject = `Firmware SolarTank siap - ${deviceCode}`;
+  const subject = `Firmware FTM siap - ${deviceCode}`;
   const text = [
     `Pengajuan ${requestCode} untuk ${siteName} sudah disetujui.`,
     "",

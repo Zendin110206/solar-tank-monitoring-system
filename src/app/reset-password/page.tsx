@@ -4,8 +4,8 @@ import Link from "next/link";
 import ResetPasswordForm from "./reset-password-form";
 
 export const metadata: Metadata = {
-  title: "Buat Password Baru | SolarTank",
-  description: "Buat kata sandi baru dari link reset akun SolarTank.",
+  title: "Buat Password Baru | FTM",
+  description: "Buat kata sandi baru dari link reset akun FTM.",
 };
 
 export default async function ResetPasswordPage({

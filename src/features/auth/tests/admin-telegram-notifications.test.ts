@@ -65,7 +65,7 @@ describe("admin telegram notifications", () => {
       1,
       expect.objectContaining({
         chatId: "111",
-        text: expect.stringContaining("Pengajuan akses baru SolarTank"),
+        text: expect.stringContaining("Pengajuan akses baru FTM"),
       }),
     );
 

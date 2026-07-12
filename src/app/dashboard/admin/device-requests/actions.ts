@@ -112,10 +112,10 @@ function getActionSuccess(message: string): DeviceRequestAdminActionState {
 
 function formatResetSummary(totalRows: number): string {
   if (totalRows === 0) {
-    return "Tidak ada data monitoring perangkat yang perlu dibersihkan.";
+    return "Tidak ada data operasional perangkat yang perlu dibersihkan.";
   }
 
-  return `${totalRows} baris data monitoring perangkat berhasil dibersihkan. Akun, admin, template firmware, dan profil hardware tetap disimpan.`;
+  return `${totalRows} baris data operasional perangkat berhasil dibersihkan. Akun, admin, template firmware, dan profil hardware tetap disimpan.`;
 }
 
 function formatCleanupSummary({

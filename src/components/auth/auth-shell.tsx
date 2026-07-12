@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowLeft } from "lucide-react";
 
+import { BrandLogo } from "@/components/brand-logo";
+
 type AuthShellProps = {
   children: ReactNode;
   description: string;
@@ -16,22 +18,8 @@ type AuthShellProps = {
 
 const DEFAULT_CONTEXT_NOTE = {
   title: "Akses operasional",
-  description: "Data monitoring tersedia bagi akun yang telah diberi izin.",
+  description: "Data operasional tersedia bagi akun yang telah diberi izin.",
 };
-
-function BrandMark() {
-  return (
-    <span
-      aria-hidden="true"
-      className="relative grid size-8 shrink-0 place-items-center"
-    >
-      <span className="absolute size-8 rounded-full border-2 border-red-500" />
-      <span className="absolute right-0 top-1 size-3 rounded-full bg-cyan-400" />
-      <span className="absolute bottom-1 left-0 size-2.5 rounded-full bg-zinc-950" />
-      <span className="size-2.5 rounded-full bg-red-500" />
-    </span>
-  );
-}
 
 function MonitoringVisual({
   contextNote,
@@ -69,7 +57,7 @@ function MonitoringVisual({
               />
               <div className="relative mx-auto flex h-36 max-w-[15rem] items-center justify-center">
                 <svg
-                  aria-label="Ilustrasi tangki solar terisi 78 persen"
+                  aria-label="Ilustrasi tangki bahan bakar terisi 78 persen"
                   className="h-full w-full"
                   role="img"
                   viewBox="0 0 280 150"
@@ -223,14 +211,15 @@ export default function AuthShell({
         <div className="flex min-w-0 flex-col px-5 py-6 sm:px-10 sm:py-8 lg:px-14 xl:px-20">
           <header className="flex items-center justify-between gap-4">
             <Link
-              aria-label="Kembali ke beranda SolarTank"
+              aria-label="Kembali ke beranda FTM"
               className="flex items-center gap-3"
               href="/"
             >
-              <BrandMark />
-              <span className="text-xl font-semibold tracking-normal">
-                SolarTank
-              </span>
+              <BrandLogo
+                markClassName="size-9"
+                priority
+                textClassName="text-xl font-semibold tracking-normal"
+              />
             </Link>
 
             <Link
@@ -260,8 +249,8 @@ export default function AuthShell({
           </div>
 
           <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 pt-5 text-[0.72rem] text-zinc-400">
-            <span>© 2026 SolarTank</span>
-            <span>Akses sistem monitoring internal</span>
+            <span>© 2026 FTM</span>
+            <span>FTM Fuel Tank Management Service.</span>
           </footer>
         </div>
 
@@ -283,13 +272,13 @@ export default function AuthShell({
 
           <div className="relative z-10 max-w-xl">
             <h2 className="text-[clamp(2rem,3vw,3rem)] font-medium leading-[1.08] tracking-normal">
-              Monitoring tangki,
+              Manajemen tangki,
               <span className="block text-red-600">
                 lebih jelas dalam satu layar.
               </span>
             </h2>
             <p className="mt-5 max-w-lg text-sm leading-7 text-zinc-600 sm:text-base">
-              Pantau volume solar, estimasi runtime genset, dan kesehatan data
+              Pantau volume bahan bakar, estimasi runtime genset, dan kesehatan data
               perangkat untuk membantu tindak lanjut operasional.
             </p>
           </div>

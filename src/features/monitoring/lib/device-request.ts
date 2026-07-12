@@ -473,7 +473,7 @@ export function validateDeviceRequestDraft(
     errors.push(
       createIssue(
         "loadValue",
-        "Beban lokasi wajib diisi lebih dari 0 agar konsumsi solar per jam bisa dihitung.",
+        "Beban lokasi wajib diisi lebih dari 0 agar konsumsi bahan bakar per jam bisa dihitung.",
       ),
     );
   }

@@ -56,9 +56,9 @@ import type {
 } from "@/features/monitoring/types/monitoring";
 
 export const metadata: Metadata = {
-  title: "Detail Tangki Solar | SolarTank",
+  title: "Detail Tangki Bahan Bakar | FTM",
   description:
-    "Halaman detail untuk membaca kondisi satu tangki solar, visual isi tangki, parameter perangkat, dan riwayat pembacaan.",
+    "Halaman detail untuk membaca kondisi satu tangki bahan bakar, visual isi tangki, parameter perangkat, dan riwayat pembacaan.",
 };
 
 export const runtime = "nodejs";
@@ -493,7 +493,7 @@ function TankVisual({ tank }: { tank: TankDetail }) {
   const fillPercent = tank.hasReading ? clampPercent(tank.fillPercent) : 0;
   const visualDescription = isRectangular
     ? "Model tampilan mengikuti tangki balok/persegi panjang. Sensor berada di atas, sehingga perubahan level dibaca secara vertikal."
-    : "Model tampilan mengikuti tangki silinder horizontal. Sensor berada di atas, sehingga permukaan solar naik-turun secara vertikal.";
+    : "Model tampilan mengikuti tangki silinder horizontal. Sensor berada di atas, sehingga permukaan bahan bakar naik-turun secara vertikal.";
   const dimensionItems: ParameterItem[] = [
     {
       label: "Jarak sensor",
@@ -504,7 +504,7 @@ function TankVisual({ tank }: { tank: TankDetail }) {
       icon: Ruler,
     },
     {
-      label: "Tinggi solar",
+      label: "Tinggi bahan bakar",
       value: tank.hasReading ? `${tank.fuelHeightCm} cm` : "-",
       note: tank.hasReading
         ? "raw.H_cm setelah normalisasi"
@@ -626,8 +626,8 @@ function TankVisual({ tank }: { tank: TankDetail }) {
           </div>
 
           <div className="mt-4 rounded-lg border border-cyan-100 bg-white p-3 text-xs leading-5 text-zinc-500">
-            Garis merah menunjukkan jarak sensor dari atas ke permukaan solar.
-            Area biru mengikuti tinggi solar secara vertikal, bukan kiri ke
+            Garis merah menunjukkan jarak sensor dari atas ke permukaan bahan bakar.
+            Area biru mengikuti tinggi bahan bakar secara vertikal, bukan kiri ke
             kanan.
           </div>
         </div>
@@ -1149,15 +1149,15 @@ export default async function TankDetailPage({
       label: "Sensor membaca jarak",
       value: tank.hasReading ? `${tank.sensorDistanceCm} cm` : "-",
       detail: tank.hasReading
-        ? "jarak dari sensor ke permukaan solar"
+        ? "jarak dari sensor ke permukaan bahan bakar"
         : "belum ada jarak sensor yang diterima",
     },
     {
-      label: "Tinggi solar dihitung",
+      label: "Tinggi bahan bakar dihitung",
       value: tank.hasReading ? `${tank.fuelHeightCm} cm` : "-",
       detail: tank.hasReading
-        ? `sumber tinggi solar ${formatSourceLabel(tank.dataSources.fuelHeightSource)}`
-        : "tinggi solar belum dihitung sebelum data masuk",
+        ? `sumber tinggi bahan bakar ${formatSourceLabel(tank.dataSources.fuelHeightSource)}`
+        : "tinggi bahan bakar belum dihitung sebelum data masuk",
     },
     {
       label: "Volume dan persen",
@@ -1173,7 +1173,7 @@ export default async function TankDetailPage({
       value: tank.hasReading ? `${tank.runtimeHour} jam` : "-",
       detail: tank.hasReading
         ? "perkiraan durasi genset dari konsumsi per jam"
-        : "runtime baru valid setelah volume solar tersedia",
+        : "runtime baru valid setelah volume bahan bakar tersedia",
     },
   ];
 
@@ -1181,7 +1181,7 @@ export default async function TankDetailPage({
     <main className="min-h-screen overflow-x-hidden bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
         navItems={[
-          { href: "/dashboard", label: "Monitoring Tangki" },
+          { href: "/dashboard", label: "Manajemen Tangki" },
           { current: true, label: "Detail Tangki" },
           { href: "#riwayat", label: "Riwayat" },
           { href: "#lokasi", label: "Lokasi" },
@@ -1220,7 +1220,7 @@ export default async function TankDetailPage({
                   detail tangki
                 </span>
                 <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
-                  data monitoring
+                  data operasional
                 </span>
               </div>
 
@@ -1442,7 +1442,7 @@ export default async function TankDetailPage({
             <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
               {[
                 "Dimensi tangki mengikuti pengukuran fisik terakhir.",
-                "Konsumsi solar per jam sesuai beban genset masing-masing STO.",
+                "Konsumsi bahan bakar per jam sesuai beban genset masing-masing STO.",
                 "Interval kirim data perangkat sesuai konfigurasi aktif.",
                 "Koordinat manual sudah disetujui penanggung jawab lokasi.",
               ].map((note) => (

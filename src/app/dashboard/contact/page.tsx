@@ -6,9 +6,9 @@ import { requirePageUser } from "@/features/auth/lib/auth-guards";
 import { ContactMessageTemplate } from "./contact-message-template";
 
 export const metadata: Metadata = {
-  title: "Kontak Operasional | SolarTank",
+  title: "Kontak Operasional | FTM",
   description:
-    "Kontak operasional SolarTank untuk koordinasi bantuan monitoring tangki solar.",
+    "Kontak operasional FTM untuk koordinasi bantuan manajemen tangki bahan bakar.",
 };
 
 export const dynamic = "force-dynamic";
@@ -50,7 +50,7 @@ function buildContactMessage({
   username: string;
 }) {
   return [
-    "Halo Pak Astra, saya butuh bantuan terkait SolarTank.",
+    "Halo Pak Astra, saya butuh bantuan terkait FTM.",
     "",
     `Nama: ${fullName}`,
     `Username: ${username}`,
@@ -85,7 +85,7 @@ export default async function DashboardContactPage() {
     <main className="min-h-screen overflow-hidden bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
         navItems={[
-          { href: "/dashboard", label: "Monitoring Tangki" },
+          { href: "/dashboard", label: "Manajemen Tangki" },
           { current: true, label: "Kontak" },
         ]}
         user={user}
@@ -113,10 +113,10 @@ export default async function DashboardContactPage() {
             Kontak operasional
           </p>
           <h1 className="mx-auto mt-2 max-w-2xl text-2xl font-semibold tracking-tight text-zinc-950 sm:text-3xl lg:text-4xl">
-            Informasi bantuan SolarTank
+            Informasi bantuan FTM
           </h1>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-zinc-500 sm:text-base">
-            Kanal singkat untuk koordinasi akses, klarifikasi data monitoring,
+            Kanal singkat untuk koordinasi akses, klarifikasi data operasional,
             dan tindak lanjut perangkat IoT area STO.
           </p>
 

@@ -16,7 +16,7 @@ export default function TankDetailError({
           Detail tangki belum siap
         </p>
         <h1 className="mt-3 break-words text-2xl font-semibold tracking-normal sm:text-3xl">
-          Detail monitoring belum bisa dibaca
+          Detail tangki belum bisa dibaca
         </h1>
         <p className="mt-3 break-words text-sm leading-6 text-zinc-600">
           Halaman detail gagal mengambil data dari storage aktif. Cek endpoint

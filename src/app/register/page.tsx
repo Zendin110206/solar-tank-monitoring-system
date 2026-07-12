@@ -6,9 +6,9 @@ import { redirect } from "next/navigation";
 import SignUpForm from "./sign-up-form";
 
 export const metadata: Metadata = {
-  title: "Ajukan Akses | SolarTank",
+  title: "Ajukan Akses | FTM",
   description:
-    "Tampilan pengajuan akses SolarTank untuk operator monitoring dan reviewer operasional.",
+    "Tampilan pengajuan akses FTM untuk operator lapangan dan reviewer operasional.",
 };
 
 export default async function RegisterPage() {
@@ -26,7 +26,7 @@ export default async function RegisterPage() {
         description:
           "Akun baru masuk sebagai pengajuan dan harus disetujui administrator sebelum bisa membuka dashboard.",
       }}
-      description="Lengkapi identitas kerja untuk mengajukan akses sistem monitoring tangki."
+      description="Lengkapi identitas kerja untuk mengajukan akses sistem manajemen tangki."
       footerPrompt={
         <>
           Sudah memiliki akun?{" "}

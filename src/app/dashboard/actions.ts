@@ -98,7 +98,7 @@ export async function cleanupDashboardTankAction(
 
     return {
       status: "success",
-      message: `${siteLabel} berhasil dibersihkan dari monitoring.`,
+      message: `${siteLabel} berhasil dibersihkan dari dashboard FTM.`,
     };
   } catch (error) {
     return {

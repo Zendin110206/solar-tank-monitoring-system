@@ -306,7 +306,7 @@ export async function ingestTelemetry({
         return {
           ok: false,
           status: 404,
-          error: "Device tidak terdaftar di data monitoring.",
+          error: "Device tidak terdaftar di data operasional.",
         };
       }
 

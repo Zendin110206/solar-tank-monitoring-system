@@ -84,7 +84,7 @@ export async function handleTelegramTopicInfoCommand(
     await sendHelpdeskCommandReply({
       chatId: message.chatId,
       messageThreadId: message.messageThreadId,
-      text: "Command ini hanya tersedia untuk admin SolarTank yang sudah menghubungkan Telegram.",
+      text: "Command ini hanya tersedia untuk admin FTM yang sudah menghubungkan Telegram.",
     });
     return true;
   }
@@ -121,7 +121,7 @@ export async function handleTelegramHelpdeskCommand(
     await sendHelpdeskCommandReply({
       chatId: message.chatId,
       messageThreadId: message.messageThreadId,
-      text: "Command helpdesk hanya tersedia untuk admin SolarTank yang sudah menghubungkan Telegram.",
+      text: "Command helpdesk hanya tersedia untuk admin FTM yang sudah menghubungkan Telegram.",
     });
     return true;
   }
@@ -144,7 +144,7 @@ export async function handleTelegramHelpdeskCommand(
     });
     await addHelpdeskMessage({
       body: "Sesi helpdesk ditutup oleh admin.",
-      senderLabel: "SolarTank",
+      senderLabel: "FTM",
       senderType: "system",
       sessionId: session.id,
       telegramChatId: adminChatId,

@@ -260,7 +260,7 @@ export async function getOrCreateHelpdeskSession({
 
   await addHelpdeskMessage({
     body: "Sesi helpdesk dibuat. Admin akan membalas melalui chat ini.",
-    senderLabel: "SolarTank",
+    senderLabel: "FTM",
     senderType: "system",
     sessionId,
   });
@@ -297,7 +297,7 @@ export async function addHelpdeskMessage({
       messageId,
       sessionId,
       senderType,
-      senderLabel.trim().slice(0, 160) || "SolarTank",
+      senderLabel.trim().slice(0, 160) || "FTM",
       messageBody,
       telegramChatId,
     ],
