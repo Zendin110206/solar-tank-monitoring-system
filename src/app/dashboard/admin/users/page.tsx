@@ -339,6 +339,13 @@ function UserActionStack({
         <AdminActionForm
           action={disableAuthUserAction}
           compact
+          confirmation={{
+            confirmLabel: "Ya, nonaktifkan",
+            description: `${user.fullName} tidak dapat menggunakan akun ini sampai admin mengaktifkannya kembali.`,
+            eyebrow: "Nonaktifkan akses pengguna",
+            title: `Nonaktifkan akun ${user.fullName}?`,
+            tone: "danger",
+          }}
           csrfToken={csrfToken}
           fields={{ targetUserId: user.id }}
           hideMessage
@@ -353,6 +360,13 @@ function UserActionStack({
         <AdminActionForm
           action={activateAuthUserAction}
           compact
+          confirmation={{
+            confirmLabel: "Ya, aktifkan",
+            description: `${user.fullName} akan kembali dapat masuk dan menggunakan fitur sesuai role yang dimilikinya.`,
+            eyebrow: "Aktifkan akses pengguna",
+            title: `Aktifkan kembali ${user.fullName}?`,
+            tone: "primary",
+          }}
           csrfToken={csrfToken}
           fields={{ targetUserId: user.id }}
           hideMessage
@@ -367,6 +381,13 @@ function UserActionStack({
         <AdminActionForm
           action={revokeAuthUserSessionsAction}
           compact
+          confirmation={{
+            confirmLabel: "Ya, cabut semua sesi",
+            description: `${user.fullName} akan dikeluarkan dari seluruh perangkat dan harus login kembali.`,
+            eyebrow: "Keamanan sesi pengguna",
+            title: `Cabut semua sesi ${user.fullName}?`,
+            tone: "warning",
+          }}
           csrfToken={csrfToken}
           fields={{ targetUserId: user.id }}
           hideMessage
@@ -381,6 +402,13 @@ function UserActionStack({
         <AdminActionForm
           action={resendUserVerificationEmailAction}
           compact
+          confirmation={{
+            confirmLabel: "Ya, kirim email",
+            description: `Sistem akan mengirim tautan verifikasi baru ke ${user.email}.`,
+            eyebrow: "Kirim email verifikasi",
+            title: `Kirim verifikasi untuk ${user.fullName}?`,
+            tone: "primary",
+          }}
           csrfToken={csrfToken}
           fields={{ targetUserId: user.id }}
           hideMessage
@@ -395,6 +423,13 @@ function UserActionStack({
         <AdminActionForm
           action={sendUserPasswordResetAction}
           compact
+          confirmation={{
+            confirmLabel: "Ya, kirim tautan",
+            description: `Tautan reset password akan dikirim ke ${user.email}. Password tidak berubah sampai pengguna menyelesaikan proses tersebut.`,
+            eyebrow: "Pemulihan akun pengguna",
+            title: `Kirim reset password untuk ${user.fullName}?`,
+            tone: "warning",
+          }}
           csrfToken={csrfToken}
           fields={{ targetUserId: user.id }}
           hideMessage
@@ -414,6 +449,7 @@ function UserActionStack({
             description: `Akun ${user.fullName} akan dihapus permanen. Aksi ini hanya dapat dilakukan jika akun tidak memiliki jejak pengajuan perangkat.`,
             eyebrow: "Hapus akun pengguna",
             title: `Hapus ${user.fullName}?`,
+            tone: "danger",
           }}
           csrfToken={csrfToken}
           fields={{ targetUserId: user.id }}
@@ -621,6 +657,13 @@ function PendingAccessRequests({
                   <AdminActionForm
                     action={approveAccessRequestAction}
                     className="min-w-0"
+                    confirmation={{
+                      confirmLabel: "Ya, setujui akses",
+                      description: `${request.user.fullName} akan memperoleh akses sebagai ${getRoleLabel(request.requestedRole)} dan dapat masuk ke sistem setelah persyaratan akun terpenuhi.`,
+                      eyebrow: "Persetujuan akses pengguna",
+                      title: `Setujui pengajuan ${request.user.fullName}?`,
+                      tone: "primary",
+                    }}
                     csrfToken={csrfToken}
                     fields={{ accessRequestId: request.id }}
                     icon="check"
@@ -631,6 +674,13 @@ function PendingAccessRequests({
                   <AdminActionForm
                     action={rejectAccessRequestAction}
                     className="min-w-0"
+                    confirmation={{
+                      confirmLabel: "Ya, tolak pengajuan",
+                      description: `Pengajuan akses ${request.user.fullName} akan ditolak dan tidak dapat diproses sebagai pengajuan aktif.`,
+                      eyebrow: "Tolak akses pengguna",
+                      title: `Tolak pengajuan ${request.user.fullName}?`,
+                      tone: "danger",
+                    }}
                     csrfToken={csrfToken}
                     fields={{ accessRequestId: request.id }}
                     icon="x"
@@ -642,6 +692,13 @@ function PendingAccessRequests({
                     <AdminActionForm
                       action={resendUserVerificationEmailAction}
                       className="col-span-2 min-w-0 sm:col-span-1"
+                      confirmation={{
+                        confirmLabel: "Ya, kirim email",
+                        description: `Sistem akan mengirim tautan verifikasi baru ke ${request.user.email}.`,
+                        eyebrow: "Kirim email verifikasi",
+                        title: `Kirim verifikasi untuk ${request.user.fullName}?`,
+                        tone: "primary",
+                      }}
                       csrfToken={csrfToken}
                       fields={{ targetUserId: request.user.id }}
                       icon="send"
@@ -940,8 +997,8 @@ export default async function AdminUsersPage({
                               csrfToken={csrfToken}
                               currentRole={user.role}
                               disabled={!canSaveRole}
-                              hideMessage
                               targetUserId={user.id}
+                              targetUserName={user.fullName}
                             />
                           </td>
                           <td className="px-4 py-2.5">
@@ -1027,6 +1084,7 @@ export default async function AdminUsersPage({
                             currentRole={user.role}
                             disabled={!canSaveRole}
                             targetUserId={user.id}
+                            targetUserName={user.fullName}
                           />
                         </div>
                       </div>

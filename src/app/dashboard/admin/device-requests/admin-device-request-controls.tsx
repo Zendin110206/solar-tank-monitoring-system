@@ -10,9 +10,13 @@ import {
   X,
 } from "lucide-react";
 import type { ReactNode } from "react";
-import { useActionState } from "react";
+import { useActionState, useCallback, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 
+import {
+  AdminConfirmationDialog,
+  type AdminConfirmationContent,
+} from "../_components/admin-confirmation-dialog";
 import {
   approveDeviceRequestAction,
   cleanupDeviceRequestsAction,
@@ -63,13 +67,11 @@ function ActionMessage({ state }: { state: DeviceRequestAdminActionState }) {
 
 function SubmitButton({
   children,
-  confirmMessage,
   disabled,
   icon,
   variant,
 }: {
   children: ReactNode;
-  confirmMessage?: string;
   disabled?: boolean;
   icon: "ban" | "check" | "refresh" | "rotate" | "trash" | "x";
   variant: "danger" | "dangerOutline" | "neutral" | "primary" | "warning";
@@ -103,16 +105,76 @@ function SubmitButton({
     <button
       className={`inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-500 ${variantClass}`}
       disabled={disabled || pending}
-      onClick={(event) => {
-        if (confirmMessage && !window.confirm(confirmMessage)) {
-          event.preventDefault();
-        }
-      }}
       type="submit"
     >
       <Icon className="size-4" aria-hidden="true" />
       {pending ? "Memproses..." : children}
     </button>
+  );
+}
+
+function ConfirmedSubmitButton({
+  children,
+  confirmation,
+  disabled,
+  icon,
+  variant,
+}: {
+  children: ReactNode;
+  confirmation: AdminConfirmationContent;
+  disabled?: boolean;
+  icon: "ban" | "refresh" | "rotate" | "trash";
+  variant: "danger" | "dangerOutline" | "neutral" | "warning";
+}) {
+  const { pending } = useFormStatus();
+  const [isOpen, setIsOpen] = useState(false);
+  const hiddenSubmitRef = useRef<HTMLButtonElement>(null);
+  const handleClose = useCallback(() => setIsOpen(false), []);
+  const Icon =
+    icon === "ban"
+      ? Ban
+      : icon === "refresh"
+        ? RefreshCw
+        : icon === "rotate"
+          ? RotateCw
+          : Trash2;
+  const variantClass = {
+    danger: "bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-600/20",
+    dangerOutline:
+      "border border-red-200 bg-white text-red-700 hover:bg-red-50 focus-visible:ring-red-600/15",
+    neutral:
+      "border border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 focus-visible:ring-zinc-600/15",
+    warning:
+      "border border-amber-200 bg-amber-50 text-amber-800 hover:bg-amber-100 focus-visible:ring-amber-600/15",
+  }[variant];
+
+  return (
+    <>
+      <button
+        aria-haspopup="dialog"
+        className={`inline-flex h-10 w-full items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-500 ${variantClass}`}
+        disabled={disabled || pending}
+        onClick={() => setIsOpen(true)}
+        type="button"
+      >
+        <Icon className="size-4" aria-hidden="true" />
+        {pending ? "Memproses..." : children}
+      </button>
+      <button hidden ref={hiddenSubmitRef} type="submit" />
+
+      {isOpen ? (
+        <AdminConfirmationDialog
+          confirmation={confirmation}
+          confirmIcon={<Icon className="size-4" aria-hidden="true" />}
+          onClose={handleClose}
+          onConfirm={() => {
+            handleClose();
+            hiddenSubmitRef.current?.click();
+          }}
+          pending={pending}
+        />
+      ) : null}
+    </>
   );
 }
 
@@ -179,6 +241,7 @@ export function RejectDeviceRequestForm({
 function PackageActionForm({
   action,
   children,
+  confirmation,
   csrfToken,
   icon,
   requestId,
@@ -189,6 +252,7 @@ function PackageActionForm({
     formData: FormData,
   ) => Promise<DeviceRequestAdminActionState>;
   children: ReactNode;
+  confirmation?: AdminConfirmationContent;
   csrfToken: string;
   icon: "ban" | "refresh" | "rotate";
   requestId: string;
@@ -200,9 +264,19 @@ function PackageActionForm({
     <form action={formAction} className="grid gap-1.5">
       <input name="csrfToken" type="hidden" value={csrfToken} />
       <input name="requestId" type="hidden" value={requestId} />
-      <SubmitButton icon={icon} variant={variant}>
-        {children}
-      </SubmitButton>
+      {confirmation ? (
+        <ConfirmedSubmitButton
+          confirmation={confirmation}
+          icon={icon}
+          variant={variant}
+        >
+          {children}
+        </ConfirmedSubmitButton>
+      ) : (
+        <SubmitButton icon={icon} variant={variant}>
+          {children}
+        </SubmitButton>
+      )}
       <ActionMessage state={state} />
     </form>
   );
@@ -238,6 +312,14 @@ export function ReissueDevicePackageForm({
   return (
     <PackageActionForm
       action={reissueDevicePackageAction}
+      confirmation={{
+        confirmLabel: "Ya, buat ulang paket",
+        description:
+          "Paket dan kredensial lama akan dicabut, lalu sistem membuat paket provisioning baru untuk perangkat ini.",
+        eyebrow: "Rotasi kredensial perangkat",
+        title: "Buat ulang paket provisioning?",
+        tone: "warning",
+      }}
       csrfToken={csrfToken}
       icon="rotate"
       requestId={requestId}
@@ -258,6 +340,14 @@ export function RevokeDeviceProvisioningForm({
   return (
     <PackageActionForm
       action={revokeDeviceProvisioningAction}
+      confirmation={{
+        confirmLabel: "Ya, cabut akses",
+        description:
+          "Perangkat tidak lagi dapat mengirim telemetry menggunakan kredensial provisioning yang sekarang.",
+        eyebrow: "Cabut akses perangkat",
+        title: "Cabut akses provisioning perangkat?",
+        tone: "danger",
+      }}
       csrfToken={csrfToken}
       icon="ban"
       requestId={requestId}
@@ -292,13 +382,19 @@ export function CleanupDeviceRequestForm({
         type="hidden"
         value={CLEANUP_SINGLE_CONFIRMATION}
       />
-      <SubmitButton
-        confirmMessage={`Bersihkan data untuk ${requestLabel}? Aksi ini menghapus pengajuan, paket firmware, event, reading, dan device terkait jika tidak dipakai data lain.`}
+      <ConfirmedSubmitButton
+        confirmation={{
+          confirmLabel: "Ya, hapus data",
+          description: `Pengajuan, paket firmware, event, reading, dan perangkat terkait ${requestLabel} akan dihapus jika tidak dipakai data lain.`,
+          eyebrow: "Pembersihan data perangkat",
+          title: `Hapus data ${requestLabel}?`,
+          tone: "danger",
+        }}
         icon="trash"
         variant="dangerOutline"
       >
         Hapus data
-      </SubmitButton>
+      </ConfirmedSubmitButton>
       <ActionMessage state={state} />
     </form>
   );
@@ -334,13 +430,20 @@ export function CleanupSelectedDeviceRequestsForm({
           required
         />
       </label>
-      <SubmitButton
-        confirmMessage="Bersihkan semua pengajuan yang sedang dicentang?"
+      <ConfirmedSubmitButton
+        confirmation={{
+          confirmLabel: "Ya, bersihkan pilihan",
+          description:
+            "Semua pengajuan yang dicentang beserta data perangkat terkait akan dibersihkan sesuai aturan keamanan relasi data.",
+          eyebrow: "Pembersihan data terpilih",
+          title: "Bersihkan semua pengajuan yang dicentang?",
+          tone: "warning",
+        }}
         icon="trash"
         variant="warning"
       >
         Bersihkan pilihan
-      </SubmitButton>
+      </ConfirmedSubmitButton>
       <p className="text-xs leading-5 text-zinc-500 lg:col-span-2">
         Centang satu atau beberapa pengajuan, ketik tepat{" "}
         <span className="font-semibold">{CLEANUP_SELECTED_CONFIRMATION}</span>,
@@ -382,13 +485,20 @@ export function ResetMonitoringDeviceDataForm({
         paket firmware, dan event provisioning. Akun pengguna, admin, template
         firmware, dan profil hardware tidak ikut dihapus.
       </p>
-      <SubmitButton
-        confirmMessage="Bersihkan semua data monitoring perangkat? Gunakan hanya jika benar-benar ingin mulai ulang dari kosong."
+      <ConfirmedSubmitButton
+        confirmation={{
+          confirmLabel: "Ya, bersihkan semuanya",
+          description:
+            "Seluruh data STO, tangki, perangkat, reading, pengajuan, paket firmware, dan event provisioning akan dihapus. Akun pengguna dan template tetap dipertahankan.",
+          eyebrow: "Reset data monitoring",
+          title: "Bersihkan semua data perangkat?",
+          tone: "danger",
+        }}
         icon="trash"
         variant="danger"
       >
         Bersihkan semua data
-      </SubmitButton>
+      </ConfirmedSubmitButton>
       <ActionMessage state={state} />
     </form>
   );

@@ -1,15 +1,8 @@
 "use client";
 
-import type { KeyboardEvent, ReactNode } from "react";
-import {
-  useActionState,
-  useCallback,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-} from "react";
-import { createPortal, useFormStatus } from "react-dom";
+import type { ReactNode } from "react";
+import { useActionState, useCallback, useEffect, useState } from "react";
+import { useFormStatus } from "react-dom";
 import {
   Ban,
   Check,
@@ -17,11 +10,16 @@ import {
   LogOut,
   RefreshCcw,
   Send,
+  ShieldCheck,
   Trash2,
   X,
 } from "lucide-react";
 
 import type { AuthRole } from "@/features/auth/types";
+import {
+  AdminConfirmationDialog,
+  type AdminConfirmationContent,
+} from "../_components/admin-confirmation-dialog";
 import type { AdminActionState } from "./actions";
 
 type AdminServerAction = (
@@ -50,13 +48,6 @@ type ButtonIcon =
   | "send"
   | "key"
   | "trash";
-
-type AdminActionConfirmation = {
-  confirmLabel: string;
-  description: string;
-  eyebrow: string;
-  title: string;
-};
 
 const buttonVariantClass: Record<ButtonVariant, string> = {
   danger:
@@ -102,6 +93,25 @@ function ActionMessage({ state }: { state: AdminActionState }) {
       aria-live="polite"
       className={`text-xs font-semibold ${
         state.status === "success" ? "text-emerald-700" : "text-red-700"
+      }`}
+    >
+      {state.message}
+    </p>
+  );
+}
+
+function DialogActionMessage({ state }: { state: AdminActionState }) {
+  if (state.status === "idle" || !state.message) {
+    return null;
+  }
+
+  return (
+    <p
+      aria-live="polite"
+      className={`rounded-lg border px-3 py-2 text-sm font-semibold leading-6 ${
+        state.status === "success"
+          ? "border-emerald-100 bg-emerald-50 text-emerald-700"
+          : "border-red-100 bg-red-50 text-red-700"
       }`}
     >
       {state.message}
@@ -212,7 +222,7 @@ function AdminActionConfirmationDialog({
   onClose,
 }: {
   action: AdminServerAction;
-  confirmation: AdminActionConfirmation;
+  confirmation: AdminConfirmationContent;
   csrfToken: string;
   fields: Record<string, string>;
   icon: ButtonIcon;
@@ -222,27 +232,6 @@ function AdminActionConfirmationDialog({
     action,
     INITIAL_ACTION_STATE,
   );
-  const titleId = useId();
-  const descriptionId = useId();
-  const dialogRef = useRef<HTMLElement>(null);
-  const cancelButtonRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    const activeElement =
-      document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : null;
-    const previousOverflow = document.body.style.overflow;
-
-    document.body.style.overflow = "hidden";
-    cancelButtonRef.current?.focus();
-
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      activeElement?.focus();
-    };
-  }, []);
-
   useEffect(() => {
     if (state.status !== "success") {
       return undefined;
@@ -253,142 +242,17 @@ function AdminActionConfirmationDialog({
     return () => window.clearTimeout(timeoutId);
   }, [onClose, state.status]);
 
-  function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    if (event.key === "Escape" && !pending) {
-      event.preventDefault();
-      onClose();
-      return;
-    }
-
-    if (event.key !== "Tab") {
-      return;
-    }
-
-    const focusableElements = Array.from(
-      dialogRef.current?.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), [href], input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-      ) ?? [],
-    );
-
-    if (focusableElements.length === 0) {
-      event.preventDefault();
-      return;
-    }
-
-    const firstElement = focusableElements[0];
-    const lastElement = focusableElements.at(-1);
-
-    if (event.shiftKey && document.activeElement === firstElement) {
-      event.preventDefault();
-      lastElement?.focus();
-    } else if (!event.shiftKey && document.activeElement === lastElement) {
-      event.preventDefault();
-      firstElement?.focus();
-    }
-  }
-
-  return createPortal(
-    <div
-      className="fixed inset-0 z-50 grid place-items-center bg-zinc-950/40 px-4 py-6 backdrop-blur-sm"
-      onKeyDown={handleKeyDown}
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget && !pending) {
-          onClose();
-        }
-      }}
-      role="presentation"
+  return (
+    <AdminConfirmationDialog
+      confirmation={confirmation}
+      confirmIcon={getIcon(icon)}
+      formAction={formAction}
+      onClose={onClose}
+      pending={pending}
     >
-      <section
-        aria-describedby={descriptionId}
-        aria-labelledby={titleId}
-        aria-modal="true"
-        aria-busy={pending}
-        className="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-2xl shadow-zinc-950/20"
-        ref={dialogRef}
-        role="dialog"
-        style={{
-          animation:
-            "login-shell-enter 180ms cubic-bezier(0.22, 1, 0.36, 1) both",
-        }}
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex min-w-0 items-start gap-4">
-            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-red-50 text-red-700 ring-1 ring-red-100">
-              {getIcon(icon)}
-            </span>
-            <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-red-600">
-                {confirmation.eyebrow}
-              </p>
-              <h2
-                className="mt-2 text-xl font-semibold text-zinc-950"
-                id={titleId}
-              >
-                {confirmation.title}
-              </h2>
-            </div>
-          </div>
-          <button
-            aria-label="Tutup dialog konfirmasi"
-            className="grid size-9 shrink-0 place-items-center rounded-lg text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-zinc-600/15 disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={pending}
-            onClick={onClose}
-            type="button"
-          >
-            <X aria-hidden="true" className="size-5" />
-          </button>
-        </div>
-
-        <p
-          className="mt-4 text-sm leading-6 text-zinc-600"
-          id={descriptionId}
-        >
-          {confirmation.description}
-        </p>
-
-        <form action={formAction} className="mt-5 grid gap-3">
-          <AdminActionHiddenFields csrfToken={csrfToken} fields={fields} />
-
-          {state.status === "error" && state.message ? (
-            <p
-              aria-live="polite"
-              className="rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm font-semibold leading-6 text-red-700"
-            >
-              {state.message}
-            </p>
-          ) : null}
-          {state.status === "success" && state.message ? (
-            <p
-              aria-live="polite"
-              className="rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-2 text-sm font-semibold leading-6 text-emerald-700"
-            >
-              {state.message}
-            </p>
-          ) : null}
-
-          <div className="grid gap-2 sm:grid-cols-2">
-            <button
-              className="inline-flex h-11 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-zinc-600/15 disabled:cursor-not-allowed disabled:opacity-60"
-              disabled={pending}
-              onClick={onClose}
-              ref={cancelButtonRef}
-              type="button"
-            >
-              Batal
-            </button>
-            <button
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 text-sm font-semibold text-white shadow-lg shadow-red-600/15 transition hover:bg-red-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-600/20 disabled:cursor-wait disabled:bg-red-300"
-              disabled={pending}
-              type="submit"
-            >
-              {getIcon(icon)}
-              {pending ? "Memproses..." : confirmation.confirmLabel}
-            </button>
-          </div>
-        </form>
-      </section>
-    </div>,
-    document.body,
+      <AdminActionHiddenFields csrfToken={csrfToken} fields={fields} />
+      <DialogActionMessage state={state} />
+    </AdminConfirmationDialog>
   );
 }
 
@@ -408,7 +272,7 @@ function ConfirmedAdminAction({
   children: ReactNode;
   className?: string;
   compact?: boolean;
-  confirmation: AdminActionConfirmation;
+  confirmation: AdminConfirmationContent;
   csrfToken: string;
   disabled?: boolean;
   fields: Record<string, string>;
@@ -417,17 +281,22 @@ function ConfirmedAdminAction({
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const handleClose = useCallback(() => setIsOpen(false), []);
+  const triggerLabel =
+    typeof children === "string"
+      ? `${children}: ${confirmation.title}`
+      : undefined;
 
   return (
     <div className={className}>
       <button
         aria-haspopup="dialog"
+        aria-label={triggerLabel}
         className={`inline-flex items-center justify-center gap-2 rounded-lg text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-500 ${
           compact ? "size-8 px-0" : "h-9 w-full px-3"
         } ${buttonVariantClass[variant]}`}
         disabled={disabled}
         onClick={() => setIsOpen(true)}
-        title={typeof children === "string" ? children : undefined}
+        title={triggerLabel}
         type="button"
       >
         {getIcon(icon)}
@@ -465,7 +334,7 @@ export function AdminActionForm({
   children: ReactNode;
   className?: string;
   compact?: boolean;
-  confirmation?: AdminActionConfirmation;
+  confirmation?: AdminConfirmationContent;
   csrfToken: string;
   disabled?: boolean;
   fields: Record<string, string>;
@@ -514,18 +383,18 @@ export function AdminRoleForm({
   csrfToken,
   currentRole,
   disabled,
-  hideMessage,
   targetUserId,
+  targetUserName,
 }: {
   action: AdminServerAction;
   compact?: boolean;
   csrfToken: string;
   currentRole: AuthRole;
   disabled?: boolean;
-  hideMessage?: boolean;
   targetUserId: string;
+  targetUserName: string;
 }) {
-  const [state, formAction] = useActionState(action, INITIAL_ACTION_STATE);
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
   const [roleDraft, setRoleDraft] = useState<{
     baseRole: AuthRole;
     selectedRole: AuthRole;
@@ -540,64 +409,111 @@ export function AdminRoleForm({
   const submitDisabled = Boolean(disabled) || !hasRoleChange;
 
   return (
-    <form action={formAction} className="grid gap-1.5">
-      <div className="flex items-center gap-2">
-        <input name="csrfToken" type="hidden" value={csrfToken} />
-        <input name="targetUserId" type="hidden" value={targetUserId} />
-        <select
-          aria-label="Role pengguna"
-          className={`rounded-lg border border-zinc-200 bg-white font-semibold text-zinc-800 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-600/15 disabled:bg-zinc-100 disabled:text-zinc-400 ${
-            compact ? "h-8 w-24 px-2 text-xs" : "h-9 min-w-28 px-3 text-sm"
-          }`}
-          onChange={(event) =>
-            setRoleDraft({
-              baseRole: currentRole,
-              selectedRole: event.target.value as AuthRole,
-            })
-          }
-          value={selectedRole}
-          disabled={disabled}
-          name="role"
-        >
-          <option value="user">User</option>
-          <option value="admin">Admin</option>
-        </select>
-        <RoleSubmitButton compact={compact} disabled={submitDisabled} />
-      </div>
-      {hideMessage ? null : <ActionMessage state={state} />}
-    </form>
+    <div className="flex items-center gap-2">
+      <select
+        aria-label={`Role ${targetUserName}`}
+        className={`rounded-lg border border-zinc-200 bg-white font-semibold text-zinc-800 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-600/15 disabled:bg-zinc-100 disabled:text-zinc-400 ${
+          compact ? "h-8 w-24 px-2 text-xs" : "h-9 min-w-28 px-3 text-sm"
+        }`}
+        disabled={disabled}
+        onChange={(event) =>
+          setRoleDraft({
+            baseRole: currentRole,
+            selectedRole: event.target.value as AuthRole,
+          })
+        }
+        value={selectedRole}
+      >
+        <option value="user">User</option>
+        <option value="admin">Admin</option>
+      </select>
+      <button
+        aria-haspopup="dialog"
+        aria-label={`Simpan role ${targetUserName}`}
+        className={`inline-flex items-center justify-center rounded-lg bg-blue-600 text-sm font-semibold text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-500 ${
+          compact ? "size-8 px-0" : "h-9 px-3"
+        }`}
+        disabled={submitDisabled}
+        onClick={() => setIsConfirmationOpen(true)}
+        title={`Simpan role ${targetUserName}`}
+        type="button"
+      >
+        {compact ? (
+          <>
+            <Check className="size-4" aria-hidden="true" />
+            <span className="sr-only">Simpan</span>
+          </>
+        ) : (
+          "Simpan"
+        )}
+      </button>
+
+      {isConfirmationOpen ? (
+        <AdminRoleConfirmationDialog
+          action={action}
+          csrfToken={csrfToken}
+          onClose={() => setIsConfirmationOpen(false)}
+          role={selectedRole}
+          targetUserId={targetUserId}
+          targetUserName={targetUserName}
+        />
+      ) : null}
+    </div>
   );
 }
 
-function RoleSubmitButton({
-  compact,
-  disabled,
+function AdminRoleConfirmationDialog({
+  action,
+  csrfToken,
+  onClose,
+  role,
+  targetUserId,
+  targetUserName,
 }: {
-  compact?: boolean;
-  disabled?: boolean;
+  action: AdminServerAction;
+  csrfToken: string;
+  onClose: () => void;
+  role: AuthRole;
+  targetUserId: string;
+  targetUserName: string;
 }) {
-  const { pending } = useFormStatus();
+  const [state, formAction, pending] = useActionState(
+    action,
+    INITIAL_ACTION_STATE,
+  );
+  const isPromotion = role === "admin";
+
+  useEffect(() => {
+    if (state.status !== "success") {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(onClose, 650);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [onClose, state.status]);
 
   return (
-    <button
-      aria-label="Simpan role"
-      className={`inline-flex items-center justify-center rounded-lg bg-blue-600 text-sm font-semibold text-white transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-500 ${
-        compact ? "size-8 px-0" : "h-9 px-3"
-      }`}
-      disabled={disabled || pending}
-      title="Simpan role"
-      type="submit"
+    <AdminConfirmationDialog
+      confirmation={{
+        confirmLabel: "Ya, ubah role",
+        description: isPromotion
+          ? `${targetUserName} akan memperoleh akses penuh ke fitur administrasi dan data operasional.`
+          : `${targetUserName} tidak lagi dapat membuka fitur administrasi setelah role diubah menjadi User.`,
+        eyebrow: "Perubahan hak akses",
+        title: `Ubah role ${targetUserName} menjadi ${isPromotion ? "Admin" : "User"}?`,
+        tone: "warning",
+      }}
+      confirmIcon={<ShieldCheck className="size-4" aria-hidden="true" />}
+      formAction={formAction}
+      onClose={onClose}
+      pending={pending}
     >
-      {compact ? (
-        <>
-          <Check className="size-4" aria-hidden="true" />
-          <span className="sr-only">{pending ? "Memproses..." : "Simpan"}</span>
-        </>
-      ) : pending ? (
-        "..."
-      ) : (
-        "Simpan"
-      )}
-    </button>
+      <AdminActionHiddenFields
+        csrfToken={csrfToken}
+        fields={{ role, targetUserId }}
+      />
+      <DialogActionMessage state={state} />
+    </AdminConfirmationDialog>
   );
 }
