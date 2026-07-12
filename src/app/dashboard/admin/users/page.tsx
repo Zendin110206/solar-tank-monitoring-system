@@ -409,7 +409,12 @@ function UserActionStack({
         <AdminActionForm
           action={deleteAuthUserAction}
           compact
-          confirmMessage={`Hapus akun ${user.fullName}? Aksi ini hanya berhasil jika akun tidak punya jejak pengajuan perangkat.`}
+          confirmation={{
+            confirmLabel: "Ya, hapus akun",
+            description: `Akun ${user.fullName} akan dihapus permanen. Aksi ini hanya dapat dilakukan jika akun tidak memiliki jejak pengajuan perangkat.`,
+            eyebrow: "Hapus akun pengguna",
+            title: `Hapus ${user.fullName}?`,
+          }}
           csrfToken={csrfToken}
           fields={{ targetUserId: user.id }}
           hideMessage

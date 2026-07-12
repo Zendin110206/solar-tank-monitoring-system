@@ -1,8 +1,15 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { useActionState, useState } from "react";
-import { useFormStatus } from "react-dom";
+import type { KeyboardEvent, ReactNode } from "react";
+import {
+  useActionState,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
+import { createPortal, useFormStatus } from "react-dom";
 import {
   Ban,
   Check,
@@ -43,6 +50,13 @@ type ButtonIcon =
   | "send"
   | "key"
   | "trash";
+
+type AdminActionConfirmation = {
+  confirmLabel: string;
+  description: string;
+  eyebrow: string;
+  title: string;
+};
 
 const buttonVariantClass: Record<ButtonVariant, string> = {
   danger:
@@ -98,14 +112,12 @@ function ActionMessage({ state }: { state: AdminActionState }) {
 function SubmitButton({
   children,
   compact,
-  confirmMessage,
   disabled,
   icon,
   variant,
 }: {
   children: ReactNode;
   compact?: boolean;
-  confirmMessage?: string;
   disabled?: boolean;
   icon: ButtonIcon;
   variant: ButtonVariant;
@@ -120,11 +132,6 @@ function SubmitButton({
         compact ? "size-8 px-0" : "h-9 w-full px-3"
       } ${buttonVariantClass[variant]}`}
       disabled={Boolean(disabled) || pending}
-      onClick={(event) => {
-        if (confirmMessage && !window.confirm(confirmMessage)) {
-          event.preventDefault();
-        }
-      }}
       title={typeof children === "string" ? children : undefined}
       type="submit"
     >
@@ -138,12 +145,28 @@ function SubmitButton({
   );
 }
 
-export function AdminActionForm({
+function AdminActionHiddenFields({
+  csrfToken,
+  fields,
+}: {
+  csrfToken: string;
+  fields: Record<string, string>;
+}) {
+  return (
+    <>
+      <input name="csrfToken" type="hidden" value={csrfToken} />
+      {Object.entries(fields).map(([name, value]) => (
+        <input key={name} name={name} type="hidden" value={value} />
+      ))}
+    </>
+  );
+}
+
+function DirectAdminActionForm({
   action,
   children,
   className,
   compact,
-  confirmMessage,
   csrfToken,
   disabled,
   fields,
@@ -155,7 +178,6 @@ export function AdminActionForm({
   children: ReactNode;
   className?: string;
   compact?: boolean;
-  confirmMessage?: string;
   csrfToken: string;
   disabled?: boolean;
   fields: Record<string, string>;
@@ -167,13 +189,9 @@ export function AdminActionForm({
 
   return (
     <form action={formAction} className={`grid gap-1.5 ${className ?? ""}`}>
-      <input name="csrfToken" type="hidden" value={csrfToken} />
-      {Object.entries(fields).map(([name, value]) => (
-        <input key={name} name={name} type="hidden" value={value} />
-      ))}
+      <AdminActionHiddenFields csrfToken={csrfToken} fields={fields} />
       <SubmitButton
         compact={compact}
-        confirmMessage={confirmMessage}
         disabled={disabled}
         icon={icon}
         variant={variant}
@@ -182,6 +200,311 @@ export function AdminActionForm({
       </SubmitButton>
       {hideMessage ? null : <ActionMessage state={state} />}
     </form>
+  );
+}
+
+function AdminActionConfirmationDialog({
+  action,
+  confirmation,
+  csrfToken,
+  fields,
+  icon,
+  onClose,
+}: {
+  action: AdminServerAction;
+  confirmation: AdminActionConfirmation;
+  csrfToken: string;
+  fields: Record<string, string>;
+  icon: ButtonIcon;
+  onClose: () => void;
+}) {
+  const [state, formAction, pending] = useActionState(
+    action,
+    INITIAL_ACTION_STATE,
+  );
+  const titleId = useId();
+  const descriptionId = useId();
+  const dialogRef = useRef<HTMLElement>(null);
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const activeElement =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    const previousOverflow = document.body.style.overflow;
+
+    document.body.style.overflow = "hidden";
+    cancelButtonRef.current?.focus();
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      activeElement?.focus();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (state.status !== "success") {
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(onClose, 450);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [onClose, state.status]);
+
+  function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.key === "Escape" && !pending) {
+      event.preventDefault();
+      onClose();
+      return;
+    }
+
+    if (event.key !== "Tab") {
+      return;
+    }
+
+    const focusableElements = Array.from(
+      dialogRef.current?.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ) ?? [],
+    );
+
+    if (focusableElements.length === 0) {
+      event.preventDefault();
+      return;
+    }
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements.at(-1);
+
+    if (event.shiftKey && document.activeElement === firstElement) {
+      event.preventDefault();
+      lastElement?.focus();
+    } else if (!event.shiftKey && document.activeElement === lastElement) {
+      event.preventDefault();
+      firstElement?.focus();
+    }
+  }
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-50 grid place-items-center bg-zinc-950/40 px-4 py-6 backdrop-blur-sm"
+      onKeyDown={handleKeyDown}
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget && !pending) {
+          onClose();
+        }
+      }}
+      role="presentation"
+    >
+      <section
+        aria-describedby={descriptionId}
+        aria-labelledby={titleId}
+        aria-modal="true"
+        aria-busy={pending}
+        className="w-full max-w-md rounded-xl border border-zinc-200 bg-white p-5 shadow-2xl shadow-zinc-950/20"
+        ref={dialogRef}
+        role="dialog"
+        style={{
+          animation:
+            "login-shell-enter 180ms cubic-bezier(0.22, 1, 0.36, 1) both",
+        }}
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex min-w-0 items-start gap-4">
+            <span className="grid size-11 shrink-0 place-items-center rounded-full bg-red-50 text-red-700 ring-1 ring-red-100">
+              {getIcon(icon)}
+            </span>
+            <div className="min-w-0">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-red-600">
+                {confirmation.eyebrow}
+              </p>
+              <h2
+                className="mt-2 text-xl font-semibold text-zinc-950"
+                id={titleId}
+              >
+                {confirmation.title}
+              </h2>
+            </div>
+          </div>
+          <button
+            aria-label="Tutup dialog konfirmasi"
+            className="grid size-9 shrink-0 place-items-center rounded-lg text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-zinc-600/15 disabled:cursor-not-allowed disabled:opacity-50"
+            disabled={pending}
+            onClick={onClose}
+            type="button"
+          >
+            <X aria-hidden="true" className="size-5" />
+          </button>
+        </div>
+
+        <p
+          className="mt-4 text-sm leading-6 text-zinc-600"
+          id={descriptionId}
+        >
+          {confirmation.description}
+        </p>
+
+        <form action={formAction} className="mt-5 grid gap-3">
+          <AdminActionHiddenFields csrfToken={csrfToken} fields={fields} />
+
+          {state.status === "error" && state.message ? (
+            <p
+              aria-live="polite"
+              className="rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm font-semibold leading-6 text-red-700"
+            >
+              {state.message}
+            </p>
+          ) : null}
+          {state.status === "success" && state.message ? (
+            <p
+              aria-live="polite"
+              className="rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-2 text-sm font-semibold leading-6 text-emerald-700"
+            >
+              {state.message}
+            </p>
+          ) : null}
+
+          <div className="grid gap-2 sm:grid-cols-2">
+            <button
+              className="inline-flex h-11 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-zinc-600/15 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={pending}
+              onClick={onClose}
+              ref={cancelButtonRef}
+              type="button"
+            >
+              Batal
+            </button>
+            <button
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-lg bg-red-600 px-4 text-sm font-semibold text-white shadow-lg shadow-red-600/15 transition hover:bg-red-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-600/20 disabled:cursor-wait disabled:bg-red-300"
+              disabled={pending}
+              type="submit"
+            >
+              {getIcon(icon)}
+              {pending ? "Memproses..." : confirmation.confirmLabel}
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>,
+    document.body,
+  );
+}
+
+function ConfirmedAdminAction({
+  action,
+  children,
+  className,
+  compact,
+  confirmation,
+  csrfToken,
+  disabled,
+  fields,
+  icon,
+  variant,
+}: {
+  action: AdminServerAction;
+  children: ReactNode;
+  className?: string;
+  compact?: boolean;
+  confirmation: AdminActionConfirmation;
+  csrfToken: string;
+  disabled?: boolean;
+  fields: Record<string, string>;
+  icon: ButtonIcon;
+  variant: ButtonVariant;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+  const handleClose = useCallback(() => setIsOpen(false), []);
+
+  return (
+    <div className={className}>
+      <button
+        aria-haspopup="dialog"
+        className={`inline-flex items-center justify-center gap-2 rounded-lg text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-4 disabled:cursor-not-allowed disabled:bg-zinc-200 disabled:text-zinc-500 ${
+          compact ? "size-8 px-0" : "h-9 w-full px-3"
+        } ${buttonVariantClass[variant]}`}
+        disabled={disabled}
+        onClick={() => setIsOpen(true)}
+        title={typeof children === "string" ? children : undefined}
+        type="button"
+      >
+        {getIcon(icon)}
+        {compact ? <span className="sr-only">{children}</span> : children}
+      </button>
+
+      {isOpen ? (
+        <AdminActionConfirmationDialog
+          action={action}
+          confirmation={confirmation}
+          csrfToken={csrfToken}
+          fields={fields}
+          icon={icon}
+          onClose={handleClose}
+        />
+      ) : null}
+    </div>
+  );
+}
+
+export function AdminActionForm({
+  action,
+  children,
+  className,
+  compact,
+  confirmation,
+  csrfToken,
+  disabled,
+  fields,
+  hideMessage,
+  icon,
+  variant,
+}: {
+  action: AdminServerAction;
+  children: ReactNode;
+  className?: string;
+  compact?: boolean;
+  confirmation?: AdminActionConfirmation;
+  csrfToken: string;
+  disabled?: boolean;
+  fields: Record<string, string>;
+  hideMessage?: boolean;
+  icon: ButtonIcon;
+  variant: ButtonVariant;
+}) {
+  if (confirmation) {
+    return (
+      <ConfirmedAdminAction
+        action={action}
+        className={className}
+        compact={compact}
+        confirmation={confirmation}
+        csrfToken={csrfToken}
+        disabled={disabled}
+        fields={fields}
+        icon={icon}
+        variant={variant}
+      >
+        {children}
+      </ConfirmedAdminAction>
+    );
+  }
+
+  return (
+    <DirectAdminActionForm
+      action={action}
+      className={className}
+      compact={compact}
+      csrfToken={csrfToken}
+      disabled={disabled}
+      fields={fields}
+      hideMessage={hideMessage}
+      icon={icon}
+      variant={variant}
+    >
+      {children}
+    </DirectAdminActionForm>
   );
 }
 
