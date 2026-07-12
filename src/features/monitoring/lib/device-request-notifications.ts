@@ -20,7 +20,7 @@ export async function notifyAdminsDeviceRequestCreated(
 ): Promise<AdminTelegramNotifyResult> {
   const adminUrl = buildAdminRequestUrl(request.id);
   const text = [
-    "Pengajuan perangkat baru SolarTank",
+    "Pengajuan perangkat baru FTM",
     "",
     `Kode pengajuan: ${request.requestCode}`,
     `STO: ${request.siteName}`,

@@ -555,7 +555,7 @@ export function DeviceRequestForm({
           icon={<Gauge className="size-5" aria-hidden="true" />}
           title="Beban Genset"
         >
-          Sistem menghitung konsumsi solar per jam dari beban lokasi, kapasitas
+          Sistem menghitung konsumsi bahan bakar per jam dari beban lokasi, kapasitas
           diesel engine, dan cos phi.
         </SectionHeader>
 
@@ -606,7 +606,7 @@ export function DeviceRequestForm({
           </FormField>
           <ComputedMetric
             help="Dipakai estimasi runtime."
-            label="Konsumsi solar"
+            label="Konsumsi bahan bakar"
             unit="L/jam"
             value={calculatedConsumptionLiterPerHour}
           />

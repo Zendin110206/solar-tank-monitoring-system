@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { BrandLogo } from "@/components/brand-logo";
 import type { AuthSafeUser } from "@/features/auth/types";
 import { DashboardMobileNav } from "./dashboard-mobile-nav";
 import { DashboardUserMenu } from "./dashboard-user-menu";
@@ -14,7 +15,10 @@ export type DashboardNavItem = {
 type DashboardHeaderProps = {
   navItems: DashboardNavItem[];
   rightSlot?: ReactNode;
-  user: Pick<AuthSafeUser, "email" | "fullName" | "role" | "username">;
+  user: Pick<
+    AuthSafeUser,
+    "email" | "fullName" | "role" | "telegramVerifiedAt" | "username"
+  >;
 };
 
 const dashboardContactItem: DashboardNavItem = {
@@ -34,20 +38,6 @@ function withDashboardContact(navItems: DashboardNavItem[]) {
   }
 
   return [...navItems, dashboardContactItem];
-}
-
-function SolarTankLogo() {
-  return (
-    <span className="flex w-fit shrink-0 items-center gap-3">
-      <span className="relative grid size-8 place-items-center">
-        <span className="absolute size-8 rounded-full border-2 border-red-500" />
-        <span className="absolute right-0 top-1 size-3 rounded-full bg-cyan-400" />
-        <span className="absolute bottom-1 left-0 size-2.5 rounded-full bg-zinc-950" />
-        <span className="size-2.5 rounded-full bg-red-500" />
-      </span>
-      <span className="text-lg font-semibold">SolarTank</span>
-    </span>
-  );
 }
 
 function DashboardNavLink({ item }: { item: DashboardNavItem }) {
@@ -87,11 +77,14 @@ export function DashboardHeader({
         {/* Brand */}
         <div className="flex min-w-0 items-center gap-3">
           <Link
-            aria-label="Kembali ke dashboard SolarTank"
+            aria-label="Kembali ke dashboard FTM"
             className="min-w-0"
             href="/dashboard"
           >
-            <SolarTankLogo />
+            <BrandLogo
+              markClassName="size-9"
+              textClassName="text-lg font-semibold"
+            />
           </Link>
         </div>
 

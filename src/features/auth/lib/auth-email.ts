@@ -69,8 +69,8 @@ function buildHtmlEmail({
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;background:#ffffff;border:1px solid #e4e4e7;border-radius:12px;overflow:hidden;">
             <tr>
               <td style="padding:22px 24px;border-bottom:1px solid #eef2f7;">
-                <div style="font-size:18px;font-weight:700;color:#18181b;">SolarTank</div>
-                <div style="margin-top:4px;font-size:13px;color:#64748b;">Monitoring tangki solar</div>
+                <div style="font-size:18px;font-weight:700;color:#18181b;">FTM</div>
+                <div style="margin-top:4px;font-size:13px;color:#64748b;">Fuel Tank Management</div>
               </td>
             </tr>
             <tr>
@@ -93,7 +93,7 @@ function buildHtmlEmail({
             </tr>
             <tr>
               <td style="padding:16px 24px;background:#f8fafc;border-top:1px solid #eef2f7;font-size:12px;line-height:1.6;color:#64748b;">
-                Email ini dikirim otomatis oleh SolarTank. Jangan balas email ini.
+                Email ini dikirim otomatis oleh FTM. Jangan balas email ini.
               </td>
             </tr>
           </table>
@@ -191,11 +191,11 @@ export async function sendAdminLoginOtp({
   return sendAuthEmail({
     code,
     email,
-    subject: "Kode masuk admin SolarTank",
+    subject: "Kode masuk admin FTM",
     htmlIntro:
       "Gunakan kode berikut untuk menyelesaikan proses masuk admin. Kode ini berlaku singkat dan hanya bisa dipakai satu kali.",
     lines: [
-      "Kode masuk admin SolarTank:",
+      "Kode masuk admin FTM:",
       "",
       code,
       "",
@@ -219,11 +219,11 @@ export async function sendPasswordResetEmail({
     actionLabel: "Buat password baru",
     actionUrl: resetUrl,
     email,
-    subject: "Reset kata sandi SolarTank",
+    subject: "Reset kata sandi FTM",
     htmlIntro:
-      "Kami menerima permintaan reset kata sandi untuk akun SolarTank Anda. Klik tombol berikut untuk membuat kata sandi baru.",
+      "Kami menerima permintaan reset kata sandi untuk akun FTM Anda. Klik tombol berikut untuk membuat kata sandi baru.",
     lines: [
-      "Permintaan reset kata sandi SolarTank diterima.",
+      "Permintaan reset kata sandi FTM diterima.",
       "",
       "Buka link berikut untuk membuat kata sandi baru:",
       resetUrl,
@@ -248,11 +248,11 @@ export async function sendEmailVerificationEmail({
     actionLabel: "Verifikasi email",
     actionUrl: verificationUrl,
     email,
-    subject: "Verifikasi email SolarTank",
+    subject: "Verifikasi email FTM",
     htmlIntro:
-      "Verifikasi email diperlukan sebelum akun SolarTank bisa disetujui administrator. Klik tombol berikut untuk melanjutkan.",
+      "Verifikasi email diperlukan sebelum akun FTM bisa disetujui administrator. Klik tombol berikut untuk melanjutkan.",
     lines: [
-      "Verifikasi email akun SolarTank diperlukan sebelum akun disetujui.",
+      "Verifikasi email akun FTM diperlukan sebelum akun disetujui.",
       "",
       "Buka link berikut untuk verifikasi email:",
       verificationUrl,
@@ -262,6 +262,6 @@ export async function sendEmailVerificationEmail({
     devLogLabel: "DEV-EMAIL-VERIFY",
     kind: "action",
     warning:
-      "Jika Anda tidak merasa membuat akun SolarTank, abaikan email ini.",
+      "Jika Anda tidak merasa membuat akun FTM, abaikan email ini.",
   });
 }

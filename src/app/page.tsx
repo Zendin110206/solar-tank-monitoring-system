@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 
+import { BrandLogo } from "@/components/brand-logo";
 import { getCurrentSessionUser } from "@/features/auth/lib/auth-session";
 
 const navItems = [
@@ -28,8 +29,8 @@ const tankStatus = [
 
 const siteStats = [
   ["13", "STO terpantau"],
-  ["5 mnt", "interval baca"],
-  ["24/7", "monitoring"],
+  ["20 dtk", "refresh dashboard"],
+  ["24/7", "pantauan"],
 ];
 
 const monitoredSites = [
@@ -123,20 +124,13 @@ export default async function Home() {
         <a
           href="#beranda"
           className="flex items-center gap-3"
-          aria-label="SolarTank"
+          aria-label="FTM"
         >
-          <span
-            className="relative grid size-8 place-items-center"
-            aria-hidden="true"
-          >
-            <span className="absolute size-8 rounded-full border-2 border-red-500" />
-            <span className="absolute right-0 top-1 size-3 rounded-full bg-cyan-400" />
-            <span className="absolute bottom-1 left-0 size-2.5 rounded-full bg-zinc-950" />
-            <span className="size-2.5 rounded-full bg-red-500" />
-          </span>
-          <span className="text-xl font-semibold tracking-normal sm:text-2xl">
-            SolarTank
-          </span>
+          <BrandLogo
+            markClassName="size-10 sm:size-11"
+            priority
+            textClassName="text-xl font-semibold tracking-normal sm:text-2xl"
+          />
         </a>
 
         <nav className="hidden items-center gap-10 text-sm font-medium text-zinc-800 lg:flex">
@@ -192,7 +186,7 @@ export default async function Home() {
         >
           <div className="relative h-40 w-56 bg-[#fff18a] px-7 py-6 text-lg font-medium leading-7 shadow-xl shadow-zinc-300/40">
             <span className="absolute -top-2 left-1/2 size-4 -translate-x-1/2 rounded-full bg-red-500 shadow" />
-            Catat stok solar, cek runtime genset, dan pantau status STO.
+            Catat stok bahan bakar, cek runtime genset, dan pantau status STO.
           </div>
         </div>
 
@@ -341,7 +335,7 @@ export default async function Home() {
               Fitur
             </span>
             <h2 className="mt-10 text-[clamp(1.75rem,4.2vw,3.75rem)] font-medium leading-[1.08] tracking-normal text-zinc-950">
-              Semua kebutuhan monitoring dalam satu tempat
+              Manajemen tangki dalam satu tempat
             </h2>
             <p className="mx-auto mt-6 max-w-2xl text-base leading-8 text-zinc-600 sm:text-lg">
               Dashboard disiapkan untuk membaca data perangkat, melihat kondisi
@@ -418,7 +412,7 @@ export default async function Home() {
 
               <div className="mx-auto max-w-md text-center">
                 <h3 className="text-2xl font-semibold text-zinc-950">
-                  Monitoring multi-STO
+                  Manajemen multi-STO
                 </h3>
                 <p className="mt-4 text-base leading-7 text-zinc-600">
                   Setiap lokasi bisa dipantau dari satu daftar ringkas, sehingga
@@ -545,7 +539,7 @@ export default async function Home() {
                     Runtime genset dan prioritas risiko
                   </h3>
                   <p className="mt-5 text-base leading-8 text-zinc-600">
-                    Volume solar diterjemahkan menjadi estimasi durasi
+                    Volume bahan bakar diterjemahkan menjadi estimasi durasi
                     operasional, supaya keputusan lapangan tidak berhenti di
                     angka liter saja.
                   </p>
@@ -853,10 +847,14 @@ export default async function Home() {
       <footer className="border-t border-zinc-200 bg-white px-5 py-8 sm:px-8 lg:px-12">
         <div className="mx-auto flex max-w-[1480px] flex-col gap-4 text-sm text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-zinc-900">SolarTank</span>
+            <BrandLogo
+              className="gap-2"
+              markClassName="size-7"
+              textClassName="font-semibold text-zinc-900"
+            />
             <span>&copy; 2026 Hak Cipta Dilindungi.</span>
           </div>
-          <p>Solusi Cerdas Pemantauan Tangki Berbasis IoT.</p>
+          <p>FTM Fuel Tank Management Service.</p>
         </div>
       </footer>
     </main>

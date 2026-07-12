@@ -7,9 +7,9 @@ import type { AuthSafeUser } from "@/features/auth/types";
 import { ProfileForm } from "./profile-form";
 
 export const metadata: Metadata = {
-  title: "Profile | SolarTank",
+  title: "Profile | FTM",
   description:
-    "Halaman profile akun SolarTank untuk melihat dan memperbarui data pengguna.",
+    "Halaman profile akun FTM untuk melihat dan memperbarui data pengguna.",
 };
 
 export const dynamic = "force-dynamic";
@@ -70,7 +70,7 @@ export default async function ProfilePage() {
   return (
     <main className="min-h-screen bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
-        navItems={[{ href: "/dashboard", label: "Monitoring Tangki" }]}
+        navItems={[{ href: "/dashboard", label: "Manajemen Tangki" }]}
         user={user}
       />
 

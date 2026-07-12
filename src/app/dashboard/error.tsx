@@ -16,7 +16,7 @@ export default function DashboardError({
           Dashboard belum siap
         </p>
         <h1 className="mt-3 break-words text-2xl font-semibold tracking-normal sm:text-3xl">
-          Data monitoring belum bisa dibaca
+          Data operasional belum bisa dibaca
         </h1>
         <p className="mt-3 break-words text-sm leading-6 text-zinc-600">
           Aplikasi hidup, tetapi dashboard gagal mengambil data dari storage

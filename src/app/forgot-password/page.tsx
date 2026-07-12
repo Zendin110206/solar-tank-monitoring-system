@@ -4,9 +4,9 @@ import Link from "next/link";
 import ForgotPasswordForm from "./forgot-password-form";
 
 export const metadata: Metadata = {
-  title: "Lupa Password | SolarTank",
+  title: "Lupa Password | FTM",
   description:
-    "Permintaan reset kata sandi akun SolarTank melalui email terdaftar.",
+    "Permintaan reset kata sandi akun FTM melalui email terdaftar.",
 };
 
 export default function ForgotPasswordPage() {

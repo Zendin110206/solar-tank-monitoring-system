@@ -156,7 +156,7 @@ export async function notifyAdminsAccessRequestSubmitted({
     request: accessRequestId,
   });
   const text = [
-    "Pengajuan akses baru SolarTank",
+    "Pengajuan akses baru FTM",
     "",
     `Nama: ${payload.fullName}`,
     `Username: ${payload.username}`,

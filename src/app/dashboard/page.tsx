@@ -15,9 +15,9 @@ import Link from "next/link";
 import { connection } from "next/server";
 
 export const metadata: Metadata = {
-  title: "Monitoring Tangki Solar | SolarTank",
+  title: "Manajemen Tangki Bahan Bakar | FTM",
   description:
-    "Tampilan operasional per STO untuk memantau volume tangki solar, status perangkat, dan akses cepat ke detail tangki.",
+    "Tampilan operasional per STO untuk memantau volume tangki bahan bakar, status perangkat, dan akses cepat ke detail tangki.",
 };
 
 export const runtime = "nodejs";
@@ -66,7 +66,7 @@ export default async function SimpleDashboardPage() {
     <main className="min-h-screen w-full min-w-0 overflow-x-hidden bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
         navItems={[
-          { current: true, label: "Monitoring Tangki" },
+          { current: true, label: "Manajemen Tangki" },
           ...(isAdmin
             ? [
                 { href: "/dashboard/detail", label: "Analisis Teknis" },

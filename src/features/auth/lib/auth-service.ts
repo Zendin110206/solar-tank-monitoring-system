@@ -44,20 +44,19 @@ import {
   createPasswordResetTokenRecord,
   createPendingAccessRequest,
   createTelegramBindTokenRecord,
+  completeTelegramBindingInMysql,
   findAuthSessionByTokenHash,
   findAuthUserByIdentity,
   findAuthUserById,
   findEmailVerificationTokenRecord,
   findOtpCodeRecord,
   findPasswordResetTokenRecord,
-  findTelegramBindTokenRecord,
   listAuthSessionsForUser,
   markAuthUserEmailVerified,
   markEmailVerificationTokenUsed,
   markOtpAttempt,
   markOtpUsed,
   markPasswordResetTokenUsed,
-  markTelegramBindTokenUsed,
   recordAuthAuditEvent,
   recordFailedLogin,
   resetFailedLogin,
@@ -65,7 +64,6 @@ import {
   revokeAuthSessionForUser,
   revokeAuthSession,
   revokeOtherUserSessions,
-  setAuthUserTelegramChatId,
   touchAuthSessionIfStale,
   updateAuthUserPasswordHash,
 } from "./mysql-auth-repository";
@@ -119,6 +117,26 @@ function buildSessionExpiry(user: AuthSafeUser): Date {
   return new Date(Date.now() + getSessionTtlSeconds(user.role) * 1000);
 }
 
+function buildSessionUser(
+  user: AuthSafeUser,
+  sessionId: string,
+): AuthSessionUser {
+  return {
+    id: user.id,
+    email: user.email,
+    username: user.username,
+    fullName: user.fullName,
+    phone: user.phone,
+    role: user.role,
+    status: user.status,
+    emailVerifiedAt: user.emailVerifiedAt,
+    telegramVerifiedAt: user.telegramVerifiedAt,
+    passwordChangedAt: user.passwordChangedAt,
+    lastLoginAt: user.lastLoginAt,
+    sessionId,
+  };
+}
+
 function buildAppUrl(path: string, params?: Record<string, string>): string {
   const url = new URL(path, getAppBaseUrl());
 
@@ -155,10 +173,7 @@ async function createSessionForUser(
   });
 
   return {
-    user: {
-      ...user,
-      sessionId,
-    },
+    user: buildSessionUser(user, sessionId),
     sessionToken,
     expiresAt,
   };
@@ -820,28 +835,24 @@ export async function completeTelegramBinding({
   chatId: string;
   request: AuthRequestContext;
 }): Promise<void> {
-  const record = await findTelegramBindTokenRecord(hashOneTimeToken(token));
+  const binding = await completeTelegramBindingInMysql({
+    tokenHash: hashOneTimeToken(token),
+    chatId,
+  });
 
-  if (!record || !isTokenUsable(record)) {
+  if (!binding) {
     throw new Error("Token Telegram sudah tidak valid.");
   }
-
-  await markTelegramBindTokenUsed({
-    tokenId: record.id,
-    chatId,
-  });
-  await setAuthUserTelegramChatId({
-    userId: record.user_id,
-    chatId,
-  });
   await sendTelegramMessage({
     chatId,
-    text: "Akun Telegram berhasil terhubung ke SolarTank.",
+    text:
+      "Akun Telegram berhasil terhubung ke FTM. " +
+      "Kembali ke dashboard lalu klik Cek status Telegram untuk memperbarui status akun.",
   }).catch(() => undefined);
   await recordAuthAuditEvent({
     eventType: "telegram_bound",
-    actorUserId: record.user_id,
-    targetUserId: record.user_id,
+    actorUserId: binding.userId,
+    targetUserId: binding.userId,
     ip: getRequestIp(request),
     userAgent: getRequestUserAgent(request),
   }).catch(() => undefined);

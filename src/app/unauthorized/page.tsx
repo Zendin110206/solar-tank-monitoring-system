@@ -3,9 +3,9 @@ import type { Metadata } from "next";
 import { ShieldAlert } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Akses Tidak Tersedia | SolarTank",
+  title: "Akses Tidak Tersedia | FTM",
   description:
-    "Halaman pemberitahuan ketika akun tidak memiliki izin untuk membuka area SolarTank tertentu.",
+    "Halaman pemberitahuan ketika akun tidak memiliki izin untuk membuka area FTM tertentu.",
 };
 
 export default function UnauthorizedPage() {

@@ -489,9 +489,9 @@ export function ResetMonitoringDeviceDataForm({
         confirmation={{
           confirmLabel: "Ya, bersihkan semuanya",
           description:
-            "Seluruh data STO, tangki, perangkat, reading, pengajuan, paket firmware, dan event provisioning akan dihapus. Akun pengguna dan template tetap dipertahankan.",
-          eyebrow: "Reset data monitoring",
-          title: "Bersihkan semua data perangkat?",
+            "Seluruh data operasional STO, tangki, perangkat, reading, pengajuan, paket firmware, dan event provisioning akan dihapus. Akun pengguna dan template tetap dipertahankan.",
+          eyebrow: "Reset data operasional",
+          title: "Bersihkan semua data operasional perangkat?",
           tone: "danger",
         }}
         icon="trash"

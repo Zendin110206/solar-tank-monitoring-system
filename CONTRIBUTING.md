@@ -1,6 +1,6 @@
 # Panduan Kontribusi
 
-Dokumen ini menjelaskan cara berkontribusi ke Solar Tank Monitoring System agar pekerjaan tetap rapi, mudah ditinjau, dan aman untuk repositori publik.
+Dokumen ini menjelaskan cara berkontribusi ke FTM (Fuel Tank Management) agar pekerjaan tetap rapi, mudah ditinjau, dan aman untuk repositori publik.
 
 ## Prinsip Utama
 

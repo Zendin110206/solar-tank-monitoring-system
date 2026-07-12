@@ -19,9 +19,9 @@ import type {
 import { DeviceRequestForm } from "./device-request-form";
 
 export const metadata: Metadata = {
-  title: "Ajukan Perangkat | SolarTank",
+  title: "Ajukan Perangkat | FTM",
   description:
-    "Pengajuan perangkat monitoring baru untuk proses tinjauan admin dan persiapan paket firmware SolarTank.",
+    "Pengajuan perangkat telemetri baru untuk proses tinjauan admin dan persiapan paket firmware FTM.",
 };
 
 export const dynamic = "force-dynamic";
@@ -157,7 +157,7 @@ export default async function DeviceRequestPage() {
     <main className="min-h-screen overflow-x-hidden bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
         navItems={[
-          { href: "/dashboard", label: "Monitoring Tangki" },
+          { href: "/dashboard", label: "Manajemen Tangki" },
           ...(user.role === "admin"
             ? [
                 {

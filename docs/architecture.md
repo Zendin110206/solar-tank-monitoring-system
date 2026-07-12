@@ -1,6 +1,6 @@
 # Arsitektur Sistem
 
-Dokumen ini menjelaskan gambaran arsitektur Solar Tank Monitoring System dalam bahasa yang mudah diikuti.
+Dokumen ini menjelaskan gambaran arsitektur FTM (Fuel Tank Management) dalam bahasa yang mudah diikuti.
 
 ## Ringkasan
 

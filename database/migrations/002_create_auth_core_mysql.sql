@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS auth_users (
   PRIMARY KEY (id),
   UNIQUE KEY uniq_auth_users_email (email),
   UNIQUE KEY uniq_auth_users_username (username),
+  UNIQUE KEY uniq_auth_users_telegram_chat_id (telegram_chat_id),
   KEY idx_auth_users_role_status (role, status),
   CONSTRAINT chk_auth_users_role
     CHECK (role IN ('user', 'admin')),

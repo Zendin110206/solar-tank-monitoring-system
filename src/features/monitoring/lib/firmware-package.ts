@@ -454,7 +454,7 @@ export function renderDeviceConfigHeader({
 }: Pick<FirmwarePackageContext, "appBaseUrl" | "deviceKey" | "request">): string {
   return `#pragma once
 
-// File ini dibuat otomatis oleh SolarTank.
+// File ini dibuat otomatis oleh FTM.
 // Jangan membagikan isi file ini karena berisi device key.
 
 #define SOLARTANK_API_BASE_URL ${toCppString(appBaseUrl)}
@@ -506,7 +506,7 @@ export function renderFirmwareReadme({
   hardwareProfile,
   request,
 }: Pick<FirmwarePackageContext, "hardwareProfile" | "request">): string {
-  return `# Langkah Upload Firmware SolarTank
+  return `# Langkah Upload Firmware FTM
 
 Paket ini dibuat untuk:
 

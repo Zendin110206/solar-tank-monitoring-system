@@ -39,9 +39,9 @@ type AdminDeviceRequestsPageProps = {
 };
 
 export const metadata: Metadata = {
-  title: "Tinjau Pengajuan Perangkat | SolarTank",
+  title: "Tinjau Pengajuan Perangkat | FTM",
   description:
-    "Tinjauan admin untuk pengajuan perangkat baru sebelum paket firmware SolarTank dibuat.",
+    "Tinjauan admin untuk pengajuan perangkat baru sebelum paket firmware FTM dibuat.",
 };
 
 export const dynamic = "force-dynamic";
@@ -126,7 +126,7 @@ export default async function AdminDeviceRequestsPage({
     <main className="flex h-screen flex-col overflow-hidden bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
         navItems={[
-          { href: "/dashboard", label: "Monitoring Tangki" },
+          { href: "/dashboard", label: "Manajemen Tangki" },
           { current: true, label: "Tinjau Pengajuan" },
           { href: "/dashboard/admin/users", label: "Manajemen Pengguna" },
         ]}

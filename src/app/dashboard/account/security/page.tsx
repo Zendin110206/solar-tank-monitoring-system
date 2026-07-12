@@ -7,9 +7,9 @@ import { listCurrentUserSessions } from "@/features/auth/lib/auth-service";
 import AccountSecurityPanel from "./security-panel";
 
 export const metadata: Metadata = {
-  title: "Keamanan Akun | SolarTank",
+  title: "Keamanan Akun | FTM",
   description:
-    "Pengaturan keamanan akun SolarTank: password, sesi aktif, dan Telegram.",
+    "Pengaturan keamanan akun FTM: password, sesi aktif, dan Telegram.",
 };
 
 export const dynamic = "force-dynamic";
@@ -22,7 +22,7 @@ export default async function AccountSecurityPage() {
   return (
     <main className="min-h-screen bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
-        navItems={[{ href: "/dashboard", label: "Monitoring Tangki" }]}
+        navItems={[{ href: "/dashboard", label: "Manajemen Tangki" }]}
         user={user}
       />
 

@@ -4,7 +4,7 @@ import type {
   RowDataPacket,
 } from "mysql2/promise";
 
-import { getMysqlPool } from "@/features/monitoring/lib/mysql-connection";
+import { getMysqlPool } from "../../monitoring/lib/mysql-connection";
 import type {
   AuthAccessRequest,
   AuthAuditEvent,
@@ -124,6 +124,19 @@ type AuthUserLifecycleRow = RowDataPacket & {
 type AuthUserDirectoryRow = AuthUserRow & {
   created_at: Date;
 };
+
+type VerifiedTelegramUserSummaryRow = RowDataPacket & {
+  full_name: string;
+  role: string;
+  status: string;
+  telegram_verified_at: Date;
+  username: string;
+};
+
+export type VerifiedTelegramUserSummary = Pick<
+  AuthSafeUser,
+  "fullName" | "role" | "status" | "telegramVerifiedAt" | "username"
+>;
 
 type AuthUserCountRow = RowDataPacket & {
   count: number;
@@ -363,6 +376,33 @@ export async function findAuthUserById(
   const row = rows[0];
 
   return row ? rowToSafeUser(row) : null;
+}
+
+export async function findAuthUserByVerifiedTelegramChatId(
+  chatId: string,
+): Promise<VerifiedTelegramUserSummary | null> {
+  const pool = getMysqlPool();
+  const [rows] = await pool.execute<VerifiedTelegramUserSummaryRow[]>(
+    `SELECT username, full_name, role, status, telegram_verified_at
+       FROM auth_users
+      WHERE telegram_chat_id = ?
+        AND telegram_verified_at IS NOT NULL
+      LIMIT 1`,
+    [chatId],
+  );
+  const row = rows[0];
+
+  if (!row || !isAuthRole(row.role) || !isAuthUserStatus(row.status)) {
+    return null;
+  }
+
+  return {
+    fullName: row.full_name,
+    role: row.role,
+    status: row.status,
+    telegramVerifiedAt: toIso(row.telegram_verified_at),
+    username: row.username,
+  };
 }
 
 export async function findAuthSessionByTokenHash(
@@ -1471,53 +1511,86 @@ export async function createTelegramBindTokenRecord({
   return tokenId;
 }
 
-export async function findTelegramBindTokenRecord(
-  tokenHash: string,
-): Promise<AuthTokenRow | null> {
-  const pool = getMysqlPool();
-  const [rows] = await pool.execute<AuthTokenRow[]>(
-    `SELECT id, user_id, token_hash, expires_at, used_at, chat_id
-       FROM auth_telegram_bind_tokens
-      WHERE token_hash = ?
-      LIMIT 1`,
-    [tokenHash],
-  );
-
-  return rows[0] ?? null;
-}
-
-export async function markTelegramBindTokenUsed({
-  tokenId,
+export async function completeTelegramBindingInMysql({
+  tokenHash,
   chatId,
 }: {
-  tokenId: string;
+  tokenHash: string;
   chatId: string;
-}): Promise<void> {
+}): Promise<{ userId: string } | null> {
   const pool = getMysqlPool();
-  await pool.execute(
-    `UPDATE auth_telegram_bind_tokens
-        SET used_at = UTC_TIMESTAMP(3),
-            chat_id = ?
-      WHERE id = ? AND used_at IS NULL`,
-    [chatId, tokenId],
-  );
-}
+  const connection = await pool.getConnection();
 
-export async function setAuthUserTelegramChatId({
-  userId,
-  chatId,
-}: {
-  userId: string;
-  chatId: string;
-}): Promise<void> {
-  const pool = getMysqlPool();
-  await pool.execute(
-    `UPDATE auth_users
-        SET telegram_chat_id = ?,
-            telegram_verified_at = UTC_TIMESTAMP(3)
-      WHERE id = ?`,
-    [chatId, userId],
-  );
+  try {
+    await connection.beginTransaction();
+
+    const [tokens] = await connection.execute<AuthTokenRow[]>(
+      `SELECT id, user_id, token_hash, expires_at, used_at, chat_id
+         FROM auth_telegram_bind_tokens
+        WHERE token_hash = ?
+          AND used_at IS NULL
+          AND expires_at > UTC_TIMESTAMP(3)
+        LIMIT 1
+        FOR UPDATE`,
+      [tokenHash],
+    );
+    const token = tokens[0];
+
+    if (!token) {
+      await connection.rollback();
+      return null;
+    }
+
+    const [conflictingUsers] = await connection.execute<
+      Array<RowDataPacket & { id: string }>
+    >(
+      `SELECT id
+         FROM auth_users
+        WHERE telegram_chat_id = ?
+          AND id <> ?
+        LIMIT 1
+        FOR UPDATE`,
+      [chatId, token.user_id],
+    );
+
+    if (conflictingUsers[0]) {
+      throw new Error("Telegram ini sudah terhubung ke akun FTM lain.");
+    }
+
+    const [userUpdate] = await connection.execute<ResultSetHeader>(
+      `UPDATE auth_users
+          SET telegram_chat_id = ?,
+              telegram_verified_at = UTC_TIMESTAMP(3)
+        WHERE id = ?`,
+      [chatId, token.user_id],
+    );
+
+    if (userUpdate.affectedRows !== 1) {
+      throw new Error("Akun untuk binding Telegram tidak ditemukan.");
+    }
+
+    const [tokenUpdate] = await connection.execute<ResultSetHeader>(
+      `UPDATE auth_telegram_bind_tokens
+          SET used_at = UTC_TIMESTAMP(3),
+              chat_id = ?
+        WHERE id = ?
+          AND used_at IS NULL`,
+      [chatId, token.id],
+    );
+
+    if (tokenUpdate.affectedRows !== 1) {
+      throw new Error("Token Telegram sudah tidak valid.");
+    }
+
+    await connection.commit();
+
+    return { userId: token.user_id };
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
 }
 
 export async function updateAuthUserProfile({

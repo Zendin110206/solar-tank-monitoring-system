@@ -46,7 +46,6 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json({
       ok: true,
       data: {
-        user: result.user,
         redirectTo: "/dashboard",
       },
     });

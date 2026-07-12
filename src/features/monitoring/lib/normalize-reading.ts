@@ -311,7 +311,7 @@ export function normalizeCatPayload({
         ]),
         min: 0,
         max: maxFuelHeightCm,
-        label: "Tinggi solar",
+        label: "Tinggi bahan bakar",
         warnings,
       })
     : null;

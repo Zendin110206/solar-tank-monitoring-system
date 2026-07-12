@@ -2,13 +2,16 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { KeyRound, LogOut, UserRound } from "lucide-react";
+import { AlertTriangle, KeyRound, LogOut, Send, UserRound } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import type { AuthSafeUser } from "@/features/auth/types";
 
 type DashboardUserMenuProps = {
-  user: Pick<AuthSafeUser, "email" | "fullName" | "role" | "username">;
+  user: Pick<
+    AuthSafeUser,
+    "email" | "fullName" | "role" | "telegramVerifiedAt" | "username"
+  >;
 };
 
 function getAvatarLabel(user: DashboardUserMenuProps["user"]) {
@@ -36,6 +39,7 @@ export function DashboardUserMenu({ user }: DashboardUserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const avatarLabel = getAvatarLabel(user);
+  const needsTelegramBinding = !user.telegramVerifiedAt;
 
   useEffect(() => {
     if (!isOpen) {
@@ -88,12 +92,22 @@ export function DashboardUserMenu({ user }: DashboardUserMenuProps) {
       <button
         aria-expanded={isOpen}
         aria-haspopup="menu"
-        aria-label="Buka menu akun"
-        className="grid size-10 place-items-center rounded-full bg-zinc-950 text-sm font-semibold text-white shadow-sm ring-1 ring-zinc-950/10 transition hover:scale-[1.03] hover:bg-blue-600 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20"
+        aria-label={
+          needsTelegramBinding
+            ? "Buka menu akun, Telegram belum terhubung"
+            : "Buka menu akun"
+        }
+        className="relative grid size-10 place-items-center rounded-full bg-zinc-950 text-sm font-semibold text-white shadow-sm ring-1 ring-zinc-950/10 transition hover:scale-[1.03] hover:bg-blue-600 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20"
         onClick={() => setIsOpen((current) => !current)}
         type="button"
       >
         {avatarLabel}
+        {needsTelegramBinding ? (
+          <span className="absolute -right-0.5 -top-0.5 grid size-5 place-items-center rounded-full bg-red-600 text-[0.7rem] font-black leading-none text-white ring-2 ring-white">
+            !
+            <span className="sr-only">Telegram belum terhubung</span>
+          </span>
+        ) : null}
       </button>
 
       {isOpen ? (
@@ -107,8 +121,13 @@ export function DashboardUserMenu({ user }: DashboardUserMenuProps) {
         >
           {/* Account identity */}
           <div className="bg-[#f3ebe7] px-5 py-5 text-center">
-            <div className="mx-auto grid size-16 place-items-center rounded-full bg-blue-600 text-xl font-semibold text-white shadow-sm ring-4 ring-white">
+            <div className="relative mx-auto grid size-16 place-items-center rounded-full bg-blue-600 text-xl font-semibold text-white shadow-sm ring-4 ring-white">
               {avatarLabel}
+              {needsTelegramBinding ? (
+                <span className="absolute -right-0.5 top-0 grid size-6 place-items-center rounded-full bg-red-600 text-xs font-black text-white ring-4 ring-white">
+                  !
+                </span>
+              ) : null}
             </div>
             <p className="mt-3 truncate text-sm font-semibold text-zinc-950">
               {user.fullName}
@@ -121,6 +140,34 @@ export function DashboardUserMenu({ user }: DashboardUserMenuProps) {
 
           {/* Account actions */}
           <div className="grid gap-1 p-2">
+            {needsTelegramBinding ? (
+              <Link
+                className="mb-1 grid gap-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-3 text-left text-sm text-amber-950 transition hover:border-amber-300 hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-500/20"
+                href="/dashboard/account/security"
+                onClick={() => setIsOpen(false)}
+                role="menuitem"
+              >
+                <span className="flex items-start gap-3">
+                  <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-lg bg-white text-amber-700 ring-1 ring-amber-200">
+                    <AlertTriangle className="size-4" aria-hidden="true" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block font-semibold">
+                      Telegram belum terhubung
+                    </span>
+                    <span className="mt-1 block text-xs leading-5 text-amber-800">
+                      Hubungkan akun agar notifikasi dan fitur Telegram siap
+                      dipakai.
+                    </span>
+                  </span>
+                </span>
+                <span className="inline-flex items-center gap-2 text-xs font-semibold text-amber-800">
+                  <Send className="size-3.5" aria-hidden="true" />
+                  Hubungkan Telegram
+                </span>
+              </Link>
+            ) : null}
+
             <Link
               className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold text-zinc-700 transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
               href="/dashboard/profile"

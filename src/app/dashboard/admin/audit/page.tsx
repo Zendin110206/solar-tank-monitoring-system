@@ -6,8 +6,8 @@ import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
 import { listAuthAuditEvents } from "@/features/auth/lib/mysql-auth-repository";
 
 export const metadata: Metadata = {
-  title: "Audit Keamanan | SolarTank",
-  description: "Log audit keamanan akun SolarTank untuk administrator.",
+  title: "Audit Keamanan | FTM",
+  description: "Log audit keamanan akun FTM untuk administrator.",
 };
 
 export const dynamic = "force-dynamic";
@@ -40,7 +40,7 @@ export default async function AdminAuditPage() {
     <main className="min-h-screen bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
         navItems={[
-          { href: "/dashboard", label: "Monitoring Tangki" },
+          { href: "/dashboard", label: "Manajemen Tangki" },
           { href: "/dashboard/admin/users", label: "Manajemen Pengguna" },
           { current: true, label: "Audit Keamanan" },
         ]}

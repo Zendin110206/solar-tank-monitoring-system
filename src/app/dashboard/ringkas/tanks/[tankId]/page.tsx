@@ -37,9 +37,9 @@ import { mergeMonitoringReadingsById } from "@/features/monitoring/lib/latest-re
 import type { DeviceStatus } from "@/features/monitoring/types/monitoring";
 
 export const metadata: Metadata = {
-  title: "Detail Operasional Tangki | SolarTank",
+  title: "Detail Operasional Tangki | FTM",
   description:
-    "Detail operasional tangki solar untuk membaca volume, status perangkat, update terakhir, dan tren volume terbaru.",
+    "Detail operasional tangki bahan bakar untuk membaca volume, status perangkat, update terakhir, dan tren volume terbaru.",
 };
 
 export const runtime = "nodejs";
@@ -468,7 +468,7 @@ export default async function SimpleTankDetailPage({
     <main className="min-h-screen w-full min-w-0 overflow-x-hidden bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
         navItems={[
-          { href: "/dashboard", label: "Monitoring Tangki" },
+          { href: "/dashboard", label: "Manajemen Tangki" },
           { current: true, label: "Detail Operasional" },
           ...(isAdmin
             ? [{ href: "/dashboard/detail", label: "Analisis Teknis" }]

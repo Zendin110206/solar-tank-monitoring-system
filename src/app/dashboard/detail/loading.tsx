@@ -5,7 +5,7 @@ export default function TechnicalDetailLoading() {
     <DashboardRouteLoading
       label="Memuat analisis"
       title="Menyiapkan analisis teknis"
-      description="Sistem sedang membaca data teknis, peta monitoring, dan riwayat perangkat."
+      description="Sistem sedang membaca data teknis, peta operasional, dan riwayat perangkat."
     />
   );
 }

@@ -138,7 +138,12 @@ export default function SignInForm({
           : null;
 
   return (
-    <form className="mt-7 space-y-4" noValidate onSubmit={handleSubmit}>
+    <form
+      className="mt-7 space-y-4"
+      method="post"
+      noValidate
+      onSubmit={handleSubmit}
+    >
       {challengeId ? null : (
         <div>
           <label

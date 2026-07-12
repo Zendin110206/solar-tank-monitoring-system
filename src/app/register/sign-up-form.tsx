@@ -257,7 +257,7 @@ export default function SignUpForm() {
               <option disabled value="">
                 Pilih peran
               </option>
-              <option>Operator monitoring</option>
+              <option>Operator operasional</option>
               <option>Teknisi lapangan</option>
               <option>Reviewer operasional</option>
             </select>

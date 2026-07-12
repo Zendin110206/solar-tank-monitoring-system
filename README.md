@@ -1,11 +1,11 @@
-# Solar Tank Monitoring System
+# FTM - Fuel Tank Management
 
 ![Status](https://img.shields.io/badge/status-prototipe_aktif-blue)
 ![Next.js](https://img.shields.io/badge/Next.js-16.2.9-111827)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)
 ![Lisensi](https://img.shields.io/badge/lisensi-MIT-green)
 
-Solar Tank Monitoring System adalah prototipe aplikasi web untuk memantau volume tangki bahan bakar dari data perangkat atau simulator. Aplikasi ini menyiapkan alur dasar monitoring: data dikirim ke API, data divalidasi, data dinormalisasi, lalu dashboard dapat menampilkan volume, persentase isi, estimasi durasi operasional, status perangkat, dan riwayat pembacaan.
+FTM (Fuel Tank Management) adalah aplikasi web untuk mengelola dan memantau volume tangki bahan bakar dari data perangkat atau simulator. Aplikasi ini menyiapkan alur operasional lengkap: data dikirim ke API, divalidasi, dinormalisasi, lalu dashboard menampilkan volume, persentase isi, estimasi durasi operasional, status perangkat, dan riwayat pembacaan.
 
 Repositori ini menggunakan Bahasa Indonesia agar mudah dibaca oleh pengguna operasional, reviewer non-IT, dan pengembang berikutnya.
 
@@ -395,6 +395,7 @@ curl.exe -X POST http://localhost:3000/api/ingest `
 | `pnpm db:migrate:device-provisioning` | Menjalankan migration tabel pengajuan perangkat, firmware template, hardware profile, paket firmware, dan event provisioning |
 | `pnpm db:migrate:device-request-fields` | Menambahkan field operasional Batch 19, index, dan validasi database ke tabel pengajuan perangkat pada database yang sudah pernah menjalankan migration lama |
 | `pnpm db:migrate:reading-rollup` | Menambahkan snapshot live dan metadata agregat history 5 menit |
+| `pnpm db:migrate:auth-telegram` | Menjamin satu akun Telegram hanya terhubung ke satu akun FTM |
 | `pnpm db:seed:mysql` | Mengisi data contoh site, tangki, dan device ke MySQL |
 | `pnpm db:setup:mysql` | Menjalankan migration lalu seed MySQL |
 | `pnpm db:backup:mysql` | Membuat dump MySQL konsisten ke folder backup yang di-ignore Git |
@@ -481,6 +482,7 @@ Jika database sudah pernah dipakai dan hanya perlu menyusul schema pengajuan per
 pnpm db:migrate:device-provisioning
 pnpm db:migrate:device-request-fields
 pnpm db:migrate:reading-rollup
+pnpm db:migrate:auth-telegram
 ```
 
 `db:migrate:device-request-fields` memperbaiki kasus database lama yang belum memiliki kolom seperti `device_sensor_type`, `load_value`, `diesel_engine_capacity_kva`, dan `cos_phi`. Script ini juga menambahkan index dan check constraint agar aturan database lama sama kuatnya dengan database baru.
@@ -489,6 +491,12 @@ pnpm db:migrate:reading-rollup
 runner migration project. Migration ini tidak menghapus raw history lama. Untuk
 database operasional, jalankan `pnpm db:backup:mysql` terlebih dahulu, lalu cek
 `/api/ready` setelah migration dan deployment.
+
+`db:migrate:auth-telegram` menambahkan unique index untuk binding Telegram. Jika
+database lama masih memiliki satu chat pada beberapa akun, binding yang paling
+baru diverifikasi dipertahankan; binding lama dilepas dan dicatat pada audit log.
+Migration ini aman dijalankan ulang melalui runner schema dan `/api/ready` akan
+menandai deployment belum siap jika index tersebut belum tersedia.
 
 Jika tim perlu membersihkan data device/uji sebelum uji real, login sebagai
 admin lalu buka:

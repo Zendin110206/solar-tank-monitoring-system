@@ -28,9 +28,9 @@ import { listLatestMonitoringReadingsByTankWithSource } from "@/features/monitor
 import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/lib/refresh-interval";
 
 export const metadata: Metadata = {
-  title: "Analisis Teknis Monitoring Solar | SolarTank",
+  title: "Analisis Teknis Tangki Bahan Bakar | FTM",
   description:
-    "Analisis teknis untuk memantau volume tangki solar, runtime genset, status perangkat, peta STO, dan log data monitoring.",
+    "Analisis teknis untuk memantau volume tangki bahan bakar, runtime genset, status perangkat, peta STO, dan log data operasional.",
 };
 
 export const runtime = "nodejs";
@@ -219,7 +219,7 @@ export default async function DashboardPage() {
     <main className="min-h-screen overflow-x-hidden bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
         navItems={[
-          { href: "/dashboard", label: "Monitoring Tangki" },
+          { href: "/dashboard", label: "Manajemen Tangki" },
           { current: true, label: "Analisis Teknis" },
           { href: "#peta", label: "Peta STO" },
           { href: "#prioritas", label: "Prioritas" },
@@ -245,14 +245,14 @@ export default async function DashboardPage() {
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-600 ring-1 ring-red-100">
-                  Data monitoring
+                  Data operasional
                 </span>
                 <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
                   {storageBadgeLabel}
                 </span>
               </div>
               <h1 className="mt-3 max-w-full break-words text-[1.85rem] font-semibold leading-[1.08] tracking-normal text-zinc-950 sm:text-4xl">
-                Monitoring tangki solar STO
+                Manajemen tangki bahan bakar STO
               </h1>
               <p className="mt-2 max-w-3xl break-words text-sm leading-6 text-zinc-500 sm:text-base">
                 Tampilan awal untuk membaca volume, estimasi runtime genset,
@@ -500,8 +500,8 @@ export default async function DashboardPage() {
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <SectionHeader
               label="Log perangkat"
-              title="Daftar monitoring tangki"
-              description="Tabel ini membaca data monitoring dari storage aktif yang juga dipakai endpoint API."
+              title="Daftar manajemen tangki"
+              description="Tabel ini membaca data operasional dari storage aktif yang juga dipakai endpoint API."
             />
             <Link
               href={`/dashboard/tanks/${latestSite.tankId}`}

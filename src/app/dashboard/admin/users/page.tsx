@@ -34,9 +34,9 @@ import {
 import { AdminActionForm, AdminRoleForm } from "./admin-action-controls";
 
 export const metadata: Metadata = {
-  title: "Manajemen Pengguna | SolarTank",
+  title: "Manajemen Pengguna | FTM",
   description:
-    "Manajemen akses pengguna SolarTank untuk admin monitoring tangki solar.",
+    "Manajemen akses pengguna FTM untuk admin manajemen tangki bahan bakar.",
 };
 
 export const dynamic = "force-dynamic";
@@ -774,7 +774,7 @@ export default async function AdminUsersPage({
     <main className="min-h-screen bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
         navItems={[
-          { href: "/dashboard", label: "Monitoring Tangki" },
+          { href: "/dashboard", label: "Manajemen Tangki" },
           { current: true, label: "Manajemen Pengguna" },
           {
             href: "/dashboard/admin/device-requests",

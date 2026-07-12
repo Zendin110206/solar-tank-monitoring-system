@@ -1,16 +1,4 @@
-function BrandMark() {
-  return (
-    <span
-      aria-hidden="true"
-      className="relative grid size-8 shrink-0 place-items-center"
-    >
-      <span className="absolute size-8 rounded-full border-2 border-red-500" />
-      <span className="absolute right-0 top-1 size-3 rounded-full bg-cyan-400" />
-      <span className="absolute bottom-1 left-0 size-2.5 rounded-full bg-zinc-950" />
-      <span className="size-2.5 rounded-full bg-red-500" />
-    </span>
-  );
-}
+import { BrandLogo } from "@/components/brand-logo";
 
 export default function LoginLoading() {
   return (
@@ -27,12 +15,11 @@ export default function LoginLoading() {
       <section className="relative mx-auto grid min-h-[calc(100vh-2.5rem)] w-full max-w-[1320px] overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-[0_28px_90px_rgba(24,24,27,0.14)] lg:min-h-[760px] lg:grid-cols-[0.9fr_1.1fr]">
         <div className="flex min-w-0 flex-col px-5 py-6 sm:px-10 sm:py-8 lg:px-14 xl:px-20">
           <header className="flex items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <BrandMark />
-              <span className="text-xl font-semibold tracking-normal">
-                SolarTank
-              </span>
-            </div>
+            <BrandLogo
+              markClassName="size-9"
+              priority
+              textClassName="text-xl font-semibold tracking-normal"
+            />
             <span className="h-5 w-20 animate-pulse rounded bg-zinc-100" />
           </header>
 
@@ -61,8 +48,8 @@ export default function LoginLoading() {
           </div>
 
           <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 pt-5 text-[0.72rem] text-zinc-400">
-            <span>© 2026 SolarTank</span>
-            <span>Akses sistem monitoring internal</span>
+            <span>© 2026 FTM</span>
+            <span>FTM Fuel Tank Management Service.</span>
           </footer>
         </div>
 
