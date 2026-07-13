@@ -162,7 +162,7 @@ function getErrorState(error: unknown): DeviceRequestFormState {
     return {
       status: "error",
       message:
-        "Pengajuan belum bisa diproses karena struktur database belum lengkap. Administrator perlu menjalankan migration Batch 19 terbaru.",
+        "Pengajuan belum bisa diproses karena struktur database belum lengkap. Administrator perlu menjalankan migration field operasional perangkat terbaru.",
     };
   }
 

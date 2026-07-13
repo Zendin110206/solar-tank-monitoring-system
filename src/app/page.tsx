@@ -28,9 +28,9 @@ const tankStatus = [
 ];
 
 const siteStats = [
-  ["13", "STO terpantau"],
+  ["3", "site pilot terdaftar"],
   ["20 dtk", "refresh dashboard"],
-  ["24/7", "pantauan"],
+  ["5 mnt", "riwayat ringkas"],
 ];
 
 const monitoredSites = [
@@ -232,7 +232,7 @@ export default async function Home() {
         </div>
 
         <div className="absolute bottom-10 left-12 hidden w-[25rem] rounded-lg border border-zinc-200 bg-white/95 p-6 shadow-2xl shadow-zinc-300/50 xl:block">
-          <p className="text-lg font-semibold">Status tangki hari ini</p>
+          <p className="text-lg font-semibold">Ilustrasi status tangki</p>
           <div className="mt-5 space-y-4">
             {tankStatus.map((tank) => (
               <div
@@ -259,7 +259,7 @@ export default async function Home() {
         </div>
 
         <div className="absolute bottom-10 right-14 hidden w-[25rem] rounded-lg border border-zinc-200 bg-white/95 p-6 shadow-2xl shadow-zinc-300/50 xl:block">
-          <p className="text-lg font-semibold">13 STO terpantau</p>
+          <p className="text-lg font-semibold">Snapshot pilot terverifikasi</p>
           <div className="mt-7 grid grid-cols-3 gap-3">
             {siteStats.map(([value, label]) => (
               <div

@@ -6,9 +6,36 @@ Dokumen ini menjadi ringkasan kebenaran operasional saat ini. Jika dokumen lama 
 
 ## Status Produk Saat Ini
 
-FTM masih dalam pengembangan aktif, tetapi sudah melewati fase dashboard dummy. Sistem sekarang sudah memiliki alur monitoring, auth, pengajuan device, pembuatan paket firmware, first valid ping activation, reset reading aman, export CSV reading berbasis periode, dukungan backup MySQL manual/terjadwal, dan cleanup data device.
+FTM adalah **pilot operasional internal yang aktif**, bukan lagi dashboard dummy
+atau konsep portfolio. Sistem telah menerima telemetry perangkat fisik melalui
+deployment Vercel, menyimpannya di Aiven MySQL, dan menampilkannya kepada akun
+pengguna nyata. Konteks penerapannya berada di lingkungan Telkom
+Indonesia/Telkominfra untuk TIF area Pasuruan–Sidoarjo.
 
-Sistem belum boleh disebut production-ready penuh karena deployment production final, restore drill, kalibrasi device lapangan, dan SOP operasional belum selesai diuji.
+Sistem sudah memiliki alur monitoring, auth, pengajuan device, pembuatan paket
+firmware, first valid ping activation, reset reading aman, export CSV berbasis
+periode, backup MySQL, Telegram, helpdesk, serta cleanup data device.
+
+Sistem belum boleh disebut production-ready penuh karena hardening firmware,
+restore drill, kalibrasi device lapangan, alerting, pembatasan akses per lokasi,
+dan SOP operasional belum selesai diuji.
+
+## Snapshot Terverifikasi 13–14 Juli 2026
+
+| Indikator | Hasil |
+|---|---|
+| Vercel landing dan health | HTTP 200 |
+| Readiness publik tanpa akses admin | HTTP 401, sesuai desain |
+| Storage development terotorisasi | MySQL aktif |
+| Registry MySQL | 3 site, 3 tangki, 3 device |
+| Reading pada audit 13 Juli | 9.272 |
+| Kesegaran saat audit | 2 device fresh, 1 device stale |
+| Snapshot live dan rollup 5 menit | Siap digunakan |
+| Regional, Wilayah, Area, dan STO | Schema siap digunakan |
+
+Angka tersebut adalah snapshot bertanggal, bukan janji bahwa semua perangkat
+selalu online. Target awal 5 STO dan arah ekspansi hingga 29 STO harus dibaca
+sebagai rencana bertahap, bukan jumlah deployment yang sudah tercapai.
 
 ## Yang Sudah Ada
 
@@ -43,12 +70,12 @@ Sistem belum boleh disebut production-ready penuh karena deployment production f
 
 ## Yang Belum Final
 
-- Deployment production final dan SOP operasional server pilihan akhir.
+- Persetujuan production final dan SOP operasional jangka panjang.
 - Restore database yang diuji rutin.
 - Monitoring/log service production.
 - Alert operasional level kritis/offline.
 - Telegram approve/reject device request. Saat ini Telegram untuk binding dan notifikasi, bukan approval utama.
-- RTU/Modbus/OPNIMUS integration. Ini fase lanjutan setelah web monitoring 5 STO stabil.
+- RTU/Modbus/OPNIMUS integration. Ini fase lanjutan setelah rollout awal stabil.
 - Firmware TLS validation final. Template ESP8266 saat ini masih perlu keputusan security sebelum production.
 - One-click firmware compile/upload untuk user lapangan.
 - Role operasional lebih rinci di luar `admin` dan `user`.
@@ -96,8 +123,10 @@ Untuk development:
 - `memory` boleh dipakai.
 - data hilang saat server restart.
 
-Untuk pilot/operasional:
+Untuk pilot/operasional yang berjalan saat ini:
 
+- aplikasi aktif di Vercel;
+- database aktif memakai Aiven MySQL;
 - gunakan `SOLAR_TANK_STORAGE_DRIVER=mysql`;
 - matikan fallback global device key;
 - siapkan SMTP, auth secret, package encryption key, backup output dir, dan admin bootstrap;
@@ -107,9 +136,10 @@ Untuk pilot/operasional:
 - uji restore backup ke database staging/lokal sebelum mengklaim SOP backup final.
 
 Deployment Vercel aktif dipakai untuk pilot dan peninjauan tim, tetapi belum
-menjadi bukti bahwa seluruh SOP produksi final sudah selesai. Sebelum kode yang
-membaca Regional/Wilayah dipakai, jalankan `pnpm db:migrate:site-taxonomy` dan
-pastikan pemeriksaan `mysql-location-taxonomy` pada `/api/ready` lulus.
+menjadi bukti bahwa seluruh SOP produksi final sudah selesai. Migration
+Regional/Wilayah telah diterapkan pada database yang diperiksa dan pemeriksaan
+`mysql-location-taxonomy` lulus pada 14 Juli 2026. Environment baru tetap wajib
+menjalankan migration yang sama sebelum kode deployment digunakan.
 
 ## Catatan Data
 
@@ -119,3 +149,5 @@ Data demo, data pilot, dan data real harus dipisahkan.
 - `config/pilot-registry.local.json` jika ada adalah private dan tidak boleh commit.
 - Seed MySQL demo bukan bukti data real.
 - Screenshot/chat lama tidak boleh dijadikan sumber data operasional tanpa verifikasi.
+- Angka pada README atau landing harus menyebut tanggal snapshot dan tidak boleh
+  mengubah target rollout menjadi klaim deployment aktual.

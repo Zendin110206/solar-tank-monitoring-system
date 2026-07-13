@@ -102,7 +102,7 @@ Pekerjaan:
 - repository MySQL untuk reading;
 - storage facade untuk memilih memory atau MySQL;
 - query reading awal memakai batas global untuk fondasi storage;
-- memory store tetap tersedia untuk development lokal, tetapi mode MySQL tidak menampilkan data dummy ketika tabel reading kosong.
+- memory store tetap tersedia untuk development lokal, tetapi mode MySQL tidak menampilkan data contoh ketika tabel reading kosong.
 
 ## 2026-06-26 - Auto-refresh Dashboard dan Detail
 
@@ -118,7 +118,7 @@ Pekerjaan:
 
 Pekerjaan:
 
-- hash key per device dummy;
+- hash key per device contoh;
 - validasi key ingest memakai hash;
 - fallback global tetap tersedia untuk development;
 - simulator memakai key demo sesuai device;
@@ -248,6 +248,20 @@ Penyempurnaan saat review:
 - urutan dan petunjuk form lokasi dibuat lebih mudah dipahami;
 - test menjaga pemetaan database, pengajuan, paket firmware, dan pemeriksaan deployment;
 - README, panduan deployment, model data, pilot, API, manual pengguna, dan PDF diselaraskan.
+
+## 2026-07-14 - Penyelarasan Status Pilot Operasional Publik
+
+Pekerjaan:
+
+- memosisikan README berdasarkan bukti deployment dan database nyata;
+- membedakan kondisi terverifikasi 3 site dari target rollout awal 5 STO dan
+  arah ekspansi 29 STO;
+- menghapus istilah nomor batch internal dari dokumentasi dan pesan pengguna;
+- mengganti klaim jumlah lokasi dan pemantauan tanpa henti dengan snapshot pilot
+  yang dapat dibuktikan;
+- menyelaraskan status operasional, deployment, safety, system boundaries, dan
+  roadmap tanpa mengklaim production-ready;
+- menjaga data contoh tetap tersedia hanya sebagai fasilitas development.
 
 ## Status Verifikasi Terakhir
 

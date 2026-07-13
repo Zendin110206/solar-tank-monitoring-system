@@ -7,7 +7,7 @@ Dokumen ini mencatat keputusan teknis penting agar alasan perubahan tetap bisa d
 Keputusan:
 
 ```text
-Frontend dan API prototipe dibuat dalam satu aplikasi Next.js.
+Frontend dan API versi awal dibuat dalam satu aplikasi Next.js.
 ```
 
 Alasan:
@@ -15,7 +15,7 @@ Alasan:
 - mudah dijalankan lokal;
 - cocok untuk iterasi cepat;
 - API route cukup untuk MVP;
-- deployment demo lebih sederhana.
+- deployment development lebih sederhana.
 
 Catatan:
 
@@ -35,7 +35,7 @@ Alasan:
 - UI tidak boleh menjadi tempat rumus utama;
 - logic bisa dipakai API dan UI.
 
-## 2026-06-25 - Gunakan Data Dummy Public-safe
+## 2026-06-25 - Gunakan Data Contoh Public-safe
 
 Keputusan:
 
@@ -101,7 +101,7 @@ Alasan:
 Keputusan:
 
 ```text
-telemetry-store.ts dipertahankan untuk mode development lokal, sedangkan query MySQL dipindah ke mysql-reading-repository.ts dan dipilih lewat monitoring-storage.ts. Saat mode MySQL aktif, tabel reading kosong tidak lagi diisi dari data dummy agar dashboard pilot/production tidak menampilkan data simulasi sebagai data lapangan.
+telemetry-store.ts dipertahankan untuk mode development lokal, sedangkan query MySQL dipindah ke mysql-reading-repository.ts dan dipilih lewat monitoring-storage.ts. Saat mode MySQL aktif, tabel reading kosong tidak lagi diisi dari data contoh agar dashboard pilot/production tidak menampilkan data simulasi sebagai data lapangan.
 ```
 
 Alasan:

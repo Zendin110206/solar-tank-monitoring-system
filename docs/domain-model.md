@@ -67,7 +67,7 @@ Untuk tangki balok atau rectangular, volume lebih sederhana.
 volumeLiter = panjangCm x lebarCm x tinggiCairanCm / 1000
 ```
 
-Contoh prototype:
+Contoh perhitungan:
 
 ```text
 panjang = 150 cm

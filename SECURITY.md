@@ -54,10 +54,10 @@ Yang sudah ada:
 
 - API ingest mengecek `X-Device-Id`;
 - API ingest mengecek `X-Api-Key` atau `X-Device-Key`;
-- device harus terdaftar di data dummy;
+- device harus terdaftar di data contoh development;
 - device tidak aktif ditolak;
 - payload device yang tidak sesuai header ditolak;
-- hash key per device pada data dummy;
+- hash key per device pada data contoh development;
 - fallback key global bisa dimatikan lewat `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK="false"`;
 - data bisa disimpan di memory store lokal atau MySQL reading repository.
 - login pengguna berbasis database MySQL;
@@ -102,7 +102,7 @@ Jika menemukan masalah keamanan:
 
 Sebelum deployment nyata:
 
-- ganti key dummy;
+- ganti key contoh;
 - simpan secret di environment;
 - matikan fallback global device key;
 - jalankan semua migration database monitoring dan auth;

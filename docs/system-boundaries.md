@@ -7,26 +7,25 @@ Dokumen ini menjelaskan hal yang masuk dan tidak masuk ke repositori.
 Yang masuk:
 
 - landing page;
-- dashboard awal;
-- detail tangki awal;
-- data dummy public-safe;
-- API read-only;
-- API ingest lokal;
+- dashboard operasional, peta, filter lokasi, dan detail tangki;
+- data contoh public-safe khusus development;
+- API baca dan API ingest;
 - normalisasi payload;
 - simulator terminal;
 - memory store development;
-- fondasi MySQL reading;
+- snapshot live dan rollup 5 menit MySQL;
 - registry MySQL untuk site, tangki, device, dan hash key;
 - template registry pilot yang public-safe;
 - script validasi/apply registry pilot lokal;
 - script smoke test payload real-format;
-- validasi key per device untuk data dummy;
+- validasi key per device untuk data contoh development;
 - auth database untuk login, session, OTP admin, reset password, email verification, Telegram binding, audit auth, dan rate limit;
 - pengajuan perangkat baru dari user;
 - review pengajuan perangkat dari admin lewat web;
 - pembuatan device key dan paket firmware ZIP setelah approval;
 - first valid ping activation;
 - cleanup data monitoring/device/uji oleh admin tanpa menghapus akun;
+- export CSV, reset reading, backup MySQL, Telegram, dan helpdesk;
 - unit test;
 - dokumentasi Bahasa Indonesia.
 
@@ -34,18 +33,15 @@ Yang masuk:
 
 Yang belum masuk:
 
-- database production lengkap;
-- konfigurasi auth production final, termasuk SMTP, CAPTCHA, backup, dan prosedur recovery;
+- hardening production penuh, termasuk restore drill dan SOP recovery;
 - role operasional yang lebih rinci di luar `admin` dan `user`;
 - firmware final yang sudah hardening TLS dan one-click compile;
-- deployment production;
 - data real di Git;
 - alert operasional level kritis/offline;
 - approval/reject device lewat Telegram;
 - integrasi hardware yang sudah dikalibrasi final;
 - integrasi RTU/Modbus/OPNIMUS;
 - detail deployment production final;
-- laporan PDF;
 - mobile app.
 
 ## Tidak Boleh Masuk Repo Publik
@@ -69,17 +65,19 @@ Yang tidak boleh masuk:
 Klaim yang aman:
 
 ```text
-Repositori ini adalah prototipe sistem monitoring tangki berbasis web dengan API ingest lokal dan simulator.
+FTM adalah pilot operasional internal yang aktif dengan perangkat, akun,
+deployment Vercel, dan database MySQL nyata dalam cakupan terbatas.
 ```
 
 Klaim yang belum boleh:
 
 ```text
 Sistem sudah production-ready.
-Sistem sudah dipakai operasional.
+Sistem sudah diterapkan secara nasional.
+Seluruh perangkat selalu online.
 Sensor sudah aman untuk tangki nyata.
 Data real sudah final dan tervalidasi lapangan.
-Deployment internal sudah final.
+FTM telah mendapat persetujuan formal sebagai sistem produksi Telkom Indonesia.
 ```
 
 ## Batas Brand dan Data Institusi
@@ -110,14 +108,15 @@ Storage final harus memakai database.
 
 ## Batas MySQL Saat Ini
 
-Fondasi MySQL yang ada saat ini belum berarti seluruh sistem sudah siap production.
+MySQL sudah dipakai pada pilot, tetapi keberadaan database aktif belum berarti
+seluruh sistem siap production.
 
 Yang sudah masuk:
 
-- migration tabel monitoring;
+- migration tabel monitoring dan auth;
 - seed demo;
-- penyimpanan reading;
-- query riwayat terbaru.
+- snapshot live dan history agregat 5 menit;
+- query dashboard, detail, dan CSV;
 - registry site, tangki, device, dan hash key;
 - script apply registry pilot dari file lokal yang tidak di-commit.
 - tabel auth, session, OTP, audit, dan rate limit;
@@ -126,7 +125,7 @@ Yang sudah masuk:
 Yang belum final:
 
 - rotasi key device dari UI admin;
-- backup dan restore;
+- backup terenkripsi dan restore drill;
 - role operasional lebih rinci;
-- SOP pemisahan data dummy dan data real untuk operasional harian.
+- SOP pemisahan data contoh dan data real untuk operasional harian.
 - monitoring server dan alerting.

@@ -138,7 +138,7 @@ History harus bertambah setelah simulator mengirim data.
 - Saat server baru berjalan, memory mode menyiapkan data demo dengan timestamp relatif agar dashboard tidak langsung terlihat basi.
 - Memory store hilang ketika server restart.
 - MySQL mode tersedia untuk latihan persistent reading, tetapi belum berarti production-ready.
-- Key per device sudah divalidasi memakai hash pada data dummy.
+- Key per device sudah divalidasi memakai hash pada data contoh development.
 - Data real hanya boleh dipakai lewat file lokal/env yang tidak di-commit.
 - Repo tidak boleh memuat credential atau data internal.
 
@@ -175,8 +175,8 @@ pnpm db:setup:mysql
 pnpm auth:create-admin
 ```
 
-Jika database sudah pernah dibuat sebelum Batch 19, jalankan juga migration
-khusus pengajuan perangkat agar kolom operasional terbaru tersedia:
+Jika database sudah pernah dibuat sebelum field operasional pengajuan perangkat
+tersedia, jalankan juga migration berikut agar schema lama tetap kompatibel:
 
 ```powershell
 pnpm db:migrate:device-provisioning

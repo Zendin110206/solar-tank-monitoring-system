@@ -1,13 +1,16 @@
 # Deployment
 
-Dokumen ini menjelaskan status deployment dan opsi yang mungkin dipakai nanti.
+Dokumen ini menjelaskan deployment yang aktif, cara menyiapkan environment lain,
+dan batas klaim operasionalnya.
 
 ## Status Saat Ini
 
-Saat ini aplikasi sudah memiliki deployment Vercel yang dipakai untuk pilot dan
-peninjauan tim. Deployment tersebut belum boleh dianggap sebagai sistem
-produksi final sampai prosedur pemulihan backup, kalibrasi perangkat lapangan,
-observasi, dan rollback selesai diuji.
+Saat ini aplikasi aktif di Vercel dan memakai Aiven MySQL untuk pilot operasional
+serta peninjauan tim. Pemeriksaan 14 Juli 2026 membuktikan landing page dan
+`/api/health` merespons HTTP 200, sedangkan registry database berisi 3 site,
+3 tangki, dan 3 device. Deployment tersebut belum boleh dianggap sebagai sistem
+production-hardened sampai pemulihan backup, kalibrasi perangkat, observability,
+alerting, pembatasan akses per lokasi, dan rollback selesai diuji.
 
 Yang sudah aman dilakukan:
 
@@ -31,13 +34,13 @@ Yang sudah aman dilakukan:
 
 Yang belum final:
 
-- database production dengan backup dan SOP restore;
+- backup terenkripsi dengan SOP restore yang telah diuji;
 - domain production final;
 - HTTPS production final di server pilihan akhir;
 - konfigurasi auth production final, termasuk SMTP, CAPTCHA, session secret, dan cookie secure;
 - backup;
 - monitoring server;
-- integrasi device fisik yang sudah divalidasi lapangan.
+- kalibrasi serta persetujuan keselamatan device fisik per lokasi.
 
 Untuk status operasional terbaru, baca juga:
 
@@ -101,9 +104,9 @@ dan pelepasan binding lama dicatat pada audit log.
 Setelah mengubah `.env.local`, restart `pnpm dev`. Perubahan environment tidak
 selalu terbaca hanya dengan menekan tombol refresh dashboard.
 
-## Pilot Vercel + Cloud MySQL
+## Deployment Pilot Vercel + Aiven MySQL
 
-Untuk pilot ringan, alur sementara yang didukung:
+Alur yang aktif dipakai saat ini:
 
 ```text
 Device real atau smoke test
@@ -200,13 +203,13 @@ Catatan:
 - check readiness `mysql-location-taxonomy` harus lulus agar Regional dan Wilayah aman dibaca aplikasi;
 - setelah mengubah env Vercel, lakukan redeploy.
 
-## Opsi Deployment Demo
+## Opsi Deployment Development/Demo Terpisah
 
 Untuk demo tanpa data sensitif, aplikasi bisa diarahkan ke platform seperti Vercel.
 
 Syarat:
 
-- hanya data dummy;
+- hanya data contoh public-safe;
 - tidak ada credential asli;
 - tidak ada payload real;
 - tidak ada lokasi sensitif;
@@ -283,7 +286,7 @@ TELEGRAM_BOT_USERNAME
 - Admin awal sudah dibuat.
 - SMTP sudah diuji untuk OTP admin, verifikasi email, dan reset password.
 - Turnstile sudah aktif untuk form publik dan domain production sudah terdaftar di Cloudflare.
-- API key device tidak memakai dummy key.
+- API key device tidak memakai key development/contoh.
 - Fallback global device key dimatikan.
 - HTTPS aktif.
 - Endpoint ingest punya rate limit.

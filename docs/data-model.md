@@ -24,7 +24,7 @@ Artinya:
 - device mengirim banyak reading;
 - reading dipakai untuk membuat status dan grafik.
 
-Batch 19 menambah alur onboarding perangkat:
+Alur onboarding perangkat saat ini adalah:
 
 ```text
 User mengajukan perangkat

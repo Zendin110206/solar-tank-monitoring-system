@@ -155,7 +155,11 @@ Sebelum data real masuk, perlu validasi:
 - format payload final;
 - deployment target.
 
-## Alur Pilot 5 STO
+## Alur Target Rollout Awal 5 STO
+
+Kondisi terverifikasi per 13–14 Juli 2026 adalah 3 site, 3 tangki, dan 3
+perangkat terdaftar. Bagian ini menjelaskan perluasan menuju target awal 5 STO,
+bukan menyatakan lima lokasi sudah aktif.
 
 Alur pilot yang disiapkan:
 

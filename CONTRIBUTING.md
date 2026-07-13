@@ -113,7 +113,7 @@ Jenis commit yang umum:
 - Gunakan TypeScript type untuk bentuk data penting.
 - Tambahkan test untuk logika yang memengaruhi angka operasional.
 - Hindari dependency baru jika masalah bisa diselesaikan dengan fitur bawaan.
-- Simpan data dummy di file data, bukan tersebar di banyak tempat.
+- Simpan data contoh di file data, bukan tersebar di banyak tempat.
 
 ## Standar Dokumentasi
 
@@ -121,7 +121,7 @@ Dokumentasi harus:
 
 - memakai Bahasa Indonesia yang jelas;
 - menjelaskan istilah teknis dengan bahasa awam jika memungkinkan;
-- membedakan data dummy, simulator, dan data real;
+- membedakan data contoh, simulator, dan data real;
 - menyebut batasan dengan jujur;
 - tidak memakai gaya percakapan personal;
 - tidak memuat data privat.

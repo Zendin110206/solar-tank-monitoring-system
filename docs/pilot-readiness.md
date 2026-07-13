@@ -1,6 +1,10 @@
-# Pilot Readiness 5 STO
+# Target Rollout Awal 5 STO
 
-Dokumen ini menjelaskan cara menyiapkan uji pilot 5 STO dengan data yang sudah disetujui. Fokusnya adalah membuktikan alur:
+Dokumen ini menjelaskan cara memperluas pilot operasional menuju target awal 5
+STO dengan data yang sudah disetujui. Per 13–14 Juli 2026, kondisi yang
+terverifikasi adalah 3 site, 3 tangki, dan 3 perangkat terdaftar; angka 5 pada
+dokumen ini adalah target tahap berikutnya, bukan klaim jumlah lokasi yang sudah
+aktif. Fokusnya adalah membuktikan alur:
 
 ```text
 device real atau smoke test
@@ -16,7 +20,7 @@ Dokumen ini sengaja ditulis pelan-pelan agar bisa diikuti oleh pembaca non-IT.
 
 Yang sudah tersedia:
 
-- deployment demo di Vercel;
+- deployment pilot aktif di Vercel;
 - opsi storage MySQL cloud;
 - registry site/tangki/device dari MySQL;
 - pengelompokan lokasi Regional, Wilayah, Area, dan STO;
@@ -126,8 +130,8 @@ pnpm db:setup:mysql
 pnpm auth:create-admin
 ```
 
-Jika database sudah pernah dibuat sebelum alur pengajuan perangkat Batch 19,
-jalankan migration tambahan ini juga:
+Jika database sudah pernah dibuat sebelum field operasional pengajuan perangkat
+tersedia, jalankan migration tambahan ini juga:
 
 ```powershell
 pnpm db:migrate:device-provisioning
@@ -388,7 +392,7 @@ $env:PILOT_DEVICE_KEY="key-asli-device-tph"
 pnpm pilot:smoke
 ```
 
-Default payload memakai prototype:
+Default payload memakai contoh teknis berikut:
 
 ```text
 tangki balok 150 x 60 x 60 cm
