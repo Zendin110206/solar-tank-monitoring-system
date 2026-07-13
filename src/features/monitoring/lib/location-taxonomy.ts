@@ -30,24 +30,30 @@ function normalizeOptionKey(value?: string | null): string {
   return normalizeOptionText(value).replace(/\s+/g, "");
 }
 
+function findNormalizedOption<T extends readonly string[]>(
+  options: T,
+  value?: string | null,
+): T[number] | null {
+  const normalizedKey = normalizeOptionKey(value);
+
+  if (!normalizedKey) {
+    return null;
+  }
+
+  return (
+    options.find((option) => normalizeOptionKey(option) === normalizedKey) ??
+    null
+  );
+}
+
 export function normalizeRegionalLabel(
   value?: string | null,
 ): FtmRegionalLabel | null {
-  const normalizedValue = normalizeOptionText(value);
-  const match = FTM_REGIONAL_OPTIONS.find(
-    (option) => option.toUpperCase() === normalizedValue,
-  );
-
-  return match ?? null;
+  return findNormalizedOption(FTM_REGIONAL_OPTIONS, value);
 }
 
 export function normalizeWilayahLabel(
   value?: string | null,
 ): FtmWilayahLabel | null {
-  const normalizedValue = normalizeOptionText(value);
-  const match = FTM_WILAYAH_OPTIONS.find(
-    (option) => normalizeOptionKey(option) === normalizeOptionKey(normalizedValue),
-  );
-
-  return match ?? null;
+  return findNormalizedOption(FTM_WILAYAH_OPTIONS, value);
 }

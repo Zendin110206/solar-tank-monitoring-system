@@ -229,6 +229,26 @@ migration 007 berhasil serta aman diulang pada object yang sudah ada
 typecheck, lint, seluruh test, dan build production wajib lulus
 ```
 
+## 2026-07-14 - Review Pengelompokan Lokasi dan Branding Dashboard
+
+Pekerjaan dari PR #15 yang ditinjau:
+
+- menambah Regional dan Wilayah di atas Area/STO;
+- menambah pencarian dan filter lokasi pada dashboard;
+- membawa data lokasi ke pengajuan serta paket perangkat;
+- memperjelas istilah tinggi ruang kosong pada pembacaan sensor;
+- menambah identitas Telkom pada kartu STO;
+- memperjelas pesan sesudah Telegram berhasil dihubungkan.
+
+Penyempurnaan saat review:
+
+- readiness deployment sekarang mendeteksi database lama yang belum memiliki Regional/Wilayah;
+- registry pilot dapat menyimpan Regional/Wilayah dan tetap aman untuk file lama;
+- penulisan `TREG5`/`TIF3` dirapikan otomatis ke bentuk resmi;
+- urutan dan petunjuk form lokasi dibuat lebih mudah dipahami;
+- test menjaga pemetaan database, pengajuan, paket firmware, dan pemeriksaan deployment;
+- README, panduan deployment, model data, pilot, API, manual pengguna, dan PDF diselaraskan.
+
 ## Status Verifikasi Terakhir
 
 Perintah:

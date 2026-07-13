@@ -1,17 +1,33 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
+const mocks = vi.hoisted(() => ({
+  query: vi.fn(),
+}));
+
+vi.mock("../lib/mysql-connection", () => ({
+  getMysqlPool: () => ({ query: mocks.query }),
+}));
 
 import {
+  checkMonitoringLocationTaxonomySchemaFromMysql,
   rowToDevice,
   rowToSite,
   rowToTank,
 } from "../lib/mysql-reference-repository";
 
 describe("mysql reference repository mappers", () => {
+  beforeEach(() => {
+    mocks.query.mockReset();
+    mocks.query.mockResolvedValue([[], []]);
+  });
+
   it("maps mysql site rows into Site objects", () => {
     const site = rowToSite({
       id: "site-demo-01",
       code: "DMO",
       name: "STO Demo",
+      regional_label: "TREG 5",
+      wilayah_label: "TIF 3",
       area_label: "Area demo",
       latitude: "-7.6500000",
       longitude: "112.9000000",
@@ -22,11 +38,25 @@ describe("mysql reference repository mappers", () => {
       id: "site-demo-01",
       code: "DMO",
       name: "STO Demo",
+      regionalLabel: "TREG 5",
+      wilayahLabel: "TIF 3",
       areaLabel: "Area demo",
       latitude: -7.65,
       longitude: 112.9,
       isActive: true,
     });
+  });
+
+  it("checks both location tables in one lightweight database request", async () => {
+    await checkMonitoringLocationTaxonomySchemaFromMysql();
+
+    expect(mocks.query).toHaveBeenCalledTimes(1);
+    expect(mocks.query.mock.calls[0]?.[0]).toContain("monitoring_sites");
+    expect(mocks.query.mock.calls[0]?.[0]).toContain(
+      "monitoring_device_requests",
+    );
+    expect(mocks.query.mock.calls[0]?.[0]).toContain("regional_label");
+    expect(mocks.query.mock.calls[0]?.[0]).toContain("wilayah_label");
   });
 
   it("maps mysql tank rows into Tank objects", () => {

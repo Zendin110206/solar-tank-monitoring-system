@@ -366,7 +366,7 @@ export function DeviceRequestForm({
           icon={<MapPin className="size-5" aria-hidden="true" />}
           title="Lokasi STO"
         >
-          Data ini dipakai untuk nama lokasi, wilayah kerja, dan titik peta.
+          Data ini menentukan pengelompokan lokasi dan titik STO pada peta.
         </SectionHeader>
 
         <div className="grid w-full min-w-0 max-w-6xl gap-4 md:grid-cols-2 xl:grid-cols-3">
@@ -379,17 +379,9 @@ export function DeviceRequestForm({
             />
           </FormField>
           <FormField
-            label="Area"
-            help="Contoh: Pasuruan, Sidoarjo, Jombang"
+            label="Regional"
+            help="Kelompok wilayah besar Telkom, misalnya TREG 5."
           >
-            <input
-              className={inputClassName()}
-              name="areaLabel"
-              placeholder="Pasuruan"
-              required
-            />
-          </FormField>
-          <FormField label="Regional" help="Pilih regional Telkom.">
             <select className={inputClassName()} name="regionalLabel" required>
               <option value="">Pilih regional</option>
               {FTM_REGIONAL_OPTIONS.map((regional) => (
@@ -399,7 +391,10 @@ export function DeviceRequestForm({
               ))}
             </select>
           </FormField>
-          <FormField label="Wilayah" help="Pilih wilayah operasional.">
+          <FormField
+            label="Wilayah"
+            help="Wilayah operasional di bawah regional, misalnya TIF 3."
+          >
             <select className={inputClassName()} name="wilayahLabel" required>
               <option value="">Pilih wilayah</option>
               {FTM_WILAYAH_OPTIONS.map((wilayah) => (
@@ -408,6 +403,17 @@ export function DeviceRequestForm({
                 </option>
               ))}
             </select>
+          </FormField>
+          <FormField
+            label="Area"
+            help="Nama area kerja atau kota, misalnya Pasuruan."
+          >
+            <input
+              className={inputClassName()}
+              name="areaLabel"
+              placeholder="Pasuruan"
+              required
+            />
           </FormField>
           <FormField
             label="Latitude"

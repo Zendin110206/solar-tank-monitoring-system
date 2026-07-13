@@ -29,6 +29,7 @@ Yang sudah tersedia:
 - kontrol admin untuk menghapus data STO langsung dari kartu dashboard, membersihkan pengajuan perangkat terpilih, atau reset data monitoring tanpa menghapus akun, template firmware, atau profil hardware;
 - analisis teknis untuk monitoring detail;
 - monitoring operasional dengan tampilan kartu dan peta;
+- pengelompokan lokasi berjenjang `Regional -> Wilayah -> Area -> STO`, lengkap dengan pencarian dan filter pada dashboard;
 - halaman detail operasional per tangki untuk operator;
 - data contoh untuk lokasi, tangki, perangkat, dan pembacaan;
 - timestamp data contoh memory mode digeser relatif ke waktu server start agar demo awal tetap mudah dibaca;
@@ -396,6 +397,7 @@ curl.exe -X POST http://localhost:3000/api/ingest `
 | `pnpm db:migrate:device-request-fields` | Menambahkan field operasional Batch 19, index, dan validasi database ke tabel pengajuan perangkat pada database yang sudah pernah menjalankan migration lama |
 | `pnpm db:migrate:reading-rollup` | Menambahkan snapshot live dan metadata agregat history 5 menit |
 | `pnpm db:migrate:auth-telegram` | Menjamin satu akun Telegram hanya terhubung ke satu akun FTM |
+| `pnpm db:migrate:site-taxonomy` | Menambahkan tempat penyimpanan Regional dan Wilayah pada lokasi serta pengajuan perangkat |
 | `pnpm db:seed:mysql` | Mengisi data contoh site, tangki, dan device ke MySQL |
 | `pnpm db:setup:mysql` | Menjalankan migration lalu seed MySQL |
 | `pnpm db:backup:mysql` | Membuat dump MySQL konsisten ke folder backup yang di-ignore Git |
@@ -483,6 +485,7 @@ pnpm db:migrate:device-provisioning
 pnpm db:migrate:device-request-fields
 pnpm db:migrate:reading-rollup
 pnpm db:migrate:auth-telegram
+pnpm db:migrate:site-taxonomy
 ```
 
 `db:migrate:device-request-fields` memperbaiki kasus database lama yang belum memiliki kolom seperti `device_sensor_type`, `load_value`, `diesel_engine_capacity_kva`, dan `cos_phi`. Script ini juga menambahkan index dan check constraint agar aturan database lama sama kuatnya dengan database baru.
@@ -497,6 +500,12 @@ database lama masih memiliki satu chat pada beberapa akun, binding yang paling
 baru diverifikasi dipertahankan; binding lama dilepas dan dicatat pada audit log.
 Migration ini aman dijalankan ulang melalui runner schema dan `/api/ready` akan
 menandai deployment belum siap jika index tersebut belum tersedia.
+
+`db:migrate:site-taxonomy` menambahkan Regional dan Wilayah tanpa menghapus data
+lama. Lokasi lama diberi nilai awal `TREG 5` dan `TIF 3` agar pilot Pasuruan
+tetap bisa dibuka. Sesudah migration, nilai tiap STO dapat diperbarui melalui
+pengajuan perangkat atau registry pilot. `/api/ready` akan menolak status siap
+jika tempat penyimpanan baru ini belum tersedia.
 
 Jika tim perlu membersihkan data device/uji sebelum uji real, login sebagai
 admin lalu buka:

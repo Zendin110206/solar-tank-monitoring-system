@@ -19,6 +19,7 @@ Yang sudah tersedia:
 - deployment demo di Vercel;
 - opsi storage MySQL cloud;
 - registry site/tangki/device dari MySQL;
+- pengelompokan lokasi Regional, Wilayah, Area, dan STO;
 - validasi key per device;
 - normalisasi payload real device;
 - review config payload vs registry;
@@ -32,7 +33,7 @@ Yang belum final:
 
 - SMTP production dan domain email resmi;
 - Turnstile production untuk form publik;
-- rate limit endpoint ingest;
+- perlindungan tambahan di luar aplikasi untuk membatasi lalu lintas berbahaya ke endpoint ingest;
 - audit log khusus request ingest gagal;
 - backup database production;
 - keputusan server final;
@@ -132,6 +133,8 @@ jalankan migration tambahan ini juga:
 pnpm db:migrate:device-provisioning
 pnpm db:migrate:device-request-fields
 pnpm db:migrate:reading-rollup
+pnpm db:migrate:auth-telegram
+pnpm db:migrate:site-taxonomy
 ```
 
 Untuk database operasional yang sudah berisi data, jalankan
@@ -255,6 +258,7 @@ config/pilot-registry.local.json
 Yang wajib diganti:
 
 - nama 5 STO sesuai data yang boleh dipakai;
+- Regional, Wilayah, dan Area setiap STO sesuai struktur organisasi yang disetujui;
 - koordinat real yang sudah disetujui;
 - `coordinateStatus` menjadi `approved`;
 - kode device final;
@@ -269,7 +273,9 @@ Contoh bagian penting:
   "id": "site-tph",
   "code": "TPH",
   "name": "STO TPH",
-  "areaLabel": "Pilot Pasuruan",
+  "regionalLabel": "TREG 5",
+  "wilayahLabel": "TIF 3",
+  "areaLabel": "Pasuruan",
   "latitude": -7.6500000,
   "longitude": 112.9000000,
   "coordinateStatus": "approved",
@@ -357,6 +363,7 @@ storageDriver: mysql
 mysql: ok
 mysql-reference-registry: aktif
 mysql-reading-rollup: aktif
+mysql-location-taxonomy: aktif
 ```
 
 ## 8. Smoke Test Payload
@@ -554,9 +561,9 @@ Pilot ini belum berarti production final.
 Sebelum production, masih perlu:
 
 - SMTP production dan Turnstile production;
-- rate limit endpoint ingest;
+- perlindungan jaringan tambahan di luar rate limit aplikasi;
 - audit log khusus request ingest gagal;
-- backup database;
+- latihan pemulihan backup database;
 - rotasi key device dari UI/prosedur resmi;
 - monitoring server;
 - SOP jika device offline;

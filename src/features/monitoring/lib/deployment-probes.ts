@@ -21,7 +21,10 @@ import {
 import { isGlobalDeviceKeyFallbackAllowed } from "./device-key";
 import { getDevicePackageEncryptionKey } from "./firmware-package";
 import { checkMysqlConnection, getMysqlPool } from "./mysql-connection";
-import { countMonitoringReferenceRowsFromMysql } from "./mysql-reference-repository";
+import {
+  checkMonitoringLocationTaxonomySchemaFromMysql,
+  countMonitoringReferenceRowsFromMysql,
+} from "./mysql-reference-repository";
 import { checkMonitoringReadingStorageSchemaFromMysql } from "./mysql-reading-repository";
 import {
   getMonitoringStorageDriver,
@@ -167,6 +170,31 @@ async function checkReadingStorageSchemaReadiness(): Promise<DeploymentCheck> {
       status: "error",
       message:
         "Schema rollup reading belum siap. Jalankan migration 007 sebelum menerima telemetry MySQL.",
+      latencyMs: getElapsedMs(startedAtMs),
+    };
+  }
+}
+
+async function checkLocationTaxonomySchemaReadiness(): Promise<DeploymentCheck> {
+  const startedAtMs = Date.now();
+
+  try {
+    await checkMonitoringLocationTaxonomySchemaFromMysql();
+
+    return {
+      name: "mysql-location-taxonomy",
+      ok: true,
+      status: "ok",
+      message: "Regional, wilayah, dan area lokasi siap digunakan.",
+      latencyMs: getElapsedMs(startedAtMs),
+    };
+  } catch {
+    return {
+      name: "mysql-location-taxonomy",
+      ok: false,
+      status: "error",
+      message:
+        "Struktur Regional dan Wilayah belum siap. Jalankan migration 009 sebelum men-deploy dashboard lokasi.",
       latencyMs: getElapsedMs(startedAtMs),
     };
   }
@@ -585,13 +613,24 @@ export async function getDeploymentReadiness(
   ];
 
   if (storageDriver === "mysql" && storageCheck.ok) {
-    const [registryCheck, readingRollupCheck, authTelegramCheck] =
+    const [
+      registryCheck,
+      readingRollupCheck,
+      authTelegramCheck,
+      locationTaxonomyCheck,
+    ] =
       await Promise.all([
         checkReferenceRegistryReadiness(),
         checkReadingStorageSchemaReadiness(),
         checkAuthTelegramSchemaReadiness(),
+        checkLocationTaxonomySchemaReadiness(),
       ]);
-    checks.push(registryCheck, readingRollupCheck, authTelegramCheck);
+    checks.push(
+      registryCheck,
+      readingRollupCheck,
+      authTelegramCheck,
+      locationTaxonomyCheck,
+    );
   }
 
   const hasError = checks.some((check) => !check.ok);

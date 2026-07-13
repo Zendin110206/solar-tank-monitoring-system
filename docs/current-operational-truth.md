@@ -1,6 +1,6 @@
 # Current Operational Truth
 
-Tanggal status: 2026-07-11
+Tanggal status: 2026-07-14
 
 Dokumen ini menjadi ringkasan kebenaran operasional saat ini. Jika dokumen lama di repo atau `local_context` bertentangan dengan dokumen ini, gunakan dokumen ini sebagai acuan sementara lalu update dokumen lama yang tertinggal.
 
@@ -33,6 +33,7 @@ Sistem belum boleh disebut production-ready penuh karena deployment production f
 - Overview, detail, dan API memilih timestamp paling baru secara konsisten selama transisi writer lama ke writer rollup.
 - Ingest punya rate limit saat storage MySQL aktif.
 - Dashboard ringkas, dashboard detail, peta, detail tangki, dan grafik trend.
+- Lokasi dikelompokkan berurutan sebagai Regional, Wilayah, Area, lalu STO; dashboard dapat mencari dan memfilter setiap tingkat tersebut.
 - Download CSV reading dari halaman detail tangki dengan periode 1 hari, 7 hari, atau 30 hari mengikuti pilihan grafik.
 - Admin reset reading per STO dan reset semua reading tanpa menghapus registry/device.
 - Admin cleanup untuk data STO/device/uji tanpa menghapus akun user/admin, template firmware, atau hardware profile.
@@ -105,7 +106,10 @@ Untuk pilot/operasional:
 - jalankan `pnpm db:migrate:reading-rollup` sebelum men-deploy writer snapshot/rollup;
 - uji restore backup ke database staging/lokal sebelum mengklaim SOP backup final.
 
-Detail deployment pilihan akhir belum dipublikasikan di repo utama pada status ini. Jalur tersebut ditunda sampai keputusan tim berikutnya.
+Deployment Vercel aktif dipakai untuk pilot dan peninjauan tim, tetapi belum
+menjadi bukti bahwa seluruh SOP produksi final sudah selesai. Sebelum kode yang
+membaca Regional/Wilayah dipakai, jalankan `pnpm db:migrate:site-taxonomy` dan
+pastikan pemeriksaan `mysql-location-taxonomy` pada `/api/ready` lulus.
 
 ## Catatan Data
 

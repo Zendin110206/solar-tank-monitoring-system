@@ -145,6 +145,23 @@ export function rowToDevice(row: DeviceRow): Device {
   };
 }
 
+export async function checkMonitoringLocationTaxonomySchemaFromMysql(): Promise<void> {
+  const pool = getMysqlPool();
+
+  await pool.query(
+    `
+      SELECT
+        sites.regional_label,
+        sites.wilayah_label,
+        requests.regional_label,
+        requests.wilayah_label
+      FROM monitoring_sites AS sites
+      CROSS JOIN monitoring_device_requests AS requests
+      LIMIT 0
+    `,
+  );
+}
+
 export async function listMonitoringSitesFromMysql(): Promise<Site[]> {
   const pool = getMysqlPool();
   const [rows] = await pool.query<SiteRow[]>(

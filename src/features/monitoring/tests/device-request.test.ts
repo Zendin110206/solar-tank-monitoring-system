@@ -80,6 +80,9 @@ describe("device request foundation", () => {
     expect(validation.normalized).toMatchObject({
       siteCode: "TPH",
       siteName: "STO TPH",
+      areaLabel: "Pasuruan",
+      regionalLabel: "TREG 5",
+      wilayahLabel: "TIF 3",
       deviceSensorType: "fuel",
       sensorMountHeightCm: 60,
       loadValue: 20,
@@ -97,6 +100,48 @@ describe("device request foundation", () => {
       declaredCapacityLiter: 540,
       isConsistent: true,
     });
+  });
+
+  it("normalizes compact location labels into the approved format", () => {
+    const validation = validateDeviceRequestDraft(
+      {
+        ...baseDraft,
+        regionalLabel: "treg5",
+        wilayahLabel: "tif3",
+      },
+      {
+        firmwareTemplates: [firmwareTemplate],
+        hardwareProfiles: [rectangularProfile],
+      },
+    );
+
+    expect(validation.ok).toBe(true);
+    expect(validation.normalized).toMatchObject({
+      regionalLabel: "TREG 5",
+      wilayahLabel: "TIF 3",
+    });
+  });
+
+  it("rejects requests without an approved regional and wilayah", () => {
+    const validation = validateDeviceRequestDraft(
+      {
+        ...baseDraft,
+        regionalLabel: "Regional tidak dikenal",
+        wilayahLabel: "",
+      },
+      {
+        firmwareTemplates: [firmwareTemplate],
+        hardwareProfiles: [rectangularProfile],
+      },
+    );
+
+    expect(validation.ok).toBe(false);
+    expect(validation.errors).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ field: "regionalLabel" }),
+        expect.objectContaining({ field: "wilayahLabel" }),
+      ]),
+    );
   });
 
   it("preserves precise latitude and longitude values", () => {

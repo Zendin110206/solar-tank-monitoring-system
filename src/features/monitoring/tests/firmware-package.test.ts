@@ -142,6 +142,21 @@ describe("firmware package helpers", () => {
       "manifest.json",
     ]);
     expect(bundle.files.every((file) => file.content.length > 0)).toBe(true);
+    const manifestFile = bundle.files.find(
+      (file) => file.path === "manifest.json",
+    );
+    const manifest = JSON.parse(
+      manifestFile?.content.toString("utf8") ?? "{}",
+    ) as {
+      siteRegional?: string;
+      siteWilayah?: string;
+      siteLocation?: { area?: string };
+    };
+    expect(manifest).toMatchObject({
+      siteRegional: "TREG 5",
+      siteWilayah: "TIF 3",
+      siteLocation: { area: "Pasuruan" },
+    });
     expect(
       bundle.files
         .find((file) => file.path === "solar_tank_firmware.ino")

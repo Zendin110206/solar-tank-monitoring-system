@@ -58,6 +58,8 @@ describe("mysql device request repository mappers", () => {
       status: "approved_waiting_package",
       site_code: "TPH",
       site_name: "STO TPH",
+      regional_label: "TREG 5",
+      wilayah_label: "TIF 3",
       area_label: "Pasuruan",
       latitude: "-7.7200",
       longitude: "112.8800",
@@ -97,6 +99,8 @@ describe("mysql device request repository mappers", () => {
     expect(request).toMatchObject({
       requestCode: "REQ-TPH-20260705-ABC123",
       status: "approved_waiting_package",
+      regionalLabel: "TREG 5",
+      wilayahLabel: "TIF 3",
       latitude: -7.72,
       longitude: 112.88,
       capacityLiter: 540,

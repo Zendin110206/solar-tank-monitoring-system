@@ -169,3 +169,22 @@ Catatan kompatibilitas:
 Overview dan detail membandingkan snapshot dengan history terbaru berdasarkan
 `receivedAt`. Ini mencegah status berbeda ketika database sudah dimigrasi tetapi
 deployment lama masih menulis raw selama rollout.
+
+## 2026-07-14 - Gunakan Urutan Regional, Wilayah, Area, dan STO
+
+Keputusan:
+
+```text
+Setiap STO dikelompokkan sebagai Regional -> Wilayah -> Area -> STO.
+```
+
+Alasan:
+
+- daftar tetap mudah dicari ketika jumlah STO bertambah lintas area;
+- istilah lokasi konsisten antara pengajuan perangkat, dashboard, peta, paket firmware, dan registry pilot;
+- perangkat tidak perlu mengirim nama lokasi pada setiap reading karena server mengambilnya dari registry;
+- lokasi pilot lama memakai nilai awal `TREG 5` dan `TIF 3` agar perubahan database tidak membuat data yang sudah ada hilang.
+
+Catatan: daftar pilihan saat ini mengikuti kebutuhan pilot yang sudah disetujui.
+Penambahan Regional/Wilayah baru harus memakai data organisasi resmi, bukan
+perkiraan pengembang.

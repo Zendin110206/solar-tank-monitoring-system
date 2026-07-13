@@ -8,6 +8,10 @@ Sistem ini memiliki beberapa objek utama:
 
 ```text
 Lokasi
+  -> Regional
+  -> Wilayah
+  -> Area
+  -> STO
   -> Tangki
   -> Device
   -> Reading
@@ -50,6 +54,8 @@ Field penting:
 | `id` | ID internal lokasi |
 | `code` | kode pendek lokasi |
 | `name` | nama lokasi |
+| `regionalLabel` | kelompok lokasi paling besar, contoh `TREG 5` |
+| `wilayahLabel` | kelompok di bawah Regional, contoh `TIF 3` |
 | `areaLabel` | label area |
 | `coordinate` | koordinat manual contoh |
 | `markerLeft` / `markerTop` | posisi marker pada peta ilustratif |
@@ -115,7 +121,8 @@ Field penting:
 | `requestCode` | kode pengajuan yang mudah dilacak admin |
 | `requesterEmail` | email user yang mengajukan |
 | `status` | status review dan provisioning |
-| `siteName` / `areaLabel` | nama STO dan wilayah |
+| `siteName` | nama STO yang tampil di dashboard |
+| `regionalLabel` / `wilayahLabel` / `areaLabel` | urutan kelompok lokasi dari paling besar ke paling dekat dengan STO |
 | `latitude` / `longitude` | koordinat manual untuk peta |
 | `deviceCode` | kode device yang dibuat sistem |
 | `deviceSensorType` | tipe sensor, saat ini fokus ke sensor fuel |
@@ -213,7 +220,7 @@ Field penting:
 | `tankId` | tangki yang dibaca |
 | `measuredAt` | waktu pengukuran dari device atau fallback server |
 | `receivedAt` | waktu server menerima data |
-| `sensorDistanceCm` | jarak sensor ke permukaan |
+| `sensorDistanceCm` | tinggi ruang kosong: jarak dari sensor di bagian atas tangki ke permukaan bahan bakar |
 | `fuelHeightCm` | tinggi bahan bakar |
 | `volumeLiter` | estimasi volume |
 | `fillPercent` | persentase isi |

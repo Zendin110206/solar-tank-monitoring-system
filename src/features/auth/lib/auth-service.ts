@@ -846,8 +846,8 @@ export async function completeTelegramBinding({
   await sendTelegramMessage({
     chatId,
     text:
-      "Akun telegram anda sudah berhasil dibind dengan FTM.✅\n\n" +
-      "Tekan /help untuk akses bantuan dan fitur pada project FTM.",
+      "Akun Telegram Anda berhasil terhubung ke FTM. ✅\n\n" +
+      "Ketik /help untuk melihat bantuan dan fitur yang tersedia.",
   }).catch(() => undefined);
   await recordAuthAuditEvent({
     eventType: "telegram_bound",
