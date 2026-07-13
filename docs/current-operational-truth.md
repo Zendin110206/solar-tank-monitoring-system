@@ -1,4 +1,4 @@
-# Current Operational Truth
+# Status Operasional Saat Ini
 
 Tanggal status: 2026-07-14
 
@@ -26,14 +26,14 @@ dan SOP operasional belum selesai diuji.
 
 | Indikator | Hasil |
 |---|---|
-| Vercel landing dan health | HTTP 200 |
-| Readiness publik tanpa akses admin | HTTP 401, sesuai desain |
-| Operational storage | Aiven MySQL aktif |
-| Registry MySQL | 3 site, 3 tangki, 3 device |
-| Historical telemetry pada snapshot 13 Juli | 9.272 reading |
-| Kesegaran perangkat pada snapshot | 2 device fresh, 1 device stale |
-| Snapshot live dan rollup 5 menit | Siap digunakan |
-| Regional, Wilayah, Area, dan STO | Schema siap digunakan |
+| Halaman utama dan pemeriksaan kesehatan Vercel | HTTP 200 |
+| Pemeriksaan kesiapan tanpa akses admin | HTTP 401, sesuai desain |
+| Penyimpanan operasional | Aiven MySQL aktif |
+| Registri MySQL | 3 lokasi, 3 tangki, 3 perangkat |
+| Riwayat telemetri pada snapshot 13 Juli | 9.272 pembacaan |
+| Kesegaran perangkat pada snapshot | 2 perangkat mengirim data terbaru, 1 perangkat terlambat |
+| Snapshot langsung dan agregat 5 menit | Siap digunakan |
+| Regional, Wilayah, Area, dan STO | Skema siap digunakan |
 
 Angka tersebut adalah snapshot bertanggal, bukan janji bahwa semua perangkat
 selalu online. Target awal 5 STO dan arah ekspansi hingga 29 STO harus dibaca
@@ -59,7 +59,7 @@ sebagai rencana bertahap, bukan jumlah deployment yang sudah tercapai.
 - Device baru aktif setelah first valid ping dengan key yang cocok.
 - `POST /api/ingest` menerima payload device dan menyimpan reading.
 - Ingest MySQL menyimpan satu snapshot live per device dan satu rollup history per bucket 5 menit dalam satu transaksi.
-- Overview, detail, dan API memilih timestamp paling baru secara konsisten selama transisi writer lama ke writer rollup.
+- Halaman ringkasan, halaman detail, dan API memilih waktu terbaru secara konsisten selama transisi penyimpanan lama ke agregat baru.
 - Ingest punya rate limit saat storage MySQL aktif.
 - Dashboard ringkas, dashboard detail, peta, detail tangki, dan grafik trend.
 - Lokasi dikelompokkan berurutan sebagai Regional, Wilayah, Area, lalu STO; dashboard dapat mencari dan memfilter setiap tingkat tersebut.
@@ -84,7 +84,7 @@ sebagai rencana bertahap, bukan jumlah deployment yang sudah tercapai.
 - CRUD UI untuk hardware profile dan firmware template.
 - Kalibrasi tangki/device real yang terdokumentasi.
 
-## Alur Resmi Device Baru Saat Ini
+## Alur Resmi Perangkat Baru Saat Ini
 
 ```text
 User login
@@ -101,7 +101,7 @@ User login
 
 Telegram belum menjadi jalur approve/reject resmi.
 
-## Alur Data Monitoring Saat Ini
+## Alur Data Pemantauan Saat Ini
 
 ```text
 Device atau simulator
@@ -118,7 +118,7 @@ Device atau simulator
 
 Registry tetap menjadi sumber kebenaran jika payload membawa config yang berbeda jauh.
 
-## Deployment Truth
+## Kondisi Penerapan
 
 Untuk development:
 

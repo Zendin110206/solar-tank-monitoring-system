@@ -6,184 +6,186 @@
 
 **Platform IoT untuk pemantauan bahan bakar, pengelolaan perangkat, dan visibilitas operasional tangki.**
 
-[![Status](https://img.shields.io/badge/status-active_operational_pilot-0f766e)](docs/current-operational-truth.md)
+[![Status](https://img.shields.io/badge/status-pilot_operasional_aktif-0f766e)](docs/current-operational-truth.md)
 [![CI](https://github.com/Zendin110206/solar-tank-monitoring-system/actions/workflows/ci.yml/badge.svg)](https://github.com/Zendin110206/solar-tank-monitoring-system/actions/workflows/ci.yml)
 [![Next.js](https://img.shields.io/badge/Next.js-16.2.9-111827)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-strict-2563eb)](https://www.typescriptlang.org/)
-[![License](https://img.shields.io/badge/license-MIT-16a34a)](LICENSE)
+[![Lisensi](https://img.shields.io/badge/lisensi-MIT-16a34a)](LICENSE)
 
-[Live application](https://solar-tank-monitoring-system.vercel.app) · [Operational status](docs/current-operational-truth.md) · [Architecture](docs/architecture.md) · [User manual](docs/panduan-user-manual-ftm.pdf)
+[Aplikasi aktif](https://solar-tank-monitoring-system.vercel.app) · [Status operasional](docs/current-operational-truth.md) · [Arsitektur](docs/architecture.md) · [Panduan pengguna](docs/panduan-user-manual-ftm.pdf)
 
 </div>
 
-## Overview
+## Gambaran Umum
 
-FTM menghubungkan sensor tangki, perangkat ESP8266, layanan ingest, MySQL, dan
-dashboard web dalam satu alur pemantauan. Platform menyediakan pembacaan terkini,
-riwayat volume, estimasi runtime, status koneksi perangkat, pengelolaan akun,
-provisioning perangkat, serta dukungan operasional melalui Telegram dan helpdesk.
+FTM menghubungkan sensor tangki, perangkat ESP8266, layanan penerimaan data,
+MySQL, dan dashboard web dalam satu alur pemantauan. Platform menyediakan
+pembacaan terkini, riwayat volume, estimasi waktu operasional, status koneksi
+perangkat, pengelolaan akun, penyiapan perangkat, serta dukungan operasional
+melalui Telegram dan helpdesk.
 
 Sistem saat ini digunakan sebagai **pilot operasional aktif** dalam konteks
 infrastruktur Telkom Indonesia/Telkominfra, dengan cakupan awal TIF
-Pasuruan–Sidoarjo. Deployment aktif berjalan di Vercel dan menerima telemetry
-dari perangkat lapangan yang terdaftar pada Aiven MySQL.
+Pasuruan–Sidoarjo. Aplikasi aktif berjalan di Vercel dan menerima telemetri dari
+perangkat lapangan yang terdaftar pada Aiven MySQL.
 
 FTM dikelola sebagai sistem yang terus berkembang. Penguatan keamanan perangkat,
-observability, pemulihan data, kontrol akses per lokasi, dan validasi kapasitas
-menjadi bagian dari roadmap menuju penggunaan pada cakupan yang lebih luas.
+pemantauan sistem, pemulihan data, kontrol akses per lokasi, dan validasi
+kapasitas menjadi bagian dari peta jalan menuju penggunaan pada cakupan yang
+lebih luas.
 
 > Status pilot tidak menyatakan FTM sebagai produk nasional atau sistem
 > keselamatan yang telah memperoleh persetujuan produksi korporat. Keputusan
 > operasional tetap mengikuti verifikasi lapangan dan prosedur yang berlaku.
 
-## Operational Status
+## Status Operasional
 
-| Area | Status |
+| Bagian | Status |
 |---|---|
-| Lifecycle | Active operational pilot; maintained and under active development |
-| Initial scope | TIF Pasuruan–Sidoarjo |
-| Registered deployment | 3 lokasi, 3 tangki, dan 3 perangkat pada snapshot operasional terakhir |
-| Application hosting | Vercel |
-| Operational database | Aiven MySQL |
-| Live monitoring | Snapshot terbaru per perangkat dengan refresh dashboard 20 detik |
-| Historical telemetry | Agregat 5 menit untuk mean, minimum, maksimum, dan jumlah sampel |
-| Access model | Akun terverifikasi dengan peran admin dan user |
+| Tahap pengembangan | Pilot operasional aktif; dipelihara dan dikembangkan secara berkelanjutan |
+| Cakupan awal | TIF Pasuruan–Sidoarjo |
+| Perangkat terdaftar | 3 lokasi, 3 tangki, dan 3 perangkat pada pemeriksaan operasional terakhir |
+| Platform aplikasi | Vercel |
+| Database operasional | Aiven MySQL |
+| Pemantauan langsung | Snapshot terbaru per perangkat dengan pembaruan dashboard setiap 20 detik |
+| Riwayat telemetri | Agregat 5 menit berisi rata-rata, minimum, maksimum, dan jumlah sampel |
+| Pengaturan akses | Akun terverifikasi dengan peran admin dan pengguna |
 
-Angka deployment bersifat dinamis. Status terkini, batas klaim, dan catatan
-operasional dipelihara di
-[Current Operational Truth](docs/current-operational-truth.md).
+Jumlah perangkat dapat berubah mengikuti perkembangan penerapan. Kondisi
+terkini, batas klaim, dan catatan operasional dipelihara dalam dokumen
+[Status Operasional Saat Ini](docs/current-operational-truth.md).
 
-## System Architecture
+## Arsitektur Sistem
 
 ```text
-Ultrasonic sensor
+Sensor ultrasonik
        │
        ▼
-ESP8266 device
-       │  authenticated telemetry
+Perangkat ESP8266
+       │  telemetri terautentikasi
        ▼
 POST /api/ingest
        │
-       ├── device identity and payload validation
-       ├── configuration normalization
-       └── registry consistency checks
+       ├── validasi identitas perangkat dan data
+       ├── normalisasi konfigurasi
+       └── pemeriksaan kesesuaian dengan registri
        │
        ▼
 Aiven MySQL
-       ├── latest snapshot per device ──► live dashboard
-       └── 5-minute rollup ─────────────► charts and CSV export
+       ├── snapshot terbaru per perangkat ──► dashboard langsung
+       └── agregat 5 menit ─────────────────► grafik dan ekspor CSV
        │
        ▼
-Next.js application on Vercel
-       ├── operator and administrator dashboard
-       ├── account and device management
-       └── Telegram and helpdesk integration
+Aplikasi Next.js di Vercel
+       ├── dashboard operator dan admin
+       ├── pengelolaan akun dan perangkat
+       └── integrasi Telegram dan helpdesk
 ```
 
-Detail komponen, batas tanggung jawab, serta hubungan antarfitur tersedia di
-[Architecture](docs/architecture.md) dan
-[System Boundaries](docs/system-boundaries.md).
+Penjelasan komponen, batas tanggung jawab, dan hubungan antarfitur tersedia dalam
+[Arsitektur](docs/architecture.md) dan
+[Batas Sistem](docs/system-boundaries.md).
 
-## Data Lifecycle
+## Siklus Data
 
 FTM memisahkan data untuk tampilan langsung dan analisis historis:
 
-- **Latest snapshot** menyimpan satu pembacaan terbaru untuk setiap perangkat.
-  Nilainya diperbarui setiap telemetry baru diterima dan menjadi sumber utama
-  dashboard real-time.
-- **Five-minute rollup** merangkum sampel menjadi mean, minimum, maksimum, dan
-  jumlah sampel. Model ini mempertahankan informasi analitis dengan pertumbuhan
-  storage yang lebih terkendali.
-- **Registry data** menyimpan identitas lokasi, tangki, perangkat, parameter
+- **Snapshot terbaru** menyimpan satu pembacaan terakhir untuk setiap perangkat.
+  Nilainya diperbarui setiap telemetri baru diterima dan menjadi sumber utama
+  dashboard langsung.
+- **Agregat 5 menit** merangkum sampel menjadi nilai rata-rata, minimum,
+  maksimum, dan jumlah sampel. Model ini mempertahankan informasi analitis
+  dengan pertumbuhan penyimpanan yang lebih terkendali.
+- **Data registri** menyimpan identitas lokasi, tangki, perangkat, parameter
   kapasitas, serta konfigurasi yang telah disetujui.
-- **Audit data** mencatat perubahan penting pada akun dan proses administratif.
+- **Catatan audit** menyimpan perubahan penting pada akun dan proses administratif.
 
 Kontrak dan struktur data dijelaskan lebih lanjut dalam
-[Data Model](docs/data-model.md), [API Contract](docs/api-contract.md), dan
-[Device Ingestion](docs/device-ingestion.md).
+[Model Data](docs/data-model.md), [Kontrak API](docs/api-contract.md), dan
+[Penerimaan Data Perangkat](docs/device-ingestion.md).
 
-## Core Capabilities
+## Kemampuan Utama
 
-### Monitoring
+### Pemantauan
 
 - ringkasan lokasi melalui tampilan kartu dan peta;
-- filter Regional, Wilayah, Area, STO, dan status perangkat;
-- pembacaan volume, persentase isi, waktu data diterima, dan online/offline;
-- estimasi runtime berdasarkan kapasitas serta konsumsi yang dikonfigurasi;
+- penyaring Regional, Wilayah, Area, STO, dan status perangkat;
+- pembacaan volume, persentase isi, waktu data diterima, dan status koneksi;
+- estimasi waktu operasional berdasarkan kapasitas dan konsumsi;
 - tren harian, mingguan, dan bulanan;
-- ekspor CSV mengikuti rentang data yang dipilih;
-- deteksi perbedaan konfigurasi perangkat dan registry.
+- ekspor CSV sesuai rentang data yang dipilih;
+- deteksi perbedaan konfigurasi perangkat dan registri.
 
-### Device lifecycle
+### Siklus perangkat
 
-- pengajuan perangkat dan data lokasi oleh user;
-- review serta persetujuan oleh admin;
+- pengajuan perangkat dan data lokasi oleh pengguna;
+- peninjauan dan persetujuan oleh admin;
 - perhitungan parameter kapasitas dan konsumsi;
-- pembuatan device key, konfigurasi, dan paket firmware per perangkat;
-- aktivasi setelah first valid ping;
-- pengelolaan data uji dan reset reading secara selektif.
+- pembuatan kunci perangkat, konfigurasi, dan paket firmware per perangkat;
+- aktivasi setelah perangkat mengirim data valid pertama;
+- pengelolaan data uji dan pengosongan pembacaan secara selektif.
 
-### Identity and access
+### Identitas dan akses
 
-- registrasi, verifikasi email, login, dan pemulihan kata sandi;
-- peran admin dan user;
-- session cookie `httpOnly` dan password hashing Argon2id;
+- pendaftaran, verifikasi email, login, dan pemulihan kata sandi;
+- peran admin dan pengguna;
+- cookie sesi `httpOnly` dan hash kata sandi Argon2id;
 - OTP untuk tindakan administratif tertentu;
 - Cloudflare Turnstile untuk formulir publik saat diaktifkan;
 - satu identitas Telegram untuk satu akun FTM;
 - pencabutan sesi dan audit aktivitas penting.
 
-### Operations
+### Operasional
 
 - helpdesk web dengan notifikasi Telegram;
 - perintah Telegram untuk bantuan, status akun, dan akses dashboard;
-- health check dan readiness check;
-- backup MySQL manual maupun terjadwal;
-- migration database berurutan dan aman dijalankan ulang;
-- automated quality gate melalui GitHub Actions.
+- pemeriksaan kesehatan dan kesiapan layanan;
+- pencadangan MySQL secara manual maupun terjadwal;
+- migrasi database yang berurutan dan aman dijalankan ulang;
+- pemeriksaan kualitas otomatis melalui GitHub Actions.
 
-## Technology Stack
+## Teknologi
 
-| Layer | Technology |
+| Lapisan | Teknologi |
 |---|---|
-| Web application | Next.js 16 App Router, React 19, TypeScript strict |
-| Interface | Tailwind CSS 4, lucide-react, Three.js |
+| Aplikasi web | Next.js 16 App Router, React 19, TypeScript strict |
+| Antarmuka | Tailwind CSS 4, lucide-react, Three.js |
 | Data | MySQL, `mysql2`, Aiven |
-| Identity and communication | Argon2id, SMTP email, Cloudflare Turnstile, Telegram Bot API |
-| Device | ESP8266, ultrasonic sensor, per-device firmware package |
-| Hosting | Vercel |
-| Quality | Vitest, ESLint, TypeScript, Next.js production build, GitHub Actions |
+| Identitas dan komunikasi | Argon2id, email SMTP, Cloudflare Turnstile, Telegram Bot API |
+| Perangkat | ESP8266, sensor ultrasonik, paket firmware per perangkat |
+| Penerapan aplikasi | Vercel |
+| Pengujian kualitas | Vitest, ESLint, TypeScript, build produksi Next.js, GitHub Actions |
 
-## Repository Structure
+## Struktur Repositori
 
 ```text
 .
-├── .github/                 # CI workflows and issue templates
-├── config/                  # public-safe registry templates
+├── .github/                 # alur CI dan template laporan
+├── config/                  # template registri yang aman dipublikasikan
 ├── database/
-│   ├── migrations/         # ordered MySQL schema migrations
-│   └── seeds/              # development-only sample data
-├── docs/                    # architecture, operations, safety, and manuals
-├── firmware/templates/      # device firmware templates
-├── scripts/                 # migration, backup, simulator, and smoke-test tools
+│   ├── migrations/         # migrasi skema MySQL yang berurutan
+│   └── seeds/              # data contoh khusus pengembangan
+├── docs/                    # arsitektur, operasional, keamanan, dan panduan
+├── firmware/templates/      # template firmware perangkat
+├── scripts/                 # migrasi, pencadangan, simulator, dan pengujian awal
 └── src/
-    ├── app/                 # Next.js pages and Route Handlers
-    ├── components/          # shared UI components
+    ├── app/                 # halaman dan Route Handler Next.js
+    ├── components/          # komponen antarmuka yang digunakan bersama
     └── features/
-        ├── auth/            # accounts, sessions, email, Telegram, and audit
-        ├── helpdesk/        # web and Telegram support workflow
-        └── monitoring/      # domain logic, repositories, dashboard, and tests
+        ├── auth/            # akun, sesi, email, Telegram, dan audit
+        ├── helpdesk/        # alur dukungan web dan Telegram
+        └── monitoring/      # logika domain, penyimpanan, dashboard, dan pengujian
 ```
 
-## Getting Started
+## Memulai Pengembangan
 
-### Requirements
+### Prasyarat
 
-- Node.js 20 or newer;
+- Node.js 20 atau lebih baru;
 - pnpm 9.15.3;
-- MySQL for persistent-storage development.
+- MySQL untuk pengembangan dengan penyimpanan permanen.
 
-### Development server
+### Menjalankan server pengembangan
 
 ```powershell
 git clone https://github.com/Zendin110206/solar-tank-monitoring-system.git
@@ -193,19 +195,20 @@ pnpm install
 pnpm dev
 ```
 
-The application is available at `http://localhost:3000`.
+Aplikasi dapat dibuka melalui `http://localhost:3000`.
 
-Development uses an in-memory store and public-safe sample data by default.
-Device telemetry can be simulated without physical hardware:
+Mode pengembangan menggunakan penyimpanan memori dan data contoh yang aman
+dipublikasikan secara default. Telemetri perangkat dapat disimulasikan tanpa
+perangkat fisik:
 
 ```powershell
 pnpm simulate:device --once
 ```
 
-### MySQL development environment
+### Lingkungan pengembangan MySQL
 
-Create `.env.local` from `.env.example`, provide credentials for an authorized
-development database, then initialize the schema:
+Buat `.env.local` berdasarkan `.env.example`, masukkan kredensial database
+pengembangan yang telah diizinkan, kemudian siapkan skemanya:
 
 ```powershell
 pnpm db:setup:mysql
@@ -213,9 +216,10 @@ pnpm auth:create-admin
 pnpm dev
 ```
 
-`db:setup:mysql` includes sample seeds and is intended for an empty development
-database. An existing database must be backed up before its ordered migrations
-are applied, and must not receive development seeds.
+Perintah `db:setup:mysql` menyertakan data contoh dan hanya ditujukan untuk
+database pengembangan yang masih kosong. Database yang telah berisi data wajib
+dicadangkan sebelum migrasi berurutan dijalankan dan tidak boleh menerima data
+contoh pengembangan.
 
 ```powershell
 pnpm db:backup:mysql
@@ -230,99 +234,102 @@ pnpm db:migrate:auth-telegram
 pnpm db:migrate:site-taxonomy
 ```
 
-Deployment requirements, migration order, and readiness checks are documented
-in [Deployment](docs/deployment.md).
+Kebutuhan penerapan, urutan migrasi, dan pemeriksaan kesiapan dijelaskan dalam
+[Panduan Penerapan](docs/deployment.md).
 
-## Commands
+## Perintah Utama
 
-| Command | Purpose |
+| Perintah | Fungsi |
 |---|---|
-| `pnpm dev` | Start the Turbopack development server |
-| `pnpm dev:lan` | Expose the development server on an authorized local network |
-| `pnpm dev:webpack` | Use Webpack as a compatibility fallback |
-| `pnpm simulate:device` | Send development telemetry to the ingest endpoint |
-| `pnpm pilot:hash-key` | Generate credentials for authorized device onboarding |
-| `pnpm pilot:registry` | Validate and apply a local, untracked registry file |
-| `pnpm pilot:smoke` | Exercise ingestion with a device-format payload |
-| `pnpm db:backup:mysql` | Create a MySQL backup in the Git-ignored backup directory |
-| `pnpm db:migrate:*` | Apply an individual schema migration |
-| `pnpm check` | Run typecheck, lint, tests, and the production build |
+| `pnpm dev` | Menjalankan server pengembangan dengan Turbopack |
+| `pnpm dev:lan` | Membuka server pengembangan pada jaringan lokal yang diizinkan |
+| `pnpm dev:webpack` | Menggunakan Webpack sebagai pilihan kompatibilitas |
+| `pnpm simulate:device` | Mengirim telemetri contoh ke endpoint penerimaan data |
+| `pnpm pilot:hash-key` | Membuat kredensial untuk penyiapan perangkat yang diizinkan |
+| `pnpm pilot:registry` | Memvalidasi dan menerapkan registri lokal yang tidak dilacak Git |
+| `pnpm pilot:smoke` | Menguji penerimaan data dengan format perangkat |
+| `pnpm db:backup:mysql` | Membuat cadangan MySQL di direktori yang diabaikan Git |
+| `pnpm db:migrate:*` | Menjalankan satu migrasi skema |
+| `pnpm check` | Menjalankan pemeriksaan tipe, lint, pengujian, dan build produksi |
 
-## Configuration and Security
+## Konfigurasi dan Keamanan
 
-`.env.example` documents configuration names without providing operational
-values. Production data and credentials are excluded from this repository.
+`.env.example` mendokumentasikan nama konfigurasi tanpa menyertakan nilai
+operasional. Data produksi dan kredensial tidak disimpan dalam repositori ini.
 
-- secrets, database URLs, device keys, tokens, and account data must remain
-  outside version control;
-- only browser-safe values may use the `NEXT_PUBLIC_` prefix;
-- operational registries and precise location data must not be committed;
-- `config/pilot-registry.example.json` is a public template; `*.local.json`
-  remains untracked;
-- seeds and simulator payloads are development fixtures, not operational data;
-- security reports follow the private process in [SECURITY.md](SECURITY.md).
+- rahasia, URL database, kunci perangkat, token, dan data akun harus berada di
+  luar kontrol versi;
+- hanya nilai yang aman untuk browser yang boleh memakai awalan `NEXT_PUBLIC_`;
+- registri operasional dan data lokasi terperinci tidak boleh di-commit;
+- `config/pilot-registry.example.json` adalah template publik, sedangkan
+  `*.local.json` tidak dilacak Git;
+- seed dan data simulator merupakan data pengembangan, bukan data operasional;
+- laporan keamanan mengikuti proses privat dalam [SECURITY.md](SECURITY.md).
 
-Operational and physical limitations are maintained in
-[Safety and Limitations](docs/safety-and-limitations.md).
+Batas operasional dan perangkat fisik dipelihara dalam
+[Batasan dan Keselamatan](docs/safety-and-limitations.md).
 
-## Quality Assurance
+## Pengendalian Kualitas
 
-Every change is expected to pass the complete project check:
+Setiap perubahan wajib melewati pemeriksaan proyek secara menyeluruh:
 
 ```powershell
 pnpm check
 ```
 
-The command runs TypeScript type checking, ESLint, the Vitest suite, and a
-Next.js production build. Runtime changes also require focused validation of the
-affected flow. Software checks do not replace sensor calibration, installation
-inspection, or operational safety procedures.
+Perintah tersebut menjalankan pemeriksaan tipe TypeScript, ESLint, seluruh
+pengujian Vitest, dan build produksi Next.js. Perubahan perilaku aplikasi juga
+wajib diuji pada alur yang terdampak. Pemeriksaan perangkat lunak tidak
+menggantikan kalibrasi sensor, pemeriksaan instalasi, atau prosedur keselamatan
+operasional.
 
-## Product Roadmap
+## Peta Jalan Produk
 
-Development remains active across the following workstreams:
+Pengembangan berlanjut melalui beberapa fokus berikut:
 
-- firmware transport security, OTA controls, and diagnostic hardening;
-- documented calibration and measurement tolerance per tank;
-- automated alerts for critical levels, stale devices, and delivery failures;
-- location-scoped access control for larger operational teams;
-- encrypted backup retention and periodic restore drills;
-- centralized observability, incident handling, and credential rotation;
-- load, quota, and cost validation before wider deployment;
-- release management and operational ownership for long-term maintenance.
+- keamanan komunikasi firmware, kontrol OTA, dan pengamanan diagnostik;
+- dokumentasi kalibrasi dan toleransi pengukuran setiap tangki;
+- notifikasi otomatis untuk level kritis, perangkat terlambat, dan kegagalan
+  pengiriman data;
+- pembatasan akses berdasarkan lokasi untuk tim operasional yang lebih besar;
+- retensi cadangan terenkripsi dan latihan pemulihan berkala;
+- pemantauan sistem terpusat, penanganan insiden, dan rotasi kredensial;
+- validasi beban, kuota, dan biaya sebelum perluasan penerapan;
+- pengelolaan rilis dan kepemilikan operasional untuk pemeliharaan jangka panjang.
 
-Priorities and readiness gates are tracked in
-[Roadmap](docs/roadmap.md) and [Pilot Readiness](docs/pilot-readiness.md).
+Prioritas dan syarat kesiapan dijelaskan dalam
+[Peta Jalan](docs/roadmap.md) dan [Kesiapan Pilot](docs/pilot-readiness.md).
 
-## Documentation
+## Dokumentasi
 
-| Document | Scope |
+| Dokumen | Cakupan |
 |---|---|
-| [Current Operational Truth](docs/current-operational-truth.md) | Current deployment state and claim boundaries |
-| [Architecture](docs/architecture.md) | Components, dependencies, and data flow |
-| [API Contract](docs/api-contract.md) | Endpoint contracts and payload formats |
-| [Data Model](docs/data-model.md) | Sites, tanks, devices, readings, and provisioning |
-| [Device Ingestion](docs/device-ingestion.md) | Authentication, normalization, and ingest validation |
-| [Deployment](docs/deployment.md) | Environments, migrations, readiness, and release flow |
-| [Database Backup](docs/database-backup.md) | Backup, retention, and recovery boundaries |
-| [Safety and Limitations](docs/safety-and-limitations.md) | Software, data, hardware, and operational limits |
-| [Reviewer Quickstart](docs/reviewer-quickstart.md) | Technical review path |
-| [User Manual](docs/panduan-user-manual-ftm.pdf) | End-user guide |
+| [Status Operasional Saat Ini](docs/current-operational-truth.md) | Kondisi penerapan dan batas klaim terkini |
+| [Arsitektur](docs/architecture.md) | Komponen, ketergantungan, dan alur data |
+| [Kontrak API](docs/api-contract.md) | Kontrak endpoint dan format data |
+| [Model Data](docs/data-model.md) | Lokasi, tangki, perangkat, pembacaan, dan penyiapan perangkat |
+| [Penerimaan Data Perangkat](docs/device-ingestion.md) | Autentikasi, normalisasi, dan validasi data masuk |
+| [Penerapan](docs/deployment.md) | Lingkungan, migrasi, kesiapan, dan alur rilis |
+| [Pencadangan Database](docs/database-backup.md) | Pencadangan, retensi, dan batas pemulihan |
+| [Batasan dan Keselamatan](docs/safety-and-limitations.md) | Batas perangkat lunak, data, perangkat fisik, dan operasional |
+| [Panduan Peninjau](docs/reviewer-quickstart.md) | Alur pemeriksaan teknis |
+| [Panduan Pengguna](docs/panduan-user-manual-ftm.pdf) | Panduan bagi pengguna akhir |
 
-## Contributing
+## Kontribusi
 
-Contributions follow [CONTRIBUTING.md](CONTRIBUTING.md). Changes should keep
-fixtures public-safe, preserve the documented security boundaries, include
-appropriate tests, and pass the project quality gate.
+Ketentuan kontribusi tersedia dalam [CONTRIBUTING.md](CONTRIBUTING.md). Setiap
+perubahan harus menjaga keamanan data contoh untuk repositori publik,
+mempertahankan batas keamanan yang telah ditetapkan, menyertakan pengujian yang
+sesuai, dan lulus seluruh pemeriksaan kualitas proyek.
 
-| Contributor | Primary contributions |
+| Kontributor | Fokus kontribusi |
 |---|---|
-| [Muhammad Zaenal Abidin Abdurrahman](https://github.com/Zendin110206) | Project coordination, application architecture, backend and database, identity, deployment, integration, testing, and review |
-| [Yattaqi Muazirul Mulki](https://github.com/ukiirving) | Interface design and application development |
-| [Astra](https://github.com/Ata22) | Device and firmware development, field testing, Telegram integration, and operational input |
+| [Muhammad Zaenal Abidin Abdurrahman](https://github.com/Zendin110206) | Koordinasi proyek, arsitektur aplikasi, sisi server dan database, identitas, penerapan, integrasi, pengujian, dan peninjauan |
+| [Yattaqi Muazirul Mulki](https://github.com/ukiirving) | Desain antarmuka dan pengembangan aplikasi |
+| [Astra](https://github.com/Ata22) | Pengembangan perangkat dan firmware, pengujian lapangan, integrasi Telegram, dan masukan operasional |
 
-## License
+## Lisensi
 
-Source code is available under the [MIT License](LICENSE). Names, logos,
-credentials, operational data, and third-party information are not licensed by
-that grant.
+Kode sumber tersedia berdasarkan [Lisensi MIT](LICENSE). Nama, logo, kredensial,
+data operasional, dan informasi pihak lain tidak termasuk dalam pemberian lisensi
+tersebut.
