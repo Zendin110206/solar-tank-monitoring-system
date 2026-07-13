@@ -1,6 +1,9 @@
-# Panduan Lapangan Pilot 5 STO
+# Panduan Perluasan Pilot Menuju 5 STO
 
-Dokumen ini menjelaskan cara menjalankan uji real 5 STO dari awal sampai data tampil di dashboard. Bahasa sengaja dibuat pelan-pelan untuk pembaca non-IT.
+Dokumen ini menjelaskan cara memperluas uji lapangan menuju target awal 5 STO
+dari awal sampai data tampil di dashboard. Per 13–14 Juli 2026, kondisi yang
+terverifikasi adalah 3 site, 3 tangki, dan 3 perangkat terdaftar. Bahasa sengaja
+dibuat pelan-pelan untuk pembaca non-IT.
 
 ## Gambaran Paling Sederhana
 
@@ -32,7 +35,7 @@ Siapkan tabel sederhana seperti ini sebelum menyentuh kode atau device.
 | Latitude | `-7.6500000` | Harus angka koordinat yang disetujui |
 | Longitude | `112.9000000` | Harus angka koordinat yang disetujui |
 | ID tangki | `tank-tph-main` | Gunakan format konsisten |
-| Bentuk tangki | `rectangular` | Prototype sekarang balok |
+| Bentuk tangki | `rectangular` | Contoh awal memakai tangki balok |
 | Kapasitas | `540` | Liter |
 | Panjang | `150` | cm |
 | Lebar | `60` | cm |
@@ -167,7 +170,8 @@ storageDriver: mysql
 Registry MySQL aktif: 5 site, 5 tangki, 5 device
 ```
 
-Jika masih 4 site, berarti registry 5 STO belum masuk ke MySQL yang dipakai Vercel.
+Jika jumlah site belum mencapai target, berarti registry 5 STO belum sepenuhnya
+masuk ke MySQL yang dipakai Vercel.
 
 ## Cara Membaca Peta Dashboard
 
@@ -360,7 +364,8 @@ Pastikan:
 
 ## Batas Fase Pilot Ini
 
-Fase ini membuat pilot 5 STO semakin real dari sisi dashboard dan alur data.
+Fase ini memperluas pilot dari kondisi terverifikasi saat ini menuju 5 STO dari
+sisi dashboard dan alur data.
 
 Namun fase ini belum membuat:
 

@@ -351,7 +351,7 @@ X-Api-Key: demo-tph-key
 
 Catatan key:
 
-- setiap device dummy memiliki key demo sendiri;
+- setiap device contoh memiliki key development sendiri;
 - fallback `local-development-key` hanya untuk development lokal;
 - untuk mode yang lebih dekat pilot, set `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK="false"`.
 

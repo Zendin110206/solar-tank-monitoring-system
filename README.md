@@ -1,749 +1,328 @@
-# FTM - Fuel Tank Management
+# FTM — Fuel Tank Management
 
-![Status](https://img.shields.io/badge/status-prototipe_aktif-blue)
-![Next.js](https://img.shields.io/badge/Next.js-16.2.9-111827)
-![TypeScript](https://img.shields.io/badge/TypeScript-strict-blue)
-![Lisensi](https://img.shields.io/badge/lisensi-MIT-green)
+<div align="center">
 
-FTM (Fuel Tank Management) adalah aplikasi web untuk mengelola dan memantau volume tangki bahan bakar dari data perangkat atau simulator. Aplikasi ini menyiapkan alur operasional lengkap: data dikirim ke API, divalidasi, dinormalisasi, lalu dashboard menampilkan volume, persentase isi, estimasi durasi operasional, status perangkat, dan riwayat pembacaan.
+<img src="public/logo/android-icon-192x192.png" alt="FTM" width="112" />
 
-Repositori ini menggunakan Bahasa Indonesia agar mudah dibaca oleh pengguna operasional, reviewer non-IT, dan pengembang berikutnya.
+**Platform IoT untuk pemantauan bahan bakar, pengelolaan perangkat, dan visibilitas operasional tangki.**
 
-## Status Saat Ini
+[![Status](https://img.shields.io/badge/status-active_operational_pilot-0f766e)](docs/current-operational-truth.md)
+[![CI](https://github.com/Zendin110206/solar-tank-monitoring-system/actions/workflows/ci.yml/badge.svg)](https://github.com/Zendin110206/solar-tank-monitoring-system/actions/workflows/ci.yml)
+[![Next.js](https://img.shields.io/badge/Next.js-16.2.9-111827)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-strict-2563eb)](https://www.typescriptlang.org/)
+[![License](https://img.shields.io/badge/license-MIT-16a34a)](LICENSE)
 
-Repositori sudah melewati tahap fondasi awal dan sekarang berada pada tahap prototipe aplikasi monitoring dengan alur data lokal, API ingest, simulator, auto-refresh dashboard, fondasi penyimpanan MySQL, registry MySQL, alat bantu pilot 5 STO, serta autentikasi pengguna berbasis database.
+[Live application](https://solar-tank-monitoring-system.vercel.app) · [Operational status](docs/current-operational-truth.md) · [Architecture](docs/architecture.md) · [User manual](docs/panduan-user-manual-ftm.pdf)
 
-Yang sudah tersedia:
+</div>
 
-- landing page berbahasa Indonesia;
-- halaman login, pengajuan akses, verifikasi email, lupa password, dan reset password;
-- session user memakai cookie `httpOnly` dengan role `admin` dan `user`;
-- password disimpan dengan hash Argon2id, dengan dukungan upgrade dari hash legacy;
-- OTP email untuk login admin jika `AUTH_REQUIRE_ADMIN_OTP` aktif;
-- rate limit untuk login, pengajuan akses, lupa password, dan pengiriman ulang verifikasi email;
-- audit event untuk login, OTP, reset password, verifikasi email, perubahan role, aktivasi, dan aksi keamanan akun;
-- halaman manajemen pengguna untuk admin: review pengajuan, aktivasi/nonaktif, ubah role, cabut sesi, kirim verifikasi, reset password, dan hapus akun yang tidak punya jejak pengajuan perangkat;
-- halaman audit keamanan auth untuk admin;
-- halaman keamanan akun untuk ganti kata sandi, melihat sesi aktif, mencabut sesi lain, dan menghubungkan Telegram;
-- halaman pengajuan perangkat untuk user, review approve/reject oleh admin, pembuatan key perangkat, paket firmware ZIP, dan link download terbatas;
-- kontrol admin untuk menghapus data STO langsung dari kartu dashboard, membersihkan pengajuan perangkat terpilih, atau reset data monitoring tanpa menghapus akun, template firmware, atau profil hardware;
-- analisis teknis untuk monitoring detail;
-- monitoring operasional dengan tampilan kartu dan peta;
-- pengelompokan lokasi berjenjang `Regional -> Wilayah -> Area -> STO`, lengkap dengan pencarian dan filter pada dashboard;
-- halaman detail operasional per tangki untuk operator;
-- data contoh untuk lokasi, tangki, perangkat, dan pembacaan;
-- timestamp data contoh memory mode digeser relatif ke waktu server start agar demo awal tetap mudah dibaca;
-- fungsi domain untuk volume, runtime, status, dan normalisasi payload;
-- unit test untuk logika domain dan telemetry store;
-- API baca:
-  - `GET /api/health`
-  - `GET /api/ready`
-  - `GET /api/dashboard/overview`
-  - `GET /api/tanks/[tankId]`
-  - `GET /api/tanks/[tankId]/readings`
-- API ingest:
-  - `POST /api/ingest`
-- memory store lokal untuk menerima data simulator selama dev server hidup;
-- MySQL untuk registry site/tangki/device, snapshot live per device, dan history rollup 5 menit;
-- dashboard dan detail membaca storage aktif yang sama dengan endpoint API;
-- detail ringkas mengambil riwayat MySQL per tangki agar grafik tren tidak terpotong oleh limit dashboard global;
-- overview dashboard mengambil reading terbaru per tangki agar STO yang jarang mengirim tidak hilang ketika device lain lebih sering mengirim;
-- dashboard memilih reading dengan `receivedAt` paling baru dari snapshot dan history selama transisi deployment, sehingga overview dan detail tidak berbeda status;
-- ingest MySQL memperbarui satu snapshot terbaru per device dan satu bucket agregat 5 menit secara atomik; history menyimpan mean, min, max, dan jumlah sampel tanpa menumpuk raw payload setiap 20 detik;
-- timestamp reading disimpan dan dikirim sebagai ISO UTC, lalu label UI ditampilkan dalam WIB agar lokal dan Vercel konsisten;
-- health check dan readiness check untuk membedakan aplikasi hidup dengan storage benar-benar siap;
-- auto-refresh ringan pada dashboard dan detail, dengan tombol refresh manual serta pause/resume;
-- validasi key per device memakai hash pada data dummy;
-- fallback key global hanya untuk development lokal;
-- normalisasi payload real-format dari device, termasuk config tangki dari payload;
-- review config payload vs registry agar mismatch tidak diam-diam dianggap benar;
-- peta dashboard berbasis koordinat registry dengan zoom, search, dan filter status;
-- grafik tren volume pada detail ringkas dengan pilihan rentang harian, mingguan, dan bulanan;
-- alat bantu pilot:
-  - `pnpm pilot:hash-key`
-  - `pnpm pilot:registry`
-  - `pnpm pilot:smoke`
-- simulator terminal:
-  - `pnpm simulate:device`
-- dokumentasi teknis dan operasional di folder `docs/`;
-- GitHub Actions CI untuk menjalankan `pnpm check`.
+## Overview
 
-Yang belum tersedia:
+FTM menghubungkan sensor tangki, perangkat ESP8266, layanan ingest, MySQL, dan
+dashboard web dalam satu alur pemantauan. Platform menyediakan pembacaan terkini,
+riwayat volume, estimasi runtime, status koneksi perangkat, pengelolaan akun,
+provisioning perangkat, serta dukungan operasional melalui Telegram dan helpdesk.
 
-- penetapan deployment production final beserta SOP observasi dan rollback;
-- kalibrasi tangki nyata;
-- notifikasi operasional level kritis/offline di luar email auth dan notifikasi pengajuan device;
-- keputusan deployment produksi final dan proteksi perimeter endpoint ingest pada environment final;
-- rotasi key device penuh di luar alur pengajuan perangkat;
-- manajemen registry site/tangki/device yang menulis database dari UI;
-- restore drill database yang diuji rutin.
+Sistem saat ini digunakan sebagai **pilot operasional aktif** dalam konteks
+infrastruktur Telkom Indonesia/Telkominfra, dengan cakupan awal TIF
+Pasuruan–Sidoarjo. Deployment aktif berjalan di Vercel dan menerima telemetry
+dari perangkat lapangan yang terdaftar pada Aiven MySQL.
 
-Catatan penting:
+FTM dikelola sebagai sistem yang terus berkembang. Penguatan keamanan perangkat,
+observability, pemulihan data, kontrol akses per lokasi, dan validasi kapasitas
+menjadi bagian dari roadmap menuju penggunaan pada cakupan yang lebih luas.
 
-```text
-Saat ini dashboard dan detail sudah membaca storage aktif lewat layer aplikasi. Mode default tetap `memory` agar mudah dicoba. Mode `mysql` sudah tersedia untuk persistent storage, registry monitoring, auth database, pengajuan device, firmware package, dan rate limit server-side. Sistem belum boleh dianggap production-ready sampai environment production, SMTP, CAPTCHA, HTTPS, backup, prosedur restore, dan prosedur operasional final sudah divalidasi.
-```
+> Status pilot tidak menyatakan FTM sebagai produk nasional atau sistem
+> keselamatan yang telah memperoleh persetujuan produksi korporat. Keputusan
+> operasional tetap mengikuti verifikasi lapangan dan prosedur yang berlaku.
 
-## Tujuan Produk
+## Operational Status
 
-Tujuan proyek ini adalah membantu pengguna operasional melihat kondisi tangki secara lebih cepat dan terstruktur.
-
-Contoh pertanyaan yang ingin dijawab aplikasi:
-
-- berapa liter bahan bakar yang tersisa;
-- berapa persen isi tangki saat ini;
-- kira-kira cukup berapa jam jika beban berjalan seperti asumsi;
-- perangkat masih online atau sudah terlambat mengirim data;
-- lokasi mana yang perlu dicek lebih dulu;
-- bagaimana riwayat perubahan volume dari waktu ke waktu.
-
-Prinsip utamanya:
-
-```text
-Dashboard membantu membaca kondisi. Keputusan operasional tetap harus mengikuti validasi lapangan dan prosedur resmi.
-```
-
-## Gambaran Alur Data
-
-Alur yang sedang dibangun:
-
-```text
-Perangkat atau simulator
-  -> POST /api/ingest
-  -> validasi device dan key
-  -> normalisasi payload
-  -> storage aktif: memory atau MySQL
-       -> snapshot terbaru per device untuk dashboard live
-       -> agregat 5 menit untuk history, grafik, dan CSV
-  -> API dashboard/detail
-  -> tampilan web
-```
-
-Penjelasan singkat:
-
-1. Sensor atau simulator menghasilkan data pembacaan.
-2. Device mengirim data ke API, bukan langsung ke dashboard.
-3. API mengecek identitas device dan key.
-4. Data mentah diubah menjadi format yang konsisten.
-5. Data disimpan ke storage aktif. Pada MySQL, satu transaksi memperbarui snapshot live dan bucket agregat 5 menit.
-6. Endpoint baca mengambil data terbaru dan riwayat.
-7. Dashboard menampilkan status yang lebih mudah dipahami.
-
-## Kenapa Ada Simulator
-
-Simulator diperlukan agar pengembangan software tidak menunggu perangkat fisik.
-
-Dengan simulator, pengembang bisa mengecek:
-
-- API bisa menerima payload;
-- key salah ditolak;
-- data terbaru berubah;
-- history bertambah;
-- perhitungan runtime tetap masuk akal;
-- alur dashboard nanti siap disambungkan.
-
-Perintah dasar:
-
-```powershell
-pnpm simulate:device --once
-```
-
-Contoh skenario tangki rendah:
-
-```powershell
-pnpm simulate:device --critical --once
-```
-
-## Teknologi
-
-| Bagian | Teknologi |
+| Area | Status |
 |---|---|
-| Framework aplikasi | Next.js 16 App Router |
-| UI | React 19, Tailwind CSS 4, lucide-react |
-| Bahasa | TypeScript |
-| Test | Vitest |
-| Package manager | pnpm |
-| Storage saat ini | Memory store lokal, dengan opsi MySQL untuk registry monitoring dan reading |
-| Simulator | Node.js script tanpa dependency tambahan |
+| Lifecycle | Active operational pilot; maintained and under active development |
+| Initial scope | TIF Pasuruan–Sidoarjo |
+| Registered deployment | 3 lokasi, 3 tangki, dan 3 perangkat pada snapshot operasional terakhir |
+| Application hosting | Vercel |
+| Operational database | Aiven MySQL |
+| Live monitoring | Snapshot terbaru per perangkat dengan refresh dashboard 20 detik |
+| Historical telemetry | Agregat 5 menit untuk mean, minimum, maksimum, dan jumlah sampel |
+| Access model | Akun terverifikasi dengan peran admin dan user |
 
-## Struktur Repositori
+Angka deployment bersifat dinamis. Status terkini, batas klaim, dan catatan
+operasional dipelihara di
+[Current Operational Truth](docs/current-operational-truth.md).
 
-Struktur aktif saat ini:
+## System Architecture
+
+```text
+Ultrasonic sensor
+       │
+       ▼
+ESP8266 device
+       │  authenticated telemetry
+       ▼
+POST /api/ingest
+       │
+       ├── device identity and payload validation
+       ├── configuration normalization
+       └── registry consistency checks
+       │
+       ▼
+Aiven MySQL
+       ├── latest snapshot per device ──► live dashboard
+       └── 5-minute rollup ─────────────► charts and CSV export
+       │
+       ▼
+Next.js application on Vercel
+       ├── operator and administrator dashboard
+       ├── account and device management
+       └── Telegram and helpdesk integration
+```
+
+Detail komponen, batas tanggung jawab, serta hubungan antarfitur tersedia di
+[Architecture](docs/architecture.md) dan
+[System Boundaries](docs/system-boundaries.md).
+
+## Data Lifecycle
+
+FTM memisahkan data untuk tampilan langsung dan analisis historis:
+
+- **Latest snapshot** menyimpan satu pembacaan terbaru untuk setiap perangkat.
+  Nilainya diperbarui setiap telemetry baru diterima dan menjadi sumber utama
+  dashboard real-time.
+- **Five-minute rollup** merangkum sampel menjadi mean, minimum, maksimum, dan
+  jumlah sampel. Model ini mempertahankan informasi analitis dengan pertumbuhan
+  storage yang lebih terkendali.
+- **Registry data** menyimpan identitas lokasi, tangki, perangkat, parameter
+  kapasitas, serta konfigurasi yang telah disetujui.
+- **Audit data** mencatat perubahan penting pada akun dan proses administratif.
+
+Kontrak dan struktur data dijelaskan lebih lanjut dalam
+[Data Model](docs/data-model.md), [API Contract](docs/api-contract.md), dan
+[Device Ingestion](docs/device-ingestion.md).
+
+## Core Capabilities
+
+### Monitoring
+
+- ringkasan lokasi melalui tampilan kartu dan peta;
+- filter Regional, Wilayah, Area, STO, dan status perangkat;
+- pembacaan volume, persentase isi, waktu data diterima, dan online/offline;
+- estimasi runtime berdasarkan kapasitas serta konsumsi yang dikonfigurasi;
+- tren harian, mingguan, dan bulanan;
+- ekspor CSV mengikuti rentang data yang dipilih;
+- deteksi perbedaan konfigurasi perangkat dan registry.
+
+### Device lifecycle
+
+- pengajuan perangkat dan data lokasi oleh user;
+- review serta persetujuan oleh admin;
+- perhitungan parameter kapasitas dan konsumsi;
+- pembuatan device key, konfigurasi, dan paket firmware per perangkat;
+- aktivasi setelah first valid ping;
+- pengelolaan data uji dan reset reading secara selektif.
+
+### Identity and access
+
+- registrasi, verifikasi email, login, dan pemulihan kata sandi;
+- peran admin dan user;
+- session cookie `httpOnly` dan password hashing Argon2id;
+- OTP untuk tindakan administratif tertentu;
+- Cloudflare Turnstile untuk formulir publik saat diaktifkan;
+- satu identitas Telegram untuk satu akun FTM;
+- pencabutan sesi dan audit aktivitas penting.
+
+### Operations
+
+- helpdesk web dengan notifikasi Telegram;
+- perintah Telegram untuk bantuan, status akun, dan akses dashboard;
+- health check dan readiness check;
+- backup MySQL manual maupun terjadwal;
+- migration database berurutan dan aman dijalankan ulang;
+- automated quality gate melalui GitHub Actions.
+
+## Technology Stack
+
+| Layer | Technology |
+|---|---|
+| Web application | Next.js 16 App Router, React 19, TypeScript strict |
+| Interface | Tailwind CSS 4, lucide-react, Three.js |
+| Data | MySQL, `mysql2`, Aiven |
+| Identity and communication | Argon2id, SMTP email, Cloudflare Turnstile, Telegram Bot API |
+| Device | ESP8266, ultrasonic sensor, per-device firmware package |
+| Hosting | Vercel |
+| Quality | Vitest, ESLint, TypeScript, Next.js production build, GitHub Actions |
+
+## Repository Structure
 
 ```text
 .
-├── .github/
-│   ├── ISSUE_TEMPLATE/
-│   └── workflows/
-├── docs/
-│   ├── api-contract.md
-│   ├── architecture.md
-│   ├── data-model.md
-│   ├── decision-log.md
-│   ├── deployment.md
-│   ├── development-log.md
-│   ├── device-ingestion.md
-│   ├── domain-model.md
-│   ├── field-pilot-5-sto-guide.md
-│   ├── current-operational-truth.md
-│   ├── pilot-readiness.md
-│   ├── reviewer-quickstart.md
-│   ├── roadmap.md
-│   ├── safety-and-limitations.md
-│   └── system-boundaries.md
+├── .github/                 # CI workflows and issue templates
+├── config/                  # public-safe registry templates
 ├── database/
-│   ├── migrations/
-│   └── seeds/
-├── config/
-│   └── pilot-registry.example.json
-├── scripts/
-│   ├── apply-mysql-schema.mjs
-│   ├── apply-pilot-registry.mjs
-│   ├── generate-device-key.mjs
-│   ├── simulate-device.mjs
-│   └── smoke-pilot-ingest.mjs
-├── src/
-│   ├── app/
-│   │   ├── api/
-│   │   ├── dashboard/
-│   │   ├── globals.css
-│   │   ├── layout.tsx
-│   │   └── page.tsx
-│   └── features/
-│       ├── auth/
-│       │   ├── components/
-│       │   ├── lib/
-│       │   ├── tests/
-│       │   └── types.ts
-│       └── monitoring/
-│           ├── components/
-│           ├── data/
-│           ├── lib/
-│           ├── tests/
-│           └── types/
-├── .env.example
-├── CONTRIBUTING.md
-├── LICENSE
-├── README.md
-├── SECURITY.md
-├── package.json
-└── pnpm-lock.yaml
+│   ├── migrations/         # ordered MySQL schema migrations
+│   └── seeds/              # development-only sample data
+├── docs/                    # architecture, operations, safety, and manuals
+├── firmware/templates/      # device firmware templates
+├── scripts/                 # migration, backup, simulator, and smoke-test tools
+└── src/
+    ├── app/                 # Next.js pages and Route Handlers
+    ├── components/          # shared UI components
+    └── features/
+        ├── auth/            # accounts, sessions, email, Telegram, and audit
+        ├── helpdesk/        # web and Telegram support workflow
+        └── monitoring/      # domain logic, repositories, dashboard, and tests
 ```
 
-Penjelasan folder utama:
+## Getting Started
 
-| Folder | Fungsi |
-|---|---|
-| `src/app` | Halaman Next.js dan API route |
-| `src/features/auth` | Logika login, session, OTP, reset password, verifikasi email, CAPTCHA, Telegram binding, validasi payload, dan repository auth MySQL |
-| `src/features/monitoring/components` | Komponen client kecil untuk refresh dan jam real-time |
-| `src/features/monitoring/data` | Data contoh yang aman untuk pengembangan |
-| `src/features/monitoring/lib` | Logika domain, normalisasi, view model, storage facade, memory store, dan repository MySQL |
-| `src/features/monitoring/tests` | Unit test untuk logika monitoring |
-| `database` | Migration dan seed MySQL untuk latihan persistent storage |
-| `config` | Template public-safe untuk registry pilot. File real `.local.json` tidak boleh di-commit |
-| `scripts` | Alat bantu development dan pilot, termasuk simulator, setup schema MySQL, registry pilot, hash key, dan smoke ingest |
-| `docs` | Dokumentasi arsitektur, API, domain, roadmap, dan batasan |
-| `.github` | CI dan template issue |
+### Requirements
 
-## Menjalankan Project
+- Node.js 20 or newer;
+- pnpm 9.15.3;
+- MySQL for persistent-storage development.
 
-Prasyarat:
-
-- Git;
-- Node.js 20 atau lebih baru;
-- pnpm 9.x;
-- PowerShell, Git Bash, atau terminal lain.
-
-Jika `pnpm` belum tersedia, aktifkan lewat Corepack:
-
-```powershell
-corepack enable
-corepack prepare pnpm@9.15.3 --activate
-```
-
-Clone repository:
+### Development server
 
 ```powershell
 git clone https://github.com/Zendin110206/solar-tank-monitoring-system.git
 cd solar-tank-monitoring-system
-```
-
-Install dependency:
-
-```powershell
+corepack enable
 pnpm install
-```
-
-Jalankan dev server:
-
-```powershell
 pnpm dev
 ```
 
-Buka:
+The application is available at `http://localhost:3000`.
 
-```text
-http://localhost:3000
-```
-
-Halaman penting:
-
-| Halaman | Fungsi |
-|---|---|
-| `/` | Landing page |
-| `/login` | Login pengguna dengan session database |
-| `/register` | Pengajuan akses pengguna baru, dilindungi verifikasi keamanan jika CAPTCHA aktif |
-| `/forgot-password` | Permintaan link reset kata sandi |
-| `/reset-password` | Membuat kata sandi baru dari link reset |
-| `/dashboard` | Monitoring operasional tangki |
-| `/dashboard/ringkas/tanks/tank-tph-main` | Detail operasional tangki untuk user |
-| `/dashboard/detail` | Analisis teknis untuk admin |
-| `/dashboard/locations` | Persiapan lokasi dan perangkat untuk admin |
-| `/dashboard/admin/users` | Manajemen pengguna untuk admin |
-| `/dashboard/admin/audit` | Audit keamanan auth untuk admin |
-| `/dashboard/account/security` | Keamanan akun dan sesi aktif |
-
-## Menjalankan Simulator
-
-Pastikan `pnpm dev` sudah berjalan.
-
-Kirim satu payload:
+Development uses an in-memory store and public-safe sample data by default.
+Device telemetry can be simulated without physical hardware:
 
 ```powershell
 pnpm simulate:device --once
 ```
 
-Kirim payload dengan persen tertentu:
+### MySQL development environment
 
-```powershell
-pnpm simulate:device --device demo-tph-01 --start-percent 73 --once
-```
-
-Jalankan terus setiap 5 detik:
-
-```powershell
-pnpm simulate:device
-```
-
-Hentikan simulator dengan:
-
-```text
-Ctrl + C
-```
-
-## Mengecek API Secara Manual
-
-Cek aplikasi hidup tanpa menyentuh database:
-
-```powershell
-curl.exe http://localhost:3000/api/health
-```
-
-Cek storage aktif siap dipakai dashboard:
-
-```powershell
-curl.exe http://localhost:3000/api/ready
-```
-
-Catatan:
-
-```text
-/api/health menjawab apakah aplikasi hidup.
-/api/ready menjawab apakah storage aktif siap. Di production endpoint ini hanya untuk admin/session operasional atau header token readiness. Jika mode mysql dan database gagal, endpoint ini mengembalikan HTTP 503.
-```
-
-Cek detail tangki:
-
-```powershell
-curl.exe http://localhost:3000/api/tanks/tank-tph-main
-```
-
-Cek history:
-
-```powershell
-curl.exe "http://localhost:3000/api/tanks/tank-tph-main/readings?range=24h"
-```
-
-Kirim payload manual:
-
-```powershell
-curl.exe -X POST http://localhost:3000/api/ingest `
-  -H "Content-Type: application/json" `
-  -H "X-Device-Id: demo-tph-01" `
-  -H "X-Api-Key: demo-tph-key" `
-  -d "{\"device\":\"demo-tph-01\",\"ts\":0,\"distance\":40.5,\"voltage\":3.86,\"raw\":{\"H_cm\":109.5,\"volume\":3650,\"percent\":73,\"wifi_rssi\":-55}}"
-```
-
-## Script
-
-| Script | Fungsi |
-|---|---|
-| `pnpm dev` | Menjalankan dev server |
-| `pnpm build` | Membuat build produksi |
-| `pnpm start` | Menjalankan hasil build |
-| `pnpm lint` | Menjalankan ESLint |
-| `pnpm typecheck` | Mengecek tipe TypeScript |
-| `pnpm test` | Menjalankan unit test |
-| `pnpm test:watch` | Menjalankan test dalam mode watch |
-| `pnpm simulate:device` | Menjalankan simulator device |
-| `pnpm pilot:hash-key` | Membuat key baru dan hash `sha256:...` untuk device pilot |
-| `pnpm pilot:registry` | Memvalidasi dan apply registry pilot lokal ke MySQL |
-| `pnpm pilot:smoke` | Mengirim payload real-format ke `/api/ingest` untuk uji pilot |
-| `pnpm db:migrate:mysql` | Menjalankan migration MySQL dari folder `database/migrations` |
-| `pnpm db:migrate:auth` | Menjalankan migration core auth MySQL |
-| `pnpm db:migrate:auth-recovery` | Menjalankan migration tambahan reset password, verifikasi email, Telegram, dan audit auth |
-| `pnpm db:migrate:device-provisioning` | Menjalankan migration tabel pengajuan perangkat, firmware template, hardware profile, paket firmware, dan event provisioning |
-| `pnpm db:migrate:device-request-fields` | Menambahkan field operasional Batch 19, index, dan validasi database ke tabel pengajuan perangkat pada database yang sudah pernah menjalankan migration lama |
-| `pnpm db:migrate:reading-rollup` | Menambahkan snapshot live dan metadata agregat history 5 menit |
-| `pnpm db:migrate:auth-telegram` | Menjamin satu akun Telegram hanya terhubung ke satu akun FTM |
-| `pnpm db:migrate:site-taxonomy` | Menambahkan tempat penyimpanan Regional dan Wilayah pada lokasi serta pengajuan perangkat |
-| `pnpm db:seed:mysql` | Mengisi data contoh site, tangki, dan device ke MySQL |
-| `pnpm db:setup:mysql` | Menjalankan migration lalu seed MySQL |
-| `pnpm db:backup:mysql` | Membuat dump MySQL konsisten ke folder backup yang di-ignore Git |
-| `pnpm auth:create-admin` | Membuat atau memastikan admin awal dari env bootstrap |
-| `pnpm check` | Menjalankan typecheck, lint, test, dan build |
-
-## Variabel Lingkungan
-
-Salin contoh env jika diperlukan:
-
-```powershell
-Copy-Item .env.example .env.local
-```
-
-Variabel yang relevan saat ini:
-
-| Variabel | Fungsi |
-|---|---|
-| `NEXT_PUBLIC_APP_NAME` | Nama aplikasi |
-| `NEXT_PUBLIC_APP_ENV` | Label environment |
-| `NEXT_PUBLIC_MONITORING_REFRESH_INTERVAL_MS` | Interval auto-refresh dashboard/detail. Default `20000` ms |
-| `SOLAR_TANK_STORAGE_DRIVER` | Pilih `memory` atau `mysql`. Default aman untuk development adalah `memory` |
-| `MYSQL_DATABASE_URL` | Connection string MySQL, hanya dipakai ketika storage driver `mysql` |
-| `SOLAR_TANK_LOCAL_DEVICE_KEY` | Key fallback global untuk development lokal |
-| `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK` | Set `false` untuk menolak fallback global dan memakai key per device |
-| `SOLAR_TANK_DEVICE_KEY` | Override key simulator untuk satu device jika dibutuhkan |
-| `MYSQL_CONNECTION_LIMIT` | Batas koneksi pool MySQL. Untuk serverless awal gunakan nilai kecil seperti `1` atau `2` |
-| `MYSQL_SSL_MODE` | Gunakan `required` jika provider MySQL cloud mewajibkan TLS |
-| `MYSQL_SSL_CA` | CA certificate dari provider MySQL jika diperlukan |
-| `AUTH_SESSION_COOKIE_NAME` | Nama cookie session auth |
-| `AUTH_SECRET` | Secret minimal 32 karakter untuk token/CSRF auth |
-| `AUTH_REQUIRE_ADMIN_OTP` | Set `true` agar admin wajib OTP saat login |
-| `AUTH_ENABLE_REGISTER` | Set `true` untuk membuka halaman pengajuan akses publik |
-| `AUTH_ALLOW_PASSWORD_RESET` | Set `true` agar reset kata sandi lewat email aktif |
-| `AUTH_REQUIRE_EMAIL_VERIFICATION_FOR_APPROVAL` | Set `true` agar email wajib terverifikasi sebelum approval user |
-| `AUTH_COOKIE_SECURE` | Set `true` di HTTPS production; lokal boleh `false` |
-| `APP_BASE_URL` | URL aplikasi untuk link email verifikasi dan reset password. Production wajib memakai domain asli, bukan localhost |
-| `AUTH_BOOTSTRAP_ADMIN_EMAIL` | Email admin awal untuk script `pnpm auth:create-admin` |
-| `AUTH_BOOTSTRAP_ADMIN_USERNAME` | Username admin awal |
-| `AUTH_BOOTSTRAP_ADMIN_FULL_NAME` | Nama lengkap admin awal |
-| `AUTH_BOOTSTRAP_ADMIN_PASSWORD` | Password awal admin yang kuat |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `SMTP_SECURE` | Konfigurasi email untuk OTP admin, verifikasi email, dan reset password |
-| `DEVICE_PACKAGE_ENCRYPTION_KEY` | Key 32 byte base64/base64url/hex untuk mengenkripsi ZIP firmware. Wajib untuk production |
-| `DEVICE_PACKAGE_DOWNLOAD_TTL_DAYS` | Masa berlaku link download paket firmware. Default `7` hari |
-| `DEVICE_PACKAGE_MAX_DOWNLOADS` | Batas jumlah download paket firmware. Default `3` kali |
-| `AUTH_CAPTCHA_PROVIDER` | Provider verifikasi form publik: `disabled` atau `turnstile`. Nilai selain itu dianggap error konfigurasi |
-| `NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY` | Site key Turnstile yang aman untuk browser |
-| `AUTH_CAPTCHA_SECRET_KEY` | Secret key Turnstile untuk server. Jangan commit |
-| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_BOT_USERNAME` | Konfigurasi Telegram binding akun |
-| `PILOT_REGISTRY_FILE` | Path file registry pilot lokal untuk script `pnpm pilot:registry` |
-| `PILOT_API_BASE_URL` | Base URL target smoke test, misalnya URL Vercel |
-| `PILOT_DEVICE_ID` | Device ID yang dipakai smoke test |
-| `PILOT_DEVICE_KEY` | Key asli device untuk smoke test. Jangan commit |
-| `PILOT_EXPECT_STORAGE` | Storage yang diharapkan saat smoke test. Default `mysql` |
-
-Simulator otomatis memakai key demo sesuai device dummy. Contoh:
-
-```text
-demo-tph-01 -> demo-tph-key
-demo-nja-01 -> demo-nja-key
-demo-jto-01 -> demo-jto-key
-demo-skp-01 -> demo-skp-key
-```
-
-`local-development-key` tetap tersedia sebagai fallback development jika `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK` tidak dimatikan. Jangan gunakan fallback global untuk pilot atau production.
-
-## Mode MySQL Opsional
-
-Mode default tetap `memory`, sehingga aplikasi bisa langsung dicoba tanpa database.
-
-Jika ingin latihan data registry dan reading yang tidak hilang saat server restart:
-
-1. Buat database MySQL lokal.
-2. Isi `.env.local` dengan `MYSQL_DATABASE_URL`, konfigurasi auth, dan secret yang aman.
-3. Jalankan setup database monitoring dan auth:
+Create `.env.local` from `.env.example`, provide credentials for an authorized
+development database, then initialize the schema:
 
 ```powershell
 pnpm db:setup:mysql
+pnpm auth:create-admin
+pnpm dev
 ```
 
-Jika database sudah pernah dipakai dan hanya perlu menyusul schema pengajuan perangkat Batch 19, jalankan urutan ini:
+`db:setup:mysql` includes sample seeds and is intended for an empty development
+database. An existing database must be backed up before its ordered migrations
+are applied, and must not receive development seeds.
 
 ```powershell
+pnpm db:backup:mysql
+pnpm db:migrate:mysql
+pnpm db:migrate:auth
+pnpm db:migrate:auth-recovery
 pnpm db:migrate:device-provisioning
 pnpm db:migrate:device-request-fields
+pnpm db:migrate:helpdesk
 pnpm db:migrate:reading-rollup
 pnpm db:migrate:auth-telegram
 pnpm db:migrate:site-taxonomy
 ```
 
-`db:migrate:device-request-fields` memperbaiki kasus database lama yang belum memiliki kolom seperti `device_sensor_type`, `load_value`, `diesel_engine_capacity_kva`, dan `cos_phi`. Script ini juga menambahkan index dan check constraint agar aturan database lama sama kuatnya dengan database baru.
+Deployment requirements, migration order, and readiness checks are documented
+in [Deployment](docs/deployment.md).
 
-`db:migrate:reading-rollup` bersifat additive dan dapat dijalankan ulang melalui
-runner migration project. Migration ini tidak menghapus raw history lama. Untuk
-database operasional, jalankan `pnpm db:backup:mysql` terlebih dahulu, lalu cek
-`/api/ready` setelah migration dan deployment.
+## Commands
 
-`db:migrate:auth-telegram` menambahkan unique index untuk binding Telegram. Jika
-database lama masih memiliki satu chat pada beberapa akun, binding yang paling
-baru diverifikasi dipertahankan; binding lama dilepas dan dicatat pada audit log.
-Migration ini aman dijalankan ulang melalui runner schema dan `/api/ready` akan
-menandai deployment belum siap jika index tersebut belum tersedia.
-
-`db:migrate:site-taxonomy` menambahkan Regional dan Wilayah tanpa menghapus data
-lama. Lokasi lama diberi nilai awal `TREG 5` dan `TIF 3` agar pilot Pasuruan
-tetap bisa dibuka. Sesudah migration, nilai tiap STO dapat diperbarui melalui
-pengajuan perangkat atau registry pilot. `/api/ready` akan menolak status siap
-jika tempat penyimpanan baru ini belum tersedia.
-
-Jika tim perlu membersihkan data device/uji sebelum uji real, login sebagai
-admin lalu buka:
-
-```text
-/dashboard/admin/device-requests
-```
-
-Pilihan yang tersedia:
-
-- ikon **X** di kartu dashboard untuk menghapus data STO/tangki lama yang sudah
-  tidak dipakai, dengan dialog konfirmasi sebelum data dibersihkan;
-- filter pencarian dan status di halaman **Tinjau Pengajuan** supaya admin tidak
-  perlu mencari manual ketika data pengajuan sudah banyak;
-- tombol **Hapus data** di tiap card pengajuan untuk menghapus satu
-  pengajuan/perangkat uji;
-- checkbox **Pilih hapus** di tiap card lalu kontrol **Bersihkan pilihan**
-  untuk menghapus beberapa pengajuan sekaligus;
-- area lipat **Opsi lanjutan: reset semua data monitoring** hanya jika tim
-  benar-benar ingin mulai ulang dari kosong.
-
-Semua opsi membersihkan data operasional monitoring yang terkait: site, tangki,
-device, reading, pengajuan perangkat, paket firmware, dan event provisioning.
-Panel ini tidak menghapus akun admin/user, session auth, audit auth, template
-firmware, atau profil hardware. Setelah reset/pembersihan, user perlu mengajukan
-perangkat lagi atau admin perlu menyiapkan ulang data device sebelum dashboard
-berisi data real. Jika semua data monitoring dikosongkan, `/api/ready` wajar
-melaporkan registry belum lengkap sampai data device dibuat kembali.
-
-4. Jalankan bootstrap admin awal jika tabel auth masih kosong:
-
-```powershell
-pnpm auth:create-admin
-```
-
-5. Isi atau pastikan `.env.local`:
-
-```env
-SOLAR_TANK_STORAGE_DRIVER="mysql"
-MYSQL_DATABASE_URL="mysql://solar_tank_app:password@127.0.0.1:3306/solar_tank_monitoring"
-MYSQL_CONNECTION_LIMIT="2"
-MYSQL_SSL_MODE="disabled"
-SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK="false"
-AUTH_SECRET="ganti-dengan-secret-minimal-32-karakter"
-AUTH_REQUIRE_ADMIN_OTP="true"
-AUTH_ENABLE_REGISTER="true"
-AUTH_ALLOW_PASSWORD_RESET="true"
-AUTH_CAPTCHA_PROVIDER="disabled"
-```
-
-Untuk cloud MySQL yang mewajibkan TLS, gunakan `MYSQL_SSL_MODE="required"`.
-Jika provider memberi CA certificate, isi `MYSQL_SSL_CA`.
-
-Untuk production atau Vercel yang membuka form publik, gunakan
-`AUTH_CAPTCHA_PROVIDER="turnstile"` lalu isi
-`NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY` dan `AUTH_CAPTCHA_SECRET_KEY` dari
-Cloudflare Turnstile. Jangan aktifkan Turnstile hanya di salah satu sisi; site
-key dan secret key harus berasal dari widget yang sama.
-
-`APP_BASE_URL` wajib diisi dengan alamat aplikasi yang benar sebelum email auth
-dipakai. Jika production masih memakai localhost atau nilai kosong, endpoint
-readiness akan menandainya sebagai error agar link verifikasi/reset password
-tidak terkirim ke alamat yang salah.
-
-Setelah mengubah `.env.local`, hentikan lalu jalankan ulang `pnpm dev`.
-Tombol refresh di dashboard hanya mencoba mengambil data ulang dari proses server
-yang sedang berjalan; tombol itu tidak memuat ulang perubahan env.
-
-Catatan:
-
-- mode MySQL membaca registry site, tank, device, dan hash key dari database;
-- rotasi key dan halaman manajemen registry masih tahap berikutnya;
-- jangan masukkan password database asli ke Git.
-
-## Pilot 5 STO
-
-Untuk mencoba data yang lebih dekat ke lapangan, gunakan alur pilot.
-
-Langkah ringkas:
-
-```powershell
-pnpm db:migrate:mysql
-pnpm pilot:hash-key
-Copy-Item config/pilot-registry.example.json config/pilot-registry.local.json
-# edit config/pilot-registry.local.json sampai koordinat dan hash device sudah real/approved
-pnpm pilot:registry -- --dry-run
-pnpm pilot:registry
-pnpm pilot:smoke
-```
-
-Penjelasan lengkap ada di:
-
-```text
-docs/pilot-readiness.md
-```
-
-Catatan penting:
-
-- `config/pilot-registry.local.json` berisi data real/approved dan tidak boleh di-commit;
-- `config/pilot-registry.example.json` hanya template aman, bukan data final lapangan;
-- key asli device tidak boleh masuk repo;
-- registry pilot wajib memakai koordinat yang sudah boleh dipakai;
-- fallback global key harus dimatikan untuk pilot;
-- jika smoke test sukses tetapi `needsReview=true`, cek config tangki di payload vs registry.
-
-## Peta Dokumentasi
-
-| Dokumen | Isi |
+| Command | Purpose |
 |---|---|
-| `docs/reviewer-quickstart.md` | Panduan cepat menjalankan dan mengecek repo |
-| `docs/architecture.md` | Gambaran arsitektur saat ini dan target berikutnya |
-| `docs/api-contract.md` | Kontrak endpoint API |
-| `docs/current-operational-truth.md` | Status operasional terbaru agar dokumen lama yang stale tidak menjadi acuan salah |
-| `docs/device-ingestion.md` | Format payload device dan simulator |
-| `docs/data-model.md` | Entitas data utama |
-| `docs/domain-model.md` | Rumus volume, persen, runtime, dan status |
-| `docs/deployment.md` | Catatan deployment development, demo, dan pilot sementara |
-| `docs/pilot-readiness.md` | Panduan pilot 5 STO dengan registry real, hash key, dan smoke test |
-| `docs/field-pilot-5-sto-guide.md` | Panduan lapangan 5 STO: koordinat, peta, firmware, endpoint, dan checklist demo |
-| `docs/roadmap.md` | Rencana pengembangan bertahap |
-| `docs/safety-and-limitations.md` | Batasan dan keselamatan |
-| `docs/system-boundaries.md` | Hal yang masuk dan tidak masuk repo publik |
-| `docs/decision-log.md` | Keputusan teknis yang sudah diambil |
-| `docs/development-log.md` | Catatan perkembangan implementasi |
+| `pnpm dev` | Start the Turbopack development server |
+| `pnpm dev:lan` | Expose the development server on an authorized local network |
+| `pnpm dev:webpack` | Use Webpack as a compatibility fallback |
+| `pnpm simulate:device` | Send development telemetry to the ingest endpoint |
+| `pnpm pilot:hash-key` | Generate credentials for authorized device onboarding |
+| `pnpm pilot:registry` | Validate and apply a local, untracked registry file |
+| `pnpm pilot:smoke` | Exercise ingestion with a device-format payload |
+| `pnpm db:backup:mysql` | Create a MySQL backup in the Git-ignored backup directory |
+| `pnpm db:migrate:*` | Apply an individual schema migration |
+| `pnpm check` | Run typecheck, lint, tests, and the production build |
 
-## Alur Kerja Kontributor
+## Configuration and Security
 
-Sebelum mulai mengubah kode, pastikan identitas Git sudah sesuai dengan akun
-masing-masing. Ini penting agar riwayat kontribusi di GitHub tidak tercatat
-sebagai orang lain.
+`.env.example` documents configuration names without providing operational
+values. Production data and credentials are excluded from this repository.
 
-```powershell
-git config user.name
-git config user.email
-```
+- secrets, database URLs, device keys, tokens, and account data must remain
+  outside version control;
+- only browser-safe values may use the `NEXT_PUBLIC_` prefix;
+- operational registries and precise location data must not be committed;
+- `config/pilot-registry.example.json` is a public template; `*.local.json`
+  remains untracked;
+- seeds and simulator payloads are development fixtures, not operational data;
+- security reports follow the private process in [SECURITY.md](SECURITY.md).
 
-Jika masih memakai identitas orang lain, ganti di repo ini:
+Operational and physical limitations are maintained in
+[Safety and Limitations](docs/safety-and-limitations.md).
 
-```powershell
-git config user.name "Nama GitHub atau nama kontributor"
-git config user.email "email-yang-terhubung-ke-github@example.com"
-```
+## Quality Assurance
 
-Gunakan `--global` hanya jika identitas tersebut memang ingin dipakai untuk
-semua repository di laptop itu:
+Every change is expected to pass the complete project check:
 
 ```powershell
-git config --global user.name "Nama GitHub atau nama kontributor"
-git config --global user.email "email-yang-terhubung-ke-github@example.com"
-```
-
-Sebelum mulai mengubah kode, selalu ambil kondisi terbaru dari `main`:
-
-```powershell
-git checkout main
-git pull --ff-only origin main
-pnpm install
 pnpm check
 ```
 
-Buat branch baru untuk setiap pekerjaan:
+The command runs TypeScript type checking, ESLint, the Vitest suite, and a
+Next.js production build. Runtime changes also require focused validation of the
+affected flow. Software checks do not replace sensor calibration, installation
+inspection, or operational safety procedures.
 
-```powershell
-git checkout -b feat/nama-pekerjaan-singkat
-```
+## Product Roadmap
 
-Contoh nama branch:
+Development remains active across the following workstreams:
 
-```text
-feat/monitoring-operasional
-fix/peta-marker-mobile
-docs/panduan-device-local
-chore/dev-lan-script
-```
+- firmware transport security, OTA controls, and diagnostic hardening;
+- documented calibration and measurement tolerance per tank;
+- automated alerts for critical levels, stale devices, and delivery failures;
+- location-scoped access control for larger operational teams;
+- encrypted backup retention and periodic restore drills;
+- centralized observability, incident handling, and credential rotation;
+- load, quota, and cost validation before wider deployment;
+- release management and operational ownership for long-term maintenance.
 
-Sebelum push, jalankan pengecekan:
+Priorities and readiness gates are tracked in
+[Roadmap](docs/roadmap.md) and [Pilot Readiness](docs/pilot-readiness.md).
 
-```powershell
-git status
-pnpm check
-```
+## Documentation
 
-Commit message memakai pola Conventional Commit. Deskripsi setelah titik dua
-boleh memakai Bahasa Indonesia agar mudah dipahami tim.
+| Document | Scope |
+|---|---|
+| [Current Operational Truth](docs/current-operational-truth.md) | Current deployment state and claim boundaries |
+| [Architecture](docs/architecture.md) | Components, dependencies, and data flow |
+| [API Contract](docs/api-contract.md) | Endpoint contracts and payload formats |
+| [Data Model](docs/data-model.md) | Sites, tanks, devices, readings, and provisioning |
+| [Device Ingestion](docs/device-ingestion.md) | Authentication, normalization, and ingest validation |
+| [Deployment](docs/deployment.md) | Environments, migrations, readiness, and release flow |
+| [Database Backup](docs/database-backup.md) | Backup, retention, and recovery boundaries |
+| [Safety and Limitations](docs/safety-and-limitations.md) | Software, data, hardware, and operational limits |
+| [Reviewer Quickstart](docs/reviewer-quickstart.md) | Technical review path |
+| [User Manual](docs/panduan-user-manual-ftm.pdf) | End-user guide |
 
-Contoh:
+## Contributing
 
-```powershell
-git add .
-git commit -m "feat(dashboard): sederhanakan kartu monitoring"
-git push -u origin feat/nama-pekerjaan-singkat
-```
+Contributions follow [CONTRIBUTING.md](CONTRIBUTING.md). Changes should keep
+fixtures public-safe, preserve the documented security boundaries, include
+appropriate tests, and pass the project quality gate.
 
-Aturan penting:
+| Contributor | Primary contributions |
+|---|---|
+| [Muhammad Zaenal Abidin Abdurrahman](https://github.com/Zendin110206) | Project coordination, application architecture, backend and database, identity, deployment, integration, testing, and review |
+| [Yattaqi Muazirul Mulki](https://github.com/ukiirving) | Interface design and application development |
+| [Astra](https://github.com/Ata22) | Device and firmware development, field testing, Telegram integration, and operational input |
 
-- utamakan branch baru dan pull request untuk perubahan yang dikerjakan tim;
-- jangan push langsung ke `main` kecuali sudah disepakati;
-- jangan commit `.env.local`;
-- jangan commit data real;
-- jangan commit credential;
-- jangan commit folder `local_context`;
-- jangan commit folder kerja lokal perangkat atau firmware yang belum disepakati;
-- jangan force push kecuali sudah disepakati;
-- kalau ada konflik Git, berhenti dulu dan minta bantuan.
+## License
 
-Panduan kontribusi lebih lengkap ada di `CONTRIBUTING.md`.
-
-## Batasan Produksi
-
-Repositori ini belum siap production.
-
-Sebelum dipakai dengan perangkat dan tangki nyata, perlu validasi:
-
-- bentuk dan dimensi tangki;
-- posisi sensor;
-- metode kalibrasi;
-- toleransi error sensor;
-- konsumsi bahan bakar per lokasi;
-- interval pengiriman device;
-- keamanan API key;
-- konfigurasi SMTP untuk OTP admin, verifikasi email, dan reset password;
-- konfigurasi Turnstile untuk form pengajuan akses dan lupa password;
-- akses user, role, approval admin, dan prosedur deaktivasi akun;
-- keputusan deployment production final dan SOP operasional;
-- backup database dan restore drill, lihat `docs/database-backup.md`;
-- rate limit ingest pada mode MySQL dan proteksi tambahan endpoint ingest di environment final;
-- rotasi key per device;
-- cara menonaktifkan fallback data dummy;
-- prosedur keselamatan lapangan.
-
-## Pemelihara dan Kontributor
-
-| Nama | Peran | Profil |
-|---|---|---|
-| Muhammad Zaenal Abidin Abdurrahman | Pengelola proyek dan pengembangan awal | - |
-| Yattaqi Muazirul Mulki | Kolaborator pengembangan aplikasi | [ukiirving](https://github.com/ukiirving) |
-| Astra | Kontributor perangkat, pengujian data real, dan dukungan integrasi lapangan | [Ata22](https://github.com/Ata22) |
-
-## Lisensi
-
-Proyek ini menggunakan lisensi MIT. Lihat `LICENSE` untuk detail.
+Source code is available under the [MIT License](LICENSE). Names, logos,
+credentials, operational data, and third-party information are not licensed by
+that grant.

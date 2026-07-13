@@ -17,7 +17,10 @@ jarak sensor
   -> status
 ```
 
-Pada fase prototipe, simulator bisa langsung mengirim `raw.volume` dan `raw.percent` agar alur API mudah diuji. Untuk pilot, device atau smoke test dapat mengirim payload real-format yang membawa config tangki seperti bentuk, kapasitas, dimensi, dan konsumsi per jam.
+Pada mode development, simulator bisa langsung mengirim `raw.volume` dan
+`raw.percent` agar alur API mudah diuji. Untuk pilot, device atau smoke test
+dapat mengirim payload real-format yang membawa config tangki seperti bentuk,
+kapasitas, dimensi, dan konsumsi per jam.
 
 ## Endpoint
 
@@ -204,7 +207,7 @@ Jika smoke test gagal:
 | `503` | storage MySQL belum siap |
 | `needsReview=true` | payload masuk, tetapi config payload berbeda dari registry |
 
-## Device Dummy yang Tersedia
+## Device Contoh yang Tersedia
 
 | Device | Tangki |
 |---|---|

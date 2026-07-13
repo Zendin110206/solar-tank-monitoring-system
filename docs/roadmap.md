@@ -26,7 +26,7 @@ Isi:
 - konteks monitoring tangki;
 - tombol masuk dashboard.
 
-## Fase 3 - Dashboard dan Detail Dummy
+## Fase 3 - Dashboard dan Detail Awal
 
 Status: selesai untuk versi awal.
 
@@ -85,7 +85,7 @@ Isi:
 
 ## Fase 7 - Storage Permanen dan Registry
 
-Status: fondasi reading dan registry selesai untuk prototipe, belum production.
+Status: dipakai pada pilot operasional, hardening production belum selesai.
 
 Sudah ada:
 
@@ -100,9 +100,9 @@ Sudah ada:
 Yang belum selesai:
 
 - rotasi key device;
-- backup database;
+- backup terenkripsi dan restore drill;
 - test integrasi database nyata;
-- audit berkala agar data dummy tetap hanya aktif di mode development lokal.
+- audit berkala agar data contoh tetap hanya aktif di mode development lokal.
 
 ## Fase 8 - Auth dan Role
 
@@ -126,10 +126,12 @@ Yang masih perlu dimatangkan:
 
 ## Fase 9 - Integrasi Device Fisik
 
-Status: fondasi payload real-format dan smoke test tersedia, integrasi lapangan tetap perlu validasi.
+Status: perangkat fisik sudah mengirim data pada pilot; kalibrasi dan hardening
+lapangan tetap perlu validasi.
 
 Sudah ada:
 
+- perangkat fisik yang terhubung ke deployment pilot;
 - normalisasi payload real-format;
 - review config payload vs registry;
 - script smoke test ingest;
@@ -152,9 +154,10 @@ Catatan:
 
 Endpoint ingest dan key per device sudah disiapkan untuk latihan dan pilot awal. Perangkat fisik tetap harus mengikuti validasi payload, jaringan, keamanan, dan safety lapangan.
 
-## Fase 10 - Deployment Demo atau Pilot
+## Fase 10 - Deployment Pilot
 
-Status: jalur Vercel + cloud MySQL tersedia untuk demo/pilot ringan. Detail deployment pilihan akhir ditunda sampai keputusan tim berikutnya.
+Status: Vercel + Aiven MySQL aktif untuk pilot terbatas. Kesiapan produksi final,
+kapasitas target ekspansi, dan SOP jangka panjang belum disetujui.
 
 Sudah ada:
 
@@ -164,6 +167,7 @@ Sudah ada:
 - alat registry pilot;
 - smoke ingest ke URL lokal atau Vercel;
 - dokumen kebenaran operasional terkini.
+- registry 3 site, 3 tangki, dan 3 device pada verifikasi 14 Juli 2026.
 
 Target berikutnya:
 

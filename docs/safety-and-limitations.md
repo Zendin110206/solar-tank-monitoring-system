@@ -4,25 +4,27 @@ Dokumen ini menjelaskan batas sistem dan hal keselamatan yang harus diperhatikan
 
 ## Status Keamanan Saat Ini
 
-Repositori ini adalah prototipe software.
+Repositori ini menopang pilot operasional internal yang sudah menerima data dari
+perangkat nyata. Status tersebut tidak sama dengan production-hardened.
 
 Belum boleh dianggap:
 
 - production-ready;
-- aman untuk perangkat nyata tanpa review;
-- siap dipasang di tangki nyata;
-- siap menyimpan data operasional sensitif.
+- aman untuk perluasan perangkat tanpa review keamanan dan keselamatan;
+- hasil sensor terkalibrasi untuk seluruh tangki;
+- satu-satunya sumber keputusan operasional;
+- persetujuan resmi deployment nasional.
 
 ## Batas Software
 
 Yang sudah ada:
 
-- data dummy;
-- API ingest lokal;
-- validasi key per device dengan hash pada data dummy;
-- memory store;
-- fondasi MySQL untuk reading;
-- registry MySQL untuk pilot;
+- data contoh dan simulator khusus development;
+- API ingest lokal dan deployment;
+- validasi hash key per device;
+- memory store development;
+- snapshot live dan history rollup pada MySQL;
+- registry MySQL yang telah dipakai pilot;
 - auth user/admin berbasis MySQL;
 - session, OTP admin, email verification, reset password, dan audit auth;
 - rate limit untuk auth dan endpoint ingest saat storage MySQL aktif;
@@ -36,12 +38,12 @@ Yang sudah ada:
 
 Yang belum ada:
 
-- database production lengkap dengan backup;
+- backup terenkripsi dan restore drill yang teruji;
 - role operasional rinci di luar `admin` dan `user`;
 - backup dan restore yang diuji rutin;
 - monitoring server;
 - alert operasional level kritis/offline;
-- integrasi hardware real yang sudah dikalibrasi dan disetujui lapangan;
+- kalibrasi serta persetujuan keselamatan hardware untuk setiap lokasi;
 - halaman admin untuk mengelola registry device, hardware profile, dan firmware template secara penuh;
 - keputusan deployment production final dan proteksi perimeter environment final;
 - approval/reject device lewat Telegram.
@@ -117,7 +119,7 @@ Dashboard tidak menggantikan:
 - prosedur keselamatan;
 - validasi mentor atau penanggung jawab.
 
-## Sebelum Production
+## Sebelum Production-Hardened
 
 Checklist minimum:
 
