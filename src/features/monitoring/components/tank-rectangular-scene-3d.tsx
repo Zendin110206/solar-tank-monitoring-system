@@ -521,7 +521,7 @@ export function TankRectangularScene3D({
             H {fuelHeightCm} cm
           </div>
           <div className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-white/85 px-3 py-1 text-xs font-semibold text-zinc-600 ring-1 ring-zinc-200">
-            Distance {sensorDistanceCm} cm
+            Ruang kosong {sensorDistanceCm} cm
           </div>
         </>
       ) : null}

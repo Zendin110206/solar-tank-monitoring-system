@@ -62,6 +62,8 @@ export type TankDetailView = {
   siteCode: string;
   siteName: string;
   areaLabel: string;
+  regionalLabel?: string;
+  wilayahLabel?: string;
   tankName: string;
   status: TankDetailStatus;
   statusLabel: string;
@@ -580,6 +582,8 @@ export function buildTankDetail(
     siteCode: site.code,
     siteName: site.name,
     areaLabel: site.areaLabel,
+    regionalLabel: site.regionalLabel,
+    wilayahLabel: site.wilayahLabel,
     tankName: tank.name,
     status,
     statusLabel: statusLabels[status],

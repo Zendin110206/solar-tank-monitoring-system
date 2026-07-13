@@ -65,6 +65,8 @@ export type DeviceRequestDraft = {
   siteCode?: string | null;
   siteName: string;
   areaLabel: string;
+  regionalLabel?: string | null;
+  wilayahLabel?: string | null;
   latitude?: number | null;
   longitude?: number | null;
   deviceCode?: string | null;
@@ -91,6 +93,8 @@ export type NormalizedDeviceRequestDraft = {
   siteCode: string;
   siteName: string;
   areaLabel: string;
+  regionalLabel: string;
+  wilayahLabel: string;
   deviceCode: string;
   deviceSensorType: DeviceSensorType;
   tankShape: TankShape;
@@ -190,6 +194,8 @@ export type Site = {
   code: string;
   name: string;
   areaLabel: string;
+  regionalLabel?: string;
+  wilayahLabel?: string;
   latitude?: number;
   longitude?: number;
   isActive: boolean;
@@ -348,6 +354,11 @@ export type CatTelemetryPayload = {
   site_code?: unknown;
   site_name?: unknown;
   area_label?: unknown;
+  areaLabel?: unknown;
+  regional_label?: unknown;
+  regionalLabel?: unknown;
+  wilayah_label?: unknown;
+  wilayahLabel?: unknown;
   device_label?: unknown;
   expected_report_interval_sec?: unknown;
   tank?: Record<string, unknown> | null;

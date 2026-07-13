@@ -28,6 +28,8 @@ const CLEANUP_SINGLE_CONFIRMATION = "BERSIHKAN ITEM DEVICE";
 const RESET_DEVICE_DATA_CONFIRMATION = "BERSIHKAN SEMUA DATA DEVICE";
 const DEVICE_REQUEST_SCHEMA_COLUMNS = [
   "device_sensor_type",
+  "regional_label",
+  "wilayah_label",
   "load_value",
   "load_unit",
   "diesel_engine_capacity_kva",
@@ -89,7 +91,7 @@ function getActionError(error: unknown): DeviceRequestAdminActionState {
     return {
       status: "error",
       message:
-        "Aksi belum bisa diproses karena struktur database Batch 19 belum lengkap. Jalankan migration device request fields lalu coba lagi.",
+        "Aksi belum bisa diproses karena struktur database pengajuan perangkat belum lengkap. Jalankan seluruh migration terbaru lalu coba lagi.",
     };
   }
 

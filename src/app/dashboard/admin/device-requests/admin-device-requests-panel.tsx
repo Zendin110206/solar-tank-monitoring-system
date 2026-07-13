@@ -238,6 +238,8 @@ function RequestDetailModal({
                 <dl className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                   <DetailItem label="Nama STO">{request.siteName}</DetailItem>
                   <DetailItem label="Kode STO">{request.siteCode}</DetailItem>
+                  <DetailItem label="Regional">{request.regionalLabel}</DetailItem>
+                  <DetailItem label="Wilayah">{request.wilayahLabel}</DetailItem>
                   <DetailItem label="Area">{request.areaLabel}</DetailItem>
                   <DetailItem label="Kode device">{request.deviceCode}</DetailItem>
                   <DetailItem label="Label device">{request.deviceLabel}</DetailItem>
@@ -492,7 +494,11 @@ export function AdminDeviceRequestsPanel({
                     <td className="rounded-l-lg border-y border-l border-zinc-200 px-3 py-3">
                       <p className="font-semibold text-zinc-950">{request.siteName}</p>
                       <p className="mt-1 text-xs text-zinc-500">
-                        {request.siteCode} / {request.areaLabel}
+                        {request.siteCode} / {request.regionalLabel} /{" "}
+                        {request.wilayahLabel}
+                      </p>
+                      <p className="mt-0.5 text-xs text-zinc-500">
+                        Area {request.areaLabel}
                       </p>
                     </td>
                     <td className="border-y border-zinc-200 px-3 py-3">

@@ -1,6 +1,10 @@
 import { type RowDataPacket } from "mysql2/promise";
 
 import type { Device, Site, Tank, TankShape } from "../types/monitoring";
+import {
+  normalizeRegionalLabel,
+  normalizeWilayahLabel,
+} from "./location-taxonomy";
 import { getMysqlPool } from "./mysql-connection";
 
 type SiteRow = RowDataPacket & {
@@ -8,6 +12,8 @@ type SiteRow = RowDataPacket & {
   code: string;
   name: string;
   area_label: string;
+  regional_label: string | null;
+  wilayah_label: string | null;
   latitude: number | string | null;
   longitude: number | string | null;
   is_active: number | boolean;
@@ -84,12 +90,18 @@ function toTankShape(value: string): TankShape {
 export function rowToSite(row: SiteRow): Site {
   const latitude = toOptionalNumber(row.latitude);
   const longitude = toOptionalNumber(row.longitude);
+  const regionalLabel =
+    normalizeRegionalLabel(row.regional_label) ?? row.regional_label ?? undefined;
+  const wilayahLabel =
+    normalizeWilayahLabel(row.wilayah_label) ?? row.wilayah_label ?? undefined;
 
   return {
     id: row.id,
     code: row.code,
     name: row.name,
     areaLabel: row.area_label,
+    ...(regionalLabel ? { regionalLabel } : {}),
+    ...(wilayahLabel ? { wilayahLabel } : {}),
     ...(typeof latitude === "number" ? { latitude } : {}),
     ...(typeof longitude === "number" ? { longitude } : {}),
     isActive: toBoolean(row.is_active),
@@ -133,6 +145,23 @@ export function rowToDevice(row: DeviceRow): Device {
   };
 }
 
+export async function checkMonitoringLocationTaxonomySchemaFromMysql(): Promise<void> {
+  const pool = getMysqlPool();
+
+  await pool.query(
+    `
+      SELECT
+        sites.regional_label,
+        sites.wilayah_label,
+        requests.regional_label,
+        requests.wilayah_label
+      FROM monitoring_sites AS sites
+      CROSS JOIN monitoring_device_requests AS requests
+      LIMIT 0
+    `,
+  );
+}
+
 export async function listMonitoringSitesFromMysql(): Promise<Site[]> {
   const pool = getMysqlPool();
   const [rows] = await pool.query<SiteRow[]>(
@@ -142,6 +171,8 @@ export async function listMonitoringSitesFromMysql(): Promise<Site[]> {
         code,
         name,
         area_label,
+        regional_label,
+        wilayah_label,
         latitude,
         longitude,
         is_active

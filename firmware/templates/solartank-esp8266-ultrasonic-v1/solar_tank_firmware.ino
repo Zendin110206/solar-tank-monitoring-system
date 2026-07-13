@@ -48,6 +48,14 @@
   #define SOLARTANK_SITE_LONGITUDE 0
 #endif
 
+#ifndef SOLARTANK_REGIONAL_LABEL
+  #define SOLARTANK_REGIONAL_LABEL "TREG 5"
+#endif
+
+#ifndef SOLARTANK_WILAYAH_LABEL
+  #define SOLARTANK_WILAYAH_LABEL "TIF 3"
+#endif
+
 /* ===================== Network and API ===================== */
 String wifiSsid = SOLARTANK_WIFI_SSID;
 String wifiPass = SOLARTANK_WIFI_PASSWORD;
@@ -60,6 +68,8 @@ String apiKey = SOLARTANK_DEVICE_KEY;
 String siteCode = SOLARTANK_SITE_CODE;
 String siteName = SOLARTANK_SITE_NAME;
 String areaLabel = SOLARTANK_AREA_LABEL;
+String regionalLabel = SOLARTANK_REGIONAL_LABEL;
+String wilayahLabel = SOLARTANK_WILAYAH_LABEL;
 String deviceLabel = SOLARTANK_DEVICE_LABEL;
 const unsigned long EXPECTED_REPORT_INTERVAL_SEC =
   SOLARTANK_REPORT_INTERVAL_MS >= 1000 ? SOLARTANK_REPORT_INTERVAL_MS / 1000 : 1;
@@ -399,6 +409,8 @@ String buildPayload(float battVoltage) {
   payload += "\"site_code\":\"" + siteCode + "\",";
   payload += "\"site_name\":\"" + siteName + "\",";
   payload += "\"area_label\":\"" + areaLabel + "\",";
+  payload += "\"regional_label\":\"" + regionalLabel + "\",";
+  payload += "\"wilayah_label\":\"" + wilayahLabel + "\",";
   payload += "\"lat\":" + String(LAT_FIXED, 7) + ",";
   payload += "\"lng\":" + String(LNG_FIXED, 7) + ",";
   payload += "\"tank_shape\":\"" + tankShape + "\",";
@@ -433,6 +445,8 @@ String buildPayload(float battVoltage) {
   payload += "\"code\":\"" + siteCode + "\",";
   payload += "\"name\":\"" + siteName + "\",";
   payload += "\"area_label\":\"" + areaLabel + "\",";
+  payload += "\"regional_label\":\"" + regionalLabel + "\",";
+  payload += "\"wilayah_label\":\"" + wilayahLabel + "\",";
   payload += "\"lat\":" + String(LAT_FIXED, 7) + ",";
   payload += "\"lng\":" + String(LNG_FIXED, 7);
   payload += "},";
@@ -564,7 +578,7 @@ footer{margin-top:10px;color:#888;font-size:12px}
 <div class="card"><h1>SolarTank Device</h1><div class="grid">
 <div class="tile"><div class="val" id="device">-</div><div class="label">Device</div></div>
 <div class="tile"><div class="val" id="H">-</div><div class="label">Fuel height cm</div></div>
-<div class="tile"><div class="val" id="dist">-</div><div class="label">Distance cm</div></div>
+<div class="tile"><div class="val" id="dist">-</div><div class="label">Ruang kosong cm</div></div>
 <div class="tile"><div class="val" id="vol">-</div><div class="label">Volume L</div></div>
 <div class="tile"><div class="val" id="pct">-</div><div class="label">Fill percent</div></div>
 <div class="tile"><div class="val" id="ip">-</div><div class="label">IP</div></div>

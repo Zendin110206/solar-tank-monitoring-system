@@ -112,6 +112,8 @@ type TankDetail = {
   siteCode: string;
   siteName: string;
   areaLabel: string;
+  regionalLabel?: string;
+  wilayahLabel?: string;
   tankName: string;
   status: TankStatus;
   statusNote: string;
@@ -373,6 +375,8 @@ function toTankDetail(
     siteCode: view.siteCode,
     siteName: view.siteName,
     areaLabel: view.areaLabel,
+    regionalLabel: view.regionalLabel,
+    wilayahLabel: view.wilayahLabel,
     tankName: view.tankName,
     status: view.status,
     statusNote: view.statusNote,
@@ -496,10 +500,10 @@ function TankVisual({ tank }: { tank: TankDetail }) {
     : "Model tampilan mengikuti tangki silinder horizontal. Sensor berada di atas, sehingga permukaan bahan bakar naik-turun secara vertikal.";
   const dimensionItems: ParameterItem[] = [
     {
-      label: "Jarak sensor",
+      label: "Tinggi ruang kosong",
       value: tank.hasReading ? `${tank.sensorDistanceCm} cm` : "-",
       note: tank.hasReading
-        ? "jarak dari data perangkat"
+        ? "ruang kosong dari atas tangki ke permukaan cairan"
         : "menunggu data perangkat",
       icon: Ruler,
     },
@@ -626,9 +630,9 @@ function TankVisual({ tank }: { tank: TankDetail }) {
           </div>
 
           <div className="mt-4 rounded-lg border border-cyan-100 bg-white p-3 text-xs leading-5 text-zinc-500">
-            Garis merah menunjukkan jarak sensor dari atas ke permukaan bahan bakar.
-            Area biru mengikuti tinggi bahan bakar secara vertikal, bukan kiri ke
-            kanan.
+            Garis merah menunjukkan tinggi ruang kosong dari titik sensor ke
+            permukaan bahan bakar. Area biru mengikuti tinggi bahan bakar secara
+            vertikal, bukan kiri ke kanan.
           </div>
         </div>
 
@@ -987,7 +991,7 @@ function ReadingTable({ tank }: { tank: TankDetail }) {
             <th className="px-4 py-2 font-semibold">Jam</th>
             <th className="px-4 py-2 font-semibold">Persen</th>
             <th className="px-4 py-2 font-semibold">Volume</th>
-            <th className="px-4 py-2 font-semibold">Distance</th>
+            <th className="px-4 py-2 font-semibold">Ruang kosong</th>
             <th className="px-4 py-2 font-semibold">Status</th>
           </tr>
         </thead>
@@ -1146,11 +1150,11 @@ export default async function TankDetailPage({
   ];
   const dataFlow: TimelineItem[] = [
     {
-      label: "Sensor membaca jarak",
+      label: "Tinggi ruang kosong terbaca",
       value: tank.hasReading ? `${tank.sensorDistanceCm} cm` : "-",
       detail: tank.hasReading
-        ? "jarak dari sensor ke permukaan bahan bakar"
-        : "belum ada jarak sensor yang diterima",
+        ? "jarak kosong dari titik sensor ke permukaan bahan bakar"
+        : "belum ada tinggi ruang kosong yang diterima",
     },
     {
       label: "Tinggi bahan bakar dihitung",
@@ -1234,7 +1238,7 @@ export default async function TankDetailPage({
               </p>
             </div>
 
-            <div className="grid gap-2 text-sm sm:grid-cols-3 xl:w-[34rem]">
+            <div className="grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-5 xl:w-[48rem]">
               <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400">
                   Site
@@ -1243,10 +1247,18 @@ export default async function TankDetailPage({
               </div>
               <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3">
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400">
-                  Update
+                  Regional
                 </p>
                 <p className="mt-1 text-lg font-semibold">
-                  {tank.lastUpdateLabel}
+                  {tank.regionalLabel ?? "-"}
+                </p>
+              </div>
+              <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400">
+                  Wilayah
+                </p>
+                <p className="mt-1 text-lg font-semibold">
+                  {tank.wilayahLabel ?? "-"}
                 </p>
               </div>
               <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3">
@@ -1254,6 +1266,14 @@ export default async function TankDetailPage({
                   Area
                 </p>
                 <p className="mt-1 text-lg font-semibold">{tank.areaLabel}</p>
+              </div>
+              <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400">
+                  Update
+                </p>
+                <p className="mt-1 text-lg font-semibold">
+                  {tank.lastUpdateLabel}
+                </p>
               </div>
             </div>
           </div>

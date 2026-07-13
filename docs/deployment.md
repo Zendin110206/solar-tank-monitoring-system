@@ -4,7 +4,10 @@ Dokumen ini menjelaskan status deployment dan opsi yang mungkin dipakai nanti.
 
 ## Status Saat Ini
 
-Saat ini aplikasi belum dideploy sebagai sistem produksi.
+Saat ini aplikasi sudah memiliki deployment Vercel yang dipakai untuk pilot dan
+peninjauan tim. Deployment tersebut belum boleh dianggap sebagai sistem
+produksi final sampai prosedur pemulihan backup, kalibrasi perangkat lapangan,
+observasi, dan rollback selesai diuji.
 
 Yang sudah aman dilakukan:
 
@@ -181,6 +184,8 @@ pnpm db:migrate:auth-recovery
 pnpm db:migrate:device-provisioning
 pnpm db:migrate:device-request-fields
 pnpm db:migrate:reading-rollup
+pnpm db:migrate:auth-telegram
+pnpm db:migrate:site-taxonomy
 ```
 
 Catatan:
@@ -192,6 +197,7 @@ Catatan:
 - jika `/api/ready` gagal, jangan lanjut uji device sebelum storage diperbaiki;
 - jalankan `pnpm db:backup:mysql` sebelum migration pada database operasional;
 - check readiness `mysql-reading-rollup` harus lulus sebelum writer rollup dianggap siap;
+- check readiness `mysql-location-taxonomy` harus lulus agar Regional dan Wilayah aman dibaca aplikasi;
 - setelah mengubah env Vercel, lakukan redeploy.
 
 ## Opsi Deployment Demo

@@ -25,6 +25,7 @@ const INITIAL_ACTION_STATE: DashboardAdminActionState = {
 const DELETE_TANK_CONFIRMATION = "HAPUS DATA STO";
 const RESET_TANK_READINGS_CONFIRMATION = "RESET READING STO";
 const RESET_ALL_READINGS_CONFIRMATION = "RESET SEMUA READING";
+const TELKOM_WATERMARK_SRC = "/brand/Logo_Telkom1.png";
 
 function formatLiter(value: number) {
   return new Intl.NumberFormat("id-ID", {
@@ -59,7 +60,8 @@ function EmptyState() {
         Tidak ada STO yang cocok dengan filter ini.
       </p>
       <p className="mt-2 text-sm text-zinc-500">
-        Coba ubah kata kunci, status, area, atau STO yang dipilih.
+        Coba ubah kata kunci, status, regional, wilayah, area, atau STO yang
+        dipilih.
       </p>
     </div>
   );
@@ -437,13 +439,21 @@ export function SimpleDashboardCards({
         <div className="grid min-w-0 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {sites.map((site) => (
             <article
-              className="group relative cursor-pointer overflow-hidden rounded-lg border border-zinc-200 bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg hover:shadow-blue-950/10 focus-within:border-blue-300 focus-within:ring-4 focus-within:ring-blue-100"
+              className="group relative isolate cursor-pointer overflow-hidden rounded-lg border border-zinc-200 bg-white p-4 shadow-sm transition duration-200 hover:-translate-y-1 hover:border-blue-200 hover:shadow-lg hover:shadow-blue-950/10 focus-within:border-blue-300 focus-within:ring-4 focus-within:ring-blue-100"
               key={`${site.code}-${site.tankId}`}
             >
               <Link
                 aria-label={`Buka detail tangki ${site.name}`}
                 className="absolute inset-0 z-0 rounded-lg focus-visible:outline-none"
                 href={`/dashboard/ringkas/tanks/${site.tankId}`}
+              />
+              <Image
+                alt=""
+                aria-hidden="true"
+                className="pointer-events-none absolute left-4 top-5 z-0 h-24 w-24 object-contain opacity-[0.12] sm:h-28 sm:w-28"
+                height={160}
+                src={TELKOM_WATERMARK_SRC}
+                width={160}
               />
               <span
                 className={`pointer-events-none absolute inset-x-0 top-0 h-1 ${
@@ -454,7 +464,10 @@ export function SimpleDashboardCards({
             <div className="pointer-events-none relative z-10 flex flex-col items-start gap-3 sm:flex-row sm:justify-between">
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase text-zinc-500">
-                  {site.code} - {site.areaLabel}
+                  {site.code} - {site.regionalLabel} - {site.wilayahLabel}
+                </p>
+                <p className="mt-0.5 text-xs font-medium text-zinc-500">
+                  Area {site.areaLabel}
                 </p>
                 <h2 className="mt-1 text-lg font-semibold leading-snug text-zinc-950">
                   {site.name}

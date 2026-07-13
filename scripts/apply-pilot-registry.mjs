@@ -10,6 +10,20 @@ const { loadEnvConfig } = nextEnv;
 
 const DEFAULT_REGISTRY_FILE = "config/pilot-registry.local.json";
 const DEFAULT_MIN_SITES = 5;
+const MIN_REPORT_INTERVAL_SEC = 20;
+const MAX_REPORT_INTERVAL_SEC = 86400;
+const DEFAULT_REGIONAL_LABEL = "TREG 5";
+const DEFAULT_WILAYAH_LABEL = "TIF 3";
+const REGIONAL_LABELS = [
+  "TREG 1",
+  "TREG 2",
+  "TREG 3",
+  "TREG 4",
+  "TREG 5",
+  "TREG 6",
+  "TREG 7",
+];
+const WILAYAH_LABELS = ["TIF 1", "TIF 2", "TIF 3", "TIF 4", "TIF 5"];
 const HASH_PATTERN = /^sha256:[a-f0-9]{64}$/;
 const FORBIDDEN_KEYS = new Set([
   "apiKey",
@@ -155,6 +169,21 @@ function optionalNumber(value, label, range) {
   }
 
   return ensureNumber(value, label, range);
+}
+
+function normalizeLocationLabel(value, label, options, fallback) {
+  const normalizedKey = ensureString(value ?? fallback, label)
+    .toUpperCase()
+    .replace(/\s+/g, "");
+  const match = options.find(
+    (option) => option.replace(/\s+/g, "") === normalizedKey,
+  );
+
+  if (!match) {
+    throw new Error(`${label} tidak dikenali. Pilih salah satu: ${options.join(", ")}.`);
+  }
+
+  return match;
 }
 
 function assertNoForbiddenKeys(value, pathLabel = "registry") {
@@ -303,7 +332,7 @@ function normalizeDevice(site, tank, device, allowPlaceholder) {
     expectedReportIntervalSec: ensureNumber(
       device.expectedReportIntervalSec,
       `device ${siteCode}.expectedReportIntervalSec`,
-      { min: 30, max: 86400 },
+      { min: MIN_REPORT_INTERVAL_SEC, max: MAX_REPORT_INTERVAL_SEC },
     ),
     apiKeyHash,
   };
@@ -331,6 +360,18 @@ function normalizeRegistry(registry, options) {
       id: ensureString(rawSite.id, "site.id"),
       code: ensureString(rawSite.code, "site.code").toUpperCase(),
       name: ensureString(rawSite.name, "site.name"),
+      regionalLabel: normalizeLocationLabel(
+        rawSite.regionalLabel,
+        `site ${rawSite.code}.regionalLabel`,
+        REGIONAL_LABELS,
+        DEFAULT_REGIONAL_LABEL,
+      ),
+      wilayahLabel: normalizeLocationLabel(
+        rawSite.wilayahLabel,
+        `site ${rawSite.code}.wilayahLabel`,
+        WILAYAH_LABELS,
+        DEFAULT_WILAYAH_LABEL,
+      ),
       areaLabel: ensureString(rawSite.areaLabel, "site.areaLabel"),
       latitude: ensureNumber(rawSite.latitude, `site ${rawSite.code}.latitude`, {
         min: -90,
@@ -404,12 +445,24 @@ async function upsertRegistry(connection, registry) {
       await connection.execute(
         `
           INSERT INTO monitoring_sites
-            (id, code, name, area_label, latitude, longitude, is_active)
-          VALUES (?, ?, ?, ?, ?, ?, TRUE)
+            (
+              id,
+              code,
+              name,
+              area_label,
+              regional_label,
+              wilayah_label,
+              latitude,
+              longitude,
+              is_active
+            )
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, TRUE)
           ON DUPLICATE KEY UPDATE
             code = VALUES(code),
             name = VALUES(name),
             area_label = VALUES(area_label),
+            regional_label = VALUES(regional_label),
+            wilayah_label = VALUES(wilayah_label),
             latitude = VALUES(latitude),
             longitude = VALUES(longitude),
             is_active = TRUE
@@ -419,6 +472,8 @@ async function upsertRegistry(connection, registry) {
           site.code,
           site.name,
           site.areaLabel,
+          site.regionalLabel,
+          site.wilayahLabel,
           site.latitude,
           site.longitude,
         ],
@@ -533,7 +588,14 @@ function printSummary(registry, options, absolutePath) {
     const tank = registry.tanks.find((item) => item.siteId === site.id);
 
     globalThis.console.log(
-      `- ${site.code} | ${site.name} | ${site.latitude}, ${site.longitude} | ${tank?.shape} ${tank?.capacityLiter} L | ${device?.code}`,
+      [
+        `- ${site.code}`,
+        site.name,
+        `${site.regionalLabel} / ${site.wilayahLabel} / ${site.areaLabel}`,
+        `${site.latitude}, ${site.longitude}`,
+        `${tank?.shape} ${tank?.capacityLiter} L`,
+        device?.code,
+      ].join(" | "),
     );
   }
 

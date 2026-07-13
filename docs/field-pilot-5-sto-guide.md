@@ -26,6 +26,8 @@ Siapkan tabel sederhana seperti ini sebelum menyentuh kode atau device.
 |---|---|---|
 | Kode STO | `TPH` | Kode pendek yang mudah dibaca |
 | Nama lokasi | `STO TPH` | Nama yang tampil di dashboard |
+| Regional | `TREG 5` | Kelompok lokasi paling besar |
+| Wilayah | `TIF 3` | Kelompok di bawah Regional |
 | Area | `Pasuruan` | Label area kerja |
 | Latitude | `-7.6500000` | Harus angka koordinat yang disetujui |
 | Longitude | `112.9000000` | Harus angka koordinat yang disetujui |
@@ -97,6 +99,8 @@ Untuk setiap STO, isi:
 - `id`;
 - `code`;
 - `name`;
+- `regionalLabel`;
+- `wilayahLabel`;
 - `areaLabel`;
 - `latitude`;
 - `longitude`;
@@ -181,7 +185,8 @@ Bagian peta sekarang bisa:
 - zoom out;
 - geser peta;
 - pusatkan ulang peta;
-- search STO, nama lokasi, area, atau device;
+- search STO, nama lokasi, Regional, Wilayah, Area, atau device;
+- filter Regional, Wilayah, dan Area untuk mempersempit lokasi yang tampil;
 - filter semua, online, waspada, kritis, atau offline;
 - hover, fokus keyboard, atau klik marker untuk mengganti kartu `Detail overview`;
 - klik tombol `Buka detail tangki` pada kartu detail untuk masuk ke halaman detail.
@@ -361,9 +366,9 @@ Namun fase ini belum membuat:
 
 - konfigurasi SMTP dan Turnstile production final;
 - admin registry di browser;
-- backup database;
+- latihan pemulihan backup secara rutin;
 - audit log khusus request ingest gagal;
-- rate limit endpoint ingest;
+- perlindungan jaringan tambahan untuk endpoint ingest;
 - rotasi key otomatis;
 - MQTT;
 - RTU/Modbus;

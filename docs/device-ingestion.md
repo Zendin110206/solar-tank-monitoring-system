@@ -77,7 +77,7 @@ Penjelasan:
 |---|---|
 | `device` | kode device |
 | `ts` | timestamp dari device, boleh `0` untuk fallback waktu server |
-| `distance` | jarak sensor ke permukaan cairan |
+| `distance` | tinggi ruang kosong: jarak sensor di atas tangki ke permukaan cairan |
 | `voltage` | tegangan device |
 | `raw.H_cm` | tinggi cairan |
 | `raw.volume` | volume liter |
@@ -120,6 +120,11 @@ Payload real-format untuk pilot:
 ```
 
 API tetap memakai registry sebagai identitas resmi site/tangki/device. Config dari payload dibaca sebagai snapshot. Jika snapshot payload berbeda jauh dari registry, response ingest membawa `needsReview=true` dan dashboard/detail menampilkan status review.
+
+Regional, Wilayah, dan Area tidak perlu dikirim berulang kali setiap 20 detik.
+Ketiganya disimpan pada registry lokasi, lalu server menggabungkannya dengan
+reading berdasarkan device yang mengirim. Cara ini membuat payload perangkat
+lebih kecil dan mencegah nama lokasi berubah hanya karena salah isi firmware.
 
 Untuk fase pilot peta, posisi marker peta dashboard tetap berasal dari `latitude` dan
 `longitude` pada registry site. Payload device boleh membawa `lat`/`lng` jika

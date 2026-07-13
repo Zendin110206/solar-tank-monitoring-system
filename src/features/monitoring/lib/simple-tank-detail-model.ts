@@ -85,6 +85,8 @@ export type SimpleTankDetail = {
   siteCode: string;
   siteName: string;
   areaLabel: string;
+  regionalLabel?: string;
+  wilayahLabel?: string;
   tankName: string;
   hasReading: boolean;
   status: TankDetailStatus;
@@ -565,6 +567,8 @@ export function buildSimpleTankDetail(
     siteCode: view.siteCode,
     siteName: view.siteName,
     areaLabel: view.areaLabel,
+    regionalLabel: view.regionalLabel,
+    wilayahLabel: view.wilayahLabel,
     tankName: view.tankName,
     hasReading: view.hasReading,
     status: view.status,

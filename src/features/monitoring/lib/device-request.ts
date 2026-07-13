@@ -13,6 +13,10 @@ import type {
   NormalizedDeviceRequestDraft,
   TankShape,
 } from "../types/monitoring";
+import {
+  normalizeRegionalLabel,
+  normalizeWilayahLabel,
+} from "./location-taxonomy";
 import { roundTo } from "./number";
 
 const DEFAULT_LOW_LEVEL_PERCENT = 30;
@@ -340,6 +344,8 @@ export function validateDeviceRequestDraft(
   const warnings: DeviceRequestValidationIssue[] = [];
   const siteName = normalizeOptionalText(draft.siteName);
   const areaLabel = normalizeOptionalText(draft.areaLabel);
+  const regionalLabel = normalizeRegionalLabel(draft.regionalLabel);
+  const wilayahLabel = normalizeWilayahLabel(draft.wilayahLabel);
   const explicitSiteCode = normalizeOptionalText(draft.siteCode);
   const siteCode = normalizeSiteCode(
     explicitSiteCode ?? createSiteCodeFromName({ areaLabel, siteName }),
@@ -386,7 +392,15 @@ export function validateDeviceRequestDraft(
   }
 
   if (!areaLabel) {
-    errors.push(createIssue("areaLabel", "Wilayah STO wajib diisi."));
+    errors.push(createIssue("areaLabel", "Area STO wajib diisi."));
+  }
+
+  if (!regionalLabel) {
+    errors.push(createIssue("regionalLabel", "Regional wajib dipilih."));
+  }
+
+  if (!wilayahLabel) {
+    errors.push(createIssue("wilayahLabel", "Wilayah wajib dipilih."));
   }
 
   if (deviceCode && deviceCode.length < 4) {
@@ -576,6 +590,8 @@ export function validateDeviceRequestDraft(
     siteCode &&
     siteName &&
     areaLabel &&
+    regionalLabel &&
+    wilayahLabel &&
     deviceCode &&
     capacityLiter &&
     loadValue &&
@@ -585,6 +601,8 @@ export function validateDeviceRequestDraft(
           siteCode,
           siteName,
           areaLabel,
+          regionalLabel,
+          wilayahLabel,
           deviceCode,
           deviceLabel:
             normalizeOptionalText(draft.deviceLabel) ??

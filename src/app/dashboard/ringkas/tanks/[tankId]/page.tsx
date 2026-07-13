@@ -453,6 +453,8 @@ export default async function SimpleTankDetailPage({
   const tank = buildSimpleTankDetail(tankView, tankHistoryReadings);
   const statusTone = deviceStatusTone[tank.deviceStatus];
   const infoItems: InfoItem[] = [
+    { label: "Regional", value: tank.regionalLabel ?? "-" },
+    { label: "Wilayah", value: tank.wilayahLabel ?? "-" },
     { label: "Area", value: tank.areaLabel },
     { label: "Perangkat", value: tank.deviceCode },
     { label: "Jenis tangki", value: tank.shapeLabel },
@@ -503,7 +505,11 @@ export default async function SimpleTankDetailPage({
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
                 <p className="text-sm font-semibold uppercase text-zinc-500">
-                  {tank.siteCode} - {tank.areaLabel}
+                  {tank.siteCode} - {tank.regionalLabel ?? "-"} -{" "}
+                  {tank.wilayahLabel ?? "-"}
+                </p>
+                <p className="mt-0.5 text-sm font-medium text-zinc-500">
+                  Area {tank.areaLabel}
                 </p>
                 <h1 className="mt-1 text-2xl font-semibold tracking-normal text-zinc-950 sm:text-3xl">
                   {tank.siteName}

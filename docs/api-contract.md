@@ -395,6 +395,11 @@ Payload pilot real-format juga didukung. Payload ini dapat membawa config tangki
 }
 ```
 
+Regional, Wilayah, dan Area tidak dikirim pada setiap reading. Data tersebut
+berasal dari registry site yang sudah disetujui, lalu digabungkan oleh server
+berdasarkan identitas device. Dengan demikian, satu salah ketik pada firmware
+tidak memindahkan STO ke kelompok lokasi yang berbeda.
+
 Contoh curl:
 
 ```powershell
@@ -511,14 +516,15 @@ curl.exe -X POST http://localhost:3000/api/auth/register-request `
 
 ## Catatan Versi
 
-Kontrak API ini masih untuk prototipe lokal.
+Kontrak API ini dipakai untuk development dan pilot web monitoring. Ia belum
+menjadi kontrak permanen untuk seluruh perangkat nasional.
 
 Sebelum production, perlu ditambah atau dimatangkan:
 
 - halaman manajemen registry site/tank/device;
-- validasi schema lebih ketat;
-- rate limit endpoint ingest;
+- aturan versi API sebelum banyak model perangkat dipasang;
+- perlindungan jaringan tambahan di luar rate limit aplikasi;
 - rotasi key device;
-- backup/restore database;
+- latihan restore database secara rutin;
 - SMTP dan Turnstile production;
 - versioning API jika device sudah banyak.
