@@ -5,8 +5,12 @@ import { useMemo, useState } from "react";
 import {
   filterSimpleDashboardSites,
   getSimpleDashboardAreas,
+  getSimpleDashboardRegionals,
   getSimpleDashboardSummary,
+  getSimpleDashboardWilayahs,
   SIMPLE_DASHBOARD_ALL_AREAS,
+  SIMPLE_DASHBOARD_ALL_REGIONALS,
+  SIMPLE_DASHBOARD_ALL_WILAYAHS,
   sortSimpleDashboardSites,
   type SimpleDashboardSite,
   type SimpleDashboardStatusFilter,
@@ -89,11 +93,19 @@ export function SimpleDashboardView({
   const [statusFilter, setStatusFilter] =
     useState<SimpleDashboardStatusFilter>("all");
   const [areaFilter, setAreaFilter] = useState(SIMPLE_DASHBOARD_ALL_AREAS);
+  const [regionalFilter, setRegionalFilter] = useState(
+    SIMPLE_DASHBOARD_ALL_REGIONALS,
+  );
+  const [wilayahFilter, setWilayahFilter] = useState(
+    SIMPLE_DASHBOARD_ALL_WILAYAHS,
+  );
   const [selectedSto, setSelectedSto] = useState(SIMPLE_DASHBOARD_ALL_STOS);
   const [viewMode, setViewMode] = useState<DashboardViewMode>("cards");
 
   const summary = useMemo(() => getSimpleDashboardSummary(sites), [sites]);
   const areas = useMemo(() => getSimpleDashboardAreas(sites), [sites]);
+  const regionals = useMemo(() => getSimpleDashboardRegionals(sites), [sites]);
+  const wilayahs = useMemo(() => getSimpleDashboardWilayahs(sites), [sites]);
   const stoOptions = useMemo(
     () =>
       [...sites].sort(
@@ -111,12 +123,22 @@ export function SimpleDashboardView({
               query,
               status: statusFilter,
               area: areaFilter,
+              regional: regionalFilter,
+              wilayah: wilayahFilter,
             }),
           )
         : sortSimpleDashboardSites(
             sites.filter((site) => site.tankId === selectedSto),
           ),
-    [areaFilter, query, selectedSto, sites, statusFilter],
+    [
+      areaFilter,
+      query,
+      regionalFilter,
+      selectedSto,
+      sites,
+      statusFilter,
+      wilayahFilter,
+    ],
   );
   const mapViewKey = useMemo(
     () => visibleSites.map((site) => site.tankId).join("|"),
@@ -131,7 +153,7 @@ export function SimpleDashboardView({
         <SummaryValue label="Offline" tone="red" value={summary.offline} />
       </div>
 
-      <div className="grid min-w-0 gap-4 rounded-lg border border-zinc-200 bg-white p-3 shadow-sm lg:grid-cols-2 xl:grid-cols-[minmax(18rem,1fr)_17rem_15rem_18rem] xl:items-end">
+      <div className="grid min-w-0 grid-cols-1 gap-4 rounded-lg border border-zinc-200 bg-white p-3 shadow-sm md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 2xl:items-end">
         <label className="block min-w-0">
           <span className="mb-2 block text-xs font-semibold uppercase text-zinc-500">
             Cari STO
@@ -144,7 +166,7 @@ export function SimpleDashboardView({
             <input
               className="h-12 w-full rounded-lg border border-zinc-300 bg-white pl-10 pr-3 text-sm font-medium text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Cari kode, nama, area, atau perangkat"
+              placeholder="Cari kode, nama, area, regional, wilayah, atau perangkat"
               type="search"
               value={query}
             />
@@ -173,6 +195,58 @@ export function SimpleDashboardView({
             ))}
           </div>
         </div>
+
+        <label className="block min-w-0">
+          <span className="mb-2 block text-xs font-semibold uppercase text-zinc-500">
+            Regional
+          </span>
+          <span className="relative block">
+            <select
+              className="h-12 w-full appearance-none rounded-lg border border-zinc-300 bg-white pl-3 pr-11 text-sm font-semibold text-zinc-800 outline-none transition hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+              onChange={(event) => setRegionalFilter(event.target.value)}
+              value={regionalFilter}
+            >
+              <option value={SIMPLE_DASHBOARD_ALL_REGIONALS}>
+                Semua regional
+              </option>
+              {regionals.map((regional) => (
+                <option key={regional} value={regional}>
+                  {regional}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              aria-hidden="true"
+              className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-zinc-700"
+            />
+          </span>
+        </label>
+
+        <label className="block min-w-0">
+          <span className="mb-2 block text-xs font-semibold uppercase text-zinc-500">
+            Wilayah
+          </span>
+          <span className="relative block">
+            <select
+              className="h-12 w-full appearance-none rounded-lg border border-zinc-300 bg-white pl-3 pr-11 text-sm font-semibold text-zinc-800 outline-none transition hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+              onChange={(event) => setWilayahFilter(event.target.value)}
+              value={wilayahFilter}
+            >
+              <option value={SIMPLE_DASHBOARD_ALL_WILAYAHS}>
+                Semua wilayah
+              </option>
+              {wilayahs.map((wilayah) => (
+                <option key={wilayah} value={wilayah}>
+                  {wilayah}
+                </option>
+              ))}
+            </select>
+            <ChevronDown
+              aria-hidden="true"
+              className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-zinc-700"
+            />
+          </span>
+        </label>
 
         <label className="block min-w-0">
           <span className="mb-2 block text-xs font-semibold uppercase text-zinc-500">

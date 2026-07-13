@@ -544,7 +544,11 @@ export default async function DashboardPage() {
                             </Link>
                           </p>
                           <p className="mt-1 text-xs text-zinc-500">
-                            {site.areaLabel}
+                            {site.regionalLabel ?? "-"} /{" "}
+                            {site.wilayahLabel ?? "-"}
+                          </p>
+                          <p className="mt-0.5 text-xs text-zinc-500">
+                            Area {site.areaLabel}
                           </p>
                         </div>
                       </div>

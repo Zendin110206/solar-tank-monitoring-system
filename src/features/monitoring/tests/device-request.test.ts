@@ -42,6 +42,8 @@ const rectangularProfile: MonitoringHardwareProfile = {
 const baseDraft: DeviceRequestDraft = {
   siteName: "STO TPH",
   areaLabel: "Pasuruan",
+  regionalLabel: "TREG 5",
+  wilayahLabel: "TIF 3",
   deviceSensorType: "fuel",
   tankShape: "rectangular",
   lengthCm: 150,

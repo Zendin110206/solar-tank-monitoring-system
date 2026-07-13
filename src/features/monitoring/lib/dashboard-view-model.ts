@@ -32,6 +32,8 @@ export type DashboardMonitoringSite = {
   code: string;
   name: string;
   areaLabel: string;
+  regionalLabel?: string;
+  wilayahLabel?: string;
   tankId: string;
   tank: string;
   status: DashboardSiteStatus;
@@ -300,6 +302,8 @@ export function buildDashboardOverview({
       code: site.code,
       name: site.name,
       areaLabel: site.areaLabel,
+      regionalLabel: site.regionalLabel,
+      wilayahLabel: site.wilayahLabel,
       tankId: tank.id,
       tank: tank.name,
       status,

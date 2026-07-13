@@ -1,7 +1,13 @@
 import type { DashboardMonitoringSite } from "./dashboard-view-model";
 import type { TankShape } from "@/features/monitoring/types/monitoring";
+import {
+  DEFAULT_REGIONAL_LABEL,
+  DEFAULT_WILAYAH_LABEL,
+} from "./location-taxonomy";
 
 export const SIMPLE_DASHBOARD_ALL_AREAS = "all";
+export const SIMPLE_DASHBOARD_ALL_REGIONALS = "all";
+export const SIMPLE_DASHBOARD_ALL_WILAYAHS = "all";
 
 export type SimpleDashboardStatusFilter = "all" | "online" | "offline";
 
@@ -9,6 +15,8 @@ export type SimpleDashboardSite = {
   code: string;
   name: string;
   areaLabel: string;
+  regionalLabel: string;
+  wilayahLabel: string;
   tankId: string;
   tankShape: TankShape;
   volumeLiter: number;
@@ -25,6 +33,8 @@ export type SimpleDashboardFilters = {
   query: string;
   status: SimpleDashboardStatusFilter;
   area: string;
+  regional: string;
+  wilayah: string;
 };
 
 export type SimpleDashboardSummary = {
@@ -51,6 +61,8 @@ export function createSimpleDashboardSites(
     code: site.code,
     name: site.name,
     areaLabel: site.areaLabel,
+    regionalLabel: site.regionalLabel ?? DEFAULT_REGIONAL_LABEL,
+    wilayahLabel: site.wilayahLabel ?? DEFAULT_WILAYAH_LABEL,
     tankId: site.tankId,
     tankShape: shapeByTankId.get(site.tankId) ?? "horizontal-cylinder",
     volumeLiter: site.volumeLiter,
@@ -86,12 +98,34 @@ export function getSimpleDashboardAreas(sites: SimpleDashboardSite[]) {
   ).sort((first, second) => first.localeCompare(second, "id-ID"));
 }
 
+export function getSimpleDashboardRegionals(sites: SimpleDashboardSite[]) {
+  return Array.from(
+    new Set(
+      sites
+        .map((site) => site.regionalLabel.trim())
+        .filter((regionalLabel) => regionalLabel.length > 0),
+    ),
+  ).sort((first, second) => first.localeCompare(second, "id-ID"));
+}
+
+export function getSimpleDashboardWilayahs(sites: SimpleDashboardSite[]) {
+  return Array.from(
+    new Set(
+      sites
+        .map((site) => site.wilayahLabel.trim())
+        .filter((wilayahLabel) => wilayahLabel.length > 0),
+    ),
+  ).sort((first, second) => first.localeCompare(second, "id-ID"));
+}
+
 export function filterSimpleDashboardSites(
   sites: SimpleDashboardSite[],
   filters: SimpleDashboardFilters,
 ) {
   const query = normalizeSearchValue(filters.query);
   const area = filters.area.trim();
+  const regional = filters.regional.trim();
+  const wilayah = filters.wilayah.trim();
 
   return sites.filter((site) => {
     if (filters.status === "online" && !site.isOnline) {
@@ -106,11 +140,32 @@ export function filterSimpleDashboardSites(
       return false;
     }
 
+    if (
+      regional !== SIMPLE_DASHBOARD_ALL_REGIONALS &&
+      site.regionalLabel !== regional
+    ) {
+      return false;
+    }
+
+    if (
+      wilayah !== SIMPLE_DASHBOARD_ALL_WILAYAHS &&
+      site.wilayahLabel !== wilayah
+    ) {
+      return false;
+    }
+
     if (query.length === 0) {
       return true;
     }
 
-    const haystack = [site.code, site.name, site.areaLabel, site.deviceId]
+    const haystack = [
+      site.code,
+      site.name,
+      site.areaLabel,
+      site.regionalLabel,
+      site.wilayahLabel,
+      site.deviceId,
+    ]
       .map(normalizeSearchValue)
       .join(" ");
 

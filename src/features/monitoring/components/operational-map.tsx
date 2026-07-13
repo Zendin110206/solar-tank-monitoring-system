@@ -16,6 +16,8 @@ export type OperationalMapSite = {
   code: string;
   name: string;
   areaLabel: string;
+  regionalLabel?: string;
+  wilayahLabel?: string;
   tankId: string;
   status: DashboardSiteStatus;
   fillPercent: number;
@@ -266,7 +268,7 @@ export function OperationalMap({
           statusFilter === "all" || site.status === statusFilter;
         const matchesQuery =
           normalizedQuery.length === 0 ||
-          `${site.code} ${site.name} ${site.areaLabel} ${site.deviceId}`
+          `${site.code} ${site.name} ${site.areaLabel} ${site.regionalLabel ?? ""} ${site.wilayahLabel ?? ""} ${site.deviceId}`
             .toLowerCase()
             .includes(normalizedQuery);
 
@@ -435,7 +437,11 @@ export function OperationalMap({
                           {site.name}
                         </p>
                         <p className="mt-0.5 text-xs text-zinc-500">
-                          {site.areaLabel} / {site.deviceId}
+                          {site.regionalLabel ?? "-"} /{" "}
+                          {site.wilayahLabel ?? "-"}
+                        </p>
+                        <p className="mt-0.5 text-xs text-zinc-500">
+                          Area {site.areaLabel} / {site.deviceId}
                         </p>
                       </div>
                       <StatusChip status={site.status} />

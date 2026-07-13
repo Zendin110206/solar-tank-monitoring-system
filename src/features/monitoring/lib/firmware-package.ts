@@ -466,6 +466,8 @@ export function renderDeviceConfigHeader({
 #define SOLARTANK_SITE_CODE ${toCppString(request.siteCode)}
 #define SOLARTANK_SITE_NAME ${toCppString(request.siteName)}
 #define SOLARTANK_AREA_LABEL ${toCppString(request.areaLabel)}
+#define SOLARTANK_REGIONAL_LABEL ${toCppString(request.regionalLabel)}
+#define SOLARTANK_WILAYAH_LABEL ${toCppString(request.wilayahLabel)}
 #define SOLARTANK_SITE_LATITUDE ${toCppCoordinate(request.latitude)}
 #define SOLARTANK_SITE_LONGITUDE ${toCppCoordinate(request.longitude)}
 #define SOLARTANK_TANK_SHAPE ${toCppString(request.tankShape)}
@@ -511,6 +513,8 @@ export function renderFirmwareReadme({
 Paket ini dibuat untuk:
 
 - STO: ${request.siteName} (${request.siteCode})
+- Regional: ${request.regionalLabel}
+- Wilayah: ${request.wilayahLabel}
 - Area: ${request.areaLabel}
 - Device: ${request.deviceCode}
 - Mode sensor: ${request.deviceSensorType}
@@ -578,7 +582,10 @@ export function renderFirmwareManifest({
       packageVersion: 1,
       requestCode: request.requestCode,
       siteCode: request.siteCode,
+      siteRegional: request.regionalLabel,
+      siteWilayah: request.wilayahLabel,
       siteLocation: {
+        area: request.areaLabel,
         latitude: request.latitude ?? null,
         longitude: request.longitude ?? null,
       },

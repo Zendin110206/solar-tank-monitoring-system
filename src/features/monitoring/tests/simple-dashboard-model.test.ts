@@ -3,8 +3,12 @@ import {
   createSimpleDashboardSites,
   filterSimpleDashboardSites,
   getSimpleDashboardAreas,
+  getSimpleDashboardRegionals,
   getSimpleDashboardSummary,
+  getSimpleDashboardWilayahs,
   SIMPLE_DASHBOARD_ALL_AREAS,
+  SIMPLE_DASHBOARD_ALL_REGIONALS,
+  SIMPLE_DASHBOARD_ALL_WILAYAHS,
   sortSimpleDashboardSites,
   type SimpleDashboardSite,
 } from "../lib/simple-dashboard-model";
@@ -15,6 +19,8 @@ const sites: SimpleDashboardSite[] = [
     code: "TPH",
     name: "STO Tosari Pasuruan",
     areaLabel: "Pasuruan Barat",
+    regionalLabel: "TREG 5",
+    wilayahLabel: "TIF 3",
     tankId: "tank-tph",
     tankShape: "horizontal-cylinder",
     volumeLiter: 3900,
@@ -28,6 +34,8 @@ const sites: SimpleDashboardSite[] = [
     code: "NJA",
     name: "STO Nguling Jaya",
     areaLabel: "Pasuruan Timur",
+    regionalLabel: "TREG 5",
+    wilayahLabel: "TIF 3",
     tankId: "tank-nja",
     tankShape: "horizontal-cylinder",
     volumeLiter: 350,
@@ -41,6 +49,8 @@ const sites: SimpleDashboardSite[] = [
     code: "SKP",
     name: "STO Sukorejo Pasuruan",
     areaLabel: "Pasuruan Barat",
+    regionalLabel: "TREG 4",
+    wilayahLabel: "TIF 3",
     tankId: "tank-skp",
     tankShape: "rectangular",
     volumeLiter: 3200,
@@ -60,6 +70,8 @@ describe("simple dashboard model", () => {
         code: "TPH",
         name: "STO TPH",
         areaLabel: "Area demo",
+        regionalLabel: "TREG 5",
+        wilayahLabel: "TIF 3",
         tankId: "tank-tph",
         tank: "Tangki TPH",
         status: "online",
@@ -96,6 +108,8 @@ describe("simple dashboard model", () => {
       tankShape: "rectangular",
       latitude: -7.65,
       longitude: 112.9,
+      regionalLabel: "TREG 5",
+      wilayahLabel: "TIF 3",
     });
   });
 
@@ -114,12 +128,19 @@ describe("simple dashboard model", () => {
     ]);
   });
 
-  it("memfilter berdasarkan kata kunci kode, nama, area, atau device", () => {
+  it("mengambil daftar regional dan wilayah unik untuk filter nasional", () => {
+    expect(getSimpleDashboardRegionals(sites)).toEqual(["TREG 4", "TREG 5"]);
+    expect(getSimpleDashboardWilayahs(sites)).toEqual(["TIF 3"]);
+  });
+
+  it("memfilter berdasarkan kata kunci kode, nama, area, regional, wilayah, atau device", () => {
     expect(
       filterSimpleDashboardSites(sites, {
         query: "demo-nja",
         status: "all",
         area: SIMPLE_DASHBOARD_ALL_AREAS,
+        regional: SIMPLE_DASHBOARD_ALL_REGIONALS,
+        wilayah: SIMPLE_DASHBOARD_ALL_WILAYAHS,
       }).map((site) => site.code),
     ).toEqual(["NJA"]);
 
@@ -128,6 +149,18 @@ describe("simple dashboard model", () => {
         query: "sukorejo",
         status: "all",
         area: SIMPLE_DASHBOARD_ALL_AREAS,
+        regional: SIMPLE_DASHBOARD_ALL_REGIONALS,
+        wilayah: SIMPLE_DASHBOARD_ALL_WILAYAHS,
+      }).map((site) => site.code),
+    ).toEqual(["SKP"]);
+
+    expect(
+      filterSimpleDashboardSites(sites, {
+        query: "treg 4",
+        status: "all",
+        area: SIMPLE_DASHBOARD_ALL_AREAS,
+        regional: SIMPLE_DASHBOARD_ALL_REGIONALS,
+        wilayah: SIMPLE_DASHBOARD_ALL_WILAYAHS,
       }).map((site) => site.code),
     ).toEqual(["SKP"]);
   });
@@ -138,6 +171,8 @@ describe("simple dashboard model", () => {
         query: "",
         status: "online",
         area: SIMPLE_DASHBOARD_ALL_AREAS,
+        regional: SIMPLE_DASHBOARD_ALL_REGIONALS,
+        wilayah: SIMPLE_DASHBOARD_ALL_WILAYAHS,
       }).map((site) => site.code),
     ).toEqual(["TPH", "NJA"]);
 
@@ -146,6 +181,8 @@ describe("simple dashboard model", () => {
         query: "",
         status: "offline",
         area: SIMPLE_DASHBOARD_ALL_AREAS,
+        regional: SIMPLE_DASHBOARD_ALL_REGIONALS,
+        wilayah: SIMPLE_DASHBOARD_ALL_WILAYAHS,
       }).map((site) => site.code),
     ).toEqual(["SKP"]);
   });
@@ -156,8 +193,32 @@ describe("simple dashboard model", () => {
         query: "",
         status: "all",
         area: "Pasuruan Barat",
+        regional: SIMPLE_DASHBOARD_ALL_REGIONALS,
+        wilayah: SIMPLE_DASHBOARD_ALL_WILAYAHS,
       }).map((site) => site.code),
     ).toEqual(["TPH", "SKP"]);
+  });
+
+  it("memfilter regional dan wilayah dari data registry", () => {
+    expect(
+      filterSimpleDashboardSites(sites, {
+        query: "",
+        status: "all",
+        area: SIMPLE_DASHBOARD_ALL_AREAS,
+        regional: "TREG 5",
+        wilayah: SIMPLE_DASHBOARD_ALL_WILAYAHS,
+      }).map((site) => site.code),
+    ).toEqual(["TPH", "NJA"]);
+
+    expect(
+      filterSimpleDashboardSites(sites, {
+        query: "",
+        status: "all",
+        area: SIMPLE_DASHBOARD_ALL_AREAS,
+        regional: SIMPLE_DASHBOARD_ALL_REGIONALS,
+        wilayah: "TIF 3",
+      }).map((site) => site.code),
+    ).toEqual(["TPH", "NJA", "SKP"]);
   });
 
   it("mengurutkan offline lebih dulu, lalu reading terbaru", () => {

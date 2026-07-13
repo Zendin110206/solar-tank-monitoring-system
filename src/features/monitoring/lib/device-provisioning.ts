@@ -6,6 +6,12 @@ import type {
   TankShape,
 } from "../types/monitoring";
 import { hashDeviceKey } from "./device-key";
+import {
+  DEFAULT_REGIONAL_LABEL,
+  DEFAULT_WILAYAH_LABEL,
+  normalizeRegionalLabel,
+  normalizeWilayahLabel,
+} from "./location-taxonomy";
 import { getMonitoringStorageDriver } from "./monitoring-storage";
 import { getMysqlPool } from "./mysql-connection";
 import { toFiniteNumber } from "./number";
@@ -371,6 +377,24 @@ function buildProvisionedBundle({
         "site.area_label",
         "site.areaLabel",
       ]) ?? "Auto provisioned",
+    regionalLabel:
+      normalizeRegionalLabel(
+        pickString(payload, [
+          "regional_label",
+          "regionalLabel",
+          "site.regional_label",
+          "site.regionalLabel",
+        ]),
+      ) ?? DEFAULT_REGIONAL_LABEL,
+    wilayahLabel:
+      normalizeWilayahLabel(
+        pickString(payload, [
+          "wilayah_label",
+          "wilayahLabel",
+          "site.wilayah_label",
+          "site.wilayahLabel",
+        ]),
+      ) ?? DEFAULT_WILAYAH_LABEL,
     latitude,
     longitude,
     isActive: true,
@@ -439,19 +463,32 @@ async function saveProvisionedBundleToMysql({
           code,
           name,
           area_label,
+          regional_label,
+          wilayah_label,
           latitude,
           longitude,
           is_active
         )
-        VALUES (?, ?, ?, ?, ?, ?, TRUE)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, TRUE)
         ON DUPLICATE KEY UPDATE
           name = VALUES(name),
           area_label = VALUES(area_label),
+          regional_label = VALUES(regional_label),
+          wilayah_label = VALUES(wilayah_label),
           latitude = VALUES(latitude),
           longitude = VALUES(longitude),
           is_active = TRUE
       `,
-      [site.id, site.code, site.name, site.areaLabel, site.latitude, site.longitude],
+      [
+        site.id,
+        site.code,
+        site.name,
+        site.areaLabel,
+        site.regionalLabel ?? DEFAULT_REGIONAL_LABEL,
+        site.wilayahLabel ?? DEFAULT_WILAYAH_LABEL,
+        site.latitude,
+        site.longitude,
+      ],
     );
 
     await connection.query(

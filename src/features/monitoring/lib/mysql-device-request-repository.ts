@@ -35,6 +35,12 @@ import {
   getDevicePackageMaxDownloads,
   hashDownloadToken,
 } from "./firmware-package";
+import {
+  DEFAULT_REGIONAL_LABEL,
+  DEFAULT_WILAYAH_LABEL,
+  normalizeRegionalLabel,
+  normalizeWilayahLabel,
+} from "./location-taxonomy";
 import { getMysqlPool } from "./mysql-connection";
 
 const DEVICE_REQUEST_STATUSES: DeviceRequestStatus[] = [
@@ -102,6 +108,8 @@ type DeviceRequestRow = RowDataPacket & {
   site_code: string;
   site_name: string;
   area_label: string;
+  regional_label: string | null;
+  wilayah_label: string | null;
   latitude: number | string | null;
   longitude: number | string | null;
   device_code: string;
@@ -183,6 +191,8 @@ type PendingDeviceActivationRow = RowDataPacket & {
   site_code: string;
   site_name: string;
   area_label: string;
+  regional_label: string | null;
+  wilayah_label: string | null;
   latitude: number | string | null;
   longitude: number | string | null;
   site_is_active: number | boolean;
@@ -305,12 +315,18 @@ function toLoadPowerUnit(value: string | undefined): LoadPowerUnit {
 function rowToActivationSite(row: PendingDeviceActivationRow): Site {
   const latitude = toOptionalNumber(row.latitude);
   const longitude = toOptionalNumber(row.longitude);
+  const regionalLabel =
+    normalizeRegionalLabel(row.regional_label) ?? DEFAULT_REGIONAL_LABEL;
+  const wilayahLabel =
+    normalizeWilayahLabel(row.wilayah_label) ?? DEFAULT_WILAYAH_LABEL;
 
   return {
     id: row.site_id,
     code: row.site_code,
     name: row.site_name,
     areaLabel: row.area_label,
+    regionalLabel,
+    wilayahLabel,
     ...(typeof latitude === "number" ? { latitude } : {}),
     ...(typeof longitude === "number" ? { longitude } : {}),
     isActive: true,
@@ -504,6 +520,10 @@ export function rowToDeviceRequest(row: DeviceRequestRow): MonitoringDeviceReque
   const widthCm = toOptionalNumber(row.width_cm);
   const heightCm = toOptionalNumber(row.height_cm);
   const diameterCm = toOptionalNumber(row.diameter_cm);
+  const regionalLabel =
+    normalizeRegionalLabel(row.regional_label) ?? DEFAULT_REGIONAL_LABEL;
+  const wilayahLabel =
+    normalizeWilayahLabel(row.wilayah_label) ?? DEFAULT_WILAYAH_LABEL;
 
   return {
     id: row.id,
@@ -514,6 +534,8 @@ export function rowToDeviceRequest(row: DeviceRequestRow): MonitoringDeviceReque
     siteCode: row.site_code,
     siteName: row.site_name,
     areaLabel: row.area_label,
+    regionalLabel,
+    wilayahLabel,
     ...(typeof latitude === "number" ? { latitude } : {}),
     ...(typeof longitude === "number" ? { longitude } : {}),
     deviceCode: row.device_code,
@@ -963,6 +985,8 @@ export async function createDeviceRequestInMysql({
           site_code,
           site_name,
           area_label,
+          regional_label,
+          wilayah_label,
           latitude,
           longitude,
           device_code,
@@ -988,7 +1012,7 @@ export async function createDeviceRequestInMysql({
           created_at,
           updated_at
         )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `,
       [
         request.id,
@@ -999,6 +1023,8 @@ export async function createDeviceRequestInMysql({
         request.siteCode,
         request.siteName,
         request.areaLabel,
+        request.regionalLabel,
+        request.wilayahLabel,
         request.latitude ?? null,
         request.longitude ?? null,
         request.deviceCode,
@@ -1036,8 +1062,10 @@ export async function createDeviceRequestInMysql({
         dieselEngineCapacityKva: request.dieselEngineCapacityKva,
         loadUnit: request.loadUnit,
         loadValue: request.loadValue,
+        regionalLabel: request.regionalLabel,
         requestCode: request.requestCode,
         siteCode: request.siteCode,
+        wilayahLabel: request.wilayahLabel,
       },
       requestId: request.id,
     });
@@ -1135,6 +1163,8 @@ async function resolveOrCreateInactiveSite({
         SET
           name = ?,
           area_label = ?,
+          regional_label = ?,
+          wilayah_label = ?,
           latitude = ?,
           longitude = ?
         WHERE id = ?
@@ -1142,6 +1172,8 @@ async function resolveOrCreateInactiveSite({
       [
         request.siteName,
         request.areaLabel,
+        request.regionalLabel,
+        request.wilayahLabel,
         request.latitude ?? null,
         request.longitude ?? null,
         existingSite.id,
@@ -1158,17 +1190,21 @@ async function resolveOrCreateInactiveSite({
         code,
         name,
         area_label,
+        regional_label,
+        wilayah_label,
         latitude,
         longitude,
         is_active
       )
-      VALUES (?, ?, ?, ?, ?, ?, FALSE)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, FALSE)
     `,
     [
       fallbackSiteId,
       request.siteCode,
       request.siteName,
       request.areaLabel,
+      request.regionalLabel,
+      request.wilayahLabel,
       request.latitude ?? null,
       request.longitude ?? null,
     ],
@@ -1880,6 +1916,8 @@ async function findPendingDeviceActivationForUpdate({
         s.code AS site_code,
         s.name AS site_name,
         s.area_label,
+        s.regional_label,
+        s.wilayah_label,
         s.latitude,
         s.longitude,
         s.is_active AS site_is_active,

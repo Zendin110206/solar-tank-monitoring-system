@@ -118,7 +118,13 @@ function RequestHistory({
                   {request.siteName}
                 </h3>
                 <div className="mt-2 grid min-w-0 gap-2 text-sm text-zinc-600 sm:grid-cols-3">
-                  <p className="min-w-0 break-words">Wilayah: {request.areaLabel}</p>
+                  <p className="min-w-0 break-words">
+                    Regional: {request.regionalLabel}
+                  </p>
+                  <p className="min-w-0 break-words">
+                    Wilayah: {request.wilayahLabel}
+                  </p>
+                  <p className="min-w-0 break-words">Area: {request.areaLabel}</p>
                   <p className="min-w-0 break-words">Perangkat: {request.deviceCode}</p>
                   <p>{getTankShapeLabel(request)}</p>
                   <p>{getDeviceSensorTypeLabel(request.deviceSensorType)}</p>

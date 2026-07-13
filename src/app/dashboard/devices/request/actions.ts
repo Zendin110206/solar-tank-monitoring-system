@@ -22,6 +22,8 @@ const USER_DEVICE_REQUEST_PATH = "/dashboard/devices/request";
 const ADMIN_DEVICE_REQUEST_PATH = "/dashboard/admin/device-requests";
 const DEVICE_REQUEST_SCHEMA_COLUMNS = [
   "device_sensor_type",
+  "regional_label",
+  "wilayah_label",
   "load_value",
   "load_unit",
   "diesel_engine_capacity_kva",
@@ -100,6 +102,8 @@ function buildDeviceRequestDraft(formData: FormData): DeviceRequestDraft {
   return {
     siteName: getRequiredFormValue(formData, "siteName"),
     areaLabel: getRequiredFormValue(formData, "areaLabel"),
+    regionalLabel: getRequiredFormValue(formData, "regionalLabel"),
+    wilayahLabel: getRequiredFormValue(formData, "wilayahLabel"),
     latitude: parseNumberField(formData, "latitude"),
     longitude: parseNumberField(formData, "longitude"),
     deviceSensorType: parseDeviceSensorType(formData),

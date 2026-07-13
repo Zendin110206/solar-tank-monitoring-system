@@ -163,6 +163,11 @@ export function DashboardMapOverview({
                 >
                   {selectedSite.name}
                 </h2>
+                <p className="mt-1 text-sm font-medium text-zinc-500">
+                  {selectedSite.regionalLabel ?? "-"} /{" "}
+                  {selectedSite.wilayahLabel ?? "-"} / Area{" "}
+                  {selectedSite.areaLabel}
+                </p>
               </div>
               <StatusBadge status={selectedSite.status} />
             </div>

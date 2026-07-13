@@ -454,7 +454,11 @@ export function SimpleDashboardMap({ sites }: { sites: SimpleDashboardSite[] }) 
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase text-zinc-500">
-                  {activeSite.code} - {activeSite.areaLabel}
+                  {activeSite.code} - {activeSite.regionalLabel} -{" "}
+                  {activeSite.wilayahLabel}
+                </p>
+                <p className="mt-0.5 text-xs font-medium text-zinc-500">
+                  Area {activeSite.areaLabel}
                 </p>
                 <h2 className="mt-1 text-lg font-semibold leading-snug text-zinc-950">
                   {activeSite.name}

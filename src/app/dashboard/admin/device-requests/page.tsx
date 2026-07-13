@@ -85,6 +85,8 @@ function filterDeviceRequests({
       request.siteCode,
       request.siteName,
       request.areaLabel,
+      request.regionalLabel,
+      request.wilayahLabel,
       request.deviceCode,
       request.deviceLabel,
       request.requesterEmail,
