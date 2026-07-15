@@ -125,7 +125,7 @@ export default async function AdminDeviceRequestsPage({
   });
 
   return (
-    <main className="flex h-screen flex-col overflow-hidden bg-[#f5faf8] text-zinc-950">
+    <main className="flex min-h-screen flex-col overflow-x-hidden bg-[#f5faf8] text-zinc-950">
       <DashboardHeader
         navItems={[
           { href: "/dashboard", label: "Manajemen Tangki" },
@@ -135,7 +135,7 @@ export default async function AdminDeviceRequestsPage({
         user={admin}
       />
 
-      <div className="mx-auto flex min-h-0 w-full max-w-[1540px] flex-1 flex-col gap-3 px-4 py-3 sm:px-6 lg:px-8">
+      <div className="mx-auto flex w-full max-w-[1540px] flex-1 flex-col gap-3 px-4 py-3 sm:px-6 lg:min-h-0 lg:px-8">
         {/* Summary section */}
         <section className="shrink-0 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_520px] xl:items-center">
