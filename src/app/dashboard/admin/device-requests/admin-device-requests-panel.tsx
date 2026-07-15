@@ -444,7 +444,7 @@ export function AdminDeviceRequestsPanel({
   }, [activeRequestId]);
 
   return (
-    <section className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
+    <section className="flex flex-col rounded-lg border border-zinc-200 bg-white shadow-sm lg:min-h-0 lg:flex-1 lg:overflow-hidden">
       {/* Compact request list */}
       <div className="flex shrink-0 flex-col gap-2 border-b border-zinc-200 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
@@ -460,7 +460,7 @@ export function AdminDeviceRequestsPanel({
         </span>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-hidden">
+      <div className="lg:min-h-0 lg:flex-1 lg:overflow-hidden">
         {!isMysqlEnabled ? (
           <div className="grid h-full place-items-center p-6 text-center text-sm leading-6 text-zinc-500">
             Tinjauan pengajuan perangkat memerlukan storage MySQL.
@@ -474,7 +474,7 @@ export function AdminDeviceRequestsPanel({
             Tidak ada pengajuan yang cocok dengan filter ini.
           </div>
         ) : (
-          <div className="h-full overflow-auto px-3 pb-3">
+          <div className="overflow-x-auto px-3 pb-3 lg:h-full lg:overflow-auto">
             <table className="min-w-[860px] w-full border-separate border-spacing-y-2">
               <thead className="sticky top-0 z-10 bg-white">
                 <tr className="text-left text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-400">
