@@ -125,7 +125,7 @@ export default async function AdminDeviceRequestsPage({
   });
 
   return (
-    <main className="flex min-h-screen flex-col overflow-x-hidden bg-[#f5faf8] text-zinc-950">
+    <main className="flex min-h-screen flex-col overflow-x-hidden bg-[#f5faf8] text-zinc-950 lg:h-screen lg:overflow-hidden">
       <DashboardHeader
         navItems={[
           { href: "/dashboard", label: "Manajemen Tangki" },
