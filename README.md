@@ -44,7 +44,7 @@ lebih luas.
 |---|---|
 | Tahap pengembangan | Pilot operasional aktif; dipelihara dan dikembangkan secara berkelanjutan |
 | Cakupan awal | TIF Pasuruan–Sidoarjo |
-| Perangkat terdaftar | 3 lokasi, 3 tangki, dan 3 perangkat pada pemeriksaan operasional terakhir |
+| Perangkat terdaftar | Snapshot 30 Juli 2026: 6 lokasi, 6 tangki, dan 6 perangkat; 5 aktif, terdiri dari 3 online dan 2 offline, serta 1 menunggu data sah pertama |
 | Platform aplikasi | Vercel |
 | Database operasional | Aiven MySQL |
 | Pemantauan langsung | Snapshot terbaru per perangkat dengan pembaruan dashboard setiap 20 detik |
