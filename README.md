@@ -44,11 +44,12 @@ lebih luas.
 |---|---|
 | Tahap pengembangan | Pilot operasional aktif; dipelihara dan dikembangkan secara berkelanjutan |
 | Cakupan awal | TIF Pasuruan–Sidoarjo |
-| Perangkat terdaftar | Snapshot 30 Juli 2026: 6 lokasi, 6 tangki, dan 6 perangkat; 5 aktif, terdiri dari 3 online dan 2 offline, serta 1 menunggu data sah pertama |
+| Perangkat terdaftar | Snapshot 2 Agustus 2026: 6 lokasi, 6 tangki, dan 6 perangkat; 5 aktif, terdiri dari 3 online dan 2 offline, serta 1 nonaktif |
 | Platform aplikasi | Vercel |
 | Database operasional | Aiven MySQL |
 | Pemantauan langsung | Snapshot terbaru per perangkat dengan pembaruan dashboard setiap 20 detik |
 | Riwayat telemetri | Agregat 5 menit berisi rata-rata, minimum, maksimum, dan jumlah sampel |
+| Snapshot data | 23.889 baris riwayat mewakili 247.639 sampel; 16.195 baris rollup 5 menit mewakili 239.945 sampel (rata-rata 14,82 sampel per baris) |
 | Pengaturan akses | Akun terverifikasi dengan peran admin dan pengguna |
 
 Jumlah perangkat dapat berubah mengikuti perkembangan penerapan. Kondisi
