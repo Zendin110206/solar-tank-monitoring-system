@@ -75,9 +75,6 @@ jobs:
   audit:
     name: Dependency audit (report only)
     runs-on: ubuntu-latest
-    # Hanya melaporkan sampai pembaruan dependensi keamanan selesai;
-    # setelah itu langkah ini dibuat wajib lulus.
-    continue-on-error: true
 
     steps:
       - name: Checkout repository
@@ -94,5 +91,22 @@ jobs:
           node-version: 22
           cache: pnpm
 
+      # Hanya melaporkan sampai pembaruan dependensi keamanan selesai: hasilnya
+      # ditulis ke ringkasan job dan job tetap hijau. Setelah itu langkah ini
+      # dibuat wajib lulus.
       - name: Audit production dependencies (high and critical)
-        run: pnpm audit --prod --audit-level high
+        run: |
+          set +e
+          pnpm audit --prod --audit-level high > audit.txt 2>&1
+          status=$?
+          {
+            echo "## Audit dependensi produksi"
+            echo ""
+            echo '```text'
+            tail -n 5 audit.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$status" -ne 0 ]; then
+            echo "::warning title=Audit dependensi::Ada kerentanan tingkat tinggi atau kritis. Lihat ringkasan job."
+          fi
+          exit 0
