@@ -292,7 +292,9 @@ function isDeviceRequestStatus(value: string): value is DeviceRequestStatus {
   return DEVICE_REQUEST_STATUSES.includes(value as DeviceRequestStatus);
 }
 
-function isFirmwarePackageStatus(value: string): value is FirmwarePackageStatus {
+function isFirmwarePackageStatus(
+  value: string,
+): value is FirmwarePackageStatus {
   return FIRMWARE_PACKAGE_STATUSES.includes(value as FirmwarePackageStatus);
 }
 
@@ -412,7 +414,9 @@ function parseMysqlDateTimeAsUtc(value: Date | string | null): string | null {
     hasExplicitTimezone ? normalizedValue : `${normalizedValue}Z`,
   );
 
-  return Number.isFinite(parsedTime) ? new Date(parsedTime).toISOString() : null;
+  return Number.isFinite(parsedTime)
+    ? new Date(parsedTime).toISOString()
+    : null;
 }
 
 function parseRequiredMysqlDateTimeAsUtc(value: Date | string): string {
@@ -436,7 +440,9 @@ function formatMysqlDateTime(value: Date | string): string {
   return date.toISOString().slice(0, 23).replace("T", " ");
 }
 
-function isValidationIssue(value: unknown): value is DeviceRequestValidationIssue {
+function isValidationIssue(
+  value: unknown,
+): value is DeviceRequestValidationIssue {
   if (typeof value !== "object" || value === null || Array.isArray(value)) {
     return false;
   }
@@ -450,7 +456,9 @@ function isValidationIssue(value: unknown): value is DeviceRequestValidationIssu
   );
 }
 
-function parseValidationWarnings(value: unknown): DeviceRequestValidationIssue[] {
+function parseValidationWarnings(
+  value: unknown,
+): DeviceRequestValidationIssue[] {
   let parsedValue = value;
 
   if (typeof value === "string" && value.trim()) {
@@ -513,7 +521,9 @@ export function rowToHardwareProfile(
   };
 }
 
-export function rowToDeviceRequest(row: DeviceRequestRow): MonitoringDeviceRequest {
+export function rowToDeviceRequest(
+  row: DeviceRequestRow,
+): MonitoringDeviceRequest {
   const latitude = toOptionalNumber(row.latitude);
   const longitude = toOptionalNumber(row.longitude);
   const lengthCm = toOptionalNumber(row.length_cm);
@@ -1447,7 +1457,9 @@ async function createPackageForRequest({
   });
   const encryptedPackage = encryptFirmwarePackage(firmwarePackage.zipBuffer);
   const downloadToken = createDownloadToken();
-  const downloadExpiresAt = createDownloadExpiresAt(firmwarePackage.generatedAt);
+  const downloadExpiresAt = createDownloadExpiresAt(
+    firmwarePackage.generatedAt,
+  );
   const deviceId = await createInactiveRegistryForApprovedRequest({
     connection,
     deviceKeyHash,
@@ -1535,7 +1547,10 @@ export async function approveDeviceRequestInMysql({
       requestId,
     });
 
-    const updatedRequest = await findDeviceRequestById({ connection, requestId });
+    const updatedRequest = await findDeviceRequestById({
+      connection,
+      requestId,
+    });
     await connection.commit();
 
     return {
@@ -1802,7 +1817,10 @@ export async function reissueDevicePackageInMysql({
       requestId,
     });
 
-    const updatedRequest = await findDeviceRequestById({ connection, requestId });
+    const updatedRequest = await findDeviceRequestById({
+      connection,
+      requestId,
+    });
     await connection.commit();
 
     return {
@@ -1882,7 +1900,10 @@ export async function revokeDeviceProvisioningInMysql({
       requestId,
     });
 
-    const updatedRequest = await findDeviceRequestById({ connection, requestId });
+    const updatedRequest = await findDeviceRequestById({
+      connection,
+      requestId,
+    });
     await connection.commit();
 
     return updatedRequest;
@@ -2349,7 +2370,10 @@ export async function rejectDeviceRequestInMysql({
       requestId,
     });
 
-    const updatedRequest = await findDeviceRequestById({ connection, requestId });
+    const updatedRequest = await findDeviceRequestById({
+      connection,
+      requestId,
+    });
     await connection.commit();
 
     return updatedRequest;

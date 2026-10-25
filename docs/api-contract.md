@@ -13,29 +13,29 @@ http://localhost:3000
 
 ## Ringkasan Endpoint
 
-| Method | Endpoint | Fungsi |
-|---|---|---|
-| `GET` | `/api/health` | Mengecek aplikasi hidup tanpa mengecek database |
-| `GET` | `/api/ready` | Mengecek kesiapan storage aktif |
-| `GET` | `/api/dashboard/overview` | Ringkasan semua lokasi/tangki |
-| `GET` | `/api/tanks/[tankId]` | Detail satu tangki |
-| `GET` | `/api/tanks/[tankId]/readings` | Riwayat pembacaan satu tangki |
-| `GET` | `/api/tanks/[tankId]/readings/export` | Download CSV reading satu tangki |
-| `POST` | `/api/ingest` | Menerima data device atau simulator |
-| `POST` | `/api/auth/login` | Login dengan email/username dan password |
-| `POST` | `/api/auth/login/verify-otp` | Verifikasi OTP login admin |
-| `POST` | `/api/auth/logout` | Keluar dan mencabut session aktif |
-| `GET` | `/api/auth/me` | Membaca user session aktif |
-| `POST` | `/api/auth/register-request` | Mengajukan akses pengguna baru |
-| `GET` | `/api/auth/email/verify` | Verifikasi email dari link token |
-| `POST` | `/api/auth/email/resend-verification` | Kirim ulang email verifikasi |
-| `POST` | `/api/auth/password/forgot` | Meminta link reset kata sandi |
-| `POST` | `/api/auth/password/reset` | Mengganti kata sandi memakai token reset |
-| `POST` | `/api/auth/password/change` | Mengganti kata sandi user yang sedang login |
-| `GET` | `/api/auth/sessions` | Melihat sesi aktif milik user |
-| `POST` | `/api/auth/sessions/revoke` | Mencabut sesi lain milik user |
-| `POST` | `/api/auth/telegram/bind/start` | Membuat token binding Telegram |
-| `POST` | `/api/auth/telegram/webhook` | Webhook Telegram untuk binding |
+| Method | Endpoint                              | Fungsi                                          |
+| ------ | ------------------------------------- | ----------------------------------------------- |
+| `GET`  | `/api/health`                         | Mengecek aplikasi hidup tanpa mengecek database |
+| `GET`  | `/api/ready`                          | Mengecek kesiapan storage aktif                 |
+| `GET`  | `/api/dashboard/overview`             | Ringkasan semua lokasi/tangki                   |
+| `GET`  | `/api/tanks/[tankId]`                 | Detail satu tangki                              |
+| `GET`  | `/api/tanks/[tankId]/readings`        | Riwayat pembacaan satu tangki                   |
+| `GET`  | `/api/tanks/[tankId]/readings/export` | Download CSV reading satu tangki                |
+| `POST` | `/api/ingest`                         | Menerima data device atau simulator             |
+| `POST` | `/api/auth/login`                     | Login dengan email/username dan password        |
+| `POST` | `/api/auth/login/verify-otp`          | Verifikasi OTP login admin                      |
+| `POST` | `/api/auth/logout`                    | Keluar dan mencabut session aktif               |
+| `GET`  | `/api/auth/me`                        | Membaca user session aktif                      |
+| `POST` | `/api/auth/register-request`          | Mengajukan akses pengguna baru                  |
+| `GET`  | `/api/auth/email/verify`              | Verifikasi email dari link token                |
+| `POST` | `/api/auth/email/resend-verification` | Kirim ulang email verifikasi                    |
+| `POST` | `/api/auth/password/forgot`           | Meminta link reset kata sandi                   |
+| `POST` | `/api/auth/password/reset`            | Mengganti kata sandi memakai token reset        |
+| `POST` | `/api/auth/password/change`           | Mengganti kata sandi user yang sedang login     |
+| `GET`  | `/api/auth/sessions`                  | Melihat sesi aktif milik user                   |
+| `POST` | `/api/auth/sessions/revoke`           | Mencabut sesi lain milik user                   |
+| `POST` | `/api/auth/telegram/bind/start`       | Membuat token binding Telegram                  |
+| `POST` | `/api/auth/telegram/webhook`          | Webhook Telegram untuk binding                  |
 
 ## GET /api/health
 
@@ -299,9 +299,9 @@ dapat diekspor berdampingan dengan row rollup.
 
 Query:
 
-| Parameter | Nilai | Default | Keterangan |
-|---|---|---|---|
-| `range` | `day`, `week`, `month` | `day` | Periode 1 hari, 7 hari, atau 30 hari berbasis kalender WIB |
+| Parameter | Nilai                  | Default | Keterangan                                                 |
+| --------- | ---------------------- | ------- | ---------------------------------------------------------- |
+| `range`   | `day`, `week`, `month` | `day`   | Periode 1 hari, 7 hari, atau 30 hari berbasis kalender WIB |
 
 Alias yang juga diterima:
 
@@ -434,30 +434,30 @@ Response sukses:
 
 Nilai `storage` bisa berisi:
 
-| Nilai | Arti |
-|---|---|
+| Nilai    | Arti                                                   |
+| -------- | ------------------------------------------------------ |
 | `memory` | Reading disimpan sementara di memory store development |
-| `mysql` | Reading disimpan ke MySQL sesuai `MYSQL_DATABASE_URL` |
+| `mysql`  | Reading disimpan ke MySQL sesuai `MYSQL_DATABASE_URL`  |
 
 Nilai `configStatus` membantu melihat apakah config payload cocok dengan registry:
 
-| Nilai | Arti |
-|---|---|
-| `no_payload_config` | Payload tidak membawa config tangki |
-| `config_match` | Config payload dan registry cocok |
+| Nilai                     | Arti                                |
+| ------------------------- | ----------------------------------- |
+| `no_payload_config`       | Payload tidak membawa config tangki |
+| `config_match`            | Config payload dan registry cocok   |
 | `config_minor_difference` | Ada beda kecil yang perlu diketahui |
-| `config_mismatch` | Ada beda besar dan perlu review |
-| `invalid_payload_config` | Config payload tidak valid |
+| `config_mismatch`         | Ada beda besar dan perlu review     |
+| `invalid_payload_config`  | Config payload tidak valid          |
 
 ## Error yang Mungkin Muncul
 
-| Status | Penyebab |
-|---|---|
-| `400` | Body bukan JSON valid atau payload tidak sesuai |
-| `401` | Key kosong atau salah |
-| `403` | Device tidak aktif |
-| `404` | Device atau tangki tidak ditemukan |
-| `503` | Storage aktif belum siap, terutama MySQL belum bisa dikoneksi |
+| Status | Penyebab                                                      |
+| ------ | ------------------------------------------------------------- |
+| `400`  | Body bukan JSON valid atau payload tidak sesuai               |
+| `401`  | Key kosong atau salah                                         |
+| `403`  | Device tidak aktif                                            |
+| `404`  | Device atau tangki tidak ditemukan                            |
+| `503`  | Storage aktif belum siap, terutama MySQL belum bisa dikoneksi |
 
 Contoh response error:
 

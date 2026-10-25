@@ -343,7 +343,10 @@ export function normalizeCatPayload({
         warnings,
       })
     : null;
-  const backendVolumeLiter = calculateTankVolumeLiter(readingTank, fuelHeightCm);
+  const backendVolumeLiter = calculateTankVolumeLiter(
+    readingTank,
+    fuelHeightCm,
+  );
   const volumeLiter = deviceVolumeLiter ?? backendVolumeLiter;
   const volumeSource: ReadingValueSource =
     deviceVolumeLiter !== null ? "device" : "backend";

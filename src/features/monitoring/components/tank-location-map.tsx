@@ -6,10 +6,7 @@ import Link from "next/link";
 import { MapPin } from "lucide-react";
 
 export type TankLocationMapStatus =
-  | "online"
-  | "warning"
-  | "critical"
-  | "offline";
+  "online" | "warning" | "critical" | "offline";
 
 export type TankLocationMapSite = {
   tankId: string;
@@ -269,7 +266,9 @@ export function TankLocationMap({
         style={activeMarkerStyle}
         aria-hidden="true"
       >
-        <div className={`size-3.5 rounded-full ${statusMeta[activeSite.status].dot}`} />
+        <div
+          className={`size-3.5 rounded-full ${statusMeta[activeSite.status].dot}`}
+        />
       </div>
     </div>
   );

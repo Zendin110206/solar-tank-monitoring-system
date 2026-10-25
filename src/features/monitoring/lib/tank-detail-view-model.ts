@@ -543,7 +543,8 @@ export function buildTankDetail(
       )
     : tank;
   const dataSources =
-    latestReading?.quality ?? buildFallbackReadingQuality(latestReading, configReview);
+    latestReading?.quality ??
+    buildFallbackReadingQuality(latestReading, configReview);
   const hasReading = Boolean(latestReading);
   const fillPercent = latestReading?.fillPercent ?? 0;
   const volumeLiter = latestReading?.volumeLiter ?? 0;

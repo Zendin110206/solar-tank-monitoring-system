@@ -87,10 +87,14 @@ function getStatusClass(status: DeviceRequestStatus) {
 }
 
 function getTankShapeLabel(shape: TankShape) {
-  return shape === "rectangular" ? "Tangki balok" : "Tangki silinder horizontal";
+  return shape === "rectangular"
+    ? "Tangki balok"
+    : "Tangki silinder horizontal";
 }
 
-function getSupportedTankShapeLabel(shape: MonitoringHardwareProfile["supportedTankShape"]) {
+function getSupportedTankShapeLabel(
+  shape: MonitoringHardwareProfile["supportedTankShape"],
+) {
   if (shape === "any") {
     return "Semua tipe tangki";
   }
@@ -98,7 +102,9 @@ function getSupportedTankShapeLabel(shape: MonitoringHardwareProfile["supportedT
   return getTankShapeLabel(shape);
 }
 
-function getSensorTypeLabel(sensorType: MonitoringDeviceRequest["deviceSensorType"]) {
+function getSensorTypeLabel(
+  sensorType: MonitoringDeviceRequest["deviceSensorType"],
+) {
   return sensorType === "energy" ? "Sensor energy" : "Sensor fuel";
 }
 
@@ -117,7 +123,10 @@ function getDimensionSummary(request: MonitoringDeviceRequest) {
 }
 
 function getCoordinateSummary(request: MonitoringDeviceRequest) {
-  if (typeof request.latitude !== "number" || typeof request.longitude !== "number") {
+  if (
+    typeof request.latitude !== "number" ||
+    typeof request.longitude !== "number"
+  ) {
     return "-";
   }
 
@@ -139,7 +148,9 @@ function DetailItem({
         {label}
       </dt>
       <dd className="mt-1 text-sm font-semibold text-zinc-950">{children}</dd>
-      {note ? <p className="mt-1 text-xs leading-5 text-zinc-500">{note}</p> : null}
+      {note ? (
+        <p className="mt-1 text-xs leading-5 text-zinc-500">{note}</p>
+      ) : null}
     </div>
   );
 }
@@ -198,7 +209,8 @@ function RequestDetailModal({
         className="flex max-h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-zinc-950/10"
         role="dialog"
         style={{
-          animation: "login-shell-enter 180ms cubic-bezier(0.22, 1, 0.36, 1) both",
+          animation:
+            "login-shell-enter 180ms cubic-bezier(0.22, 1, 0.36, 1) both",
         }}
       >
         {/* Modal header */}
@@ -214,7 +226,8 @@ function RequestDetailModal({
               {request.siteName}
             </h3>
             <p className="mt-1 text-sm text-zinc-500">
-              Diajukan {formatDate(request.createdAt)} oleh {request.requesterEmail}
+              Diajukan {formatDate(request.createdAt)} oleh{" "}
+              {request.requesterEmail}
             </p>
           </div>
           <button
@@ -238,12 +251,22 @@ function RequestDetailModal({
                 <dl className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                   <DetailItem label="Nama STO">{request.siteName}</DetailItem>
                   <DetailItem label="Kode STO">{request.siteCode}</DetailItem>
-                  <DetailItem label="Regional">{request.regionalLabel}</DetailItem>
-                  <DetailItem label="Wilayah">{request.wilayahLabel}</DetailItem>
+                  <DetailItem label="Regional">
+                    {request.regionalLabel}
+                  </DetailItem>
+                  <DetailItem label="Wilayah">
+                    {request.wilayahLabel}
+                  </DetailItem>
                   <DetailItem label="Area">{request.areaLabel}</DetailItem>
-                  <DetailItem label="Kode device">{request.deviceCode}</DetailItem>
-                  <DetailItem label="Label device">{request.deviceLabel}</DetailItem>
-                  <DetailItem label="Koordinat">{getCoordinateSummary(request)}</DetailItem>
+                  <DetailItem label="Kode device">
+                    {request.deviceCode}
+                  </DetailItem>
+                  <DetailItem label="Label device">
+                    {request.deviceLabel}
+                  </DetailItem>
+                  <DetailItem label="Koordinat">
+                    {getCoordinateSummary(request)}
+                  </DetailItem>
                 </dl>
               </section>
 
@@ -258,7 +281,9 @@ function RequestDetailModal({
                   <DetailItem label="Kapasitas">
                     {formatNumber(request.capacityLiter, " L")}
                   </DetailItem>
-                  <DetailItem label="Dimensi">{getDimensionSummary(request)}</DetailItem>
+                  <DetailItem label="Dimensi">
+                    {getDimensionSummary(request)}
+                  </DetailItem>
                   <DetailItem label="Tinggi sensor">
                     {formatNumber(request.sensorMountHeightCm, " cm")}
                   </DetailItem>
@@ -280,12 +305,17 @@ function RequestDetailModal({
                     {getSensorTypeLabel(request.deviceSensorType)}
                   </DetailItem>
                   <DetailItem label="Beban lokasi">
-                    {formatNumber(request.loadValue, ` ${request.loadUnit.toUpperCase()}`)}
+                    {formatNumber(
+                      request.loadValue,
+                      ` ${request.loadUnit.toUpperCase()}`,
+                    )}
                   </DetailItem>
                   <DetailItem label="Diesel engine">
                     {formatNumber(request.dieselEngineCapacityKva, " kVA")}
                   </DetailItem>
-                  <DetailItem label="Cos phi">{formatNumber(request.cosPhi)}</DetailItem>
+                  <DetailItem label="Cos phi">
+                    {formatNumber(request.cosPhi)}
+                  </DetailItem>
                   <DetailItem label="Konsumsi hitung">
                     {formatNumber(request.consumptionLiterPerHour, " L/jam")}
                   </DetailItem>
@@ -303,12 +333,22 @@ function RequestDetailModal({
                   <DetailItem label="Nama profil">
                     {profile?.name ?? "Profil hardware tidak ditemukan"}
                   </DetailItem>
-                  <DetailItem label="Kode profil">{profile?.code ?? "-"}</DetailItem>
-                  <DetailItem label="Board">{profile?.boardLabel ?? "-"}</DetailItem>
-                  <DetailItem label="Pin trigger">{profile?.triggerPin ?? "-"}</DetailItem>
-                  <DetailItem label="Pin echo">{profile?.echoPin ?? "-"}</DetailItem>
+                  <DetailItem label="Kode profil">
+                    {profile?.code ?? "-"}
+                  </DetailItem>
+                  <DetailItem label="Board">
+                    {profile?.boardLabel ?? "-"}
+                  </DetailItem>
+                  <DetailItem label="Pin trigger">
+                    {profile?.triggerPin ?? "-"}
+                  </DetailItem>
+                  <DetailItem label="Pin echo">
+                    {profile?.echoPin ?? "-"}
+                  </DetailItem>
                   <DetailItem label="Dukungan tangki">
-                    {profile ? getSupportedTankShapeLabel(profile.supportedTankShape) : "-"}
+                    {profile
+                      ? getSupportedTankShapeLabel(profile.supportedTankShape)
+                      : "-"}
                   </DetailItem>
                 </dl>
               </section>
@@ -492,7 +532,9 @@ export function AdminDeviceRequestsPanel({
                     key={request.id}
                   >
                     <td className="rounded-l-lg border-y border-l border-zinc-200 px-3 py-3">
-                      <p className="font-semibold text-zinc-950">{request.siteName}</p>
+                      <p className="font-semibold text-zinc-950">
+                        {request.siteName}
+                      </p>
                       <p className="mt-1 text-xs text-zinc-500">
                         {request.siteCode} / {request.regionalLabel} /{" "}
                         {request.wilayahLabel}

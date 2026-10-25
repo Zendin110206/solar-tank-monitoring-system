@@ -129,12 +129,12 @@ src/features/monitoring/lib/runtime.ts
 
 Aturan awal:
 
-| Runtime | Status |
-|---:|---|
-| `< 13 jam` | Kritis |
-| `13 - < 16 jam` | Waspada |
-| `16 - 24 jam` | Aman terbatas |
-| `> 24 jam` | Aman panjang |
+|         Runtime | Status        |
+| --------------: | ------------- |
+|      `< 13 jam` | Kritis        |
+| `13 - < 16 jam` | Waspada       |
+|   `16 - 24 jam` | Aman terbatas |
+|      `> 24 jam` | Aman panjang  |
 
 Aturan ini bisa berubah setelah ada validasi operasional.
 
@@ -163,19 +163,19 @@ Normalizer bertugas membuatnya seragam.
 
 Contoh mapping:
 
-| Payload masuk | Field internal |
-|---|---|
-| `distance` | `sensorDistanceCm` |
-| `raw.H_cm` | `fuelHeightCm` |
-| `raw.volume` | `volumeLiter` |
-| `raw.percent` | `fillPercent` |
-| `raw.wifi_rssi` | `rssiDbm` |
-| `voltage` | `batteryVolt` |
-| `raw.local_H_cm` | `fuelHeightCm` |
-| `raw.local_volume_l` | `volumeLiter` |
-| `raw.local_percent` | `fillPercent` |
-| `tank_shape` | snapshot config payload |
-| `capacity_liter` | snapshot config payload |
+| Payload masuk                | Field internal          |
+| ---------------------------- | ----------------------- |
+| `distance`                   | `sensorDistanceCm`      |
+| `raw.H_cm`                   | `fuelHeightCm`          |
+| `raw.volume`                 | `volumeLiter`           |
+| `raw.percent`                | `fillPercent`           |
+| `raw.wifi_rssi`              | `rssiDbm`               |
+| `voltage`                    | `batteryVolt`           |
+| `raw.local_H_cm`             | `fuelHeightCm`          |
+| `raw.local_volume_l`         | `volumeLiter`           |
+| `raw.local_percent`          | `fillPercent`           |
+| `tank_shape`                 | snapshot config payload |
+| `capacity_liter`             | snapshot config payload |
 | `consumption_liter_per_hour` | snapshot config payload |
 
 Kode normalizer:

@@ -59,7 +59,8 @@ export function buildMapPositionsFromCoordinates(
         minLongitude,
         maxLongitude,
       );
-      const y = 1 - normalizeCoordinate(point.latitude, minLatitude, maxLatitude);
+      const y =
+        1 - normalizeCoordinate(point.latitude, minLatitude, maxLatitude);
 
       return [
         point.id,

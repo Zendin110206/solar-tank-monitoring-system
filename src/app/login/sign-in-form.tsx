@@ -4,13 +4,7 @@ import type { FormEvent } from "react";
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  ArrowRight,
-  Eye,
-  EyeOff,
-  LockKeyhole,
-  Mail,
-} from "lucide-react";
+import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 
 export default function SignInForm({
   redirectTo = "/dashboard",
@@ -65,18 +59,16 @@ export default function SignInForm({
           body: JSON.stringify(body),
         },
       );
-      const result = (await response.json().catch(() => null)) as
-        | {
-            ok?: boolean;
-            error?: string;
-            data?: {
-              requiresOtp?: boolean;
-              challengeId?: string;
-              delivery?: "email" | "log";
-              redirectTo?: string;
-            };
-          }
-        | null;
+      const result = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+        error?: string;
+        data?: {
+          requiresOtp?: boolean;
+          challengeId?: string;
+          delivery?: "email" | "log";
+          redirectTo?: string;
+        };
+      } | null;
 
       if (!response.ok || !result?.ok) {
         throw new Error(result?.error ?? "Login gagal.");

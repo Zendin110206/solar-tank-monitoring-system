@@ -63,14 +63,15 @@ export function isAccessRequestEnabled(): boolean {
 }
 
 export function isPasswordResetEnabled(): boolean {
-  return process.env.AUTH_ALLOW_PASSWORD_RESET?.trim().toLowerCase() !== "false";
+  return (
+    process.env.AUTH_ALLOW_PASSWORD_RESET?.trim().toLowerCase() !== "false"
+  );
 }
 
 export function shouldRequireEmailVerificationForApproval(): boolean {
   return (
-    process.env.AUTH_REQUIRE_EMAIL_VERIFICATION_FOR_APPROVAL
-      ?.trim()
-      .toLowerCase() !== "false"
+    process.env.AUTH_REQUIRE_EMAIL_VERIFICATION_FOR_APPROVAL?.trim().toLowerCase() !==
+    "false"
   );
 }
 
@@ -221,10 +222,7 @@ export function getReadinessCheckToken(): string | null {
 }
 
 export type TelegramAdminTopic =
-  | "live-chat"
-  | "new-account"
-  | "new-device"
-  | "system";
+  "live-chat" | "new-account" | "new-device" | "system";
 
 export function getTelegramAdminGroupChatId(): string | null {
   const chatId = process.env.TELEGRAM_ADMIN_GROUP_CHAT_ID?.trim();

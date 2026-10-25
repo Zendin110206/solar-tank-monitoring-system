@@ -204,9 +204,7 @@ export default async function DashboardPage() {
   const storageSource = monitoringReadingsResult.source;
   const registrySource = monitoringReferenceResult.source;
   const storageBadgeLabel =
-    storageSource.activeDriver === "mysql"
-      ? "database MySQL"
-      : "memory lokal";
+    storageSource.activeDriver === "mysql" ? "database MySQL" : "memory lokal";
 
   const monitoredSites = dashboardOverview.rows;
   const latestSite = dashboardOverview.latestRow;
@@ -520,13 +518,13 @@ export default async function DashboardPage() {
                   <th className="px-4 py-2 font-semibold">Volume</th>
                   <th className="px-4 py-2 font-semibold">Isi</th>
                   <th className="px-4 py-2 font-semibold">Runtime</th>
-                <th className="px-4 py-2 font-semibold">Perangkat</th>
-                <th className="px-4 py-2 font-semibold">Update</th>
-                <th className="px-4 py-2 font-semibold">Status</th>
-                <th className="px-4 py-2 font-semibold">Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
+                  <th className="px-4 py-2 font-semibold">Perangkat</th>
+                  <th className="px-4 py-2 font-semibold">Update</th>
+                  <th className="px-4 py-2 font-semibold">Status</th>
+                  <th className="px-4 py-2 font-semibold">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
                 {monitoredSites.map((site) => (
                   <tr key={site.code} className="bg-zinc-50">
                     <td className="rounded-l-lg px-4 py-4">

@@ -71,7 +71,9 @@ function assertValidAdminActionCsrf({
       token: csrfToken,
     })
   ) {
-    throw new Error("Sesi admin tidak valid. Muat ulang halaman lalu coba lagi.");
+    throw new Error(
+      "Sesi admin tidak valid. Muat ulang halaman lalu coba lagi.",
+    );
   }
 }
 
@@ -297,7 +299,9 @@ export async function sendUserPasswordResetAction(
     const targetUserId = getRequiredFormValue(formData, "targetUserId");
 
     if (targetUserId === admin.id) {
-      throw new Error("Reset password akun sendiri dilakukan dari keamanan akun.");
+      throw new Error(
+        "Reset password akun sendiri dilakukan dari keamanan akun.",
+      );
     }
 
     await sendPasswordResetForUserId({

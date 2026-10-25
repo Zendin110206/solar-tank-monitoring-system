@@ -40,7 +40,10 @@ function buildLinePath(points: Array<{ x: number; y: number }>) {
     .join(" ");
 }
 
-function buildAreaPath(points: Array<{ x: number; y: number }>, bottom: number) {
+function buildAreaPath(
+  points: Array<{ x: number; y: number }>,
+  bottom: number,
+) {
   if (points.length < 2) {
     return "";
   }
@@ -240,7 +243,7 @@ export function SimpleTankVolumeChart({
   ]);
 
   const activePoint =
-    activeIndex === null ? null : chart.coordinates[activeIndex] ?? null;
+    activeIndex === null ? null : (chart.coordinates[activeIndex] ?? null);
 
   function handlePointerMove(event: PointerEvent<SVGSVGElement>) {
     const svg = svgRef.current;
@@ -252,17 +255,12 @@ export function SimpleTankVolumeChart({
     const rect = svg.getBoundingClientRect();
     const pointerX =
       ((event.clientX - rect.left) / rect.width) * chartSize.width;
-    const nearestIndex = chart.coordinates.reduce(
-      (nearest, point, index) => {
-        const nearestDistance = Math.abs(
-          chart.coordinates[nearest].x - pointerX,
-        );
-        const pointDistance = Math.abs(point.x - pointerX);
+    const nearestIndex = chart.coordinates.reduce((nearest, point, index) => {
+      const nearestDistance = Math.abs(chart.coordinates[nearest].x - pointerX);
+      const pointDistance = Math.abs(point.x - pointerX);
 
-        return pointDistance < nearestDistance ? index : nearest;
-      },
-      0,
-    );
+      return pointDistance < nearestDistance ? index : nearest;
+    }, 0);
 
     setActiveIndex(nearestIndex);
   }

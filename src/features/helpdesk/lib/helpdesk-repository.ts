@@ -380,9 +380,7 @@ export async function closeHelpdeskSession({
   );
 }
 
-export async function findActiveAdminByTelegramChatId(
-  chatId: string,
-): Promise<{
+export async function findActiveAdminByTelegramChatId(chatId: string): Promise<{
   email: string;
   fullName: string;
   id: string;

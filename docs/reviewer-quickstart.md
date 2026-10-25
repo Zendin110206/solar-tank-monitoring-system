@@ -40,17 +40,17 @@ http://localhost:3000
 
 Halaman yang bisa dilihat:
 
-| URL | Isi |
-|---|---|
-| `/` | landing page |
-| `/login` | login pengguna |
-| `/register` | pengajuan akses pengguna baru |
-| `/forgot-password` | permintaan reset kata sandi |
-| `/dashboard` | monitoring operasional tangki |
+| URL                                      | Isi                              |
+| ---------------------------------------- | -------------------------------- |
+| `/`                                      | landing page                     |
+| `/login`                                 | login pengguna                   |
+| `/register`                              | pengajuan akses pengguna baru    |
+| `/forgot-password`                       | permintaan reset kata sandi      |
+| `/dashboard`                             | monitoring operasional tangki    |
 | `/dashboard/ringkas/tanks/tank-tph-main` | detail operasional tangki contoh |
-| `/dashboard/detail` | analisis teknis khusus admin |
-| `/dashboard/admin/users` | manajemen pengguna khusus admin |
-| `/dashboard/admin/audit` | audit keamanan auth khusus admin |
+| `/dashboard/detail`                      | analisis teknis khusus admin     |
+| `/dashboard/admin/users`                 | manajemen pengguna khusus admin  |
+| `/dashboard/admin/audit`                 | audit keamanan auth khusus admin |
 
 ## 3. Cek Aplikasi dan Storage
 

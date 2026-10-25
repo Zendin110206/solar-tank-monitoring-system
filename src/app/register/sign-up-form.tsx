@@ -75,9 +75,7 @@ function buildAccessReason(formData: FormData): string {
   const position = String(formData.get("position") ?? "").trim();
   const note = String(formData.get("accessReason") ?? "").trim();
 
-  return [`Peran kerja: ${position || "-"}`, note]
-    .filter(Boolean)
-    .join("\n\n");
+  return [`Peran kerja: ${position || "-"}`, note].filter(Boolean).join("\n\n");
 }
 
 export default function SignUpForm() {
@@ -120,9 +118,10 @@ export default function SignUpForm() {
           captchaToken,
         }),
       });
-      const result = (await response.json().catch(() => null)) as
-        | { ok?: boolean; error?: string }
-        | null;
+      const result = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+        error?: string;
+      } | null;
 
       if (!response.ok || !result?.ok) {
         throw new Error(

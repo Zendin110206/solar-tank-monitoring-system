@@ -29,28 +29,28 @@ Dashboard memakai peta berbasis koordinat. Titik peta tidak berasal dari GPS dev
 
 Siapkan tabel sederhana seperti ini sebelum menyentuh kode atau device.
 
-| Data | Contoh | Catatan |
-|---|---|---|
-| Kode STO | `TPH` | Kode pendek yang mudah dibaca |
-| Nama lokasi | `STO TPH` | Nama yang tampil di dashboard |
-| Regional | `TREG 5` | Kelompok lokasi paling besar |
-| Wilayah | `TIF 3` | Kelompok di bawah Regional |
-| Area | `Pasuruan` | Label area kerja |
-| Latitude | `-7.6500000` | Harus angka koordinat yang disetujui |
-| Longitude | `112.9000000` | Harus angka koordinat yang disetujui |
-| ID tangki | `tank-tph-main` | Gunakan format konsisten |
-| Bentuk tangki | `rectangular` | Contoh awal memakai tangki balok |
-| Kapasitas | `540` | Liter |
-| Panjang | `150` | cm |
-| Lebar | `60` | cm |
-| Tinggi | `60` | cm |
-| Tinggi sensor | `60` | cm dari dasar referensi |
-| Batas rendah | `30` | persen |
-| Batas kritis | `15` | persen |
-| Konsumsi | `25` | liter per jam |
-| Kode device | `pilot-tph-01` | Harus sama dengan firmware |
-| Interval kirim | `20` | detik untuk monitoring live; history tetap diringkas per 5 menit |
-| Hash key | `sha256:...` | Bukan key asli |
+| Data           | Contoh          | Catatan                                                          |
+| -------------- | --------------- | ---------------------------------------------------------------- |
+| Kode STO       | `TPH`           | Kode pendek yang mudah dibaca                                    |
+| Nama lokasi    | `STO TPH`       | Nama yang tampil di dashboard                                    |
+| Regional       | `TREG 5`        | Kelompok lokasi paling besar                                     |
+| Wilayah        | `TIF 3`         | Kelompok di bawah Regional                                       |
+| Area           | `Pasuruan`      | Label area kerja                                                 |
+| Latitude       | `-7.6500000`    | Harus angka koordinat yang disetujui                             |
+| Longitude      | `112.9000000`   | Harus angka koordinat yang disetujui                             |
+| ID tangki      | `tank-tph-main` | Gunakan format konsisten                                         |
+| Bentuk tangki  | `rectangular`   | Contoh awal memakai tangki balok                                 |
+| Kapasitas      | `540`           | Liter                                                            |
+| Panjang        | `150`           | cm                                                               |
+| Lebar          | `60`            | cm                                                               |
+| Tinggi         | `60`            | cm                                                               |
+| Tinggi sensor  | `60`            | cm dari dasar referensi                                          |
+| Batas rendah   | `30`            | persen                                                           |
+| Batas kritis   | `15`            | persen                                                           |
+| Konsumsi       | `25`            | liter per jam                                                    |
+| Kode device    | `pilot-tph-01`  | Harus sama dengan firmware                                       |
+| Interval kirim | `20`            | detik untuk monitoring live; history tetap diringkas per 5 menit |
+| Hash key       | `sha256:...`    | Bukan key asli                                                   |
 
 ## Cara Mengambil Koordinat
 
@@ -74,8 +74,8 @@ Masukkan ke registry:
 
 ```json
 {
-  "latitude": -7.6500000,
-  "longitude": 112.9000000,
+  "latitude": -7.65,
+  "longitude": 112.9,
   "coordinateStatus": "approved"
 }
 ```
@@ -301,13 +301,13 @@ X-Device-Key: key-asli-device
 
 Arti response umum:
 
-| Response | Arti |
-|---|---|
-| `201` | data diterima |
-| `400` | payload rusak atau field kurang |
-| `401` | key salah |
-| `404` | device tidak ada di registry |
-| `503` | database/storage belum siap |
+| Response | Arti                            |
+| -------- | ------------------------------- |
+| `201`    | data diterima                   |
+| `400`    | payload rusak atau field kurang |
+| `401`    | key salah                       |
+| `404`    | device tidak ada di registry    |
+| `503`    | database/storage belum siap     |
 
 Catatan HTTPS:
 

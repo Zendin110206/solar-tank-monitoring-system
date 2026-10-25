@@ -5,11 +5,11 @@ isi repositori harus aman dibaca siapa pun.
 
 ## Versi yang didukung
 
-| Branch | Peran | Dukungan keamanan |
-|---|---|---|
-| `main` | Versi yang berjalan di pilot | Ya |
-| `dev` | Integrasi sebelum rilis | Ya, perbaikan dikerjakan di sini lalu dirilis ke `main` |
-| branch lain | Pekerjaan sementara | Tidak |
+| Branch      | Peran                        | Dukungan keamanan                                       |
+| ----------- | ---------------------------- | ------------------------------------------------------- |
+| `main`      | Versi yang berjalan di pilot | Ya                                                      |
+| `dev`       | Integrasi sebelum rilis      | Ya, perbaikan dikerjakan di sini lalu dirilis ke `main` |
+| branch lain | Pekerjaan sementara          | Tidak                                                   |
 
 Belum ada rilis bernomor yang didukung terpisah. Riwayat perubahan ada di
 [CHANGELOG.md](CHANGELOG.md).
@@ -19,7 +19,7 @@ Belum ada rilis bernomor yang didukung terpisah. Riwayat perubahan ada di
 **Jangan membuat issue publik** untuk dugaan kerentanan.
 
 Gunakan **Report a vulnerability** pada tab **Security** repositori ini
-(*private vulnerability reporting*). Bila fitur itu belum tersedia, hubungi
+(_private vulnerability reporting_). Bila fitur itu belum tersedia, hubungi
 pemilik repositori melalui kanal internal tim yang sudah disepakati.
 
 Laporan sebaiknya memuat:
@@ -73,7 +73,7 @@ Menghapus rahasia dari commit terbaru tidak menghapusnya dari riwayat.
   kiriman valid pertama.
 - Paket firmware disimpan terenkripsi dan diunduh lewat token berbatas waktu dan
   jumlah unduhan.
-- Webhook Telegram diverifikasi dengan *secret header*.
+- Webhook Telegram diverifikasi dengan _secret header_.
 - Log audit untuk aktivitas akun dan admin.
 
 ## Keterbatasan yang diketahui (per Oktober 2026)

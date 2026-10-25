@@ -35,7 +35,9 @@ const hash = `sha256:${sha256(generatedKey)}`;
 
 if (providedKey) {
   globalThis.console.log("Mode: hash dari DEVICE_KEY environment");
-  globalThis.console.log("Device key asli tidak ditampilkan ulang oleh script.");
+  globalThis.console.log(
+    "Device key asli tidak ditampilkan ulang oleh script.",
+  );
 } else {
   globalThis.console.log("Mode: generate key baru");
   globalThis.console.log("");

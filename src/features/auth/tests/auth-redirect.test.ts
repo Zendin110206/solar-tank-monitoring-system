@@ -16,9 +16,7 @@ describe("auth redirect helpers", () => {
     expect(getSafeLoginRedirectPath("https://evil.example/dashboard")).toBe(
       "/dashboard",
     );
-    expect(getSafeLoginRedirectPath("javascript:alert(1)")).toBe(
-      "/dashboard",
-    );
+    expect(getSafeLoginRedirectPath("javascript:alert(1)")).toBe("/dashboard");
     expect(getSafeLoginRedirectPath("/api/ready")).toBe("/dashboard");
   });
 

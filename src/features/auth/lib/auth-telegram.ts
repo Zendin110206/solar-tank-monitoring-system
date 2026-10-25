@@ -5,8 +5,7 @@ import {
 } from "./auth-config";
 
 type TelegramSendResult =
-  | { delivered: true }
-  | { delivered: false; reason: string };
+  { delivered: true } | { delivered: false; reason: string };
 
 export type TelegramMessage = {
   chatId: string;

@@ -73,7 +73,9 @@ export function TurnstileWidget({
   }, []);
 
   if (!siteKey) {
-    return <input id={inputId} name={inputName} type="hidden" defaultValue="" />;
+    return (
+      <input id={inputId} name={inputName} type="hidden" defaultValue="" />
+    );
   }
 
   return (

@@ -70,7 +70,9 @@ export type ResetMonitoringReadingsResult = {
 };
 
 function uniqueNonEmpty(values: string[]): string[] {
-  return Array.from(new Set(values.map((value) => value.trim()).filter(Boolean)));
+  return Array.from(
+    new Set(values.map((value) => value.trim()).filter(Boolean)),
+  );
 }
 
 function buildPlaceholders(values: readonly string[]): string {
@@ -99,10 +101,7 @@ function buildWhereFromIdGroups(
   return {
     params: activeGroups.flatMap((group) => group.values),
     where: activeGroups
-      .map(
-        (group) =>
-          `${group.column} IN (${buildPlaceholders(group.values)})`,
-      )
+      .map((group) => `${group.column} IN (${buildPlaceholders(group.values)})`)
       .join(" OR "),
   };
 }
@@ -207,7 +206,10 @@ export async function resetMonitoringDeviceDataInMysql(): Promise<ResetMonitorin
 
     return {
       counts,
-      totalRows: Object.values(counts).reduce((total, count) => total + count, 0),
+      totalRows: Object.values(counts).reduce(
+        (total, count) => total + count,
+        0,
+      ),
     };
   } catch (error) {
     await connection.rollback();
@@ -568,9 +570,7 @@ export async function cleanupMonitoringTanksInMysql({
       };
     }
 
-    const candidateSiteIds = uniqueNonEmpty(
-      tankRows.map((row) => row.site_id),
-    );
+    const candidateSiteIds = uniqueNonEmpty(tankRows.map((row) => row.site_id));
     const [deviceRows] = await connection.query<DeviceLinkRow[]>(
       `
         SELECT id, site_id, tank_id
@@ -597,9 +597,7 @@ export async function cleanupMonitoringTanksInMysql({
             return rows;
           })()
         : [];
-    const requestIds = uniqueNonEmpty(
-      packageRows.map((row) => row.request_id),
-    );
+    const requestIds = uniqueNonEmpty(packageRows.map((row) => row.request_id));
     const allPackageRows =
       requestIds.length > 0
         ? await (async () => {

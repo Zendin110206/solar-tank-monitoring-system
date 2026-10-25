@@ -90,7 +90,8 @@ function SubmitButton({
               ? Trash2
               : X;
   const variantClass = {
-    danger: "bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-600/20",
+    danger:
+      "bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-600/20",
     dangerOutline:
       "border border-red-200 bg-white text-red-700 hover:bg-red-50 focus-visible:ring-red-600/15",
     neutral:
@@ -139,7 +140,8 @@ function ConfirmedSubmitButton({
           ? RotateCw
           : Trash2;
   const variantClass = {
-    danger: "bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-600/20",
+    danger:
+      "bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-600/20",
     dangerOutline:
       "border border-red-200 bg-white text-red-700 hover:bg-red-50 focus-visible:ring-red-600/15",
     neutral:
@@ -481,9 +483,9 @@ export function ResetMonitoringDeviceDataForm({
       </label>
       <p className="text-xs leading-5 text-zinc-500">
         Ketik tepat <span className="font-semibold">{RESET_CONFIRMATION}</span>{" "}
-        untuk membersihkan semua data STO, tangki, perangkat, reading, pengajuan,
-        paket firmware, dan event provisioning. Akun pengguna, admin, template
-        firmware, dan profil hardware tidak ikut dihapus.
+        untuk membersihkan semua data STO, tangki, perangkat, reading,
+        pengajuan, paket firmware, dan event provisioning. Akun pengguna, admin,
+        template firmware, dan profil hardware tidak ikut dihapus.
       </p>
       <ConfirmedSubmitButton
         confirmation={{

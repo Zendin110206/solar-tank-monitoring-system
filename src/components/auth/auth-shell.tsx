@@ -190,9 +190,7 @@ export default function AuthShell({
   const contentWidthClass =
     contentWidth === "wide" ? "max-w-[36rem]" : "max-w-[27rem]";
   const contentPaddingClass =
-    contentWidth === "wide"
-      ? "py-5 sm:py-6 lg:py-4"
-      : "py-9 sm:py-10 lg:py-8";
+    contentWidth === "wide" ? "py-5 sm:py-6 lg:py-4" : "py-9 sm:py-10 lg:py-8";
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-zinc-100 px-4 py-5 text-zinc-950 sm:px-6">
@@ -278,8 +276,8 @@ export default function AuthShell({
               </span>
             </h2>
             <p className="mt-5 max-w-lg text-sm leading-7 text-zinc-600 sm:text-base">
-              Pantau volume bahan bakar, estimasi runtime genset, dan kesehatan data
-              perangkat untuk membantu tindak lanjut operasional.
+              Pantau volume bahan bakar, estimasi runtime genset, dan kesehatan
+              data perangkat untuk membantu tindak lanjut operasional.
             </p>
           </div>
 

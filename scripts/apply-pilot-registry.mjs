@@ -180,7 +180,9 @@ function normalizeLocationLabel(value, label, options, fallback) {
   );
 
   if (!match) {
-    throw new Error(`${label} tidak dikenali. Pilih salah satu: ${options.join(", ")}.`);
+    throw new Error(
+      `${label} tidak dikenali. Pilih salah satu: ${options.join(", ")}.`,
+    );
   }
 
   return match;
@@ -223,7 +225,10 @@ function assertUnique(items, keyName, label) {
 }
 
 function hasPlaceholderHash(hash) {
-  return hash === "sha256:0000000000000000000000000000000000000000000000000000000000000000";
+  return (
+    hash ===
+    "sha256:0000000000000000000000000000000000000000000000000000000000000000"
+  );
 }
 
 function normalizeTank(site, tank, allowPlaceholder) {
@@ -241,9 +246,13 @@ function normalizeTank(site, tank, allowPlaceholder) {
     siteId: site.id,
     name: ensureString(tank.name, `tank ${siteCode}.name`),
     shape,
-    capacityLiter: ensureNumber(tank.capacityLiter, `tank ${siteCode}.capacityLiter`, {
-      min: 1,
-    }),
+    capacityLiter: ensureNumber(
+      tank.capacityLiter,
+      `tank ${siteCode}.capacityLiter`,
+      {
+        min: 1,
+      },
+    ),
     diameterCm: optionalNumber(tank.diameterCm, `tank ${siteCode}.diameterCm`, {
       min: 1,
     }),
@@ -373,10 +382,14 @@ function normalizeRegistry(registry, options) {
         DEFAULT_WILAYAH_LABEL,
       ),
       areaLabel: ensureString(rawSite.areaLabel, "site.areaLabel"),
-      latitude: ensureNumber(rawSite.latitude, `site ${rawSite.code}.latitude`, {
-        min: -90,
-        max: 90,
-      }),
+      latitude: ensureNumber(
+        rawSite.latitude,
+        `site ${rawSite.code}.latitude`,
+        {
+          min: -90,
+          max: 90,
+        },
+      ),
       longitude: ensureNumber(
         rawSite.longitude,
         `site ${rawSite.code}.longitude`,
@@ -612,7 +625,10 @@ async function main() {
     return;
   }
 
-  const { absolutePath, registry } = await readRegistry(options.filePath, options);
+  const { absolutePath, registry } = await readRegistry(
+    options.filePath,
+    options,
+  );
   printSummary(registry, options, absolutePath);
 
   if (options.dryRun) {

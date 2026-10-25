@@ -203,9 +203,7 @@ export function HelpdeskWidget() {
 
   return (
     <div
-      className={
-        isOpen ? openWidgetFrameClassName : closedWidgetFrameClassName
-      }
+      className={isOpen ? openWidgetFrameClassName : closedWidgetFrameClassName}
     >
       {isOpen ? (
         <section className="flex min-h-0 w-full flex-1 flex-col overflow-hidden rounded-lg border border-zinc-200 bg-white text-zinc-950 shadow-2xl shadow-zinc-900/15 sm:h-[min(38rem,calc(100dvh_-_2rem))] sm:w-[min(24rem,calc(100vw_-_2rem))] sm:flex-none">

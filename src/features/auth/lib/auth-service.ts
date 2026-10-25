@@ -32,10 +32,7 @@ import {
   sendEmailVerificationEmail,
   sendPasswordResetEmail,
 } from "./auth-email";
-import {
-  buildTelegramDeepLink,
-  sendTelegramMessage,
-} from "./auth-telegram";
+import { buildTelegramDeepLink, sendTelegramMessage } from "./auth-telegram";
 import { notifyAdminsAccessRequestSubmitted } from "./admin-telegram-notifications";
 import {
   createAuthSession,
@@ -743,7 +740,9 @@ export async function verifyEmailToken({
   token: string;
   request: AuthRequestContext;
 }): Promise<void> {
-  const record = await findEmailVerificationTokenRecord(hashOneTimeToken(token));
+  const record = await findEmailVerificationTokenRecord(
+    hashOneTimeToken(token),
+  );
 
   if (!record || !isTokenUsable(record)) {
     throw new Error("Link verifikasi email sudah tidak valid.");

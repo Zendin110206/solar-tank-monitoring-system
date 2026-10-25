@@ -98,7 +98,10 @@ const inputClassName =
 
 export function ProfileForm({ user }: ProfileFormProps) {
   const router = useRouter();
-  const initialName = useMemo(() => splitFullName(user.fullName), [user.fullName]);
+  const initialName = useMemo(
+    () => splitFullName(user.fullName),
+    [user.fullName],
+  );
   const [isEditing, setIsEditing] = useState(false);
   const [state, formAction] = useActionState(
     updateCurrentUserProfileAction,

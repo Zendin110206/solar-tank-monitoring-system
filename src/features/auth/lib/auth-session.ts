@@ -2,10 +2,7 @@ import { cookies } from "next/headers";
 import type { NextRequest, NextResponse } from "next/server";
 
 import type { AuthSessionUser } from "../types";
-import {
-  getAuthCookieName,
-  shouldUseSecureCookies,
-} from "./auth-config";
+import { getAuthCookieName, shouldUseSecureCookies } from "./auth-config";
 import { getSessionUserFromToken, logoutSession } from "./auth-service";
 
 export async function getCurrentSessionUser(): Promise<AuthSessionUser | null> {

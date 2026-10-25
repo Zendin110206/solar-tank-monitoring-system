@@ -17,8 +17,9 @@ function getClientKey(request: NextRequest) {
 }
 
 function getStringPayloadValue(payload: unknown, key: string): string | null {
-  const value = String(((payload ?? {}) as Record<string, unknown>)[key] ?? "")
-    .trim();
+  const value = String(
+    ((payload ?? {}) as Record<string, unknown>)[key] ?? "",
+  ).trim();
 
   return value || null;
 }

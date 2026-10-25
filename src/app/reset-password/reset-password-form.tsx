@@ -39,7 +39,9 @@ function PasswordInput({
           type={visible ? "text" : "password"}
         />
         <button
-          aria-label={visible ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
+          aria-label={
+            visible ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"
+          }
           className="absolute inset-y-0 right-0 grid w-12 place-items-center text-zinc-400 transition hover:text-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-600"
           onClick={() => setVisible((current) => !current)}
           type="button"
@@ -81,9 +83,11 @@ export default function ResetPasswordForm({ token }: { token: string }) {
           confirmPassword: formData.get("confirmPassword"),
         }),
       });
-      const result = (await response.json().catch(() => null)) as
-        | { ok?: boolean; error?: string; data?: { message?: string } }
-        | null;
+      const result = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+        error?: string;
+        data?: { message?: string };
+      } | null;
 
       if (!response.ok || !result?.ok) {
         throw new Error(result?.error ?? "Reset kata sandi gagal.");

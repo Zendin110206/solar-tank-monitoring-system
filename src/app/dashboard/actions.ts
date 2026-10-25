@@ -45,7 +45,9 @@ function assertValidAdminActionCsrf({
       token: csrfToken,
     })
   ) {
-    throw new Error("Sesi admin tidak valid. Muat ulang halaman lalu coba lagi.");
+    throw new Error(
+      "Sesi admin tidak valid. Muat ulang halaman lalu coba lagi.",
+    );
   }
 }
 

@@ -242,9 +242,9 @@ async function checkAuthTelegramSchemaReadiness(): Promise<DeploymentCheck> {
 function hasSmtpConfig(): boolean {
   return Boolean(
     process.env.SMTP_HOST?.trim() &&
-      process.env.SMTP_USER?.trim() &&
-      process.env.SMTP_PASS?.trim() &&
-      process.env.SMTP_FROM?.trim(),
+    process.env.SMTP_USER?.trim() &&
+    process.env.SMTP_PASS?.trim() &&
+    process.env.SMTP_FROM?.trim(),
   );
 }
 
@@ -344,8 +344,7 @@ function checkAdminOtpReadiness(): DeploymentCheck {
       name: "admin-otp",
       ok: true,
       status: "degraded",
-      message:
-        "SMTP belum diisi. OTP admin hanya dicetak ke log development.",
+      message: "SMTP belum diisi. OTP admin hanya dicetak ke log development.",
     };
   }
 
@@ -387,8 +386,7 @@ function checkAuthEmailFlowReadiness(): DeploymentCheck {
       name: "auth-email-flow",
       ok: true,
       status: "degraded",
-      message:
-        "SMTP belum diisi. Email auth hanya dicetak ke log development.",
+      message: "SMTP belum diisi. Email auth hanya dicetak ke log development.",
     };
   }
 
@@ -424,7 +422,10 @@ function checkCaptchaReadiness(): DeploymentCheck {
     };
   }
 
-  if (!getCaptchaSecretKey() || !process.env.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY) {
+  if (
+    !getCaptchaSecretKey() ||
+    !process.env.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY
+  ) {
     return {
       name: "auth-captcha",
       ok: false,
@@ -444,7 +445,9 @@ function checkCaptchaReadiness(): DeploymentCheck {
 
 function checkTelegramReadiness(): DeploymentCheck {
   const hasTelegram =
-    getTelegramBotToken() && getTelegramWebhookSecret() && getTelegramBotUsername();
+    getTelegramBotToken() &&
+    getTelegramWebhookSecret() &&
+    getTelegramBotUsername();
 
   if (hasTelegram) {
     return {
@@ -618,13 +621,12 @@ export async function getDeploymentReadiness(
       readingRollupCheck,
       authTelegramCheck,
       locationTaxonomyCheck,
-    ] =
-      await Promise.all([
-        checkReferenceRegistryReadiness(),
-        checkReadingStorageSchemaReadiness(),
-        checkAuthTelegramSchemaReadiness(),
-        checkLocationTaxonomySchemaReadiness(),
-      ]);
+    ] = await Promise.all([
+      checkReferenceRegistryReadiness(),
+      checkReadingStorageSchemaReadiness(),
+      checkAuthTelegramSchemaReadiness(),
+      checkLocationTaxonomySchemaReadiness(),
+    ]);
     checks.push(
       registryCheck,
       readingRollupCheck,

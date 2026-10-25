@@ -3,18 +3,8 @@
 /* eslint-disable @next/next/no-img-element -- Map tiles use OpenStreetMap's slippy-tile URLs directly. */
 
 import Link from "next/link";
-import {
-  Crosshair,
-  MapPin,
-  Minus,
-  Plus,
-} from "lucide-react";
-import {
-  useMemo,
-  useRef,
-  useState,
-  type PointerEvent,
-} from "react";
+import { Crosshair, MapPin, Minus, Plus } from "lucide-react";
+import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { formatCoordinatePair } from "@/features/monitoring/lib/number";
 import type { SimpleDashboardSite } from "@/features/monitoring/lib/simple-dashboard-model";
 
@@ -55,7 +45,9 @@ function formatLiter(value: number) {
   }).format(value);
 }
 
-function isValidCoordinate(site: SimpleDashboardSite): site is SimpleDashboardSite &
+function isValidCoordinate(
+  site: SimpleDashboardSite,
+): site is SimpleDashboardSite &
   Required<Pick<SimpleDashboardSite, "latitude" | "longitude">> {
   return (
     typeof site.latitude === "number" &&
@@ -82,8 +74,7 @@ function latLngToWorldPixel(point: LatLng, zoom: number): WorldPixel {
   const sinLatitude = Math.sin((latitude * Math.PI) / 180);
   const normalizedX = (point.longitude + 180) / 360;
   const normalizedY =
-    0.5 -
-    Math.log((1 + sinLatitude) / (1 - sinLatitude)) / (4 * Math.PI);
+    0.5 - Math.log((1 + sinLatitude) / (1 - sinLatitude)) / (4 * Math.PI);
   const worldSize = getWorldSize(zoom);
 
   return {
@@ -98,8 +89,7 @@ function worldPixelToLatLng(pixel: WorldPixel, zoom: number): LatLng {
   const normalizedY = 0.5 - pixel.y / worldSize;
   const longitude = normalizedX * 360;
   const latitude =
-    90 -
-    (360 * Math.atan(Math.exp(-normalizedY * 2 * Math.PI))) / Math.PI;
+    90 - (360 * Math.atan(Math.exp(-normalizedY * 2 * Math.PI))) / Math.PI;
 
   return {
     latitude: clamp(latitude, -85, 85),
@@ -223,8 +213,15 @@ function MapEmptyState({ hasSites }: { hasSites: boolean }) {
   );
 }
 
-export function SimpleDashboardMap({ sites }: { sites: SimpleDashboardSite[] }) {
-  const coordinateSites = useMemo(() => sites.filter(isValidCoordinate), [sites]);
+export function SimpleDashboardMap({
+  sites,
+}: {
+  sites: SimpleDashboardSite[];
+}) {
+  const coordinateSites = useMemo(
+    () => sites.filter(isValidCoordinate),
+    [sites],
+  );
   const initialCenter = useMemo(() => getAverageCenter(sites), [sites]);
   const [center, setCenter] = useState<LatLng>(initialCenter);
   const [zoom, setZoom] = useState(DEFAULT_ZOOM);
@@ -442,8 +439,8 @@ export function SimpleDashboardMap({ sites }: { sites: SimpleDashboardSite[] }) 
               target="_blank"
             >
               OpenStreetMap
-            </a>
-            {" "}contributors
+            </a>{" "}
+            contributors
           </div>
         </div>
       </div>
@@ -511,7 +508,6 @@ export function SimpleDashboardMap({ sites }: { sites: SimpleDashboardSite[] }) 
               Detail
               <MapPin className="size-4" aria-hidden="true" />
             </Link>
-
           </div>
         ) : (
           <p className="text-sm text-zinc-500">Belum ada STO yang dipilih.</p>

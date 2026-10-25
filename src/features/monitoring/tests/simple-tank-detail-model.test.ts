@@ -11,10 +11,11 @@ import type { Reading } from "../types/monitoring";
 
 const WIB_OFFSET_MS = 7 * 60 * 60 * 1000;
 
-function createReadingPoint(minute: number, volumeLiter: number): TankReadingPoint {
-  const receivedAt = new Date(
-    Date.UTC(2026, 6, 2, 8, minute, 0),
-  ).toISOString();
+function createReadingPoint(
+  minute: number,
+  volumeLiter: number,
+): TankReadingPoint {
+  const receivedAt = new Date(Date.UTC(2026, 6, 2, 8, minute, 0)).toISOString();
 
   return {
     measuredAt: receivedAt,
@@ -242,8 +243,7 @@ describe("simple tank detail model", () => {
     expect(trend.gapThresholdMinutes).toBe(15);
     expect(trend.segments).toHaveLength(2);
     expect(trend.segments.map((segment) => segment.points.length)).toEqual([
-      2,
-      1,
+      2, 1,
     ]);
     expect(trend.gaps).toHaveLength(1);
     expect(trend.gaps[0]).toMatchObject({

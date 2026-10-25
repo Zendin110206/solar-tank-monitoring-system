@@ -23,21 +23,18 @@ type AdminConfirmationDialogBaseProps = {
   pending: boolean;
 };
 
-type AdminConfirmationDialogFormProps =
-  AdminConfirmationDialogBaseProps & {
-    formAction: (formData: FormData) => void;
-    onConfirm?: never;
-  };
+type AdminConfirmationDialogFormProps = AdminConfirmationDialogBaseProps & {
+  formAction: (formData: FormData) => void;
+  onConfirm?: never;
+};
 
-type AdminConfirmationDialogCallbackProps =
-  AdminConfirmationDialogBaseProps & {
-    formAction?: never;
-    onConfirm: () => void;
-  };
+type AdminConfirmationDialogCallbackProps = AdminConfirmationDialogBaseProps & {
+  formAction?: never;
+  onConfirm: () => void;
+};
 
 export type AdminConfirmationDialogProps =
-  | AdminConfirmationDialogFormProps
-  | AdminConfirmationDialogCallbackProps;
+  AdminConfirmationDialogFormProps | AdminConfirmationDialogCallbackProps;
 
 const toneClasses: Record<
   AdminConfirmationTone,
@@ -63,16 +60,8 @@ const toneClasses: Record<
   },
 };
 
-export function AdminConfirmationDialog(
-  props: AdminConfirmationDialogProps,
-) {
-  const {
-    children,
-    confirmation,
-    confirmIcon,
-    onClose,
-    pending,
-  } = props;
+export function AdminConfirmationDialog(props: AdminConfirmationDialogProps) {
+  const { children, confirmation, confirmIcon, onClose, pending } = props;
   const titleId = useId();
   const descriptionId = useId();
   const dialogRef = useRef<HTMLElement>(null);
@@ -211,10 +200,7 @@ export function AdminConfirmationDialog(
           </button>
         </div>
 
-        <p
-          className="mt-4 text-sm leading-6 text-zinc-600"
-          id={descriptionId}
-        >
+        <p className="mt-4 text-sm leading-6 text-zinc-600" id={descriptionId}>
           {confirmation.description}
         </p>
 

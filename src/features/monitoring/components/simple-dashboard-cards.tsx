@@ -411,10 +411,12 @@ export function SimpleDashboardCards({
   adminCleanupToken,
   sites,
 }: SimpleDashboardCardsProps) {
-  const [siteToDelete, setSiteToDelete] =
-    useState<SimpleDashboardSite | null>(null);
-  const [siteToReset, setSiteToReset] =
-    useState<SimpleDashboardSite | null>(null);
+  const [siteToDelete, setSiteToDelete] = useState<SimpleDashboardSite | null>(
+    null,
+  );
+  const [siteToReset, setSiteToReset] = useState<SimpleDashboardSite | null>(
+    null,
+  );
   const [resetAllReadingsOpen, setResetAllReadingsOpen] = useState(false);
 
   if (sites.length === 0) {
@@ -461,91 +463,93 @@ export function SimpleDashboardCards({
                 }`}
               />
 
-            <div className="pointer-events-none relative z-10 flex flex-col items-start gap-3 sm:flex-row sm:justify-between">
-              <div className="min-w-0">
-                <p className="text-xs font-semibold uppercase text-zinc-500">
-                  {site.code} - {site.regionalLabel} - {site.wilayahLabel}
-                </p>
-                <p className="mt-0.5 text-xs font-medium text-zinc-500">
-                  Area {site.areaLabel}
-                </p>
-                <h2 className="mt-1 text-lg font-semibold leading-snug text-zinc-950">
-                  {site.name}
-                </h2>
-              </div>
-              <div className="flex shrink-0 items-center gap-2">
-                <OnlineBadge isOnline={site.isOnline} />
-                {adminCleanupToken ? (
-                  <>
-                    <button
-                      aria-label={`Reset reading ${site.name}`}
-                      className="pointer-events-auto grid size-8 place-items-center rounded-full border border-amber-100 bg-amber-50 text-amber-700 transition hover:border-amber-200 hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-600/15"
-                      onClick={(event) => {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        setSiteToReset(site);
-                      }}
-                      title={`Reset reading ${site.name}`}
-                      type="button"
-                    >
-                      <RotateCcw className="size-4" aria-hidden="true" />
-                    </button>
-                    <button
-                      aria-label={`Hapus data monitoring ${site.name}`}
-                      className="pointer-events-auto grid size-8 place-items-center rounded-full border border-red-100 bg-red-50 text-red-600 transition hover:border-red-200 hover:bg-red-100 hover:text-red-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-600/15"
-                      onClick={(event) => {
-                        event.preventDefault();
-                        event.stopPropagation();
-                        setSiteToDelete(site);
-                      }}
-                      title={`Hapus data monitoring ${site.name}`}
-                      type="button"
-                    >
-                      <Trash2 className="size-4" aria-hidden="true" />
-                    </button>
-                  </>
-                ) : null}
-              </div>
-            </div>
-
-            <div className="pointer-events-none relative z-10 mt-6 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
-              <div className="min-w-0">
-                <p className="text-sm font-medium text-zinc-500">Isi tangki</p>
-                <p className="mt-2 text-2xl font-semibold tracking-normal text-zinc-950">
-                  {formatLiter(site.volumeLiter)} /{" "}
-                  {formatLiter(site.capacityLiter)} L
-                </p>
-                <p className="mt-1 text-sm text-zinc-500">
-                  saat ini / kapasitas maksimal
-                </p>
+              <div className="pointer-events-none relative z-10 flex flex-col items-start gap-3 sm:flex-row sm:justify-between">
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold uppercase text-zinc-500">
+                    {site.code} - {site.regionalLabel} - {site.wilayahLabel}
+                  </p>
+                  <p className="mt-0.5 text-xs font-medium text-zinc-500">
+                    Area {site.areaLabel}
+                  </p>
+                  <h2 className="mt-1 text-lg font-semibold leading-snug text-zinc-950">
+                    {site.name}
+                  </h2>
+                </div>
+                <div className="flex shrink-0 items-center gap-2">
+                  <OnlineBadge isOnline={site.isOnline} />
+                  {adminCleanupToken ? (
+                    <>
+                      <button
+                        aria-label={`Reset reading ${site.name}`}
+                        className="pointer-events-auto grid size-8 place-items-center rounded-full border border-amber-100 bg-amber-50 text-amber-700 transition hover:border-amber-200 hover:bg-amber-100 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-amber-600/15"
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          setSiteToReset(site);
+                        }}
+                        title={`Reset reading ${site.name}`}
+                        type="button"
+                      >
+                        <RotateCcw className="size-4" aria-hidden="true" />
+                      </button>
+                      <button
+                        aria-label={`Hapus data monitoring ${site.name}`}
+                        className="pointer-events-auto grid size-8 place-items-center rounded-full border border-red-100 bg-red-50 text-red-600 transition hover:border-red-200 hover:bg-red-100 hover:text-red-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-red-600/15"
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          setSiteToDelete(site);
+                        }}
+                        title={`Hapus data monitoring ${site.name}`}
+                        type="button"
+                      >
+                        <Trash2 className="size-4" aria-hidden="true" />
+                      </button>
+                    </>
+                  ) : null}
+                </div>
               </div>
 
-              <span className="grid h-14 w-16 shrink-0 place-items-center rounded-lg bg-blue-50 ring-1 ring-blue-100 sm:h-16 sm:w-20">
-                <Image
-                  alt=""
-                  aria-hidden="true"
-                  className="h-10 w-14 object-contain opacity-80 sm:h-12 sm:w-16"
-                  height={576}
-                  src={getTankIcon(site)}
-                  width={768}
-                />
-              </span>
-            </div>
+              <div className="pointer-events-none relative z-10 mt-6 grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-zinc-500">
+                    Isi tangki
+                  </p>
+                  <p className="mt-2 text-2xl font-semibold tracking-normal text-zinc-950">
+                    {formatLiter(site.volumeLiter)} /{" "}
+                    {formatLiter(site.capacityLiter)} L
+                  </p>
+                  <p className="mt-1 text-sm text-zinc-500">
+                    saat ini / kapasitas maksimal
+                  </p>
+                </div>
 
-            <div className="pointer-events-none relative z-10 mt-5 flex items-center justify-between gap-3 border-t border-zinc-100 pt-4 text-sm">
-              <div className="min-w-0">
-                <p className="text-xs font-medium text-zinc-500">
-                  Update terakhir
-                </p>
-                <p className="mt-0.5 truncate font-semibold text-zinc-950">
-                  {site.updateLabel}
-                </p>
+                <span className="grid h-14 w-16 shrink-0 place-items-center rounded-lg bg-blue-50 ring-1 ring-blue-100 sm:h-16 sm:w-20">
+                  <Image
+                    alt=""
+                    aria-hidden="true"
+                    className="h-10 w-14 object-contain opacity-80 sm:h-12 sm:w-16"
+                    height={576}
+                    src={getTankIcon(site)}
+                    width={768}
+                  />
+                </span>
               </div>
-              <span className="inline-flex h-9 shrink-0 items-center gap-1 rounded-lg bg-blue-50 px-3 text-xs font-semibold text-blue-700 transition group-hover:bg-blue-600 group-hover:text-white">
-                Buka detail
-                <ArrowUpRight className="size-3.5" aria-hidden="true" />
-              </span>
-            </div>
+
+              <div className="pointer-events-none relative z-10 mt-5 flex items-center justify-between gap-3 border-t border-zinc-100 pt-4 text-sm">
+                <div className="min-w-0">
+                  <p className="text-xs font-medium text-zinc-500">
+                    Update terakhir
+                  </p>
+                  <p className="mt-0.5 truncate font-semibold text-zinc-950">
+                    {site.updateLabel}
+                  </p>
+                </div>
+                <span className="inline-flex h-9 shrink-0 items-center gap-1 rounded-lg bg-blue-50 px-3 text-xs font-semibold text-blue-700 transition group-hover:bg-blue-600 group-hover:text-white">
+                  Buka detail
+                  <ArrowUpRight className="size-3.5" aria-hidden="true" />
+                </span>
+              </div>
             </article>
           ))}
         </div>

@@ -112,13 +112,17 @@ describe("firmware package helpers", () => {
 
     expect(header).toContain('#define SOLARTANK_DEVICE_CODE "device-tph-main"');
     expect(header).toContain('#define SOLARTANK_DEVICE_SENSOR_TYPE "fuel"');
-    expect(header).toContain('#define SOLARTANK_DEVICE_KEY "stk_test_device_key"');
+    expect(header).toContain(
+      '#define SOLARTANK_DEVICE_KEY "stk_test_device_key"',
+    );
     expect(header).toContain("#define SOLARTANK_TANK_CAPACITY_LITER 540");
     expect(header).toContain("#define SOLARTANK_SITE_LATITUDE -7.7200000");
     expect(header).toContain("#define SOLARTANK_SITE_LONGITUDE 112.8800000");
     expect(header).toContain('#define SOLARTANK_REGIONAL_LABEL "TREG 5"');
     expect(header).toContain('#define SOLARTANK_WILAYAH_LABEL "TIF 3"');
-    expect(header).toContain("#define SOLARTANK_CONSUMPTION_LITER_PER_HOUR 5.25");
+    expect(header).toContain(
+      "#define SOLARTANK_CONSUMPTION_LITER_PER_HOUR 5.25",
+    );
     expect(header).toContain("#define SOLARTANK_COS_PHI 0.80");
     expect(header).not.toContain("{{");
   });

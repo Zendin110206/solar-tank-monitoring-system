@@ -104,8 +104,7 @@ export function DashboardUserMenu({ user }: DashboardUserMenuProps) {
         {avatarLabel}
         {needsTelegramBinding ? (
           <span className="absolute -right-0.5 -top-0.5 grid size-5 place-items-center rounded-full bg-red-600 text-[0.7rem] font-black leading-none text-white ring-2 ring-white">
-            !
-            <span className="sr-only">Telegram belum terhubung</span>
+            !<span className="sr-only">Telegram belum terhubung</span>
           </span>
         ) : null}
       </button>
@@ -132,7 +131,9 @@ export function DashboardUserMenu({ user }: DashboardUserMenuProps) {
             <p className="mt-3 truncate text-sm font-semibold text-zinc-950">
               {user.fullName}
             </p>
-            <p className="mt-0.5 truncate text-xs text-zinc-600">{user.email}</p>
+            <p className="mt-0.5 truncate text-xs text-zinc-600">
+              {user.email}
+            </p>
             <p className="mt-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
               {getRoleLabel(user.role)}
             </p>

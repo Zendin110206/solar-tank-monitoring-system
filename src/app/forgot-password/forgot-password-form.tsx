@@ -43,9 +43,11 @@ export default function ForgotPasswordForm() {
           captchaToken,
         }),
       });
-      const result = (await response.json().catch(() => null)) as
-        | { ok?: boolean; error?: string; data?: { message?: string } }
-        | null;
+      const result = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+        error?: string;
+        data?: { message?: string };
+      } | null;
 
       if (!response.ok || !result?.ok) {
         throw new Error(result?.error ?? "Permintaan reset gagal.");

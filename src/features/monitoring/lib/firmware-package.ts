@@ -69,17 +69,15 @@ function toCppString(value: string): string {
 }
 
 function toCppNumber(value: number | undefined, fallback = 0): string {
-  const safeValue = typeof value === "number" && Number.isFinite(value)
-    ? value
-    : fallback;
+  const safeValue =
+    typeof value === "number" && Number.isFinite(value) ? value : fallback;
 
   return Number.isInteger(safeValue) ? String(safeValue) : safeValue.toFixed(2);
 }
 
 function toCppCoordinate(value: number | undefined, fallback = 0): string {
-  const safeValue = typeof value === "number" && Number.isFinite(value)
-    ? value
-    : fallback;
+  const safeValue =
+    typeof value === "number" && Number.isFinite(value) ? value : fallback;
 
   return safeValue.toFixed(7);
 }
@@ -323,11 +321,13 @@ export function createFirmwarePackageFilename({
   generatedAt?: Date;
   prefix?: string;
 }): string {
-  return [
-    sanitizeFirmwareFileSegment(prefix, DEFAULT_PACKAGE_PREFIX),
-    sanitizeFirmwareFileSegment(deviceCode),
-    toDateStamp(generatedAt),
-  ].join("-") + ".zip";
+  return (
+    [
+      sanitizeFirmwareFileSegment(prefix, DEFAULT_PACKAGE_PREFIX),
+      sanitizeFirmwareFileSegment(deviceCode),
+      toDateStamp(generatedAt),
+    ].join("-") + ".zip"
+  );
 }
 
 export function findUnresolvedTemplatePlaceholders(content: string): string[] {
@@ -363,7 +363,9 @@ export function getDevicePackageMaxDownloads(): number {
 
 export function createDownloadExpiresAt(now = new Date()): Date {
   const expiresAt = new Date(now);
-  expiresAt.setUTCDate(expiresAt.getUTCDate() + getDevicePackageDownloadTtlDays());
+  expiresAt.setUTCDate(
+    expiresAt.getUTCDate() + getDevicePackageDownloadTtlDays(),
+  );
   return expiresAt;
 }
 
@@ -416,9 +418,7 @@ function resolveFirmwareTemplatePath(sourcePath: string): string {
   const relativeTemplatePath = normalizedPath.startsWith("firmware/templates/")
     ? normalizedPath.slice("firmware/templates/".length)
     : normalizedPath;
-  const templateSegments = relativeTemplatePath
-    .split("/")
-    .filter(Boolean);
+  const templateSegments = relativeTemplatePath.split("/").filter(Boolean);
 
   if (
     path.isAbsolute(sourcePath) ||
@@ -434,7 +434,9 @@ function resolveFirmwareTemplatePath(sourcePath: string): string {
     resolvedPath !== basePath &&
     !resolvedPath.startsWith(`${basePath}${path.sep}`)
   ) {
-    throw new Error("Path template firmware berada di luar folder firmware/templates.");
+    throw new Error(
+      "Path template firmware berada di luar folder firmware/templates.",
+    );
   }
 
   return resolvedPath;
@@ -451,7 +453,10 @@ export function renderDeviceConfigHeader({
   appBaseUrl,
   deviceKey,
   request,
-}: Pick<FirmwarePackageContext, "appBaseUrl" | "deviceKey" | "request">): string {
+}: Pick<
+  FirmwarePackageContext,
+  "appBaseUrl" | "deviceKey" | "request"
+>): string {
   return `#pragma once
 
 // File ini dibuat otomatis oleh FTM.
@@ -623,7 +628,10 @@ export async function createFirmwarePackageBundle({
     },
     {
       path: "hardware_profile.h",
-      content: Buffer.from(renderHardwareProfileHeader({ hardwareProfile }), "utf8"),
+      content: Buffer.from(
+        renderHardwareProfileHeader({ hardwareProfile }),
+        "utf8",
+      ),
     },
     {
       path: "README_LANGKAH_UPLOAD.md",

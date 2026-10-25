@@ -356,7 +356,11 @@ export function TankRectangularScene3D({
       thickness: 0.18,
       side: THREE.DoubleSide,
     });
-    const tankGeometry = new THREE.BoxGeometry(tankLength, tankHeight, tankWidth);
+    const tankGeometry = new THREE.BoxGeometry(
+      tankLength,
+      tankHeight,
+      tankWidth,
+    );
     const tankMesh = new THREE.Mesh(tankGeometry, tankMaterial);
     tankMesh.position.y = 0;
     root.add(tankMesh);
@@ -364,7 +368,11 @@ export function TankRectangularScene3D({
     const edgeGeometry = new THREE.EdgesGeometry(tankGeometry);
     const edges = new THREE.LineSegments(
       edgeGeometry,
-      new THREE.LineBasicMaterial({ color: 0x94a3b8, transparent: true, opacity: 0.82 }),
+      new THREE.LineBasicMaterial({
+        color: 0x94a3b8,
+        transparent: true,
+        opacity: 0.82,
+      }),
     );
     root.add(edges);
 
@@ -504,10 +512,7 @@ export function TankRectangularScene3D({
   return (
     <div ref={containerRef} className="absolute inset-0">
       {renderMode === "fallback" ? (
-        <TankFallbackVisual
-          fillPercent={fillPercent}
-          shape="rectangular"
-        />
+        <TankFallbackVisual fillPercent={fillPercent} shape="rectangular" />
       ) : (
         <canvas
           ref={canvasRef}
@@ -697,11 +702,9 @@ export function TankHorizontalCylinderScene3D({
     liquid.renderOrder = 2;
     root.add(liquid);
 
-    const chordWidth = Math.sqrt(Math.max(0, tankRadius ** 2 - surfaceY ** 2)) * 2;
-    const surfaceWidth = Math.max(
-      chordWidth * 0.9,
-      0.04,
-    );
+    const chordWidth =
+      Math.sqrt(Math.max(0, tankRadius ** 2 - surfaceY ** 2)) * 2;
+    const surfaceWidth = Math.max(chordWidth * 0.9, 0.04);
     const surface = new THREE.Mesh(
       new THREE.BoxGeometry(tankLength * 0.88, 0.018, surfaceWidth),
       new THREE.MeshPhysicalMaterial({
@@ -840,21 +843,12 @@ export function TankHorizontalCylinderScene3D({
       }
       renderer.dispose();
     };
-  }, [
-    fillPercent,
-    lengthCm,
-    diameterCm,
-    sensorDistanceCm,
-    fuelHeightCm,
-  ]);
+  }, [fillPercent, lengthCm, diameterCm, sensorDistanceCm, fuelHeightCm]);
 
   return (
     <div ref={containerRef} className="absolute inset-0">
       {renderMode === "fallback" ? (
-        <TankFallbackVisual
-          fillPercent={displayFillPercent}
-          shape="cylinder"
-        />
+        <TankFallbackVisual fillPercent={displayFillPercent} shape="cylinder" />
       ) : (
         <canvas
           ref={canvasRef}

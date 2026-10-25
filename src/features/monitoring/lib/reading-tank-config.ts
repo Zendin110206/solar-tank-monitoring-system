@@ -130,7 +130,10 @@ function normalizeTankShape(value: string | null): TankShape | null {
     return null;
   }
 
-  const normalized = value.trim().toLowerCase().replace(/[\s_]+/g, "-");
+  const normalized = value
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_]+/g, "-");
 
   if (["rectangular", "box", "balok"].includes(normalized)) {
     return "rectangular";
@@ -274,7 +277,11 @@ function validatePercentNumber(
     return [];
   }
 
-  if (candidate.value === null || candidate.value < 0 || candidate.value > 100) {
+  if (
+    candidate.value === null ||
+    candidate.value < 0 ||
+    candidate.value > 100
+  ) {
     return [
       createInvalidNumberIssue({
         field,
@@ -519,7 +526,8 @@ function compareNumberField(
     return [];
   }
 
-  const differenceRatio = Math.abs(payloadValue - registryValue) / registryValue;
+  const differenceRatio =
+    Math.abs(payloadValue - registryValue) / registryValue;
 
   if (differenceRatio <= tolerance.minorRatio) {
     return [];
@@ -613,8 +621,7 @@ export function resolveTankFromPayloadConfig(
     criticalLevelPercent:
       payloadConfig.criticalLevelPercent ?? baseTank.criticalLevelPercent,
     consumptionLiterPerHour:
-      payloadConfig.consumptionLiterPerHour ??
-      baseTank.consumptionLiterPerHour,
+      payloadConfig.consumptionLiterPerHour ?? baseTank.consumptionLiterPerHour,
     ...(shape === "rectangular"
       ? {
           lengthCm: payloadConfig.lengthCm ?? baseTank.lengthCm,
@@ -717,11 +724,12 @@ export function compareRegistryVsPayloadConfig(
         ? "minor_config_difference"
         : "normal";
   const usePayloadConfig = canApplyPayloadConfig(status);
-  const configSource = !payloadTankConfig || !usePayloadConfig
-    ? "registry"
-    : isPayloadComplete
-      ? "payload"
-      : "mixed";
+  const configSource =
+    !payloadTankConfig || !usePayloadConfig
+      ? "registry"
+      : isPayloadComplete
+        ? "payload"
+        : "mixed";
   const appliedTankConfig = usePayloadConfig
     ? payloadAppliedTankConfig
     : registryTankConfig;
@@ -749,7 +757,8 @@ export function resolveReviewedTankFromPayloadConfig(
   baseTank: Tank,
   review?: TankConfigReview,
 ): Tank {
-  const configReview = review ?? compareRegistryVsPayloadConfig(baseTank, payload);
+  const configReview =
+    review ?? compareRegistryVsPayloadConfig(baseTank, payload);
 
   if (!canApplyPayloadConfig(configReview.status)) {
     return baseTank;

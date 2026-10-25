@@ -36,8 +36,7 @@ type ProvisioningSuccess = {
 };
 
 export type DeviceProvisioningResult =
-  | ProvisioningSuccess
-  | ProvisioningFailure;
+  ProvisioningSuccess | ProvisioningFailure;
 
 export type ProvisionMonitoringDeviceInput = {
   deviceIdentifier: string;
@@ -235,7 +234,8 @@ function buildProvisionedTank({
     "tank.radius_cm",
     "tank.radiusCm",
   ]);
-  const diameterCm = payloadConfig?.diameterCm ?? (radiusCm ? radiusCm * 2 : undefined);
+  const diameterCm =
+    payloadConfig?.diameterCm ?? (radiusCm ? radiusCm * 2 : undefined);
   const lengthCm = payloadConfig?.lengthCm;
   const widthCm = payloadConfig?.widthCm;
   const heightCm = payloadConfig?.heightCm;
@@ -326,7 +326,12 @@ function buildProvisionedBundle({
   const deviceId = truncate(`device-${slug}-main`, 64);
   const siteCode = createSiteCode(payload, slug);
   const latitude = assertValidCoordinate({
-    value: pickNumber(payload, ["lat", "latitude", "site.lat", "site.latitude"]),
+    value: pickNumber(payload, [
+      "lat",
+      "latitude",
+      "site.lat",
+      "site.latitude",
+    ]),
     min: -90,
     max: 90,
     label: "Latitude",
@@ -441,7 +446,7 @@ function isAuthorizedForProvisioning({
   const cleanExpectedProvisioningKey = expectedProvisioningKey?.trim();
   return Boolean(
     cleanExpectedProvisioningKey &&
-      provisioningKey?.trim() === cleanExpectedProvisioningKey,
+    provisioningKey?.trim() === cleanExpectedProvisioningKey,
   );
 }
 

@@ -68,14 +68,14 @@ config/pilot-registry.example.json
 
 ## File Penting
 
-| File | Fungsi |
-|---|---|
-| `config/pilot-registry.example.json` | contoh format registry pilot |
-| `config/pilot-registry.local.json` | file real lokal, harus dibuat sendiri dan tidak boleh di-commit |
-| `scripts/generate-device-key.mjs` | membuat key dan hash device |
-| `scripts/apply-pilot-registry.mjs` | validasi dan apply registry ke MySQL |
-| `scripts/smoke-pilot-ingest.mjs` | mengirim payload real-format untuk uji cepat |
-| `docs/field-pilot-5-sto-guide.md` | panduan lapangan 5 STO dari koordinat sampai device mengirim data |
+| File                                 | Fungsi                                                            |
+| ------------------------------------ | ----------------------------------------------------------------- |
+| `config/pilot-registry.example.json` | contoh format registry pilot                                      |
+| `config/pilot-registry.local.json`   | file real lokal, harus dibuat sendiri dan tidak boleh di-commit   |
+| `scripts/generate-device-key.mjs`    | membuat key dan hash device                                       |
+| `scripts/apply-pilot-registry.mjs`   | validasi dan apply registry ke MySQL                              |
+| `scripts/smoke-pilot-ingest.mjs`     | mengirim payload real-format untuk uji cepat                      |
+| `docs/field-pilot-5-sto-guide.md`    | panduan lapangan 5 STO dari koordinat sampai device mengirim data |
 
 ## Alur Besar
 
@@ -189,8 +189,8 @@ atau domain deployment yang sedang dipakai.
 8. Baca konfirmasi browser sebelum menyetujui aksi.
 9. Cek pesan sukses.
 10. Buka dashboard untuk memastikan aplikasi tetap hidup. Jika memakai reset
-   semua, `/api/ready` wajar melaporkan registry belum lengkap sampai data
-   device dibuat lagi.
+    semua, `/api/ready` wajar melaporkan registry belum lengkap sampai data
+    device dibuat lagi.
 
 Yang dibersihkan:
 
@@ -284,8 +284,8 @@ Contoh bagian penting:
   "regionalLabel": "TREG 5",
   "wilayahLabel": "TIF 3",
   "areaLabel": "Pasuruan",
-  "latitude": -7.6500000,
-  "longitude": 112.9000000,
+  "latitude": -7.65,
+  "longitude": 112.9,
   "coordinateStatus": "approved",
   "tank": {
     "shape": "rectangular",
@@ -318,12 +318,12 @@ Jika sukses, script menampilkan ringkasan 5 STO.
 
 Jika gagal, ikuti pesan error. Contoh:
 
-| Error | Arti |
-|---|---|
-| `coordinateStatus harus approved` | koordinat belum ditandai boleh dipakai |
-| `apiKeyHash masih hash placeholder` | belum generate hash key real |
-| `criticalLevelPercent harus lebih kecil` | batas kritis tidak boleh lebih tinggi dari batas low |
-| `Registry pilot wajib berisi minimal 5 site aktif` | jumlah STO kurang |
+| Error                                              | Arti                                                 |
+| -------------------------------------------------- | ---------------------------------------------------- |
+| `coordinateStatus harus approved`                  | koordinat belum ditandai boleh dipakai               |
+| `apiKeyHash masih hash placeholder`                | belum generate hash key real                         |
+| `criticalLevelPercent harus lebih kecil`           | batas kritis tidak boleh lebih tinggi dari batas low |
+| `Registry pilot wajib berisi minimal 5 site aktif` | jumlah STO kurang                                    |
 
 ## 6. Apply Registry ke MySQL
 

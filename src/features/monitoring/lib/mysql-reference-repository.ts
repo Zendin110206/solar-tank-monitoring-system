@@ -91,7 +91,9 @@ export function rowToSite(row: SiteRow): Site {
   const latitude = toOptionalNumber(row.latitude);
   const longitude = toOptionalNumber(row.longitude);
   const regionalLabel =
-    normalizeRegionalLabel(row.regional_label) ?? row.regional_label ?? undefined;
+    normalizeRegionalLabel(row.regional_label) ??
+    row.regional_label ??
+    undefined;
   const wilayahLabel =
     normalizeWilayahLabel(row.wilayah_label) ?? row.wilayah_label ?? undefined;
 

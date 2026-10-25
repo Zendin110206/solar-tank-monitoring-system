@@ -1,24 +1,19 @@
 import { getAppBaseUrl } from "./auth-config";
-import {
-  sendTelegramMessage,
-  type TelegramMessage,
-} from "./auth-telegram";
+import { sendTelegramMessage, type TelegramMessage } from "./auth-telegram";
 import { findAuthUserByVerifiedTelegramChatId } from "./mysql-auth-repository";
 import type { AuthSafeUser } from "../types";
 
 type PrivateTelegramCommand = "dashboard" | "help" | "status";
 
-function parsePrivateTelegramCommand(text: string): PrivateTelegramCommand | null {
+function parsePrivateTelegramCommand(
+  text: string,
+): PrivateTelegramCommand | null {
   const match = /^\/(dashboard|help|status)(?:@\w+)?(?:\s|$)/i.exec(
     text.trim(),
   );
   const command = match?.[1]?.toLowerCase();
 
-  if (
-    command === "dashboard" ||
-    command === "help" ||
-    command === "status"
-  ) {
+  if (command === "dashboard" || command === "help" || command === "status") {
     return command;
   }
 

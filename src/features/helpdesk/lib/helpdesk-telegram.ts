@@ -36,8 +36,9 @@ function parseHelpdeskCommand(text: string): ParsedHelpdeskCommand | null {
     };
   }
 
-  const closeMatch =
-    /^\/close(?:@\w+)?\s+(HD-\d{8}-[A-F0-9]{6})\s*$/i.exec(text.trim());
+  const closeMatch = /^\/close(?:@\w+)?\s+(HD-\d{8}-[A-F0-9]{6})\s*$/i.exec(
+    text.trim(),
+  );
 
   if (closeMatch?.[1]) {
     return {
