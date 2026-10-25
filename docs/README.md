@@ -21,17 +21,17 @@ Arti status:
 
 ## Acuan teknis
 
-| Dokumen                                                | Isi                                                            | Status                | Diperiksa   |
-| ------------------------------------------------------ | -------------------------------------------------------------- | --------------------- | ----------- |
-| [api-contract.md](api-contract.md)                     | Endpoint API dan bentuk datanya, termasuk kontrak perangkat v1 | Perlu diperiksa ulang | 14 Jul 2026 |
-| [device-ingestion.md](device-ingestion.md)             | Cara data perangkat masuk, autentikasi, normalisasi            | Perlu diperiksa ulang | 14 Jul 2026 |
-| [data-model.md](data-model.md)                         | Tabel dan hubungan data                                        | Perlu diperiksa ulang | 14 Jul 2026 |
-| [domain-model.md](domain-model.md)                     | Rumus volume, status, dan sisa jam genset                      | Perlu diperiksa ulang | 14 Jul 2026 |
-| [database-backup.md](database-backup.md)               | Skrip backup dan batas pemulihan                               | Perlu diperiksa ulang | 8 Jul 2026  |
-| [deployment.md](deployment.md)                         | Variabel lingkungan, migrasi, kesiapan                         | Perlu diperiksa ulang | 14 Jul 2026 |
-| [safety-and-limitations.md](safety-and-limitations.md) | Batas perangkat lunak, data, dan perangkat fisik               | Perlu diperiksa ulang | 14 Jul 2026 |
-| [system-boundaries.md](system-boundaries.md)           | Yang masuk dan tidak masuk repositori                          | Perlu diperiksa ulang | 14 Jul 2026 |
-| [reviewer-quickstart.md](reviewer-quickstart.md)       | Langkah cepat memeriksa repositori                             | Perlu diperiksa ulang | 14 Jul 2026 |
+| Dokumen                                                | Isi                                                            | Status                 | Diperiksa   |
+| ------------------------------------------------------ | -------------------------------------------------------------- | ---------------------- | ----------- |
+| [api-contract.md](api-contract.md)                     | Endpoint API dan bentuk datanya, termasuk kontrak perangkat v1 | Perlu diperiksa ulang  | 14 Jul 2026 |
+| [device-ingestion.md](device-ingestion.md)             | Cara data perangkat masuk, autentikasi, normalisasi            | Perlu diperiksa ulang  | 14 Jul 2026 |
+| [data-model.md](data-model.md)                         | Tabel dan hubungan data                                        | Perlu diperiksa ulang  | 14 Jul 2026 |
+| [domain-model.md](domain-model.md)                     | Rumus volume, status, dan sisa jam genset                      | Perlu diperiksa ulang  | 14 Jul 2026 |
+| [database-backup.md](database-backup.md)               | Skrip backup dan batas pemulihan                               | Perlu diperiksa ulang  | 8 Jul 2026  |
+| [deployment.md](deployment.md)                         | Variabel lingkungan, migrasi, kesiapan                         | Perlu diperiksa ulang  | 14 Jul 2026 |
+| [safety-and-limitations.md](safety-and-limitations.md) | Batas perangkat lunak, data, dan perangkat fisik               | Perlu diperiksa ulang  | 14 Jul 2026 |
+| [system-boundaries.md](system-boundaries.md)           | Yang masuk dan tidak masuk repositori                          | Perlu diperiksa ulang  | 14 Jul 2026 |
+| [reviewer-quickstart.md](reviewer-quickstart.md)       | Pemeriksaan lokal, aturan akses, simulator, dan tes MySQL      | Terkini (branch `dev`) | 25 Okt 2026 |
 
 ## Panduan pengguna
 

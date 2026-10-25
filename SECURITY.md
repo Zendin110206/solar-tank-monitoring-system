@@ -81,8 +81,11 @@ Menghapus rahasia dari commit terbaru tidak menghapusnya dari riwayat.
 Ringkasan berikut sengaja tidak memuat rincian teknis yang bisa disalahgunakan.
 
 - Pilot belum dikeraskan untuk produksi penuh dan belum diuji penetrasi.
-- Beberapa dependensi memiliki kerentanan yang diketahui; pembaruannya
-  direncanakan.
+- Pada branch `dev`, audit `pnpm audit --prod` tanggal 25 Oktober 2026 tidak
+  menemukan kerentanan yang diketahui pada dependensi produksi yang terkunci.
+  Pembaruannya tercatat di [CHANGELOG.md](CHANGELOG.md). Hasil ini berlaku untuk
+  kode di `dev`; penerapannya pada pilot menunggu rilis yang disetujui ke `main`.
+  Audit dependensi tidak menggantikan pengujian keamanan aplikasi.
 - Backup otomatis dan uji pemulihan berkala belum berjalan.
 - Akses data belum dibatasi per lokasi.
 - Firmware perangkat v1 memerlukan penguatan keamanan komunikasi dan pembaruan
