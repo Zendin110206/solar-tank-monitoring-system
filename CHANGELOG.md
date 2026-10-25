@@ -39,6 +39,8 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Halaman audit, manajemen pengguna, dan aksi profil mengambil data lewat pintu
+  layanan `src/features/auth/server/` (ADR 0011), bukan langsung dari repositori MySQL.
 - Panduan pemeriksaan lokal disesuaikan dengan Node.js 22, pnpm 9.15.3, aturan
   login, kesiapan layanan, simulator, dan tes MySQL; status audit keamanan dibatasi
   pada branch yang diperiksa dan diberi tanggal (#35).
