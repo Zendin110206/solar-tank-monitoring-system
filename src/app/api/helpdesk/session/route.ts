@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { getRequestSessionUser } from "@/features/auth/lib/auth-session";
 import { checkRateLimit } from "@/features/auth/lib/rate-limit";
-import { getOrCreateHelpdeskSession } from "@/features/helpdesk/lib/helpdesk-repository";
+import { getOrCreateHelpdeskSession } from "@/features/helpdesk/server/helpdesk-service";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
 
 export const dynamic = "force-dynamic";
