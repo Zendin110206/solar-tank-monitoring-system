@@ -1,5 +1,6 @@
 import "server-only";
 
+import { serverEnv } from "@/lib/config/server-env";
 import {
   createHash,
   createHmac,
@@ -139,7 +140,7 @@ async function verifyLegacyPbkdf2Password(
 export async function createLegacyPbkdf2PasswordHashForTest(
   password: string,
 ): Promise<string> {
-  if (process.env.NODE_ENV !== "test") {
+  if (serverEnv.NODE_ENV !== "test") {
     throw new Error("Legacy password hash helper hanya boleh dipakai di test.");
   }
 

@@ -1,5 +1,6 @@
 import "server-only";
 
+import { serverEnv } from "@/lib/config/server-env";
 import {
   getMonitoringReferenceData,
   type MonitoringReferenceData,
@@ -121,7 +122,7 @@ function isSameDeviceIdentifier(identifier: string, device: Device): boolean {
 }
 
 export function getLocalDeviceKey(
-  envValue = process.env.SOLAR_TANK_LOCAL_DEVICE_KEY,
+  envValue = serverEnv.SOLAR_TANK_LOCAL_DEVICE_KEY,
 ): string {
   const trimmedValue = envValue?.trim();
   return trimmedValue || DEFAULT_LOCAL_DEVICE_KEY;

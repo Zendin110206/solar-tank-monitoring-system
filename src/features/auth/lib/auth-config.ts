@@ -1,5 +1,7 @@
 import "server-only";
 
+import { publicEnv } from "@/lib/config/public-env";
+import { serverEnv, type ServerEnvName } from "@/lib/config/server-env";
 import type { AuthRole } from "../types";
 
 const DEFAULT_SESSION_COOKIE_NAME = "solar_tank_session";
@@ -15,19 +17,19 @@ const DEFAULT_LOGIN_LOCK_SECONDS = 60 * 15;
 
 export function getAuthCookieName(): string {
   return (
-    process.env.AUTH_SESSION_COOKIE_NAME?.trim() || DEFAULT_SESSION_COOKIE_NAME
+    serverEnv.AUTH_SESSION_COOKIE_NAME?.trim() || DEFAULT_SESSION_COOKIE_NAME
   );
 }
 
 export function isProductionLikeEnvironment(): boolean {
   return (
-    process.env.NODE_ENV === "production" ||
-    process.env.NEXT_PUBLIC_APP_ENV?.trim().toLowerCase() === "production"
+    serverEnv.NODE_ENV === "production" ||
+    publicEnv.NEXT_PUBLIC_APP_ENV?.trim().toLowerCase() === "production"
   );
 }
 
 export function shouldUseSecureCookies(): boolean {
-  const override = process.env.AUTH_COOKIE_SECURE?.trim().toLowerCase();
+  const override = serverEnv.AUTH_COOKIE_SECURE?.trim().toLowerCase();
 
   if (override === "true") {
     return true;
@@ -43,8 +45,8 @@ export function shouldUseSecureCookies(): boolean {
 export function getSessionTtlSeconds(role: AuthRole): number {
   const envValue =
     role === "admin"
-      ? process.env.AUTH_ADMIN_SESSION_TTL_SECONDS
-      : process.env.AUTH_SESSION_TTL_SECONDS;
+      ? serverEnv.AUTH_ADMIN_SESSION_TTL_SECONDS
+      : serverEnv.AUTH_SESSION_TTL_SECONDS;
   const parsed = Number(envValue);
 
   if (Number.isInteger(parsed) && parsed >= 300) {
@@ -57,28 +59,26 @@ export function getSessionTtlSeconds(role: AuthRole): number {
 }
 
 export function shouldRequireAdminOtp(): boolean {
-  return process.env.AUTH_REQUIRE_ADMIN_OTP?.trim().toLowerCase() !== "false";
+  return serverEnv.AUTH_REQUIRE_ADMIN_OTP?.trim().toLowerCase() !== "false";
 }
 
 export function isAccessRequestEnabled(): boolean {
-  return process.env.AUTH_ENABLE_REGISTER?.trim().toLowerCase() !== "false";
+  return serverEnv.AUTH_ENABLE_REGISTER?.trim().toLowerCase() !== "false";
 }
 
 export function isPasswordResetEnabled(): boolean {
-  return (
-    process.env.AUTH_ALLOW_PASSWORD_RESET?.trim().toLowerCase() !== "false"
-  );
+  return serverEnv.AUTH_ALLOW_PASSWORD_RESET?.trim().toLowerCase() !== "false";
 }
 
 export function shouldRequireEmailVerificationForApproval(): boolean {
   return (
-    process.env.AUTH_REQUIRE_EMAIL_VERIFICATION_FOR_APPROVAL?.trim().toLowerCase() !==
+    serverEnv.AUTH_REQUIRE_EMAIL_VERIFICATION_FOR_APPROVAL?.trim().toLowerCase() !==
     "false"
   );
 }
 
 export function getOtpTtlSeconds(): number {
-  const parsed = Number(process.env.AUTH_OTP_TTL_SECONDS);
+  const parsed = Number(serverEnv.AUTH_OTP_TTL_SECONDS);
 
   if (Number.isInteger(parsed) && parsed >= 60 && parsed <= 1800) {
     return parsed;
@@ -88,7 +88,7 @@ export function getOtpTtlSeconds(): number {
 }
 
 export function getPasswordResetTtlSeconds(): number {
-  const parsed = Number(process.env.AUTH_PASSWORD_RESET_TTL_SECONDS);
+  const parsed = Number(serverEnv.AUTH_PASSWORD_RESET_TTL_SECONDS);
 
   if (Number.isInteger(parsed) && parsed >= 300 && parsed <= 86_400) {
     return parsed;
@@ -98,7 +98,7 @@ export function getPasswordResetTtlSeconds(): number {
 }
 
 export function getEmailVerificationTtlSeconds(): number {
-  const parsed = Number(process.env.AUTH_EMAIL_VERIFICATION_TTL_SECONDS);
+  const parsed = Number(serverEnv.AUTH_EMAIL_VERIFICATION_TTL_SECONDS);
 
   if (Number.isInteger(parsed) && parsed >= 600 && parsed <= 604_800) {
     return parsed;
@@ -108,7 +108,7 @@ export function getEmailVerificationTtlSeconds(): number {
 }
 
 export function getTelegramBindTtlSeconds(): number {
-  const parsed = Number(process.env.AUTH_TELEGRAM_BIND_TTL_SECONDS);
+  const parsed = Number(serverEnv.AUTH_TELEGRAM_BIND_TTL_SECONDS);
 
   if (Number.isInteger(parsed) && parsed >= 300 && parsed <= 3600) {
     return parsed;
@@ -118,7 +118,7 @@ export function getTelegramBindTtlSeconds(): number {
 }
 
 export function getSessionLastSeenUpdateSeconds(): number {
-  const parsed = Number(process.env.AUTH_SESSION_LAST_SEEN_UPDATE_SECONDS);
+  const parsed = Number(serverEnv.AUTH_SESSION_LAST_SEEN_UPDATE_SECONDS);
 
   if (Number.isInteger(parsed) && parsed >= 60 && parsed <= 3600) {
     return parsed;
@@ -128,7 +128,7 @@ export function getSessionLastSeenUpdateSeconds(): number {
 }
 
 export function getLoginMaxAttempts(): number {
-  const parsed = Number(process.env.AUTH_LOGIN_MAX_ATTEMPTS);
+  const parsed = Number(serverEnv.AUTH_LOGIN_MAX_ATTEMPTS);
 
   if (Number.isInteger(parsed) && parsed >= 3 && parsed <= 20) {
     return parsed;
@@ -138,7 +138,7 @@ export function getLoginMaxAttempts(): number {
 }
 
 export function getLoginLockSeconds(): number {
-  const parsed = Number(process.env.AUTH_LOGIN_LOCK_SECONDS);
+  const parsed = Number(serverEnv.AUTH_LOGIN_LOCK_SECONDS);
 
   if (Number.isInteger(parsed) && parsed >= 60 && parsed <= 3600) {
     return parsed;
@@ -150,12 +150,12 @@ export function getLoginLockSeconds(): number {
 export function canLogOtpInDevelopment(): boolean {
   return (
     !isProductionLikeEnvironment() &&
-    process.env.AUTH_ALLOW_DEV_OTP_LOG?.trim().toLowerCase() !== "false"
+    serverEnv.AUTH_ALLOW_DEV_OTP_LOG?.trim().toLowerCase() !== "false"
   );
 }
 
 export function getRequiredAuthSecret(): string {
-  const secret = process.env.AUTH_SECRET?.trim();
+  const secret = serverEnv.AUTH_SECRET?.trim();
 
   if (secret && secret.length >= 32) {
     return secret;
@@ -169,7 +169,7 @@ export function getRequiredAuthSecret(): string {
 }
 
 export function getAppBaseUrl(): string {
-  const baseUrl = process.env.APP_BASE_URL?.trim();
+  const baseUrl = serverEnv.APP_BASE_URL?.trim();
 
   if (baseUrl) {
     return baseUrl.replace(/\/+$/, "");
@@ -185,7 +185,7 @@ export function getAppBaseUrl(): string {
 export type CaptchaProvider = "disabled" | "turnstile" | "invalid";
 
 export function getCaptchaProvider(): CaptchaProvider {
-  const provider = process.env.AUTH_CAPTCHA_PROVIDER?.trim().toLowerCase();
+  const provider = serverEnv.AUTH_CAPTCHA_PROVIDER?.trim().toLowerCase();
 
   if (!provider || provider === "disabled") {
     return "disabled";
@@ -199,27 +199,27 @@ export function getCaptchaProvider(): CaptchaProvider {
 }
 
 export function getCaptchaSecretKey(): string | null {
-  const secret = process.env.AUTH_CAPTCHA_SECRET_KEY?.trim();
+  const secret = serverEnv.AUTH_CAPTCHA_SECRET_KEY?.trim();
   return secret || null;
 }
 
 export function getTelegramBotToken(): string | null {
-  const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
+  const token = serverEnv.TELEGRAM_BOT_TOKEN?.trim();
   return token || null;
 }
 
 export function getTelegramWebhookSecret(): string | null {
-  const secret = process.env.TELEGRAM_WEBHOOK_SECRET?.trim();
+  const secret = serverEnv.TELEGRAM_WEBHOOK_SECRET?.trim();
   return secret || null;
 }
 
 export function getTelegramBotUsername(): string | null {
-  const username = process.env.TELEGRAM_BOT_USERNAME?.trim().replace(/^@/, "");
+  const username = serverEnv.TELEGRAM_BOT_USERNAME?.trim().replace(/^@/, "");
   return username || null;
 }
 
 export function getReadinessCheckToken(): string | null {
-  const token = process.env.READINESS_CHECK_TOKEN?.trim();
+  const token = serverEnv.READINESS_CHECK_TOKEN?.trim();
   return token || null;
 }
 
@@ -227,12 +227,12 @@ export type TelegramAdminTopic =
   "live-chat" | "new-account" | "new-device" | "system";
 
 export function getTelegramAdminGroupChatId(): string | null {
-  const chatId = process.env.TELEGRAM_ADMIN_GROUP_CHAT_ID?.trim();
+  const chatId = serverEnv.TELEGRAM_ADMIN_GROUP_CHAT_ID?.trim();
   return chatId || null;
 }
 
-function getTelegramTopicThreadIdFromEnv(key: string): number | null {
-  const rawValue = process.env[key]?.trim();
+function getTelegramTopicThreadIdFromEnv(key: ServerEnvName): number | null {
+  const rawValue = serverEnv[key]?.trim();
   const parsed = Number(rawValue);
 
   if (!Number.isInteger(parsed) || parsed <= 0) {

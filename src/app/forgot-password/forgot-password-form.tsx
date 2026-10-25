@@ -1,5 +1,6 @@
 "use client";
 
+import { publicEnv } from "@/lib/config/public-env";
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { ArrowRight, Mail } from "lucide-react";
@@ -9,7 +10,7 @@ import { TurnstileWidget } from "@/features/auth/components/turnstile-widget";
 const captchaRequiredMessage =
   "Selesaikan verifikasi keamanan terlebih dahulu.";
 const isCaptchaEnabled = Boolean(
-  process.env.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY?.trim(),
+  publicEnv.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY?.trim(),
 );
 
 export default function ForgotPasswordForm() {

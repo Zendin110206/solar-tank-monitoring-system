@@ -1,3 +1,5 @@
+import { publicEnv } from "@/lib/config/public-env";
+
 export const DEFAULT_MONITORING_REFRESH_INTERVAL_MS = 20_000;
 export const MIN_MONITORING_REFRESH_INTERVAL_MS = 5_000;
 
@@ -12,7 +14,7 @@ export function normalizeMonitoringRefreshInterval(
 }
 
 export function getMonitoringRefreshIntervalMs(
-  envValue = process.env.NEXT_PUBLIC_MONITORING_REFRESH_INTERVAL_MS,
+  envValue = publicEnv.NEXT_PUBLIC_MONITORING_REFRESH_INTERVAL_MS,
 ): number {
   if (!envValue?.trim()) {
     return DEFAULT_MONITORING_REFRESH_INTERVAL_MS;

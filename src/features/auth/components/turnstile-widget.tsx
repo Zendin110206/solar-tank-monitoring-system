@@ -1,5 +1,6 @@
 "use client";
 
+import { publicEnv } from "@/lib/config/public-env";
 import Script from "next/script";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -28,7 +29,7 @@ export function TurnstileWidget({
   inputId?: string;
   inputName?: string;
 }) {
-  const siteKey = process.env.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY?.trim();
+  const siteKey = publicEnv.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY?.trim();
   const [scriptError, setScriptError] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const hostRef = useRef<HTMLDivElement | null>(null);

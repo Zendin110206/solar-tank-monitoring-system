@@ -39,6 +39,23 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  // Variabel lingkungan hanya dibaca di katalog src/lib/config/ (server-env.ts dan
+  // public-env.ts), sesuai panduan keamanan data Next.js. Tes boleh mengatur process.env.
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["src/lib/config/**", "**/*.test.{ts,tsx}", "**/tests/**"],
+    rules: {
+      "no-restricted-properties": [
+        "error",
+        {
+          object: "process",
+          property: "env",
+          message:
+            "Baca pengaturan lewat serverEnv atau publicEnv di src/lib/config/, bukan process.env langsung.",
+        },
+      ],
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

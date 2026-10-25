@@ -1,5 +1,6 @@
 import "server-only";
 
+import { serverEnv } from "@/lib/config/server-env";
 import nodemailer from "nodemailer";
 
 import {
@@ -16,16 +17,16 @@ type EmailDeliveryResult = OtpDeliveryResult;
 type EmailTemplateKind = "otp" | "action";
 
 function getSmtpPort(): number {
-  const parsed = Number(process.env.SMTP_PORT);
+  const parsed = Number(serverEnv.SMTP_PORT);
   return Number.isInteger(parsed) && parsed > 0 ? parsed : 587;
 }
 
 function hasSmtpConfig(): boolean {
   return Boolean(
-    process.env.SMTP_HOST?.trim() &&
-    process.env.SMTP_USER?.trim() &&
-    process.env.SMTP_PASS?.trim() &&
-    process.env.SMTP_FROM?.trim(),
+    serverEnv.SMTP_HOST?.trim() &&
+    serverEnv.SMTP_USER?.trim() &&
+    serverEnv.SMTP_PASS?.trim() &&
+    serverEnv.SMTP_FROM?.trim(),
   );
 }
 
@@ -156,20 +157,20 @@ async function sendAuthEmail({
   }
 
   const secure =
-    process.env.SMTP_SECURE?.trim().toLowerCase() === "true" ||
+    serverEnv.SMTP_SECURE?.trim().toLowerCase() === "true" ||
     getSmtpPort() === 465;
   const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
+    host: serverEnv.SMTP_HOST,
     port: getSmtpPort(),
     secure,
     auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
+      user: serverEnv.SMTP_USER,
+      pass: serverEnv.SMTP_PASS,
     },
   });
 
   await transporter.sendMail({
-    from: process.env.SMTP_FROM,
+    from: serverEnv.SMTP_FROM,
     to: email,
     subject,
     text: body,
