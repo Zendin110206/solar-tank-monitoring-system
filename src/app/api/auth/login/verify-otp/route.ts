@@ -1,12 +1,13 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 import { setSessionCookie } from "@/features/auth/server/auth-session";
 import { verifyAdminOtpLogin } from "@/features/auth/server/auth-service";
 import { checkRateLimit } from "@/features/auth/server/rate-limit";
 import {
-  getSafeErrorMessage,
-  getSafeErrorStatus,
-} from "@/lib/safe-error-message";
+  jsonCaughtError,
+  jsonOk,
+  jsonTooManyRequests,
+} from "@/lib/http/json-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -28,26 +29,15 @@ export async function POST(request: NextRequest) {
     });
 
     if (!rateLimit.allowed) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: "Terlalu banyak percobaan kode. Coba lagi beberapa saat.",
-        },
-        {
-          status: 429,
-          headers: {
-            "Retry-After": String(rateLimit.retryAfterSeconds),
-          },
-        },
+      return jsonTooManyRequests(
+        "Terlalu banyak percobaan kode. Coba lagi beberapa saat.",
+        rateLimit.retryAfterSeconds,
       );
     }
 
     const result = await verifyAdminOtpLogin({ challengeId, code, request });
-    const response = NextResponse.json({
-      ok: true,
-      data: {
-        redirectTo: "/dashboard",
-      },
+    const response = jsonOk({
+      redirectTo: "/dashboard",
     });
 
     setSessionCookie({
@@ -58,16 +48,14 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    return NextResponse.json(
+    return jsonCaughtError(
+      error,
       {
-        ok: false,
-        error: getSafeErrorMessage(error, {
-          fallbackMessage: "Kode masuk tidak valid.",
-          internalMessage:
-            "Kode masuk belum bisa diverifikasi karena layanan sedang disiapkan. Coba lagi nanti.",
-        }),
+        fallbackMessage: "Kode masuk tidak valid.",
+        internalMessage:
+          "Kode masuk belum bisa diverifikasi karena layanan sedang disiapkan. Coba lagi nanti.",
       },
-      { status: getSafeErrorStatus(error, { defaultStatus: 401 }) },
+      { defaultStatus: 401 },
     );
   }
 }

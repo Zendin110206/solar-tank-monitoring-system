@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 import { verifyCaptchaToken } from "@/features/auth/server/auth-captcha";
 import { isAccessRequestEnabled } from "@/features/auth/server/auth-config";
@@ -9,6 +9,11 @@ import {
   getSafeErrorMessage,
   getSafeErrorStatus,
 } from "@/lib/safe-error-message";
+import {
+  jsonError,
+  jsonOk,
+  jsonTooManyRequests,
+} from "@/lib/http/json-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -45,10 +50,7 @@ function getRegisterErrorResponse(error: unknown): {
 
 export async function POST(request: NextRequest) {
   if (!isAccessRequestEnabled()) {
-    return NextResponse.json(
-      { ok: false, error: "Pengajuan akses sedang ditutup." },
-      { status: 403 },
-    );
+    return jsonError("Pengajuan akses sedang ditutup.", 403);
   }
 
   try {
@@ -59,17 +61,9 @@ export async function POST(request: NextRequest) {
     });
 
     if (!rateLimit.allowed) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: "Terlalu banyak pengajuan. Coba lagi nanti.",
-        },
-        {
-          status: 429,
-          headers: {
-            "Retry-After": String(rateLimit.retryAfterSeconds),
-          },
-        },
+      return jsonTooManyRequests(
+        "Terlalu banyak pengajuan. Coba lagi nanti.",
+        rateLimit.retryAfterSeconds,
       );
     }
 
@@ -80,10 +74,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!captcha.ok) {
-      return NextResponse.json(
-        { ok: false, error: captcha.error },
-        { status: 400 },
-      );
+      return jsonError(captcha.error, 400);
     }
 
     const payload = {
@@ -92,23 +83,14 @@ export async function POST(request: NextRequest) {
     };
     await submitAccessRequest(payload, request);
 
-    return NextResponse.json({
-      ok: true,
-      data: {
-        status: "pending",
-        message:
-          "Pengajuan akses diterima. Administrator akan meninjau sebelum akun aktif.",
-      },
+    return jsonOk({
+      status: "pending",
+      message:
+        "Pengajuan akses diterima. Administrator akan meninjau sebelum akun aktif.",
     });
   } catch (error) {
     const response = getRegisterErrorResponse(error);
 
-    return NextResponse.json(
-      {
-        ok: false,
-        error: response.message,
-      },
-      { status: response.status },
-    );
+    return jsonError(response.message, response.status);
   }
 }

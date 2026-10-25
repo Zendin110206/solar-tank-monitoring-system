@@ -1,11 +1,8 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 import { requireApiUser } from "@/features/auth/server/auth-guards";
 import { revokeCurrentUserSessionById } from "@/features/auth/server/auth-service";
-import {
-  getSafeErrorMessage,
-  getSafeErrorStatus,
-} from "@/lib/safe-error-message";
+import { jsonCaughtError, jsonOk } from "@/lib/http/json-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -30,21 +27,12 @@ export async function POST(request: NextRequest) {
       sessionId,
     });
 
-    return NextResponse.json({
-      ok: true,
-      data: { message: "Sesi berhasil dicabut." },
-    });
+    return jsonOk({ message: "Sesi berhasil dicabut." });
   } catch (error) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: getSafeErrorMessage(error, {
-          fallbackMessage: "Sesi belum bisa dicabut.",
-          internalMessage:
-            "Sesi belum bisa dicabut karena layanan sedang disiapkan. Coba lagi nanti.",
-        }),
-      },
-      { status: getSafeErrorStatus(error) },
-    );
+    return jsonCaughtError(error, {
+      fallbackMessage: "Sesi belum bisa dicabut.",
+      internalMessage:
+        "Sesi belum bisa dicabut karena layanan sedang disiapkan. Coba lagi nanti.",
+    });
   }
 }

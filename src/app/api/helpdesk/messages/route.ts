@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 import { getRequestSessionUser } from "@/features/auth/server/auth-session";
 import { checkRateLimit } from "@/features/auth/server/rate-limit";
@@ -9,6 +9,11 @@ import {
 } from "@/features/helpdesk/server/helpdesk-service";
 import { notifyAdminsHelpdeskMessageCreated } from "@/features/helpdesk/server/helpdesk-notifications";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
+import {
+  jsonError,
+  jsonOk,
+  jsonTooManyRequests,
+} from "@/lib/http/json-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -35,10 +40,7 @@ export async function GET(request: NextRequest) {
     const sessionToken = searchParams.get("sessionToken");
 
     if (!sessionToken) {
-      return NextResponse.json(
-        { ok: false, error: "Token sesi helpdesk tidak tersedia." },
-        { status: 400 },
-      );
+      return jsonError("Token sesi helpdesk tidak tersedia.", 400);
     }
 
     const bundle = await getOrCreateHelpdeskSession({
@@ -47,21 +49,15 @@ export async function GET(request: NextRequest) {
       user: await getRequestSessionUser(request),
     });
 
-    return NextResponse.json({
-      ok: true,
-      data: bundle,
-    });
+    return jsonOk(bundle);
   } catch (error) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: getSafeErrorMessage(error, {
-          fallbackMessage: "Pesan helpdesk belum bisa dimuat.",
-          internalMessage:
-            "Pesan helpdesk belum bisa dimuat karena layanan database belum siap.",
-        }),
-      },
-      { status: 500 },
+    return jsonError(
+      getSafeErrorMessage(error, {
+        fallbackMessage: "Pesan helpdesk belum bisa dimuat.",
+        internalMessage:
+          "Pesan helpdesk belum bisa dimuat karena layanan database belum siap.",
+      }),
+      500,
     );
   }
 }
@@ -75,12 +71,9 @@ export async function POST(request: NextRequest) {
     });
 
     if (!rateLimit.allowed) {
-      return NextResponse.json(
-        { ok: false, error: "Terlalu banyak pesan helpdesk." },
-        {
-          status: 429,
-          headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
-        },
+      return jsonTooManyRequests(
+        "Terlalu banyak pesan helpdesk.",
+        rateLimit.retryAfterSeconds,
       );
     }
 
@@ -98,21 +91,15 @@ export async function POST(request: NextRequest) {
       session: result.session,
     }).catch(() => undefined);
 
-    return NextResponse.json({
-      ok: true,
-      data: result,
-    });
+    return jsonOk(result);
   } catch (error) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: getSafeErrorMessage(error, {
-          fallbackMessage: "Pesan helpdesk belum bisa dikirim.",
-          internalMessage:
-            "Pesan helpdesk belum bisa dikirim karena layanan database belum siap.",
-        }),
-      },
-      { status: 500 },
+    return jsonError(
+      getSafeErrorMessage(error, {
+        fallbackMessage: "Pesan helpdesk belum bisa dikirim.",
+        internalMessage:
+          "Pesan helpdesk belum bisa dikirim karena layanan database belum siap.",
+      }),
+      500,
     );
   }
 }

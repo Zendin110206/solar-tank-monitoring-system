@@ -3,6 +3,7 @@ import { buildTankReadings } from "@/features/monitoring/lib/tank-detail-view-mo
 import { listMonitoringReadingsForTank } from "@/features/monitoring/lib/monitoring-storage";
 import { getMonitoringReferenceData } from "@/features/monitoring/lib/monitoring-registry";
 import type { NextRequest } from "next/server";
+import { jsonError, jsonOk } from "@/lib/http/json-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -35,21 +36,12 @@ export async function GET(
   });
 
   if (readings.length === 0) {
-    return Response.json(
-      {
-        ok: false,
-        error: "Riwayat tangki tidak ditemukan.",
-      },
-      { status: 404 },
-    );
+    return jsonError("Riwayat tangki tidak ditemukan.", 404);
   }
 
-  return Response.json({
-    ok: true,
-    data: {
-      tankId,
-      range,
-      items: readings,
-    },
+  return jsonOk({
+    tankId,
+    range,
+    items: readings,
   });
 }

@@ -1,13 +1,15 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 import { verifyCaptchaToken } from "@/features/auth/server/auth-captcha";
 import { resendEmailVerification } from "@/features/auth/server/auth-service";
 import { parseResendVerificationPayload } from "@/features/auth/domain/auth-validation";
 import { checkRateLimit } from "@/features/auth/server/rate-limit";
 import {
-  getSafeErrorMessage,
-  getSafeErrorStatus,
-} from "@/lib/safe-error-message";
+  jsonCaughtError,
+  jsonError,
+  jsonOk,
+  jsonTooManyRequests,
+} from "@/lib/http/json-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -31,15 +33,9 @@ export async function POST(request: NextRequest) {
     });
 
     if (!rateLimit.allowed) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: "Terlalu banyak permintaan. Coba lagi nanti.",
-        },
-        {
-          status: 429,
-          headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
-        },
+      return jsonTooManyRequests(
+        "Terlalu banyak permintaan. Coba lagi nanti.",
+        rateLimit.retryAfterSeconds,
       );
     }
 
@@ -49,10 +45,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!captcha.ok) {
-      return NextResponse.json(
-        { ok: false, error: captcha.error },
-        { status: 400 },
-      );
+      return jsonError(captcha.error, 400);
     }
 
     await resendEmailVerification({
@@ -60,24 +53,15 @@ export async function POST(request: NextRequest) {
       request,
     });
 
-    return NextResponse.json({
-      ok: true,
-      data: {
-        message:
-          "Jika akun ditemukan dan belum terverifikasi, link verifikasi akan dikirim ulang.",
-      },
+    return jsonOk({
+      message:
+        "Jika akun ditemukan dan belum terverifikasi, link verifikasi akan dikirim ulang.",
     });
   } catch (error) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: getSafeErrorMessage(error, {
-          fallbackMessage: "Permintaan verifikasi belum bisa diproses.",
-          internalMessage:
-            "Permintaan verifikasi belum bisa diproses karena layanan sedang disiapkan. Coba lagi nanti.",
-        }),
-      },
-      { status: getSafeErrorStatus(error) },
-    );
+    return jsonCaughtError(error, {
+      fallbackMessage: "Permintaan verifikasi belum bisa diproses.",
+      internalMessage:
+        "Permintaan verifikasi belum bisa diproses karena layanan sedang disiapkan. Coba lagi nanti.",
+    });
   }
 }

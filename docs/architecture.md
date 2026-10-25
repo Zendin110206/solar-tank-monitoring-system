@@ -156,6 +156,11 @@ diawali `import "server-only";`, sesuai panduan keamanan data Next.js. Bila sala
 satunya terimpor ke komponen browser, `pnpm build` gagal dan menunjuk berkas
 penyebabnya. Di tes Vitest penanda ini diganti modul kosong.
 
+Route handler membalas lewat `src/lib/http/json-response.ts`: `jsonOk` (`{ ok: true, data }`),
+`jsonError` (`{ ok: false, error }`), `jsonTooManyRequests` (429 dengan `Retry-After`),
+dan `jsonCaughtError` (pesan aman untuk error yang ditangkap). Hanya `/api/ready`,
+`/api/dashboard/overview`, dan unduhan paket firmware yang bentuk balasannya berbeda.
+
 Semua pengaturan dibaca dari dua katalog di `src/lib/config/`:
 
 - `server-env.ts`: pengaturan dan rahasia yang hanya boleh dibaca server (database,
