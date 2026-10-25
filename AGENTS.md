@@ -1,0 +1,87 @@
+# Aturan Kerja untuk Kontributor dan Alat Bantu
+
+Berkas ini merangkum aturan teknis yang wajib diikuti siapa pun yang mengubah
+repositori ini, termasuk alat bantu pemrograman otomatis. Penjelasan lengkap ada
+di [CONTRIBUTING.md](CONTRIBUTING.md) dan [docs/architecture.md](docs/architecture.md).
+
+## Ringkasan proyek
+
+FTM (Fuel Tank Management) memantau isi tangki solar genset di gedung STO.
+Perangkat ESP8266 mengirim data ke `POST /api/ingest`; aplikasi Next.js +
+TypeScript + MySQL menyimpan dan menampilkannya. Aplikasi ini adalah pilot
+operasional yang sedang dipakai.
+
+## Perintah
+
+```text
+pnpm install --frozen-lockfile
+pnpm dev                 # pengembangan, http://localhost:3000
+pnpm check               # typecheck + lint + test + build (wajib lulus)
+pnpm typecheck | pnpm lint | pnpm test | pnpm build
+pnpm audit --prod
+git diff --check
+docker compose -f deploy/local/compose.yaml up -d   # MySQL + email lokal
+```
+
+Node.js 22 dan pnpm 9.15.3. Dokumentasi Next.js versi yang terpasang ada di
+`node_modules/next/dist/docs/`; rujuk dokumen itu, bukan ingatan tentang versi lain.
+
+## Struktur
+
+- `src/app/` — halaman, route handler (`api/**/route.ts`), server action. Dibuat tipis.
+- `src/features/<modul>/` — `monitoring`, `auth`, `helpdesk`: logika, view model,
+  repositori SQL, komponen.
+- `src/components/` — kerangka tampilan bersama.
+- `database/migrations/` — migrasi MySQL berurutan; `database/seeds/` — data fiktif.
+- `firmware/templates/` — templat firmware v1 (dibekukan).
+- `scripts/` — migrasi, simulator, alat operasional.
+- `docs/` — dokumentasi; keputusan di `docs/decisions/`.
+
+## Aturan lapisan
+
+```text
+src/app → layanan modul → repositori (SQL) → koneksi database
+```
+
+- Halaman dan route handler tidak mengimpor repositori atau koneksi database
+  secara langsung pada kode baru. Penyimpangan lama sedang dirapikan bertahap.
+- Rumus operasional (volume, status, sisa jam genset, konsumsi) hanya di satu
+  tempat, tanpa I/O, dan diberi tes.
+- Client component tidak mengimpor kode khusus server.
+- Kode memakai bahasa Inggris; teks yang dilihat pengguna memakai bahasa Indonesia.
+
+## Aturan perilaku
+
+- **Tanpa fitur baru dan tanpa perubahan perilaku** kecuali tugasnya menyebut
+  perubahan itu secara eksplisit. Perapian kode harus mempertahankan angka,
+  status, pesan, respons API, email, pesan Telegram, dan tampilan.
+- **Kontrak perangkat v1 dibekukan**: path `/api/ingest`, header (`X-Device-Id`,
+  `X-Api-Key`, `X-Device-Key`, `X-Provisioning-Key`), cara membaca isi kiriman,
+  hasil validasi, kode status, isi balasan, dan keluaran paket firmware.
+- Tes ditulis sebelum perapian. Tes tidak boleh dihapus, dilewati, atau dilemahkan
+  agar lulus. Tes yang mengunci perilaku keliru diberi nama yang menyebut hal itu.
+- Ketidakkonsistenan yang ditemukan dicatat, bukan diperbaiki diam-diam.
+- Migrasi 001–009 tidak boleh diubah; perubahan skema memakai migrasi baru.
+
+## Git
+
+- Branch dari `origin/dev` terbaru; pull request ke `dev`; squash merge.
+- `main` adalah produksi dan hanya menerima rilis yang disetujui pemilik
+  repositori. Tidak ada push langsung ke `main` atau `dev`.
+- Format commit dan judul pull request: `type(scope): deskripsi` (deskripsi bahasa
+  Indonesia, huruf kecil, tanpa titik, judul maks. 100 karakter).
+- Tidak ada *force push*, penulisan ulang riwayat, atau melewati pemeriksaan
+  (`--no-verify`).
+- Jangan mengubah, menghapus, atau menimpa branch, worktree, atau perubahan yang
+  bukan milik sendiri.
+
+## Hal yang dilarang
+
+- Membuka, menyalin, atau menampilkan isi `.env.local` atau rahasia apa pun.
+- Menjalankan migrasi, seed, skrip, atau aplikasi terhadap database produksi.
+- Mengirim permintaan ke alamat produksi, men-*deploy*, atau mengubah pengaturan
+  hosting, database, atau GitHub.
+- Mengirim email atau pesan Telegram ke orang sungguhan dari lingkungan
+  pengembangan.
+- Memasukkan rahasia, data pribadi, kode lokasi nyata, koordinat, path laptop,
+  atau catatan kerja lokal ke repositori.
