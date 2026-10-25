@@ -16,7 +16,8 @@ operasional yang sedang dipakai.
 ```text
 pnpm install --frozen-lockfile
 pnpm dev                 # pengembangan, http://localhost:3000
-pnpm check               # typecheck + lint + test + build (wajib lulus)
+pnpm format              # rapikan format (Prettier)
+pnpm check               # format:check + typecheck + lint + test + build (wajib lulus)
 pnpm typecheck | pnpm lint | pnpm test | pnpm build
 pnpm audit --prod
 git diff --check

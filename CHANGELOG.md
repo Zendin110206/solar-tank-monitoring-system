@@ -20,7 +20,11 @@ dirilis ke `main`.
   dan dokumen arsitektur yang sesuai kode per Oktober 2026 (#20).
 - `CODE_OF_CONDUCT.md`, `SUPPORT.md`, `CHANGELOG.md`, dan `AGENTS.md` (#21).
 - Prettier sebagai pemformat kode (`pnpm format`, `pnpm format:check`) dan `.nvmrc`
-  untuk Node.js 22.
+  untuk Node.js 22 (#22).
+- commitlint untuk format pesan commit dan judul pull request, hook git lefthook
+  (format dan lint sebelum commit, commitlint, typecheck dan tes sebelum push),
+  Dependabot mingguan untuk npm dan bulanan untuk GitHub Actions ke branch `dev`,
+  serta laporan `pnpm audit --prod` di CI.
 
 ### Diubah
 
