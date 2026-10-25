@@ -6,9 +6,12 @@ import ts from "typescript";
 // (misalnya page.tsx Next.js) agar perilakunya bisa dikunci oleh tes
 // karakterisasi tanpa mengubah berkas aslinya. Hanya dipakai sampai logika itu
 // dipindah ke modul bersama; setelah itu tes mengimpor modulnya langsung.
+// `scope` berisi nilai yang diimpor berkas asal (misalnya peta warna status) agar
+// potongan kode bisa dijalankan tanpa memuat seluruh berkas.
 export function loadSourceDeclarations<T extends Record<string, unknown>>(
   relativePath: string,
   names: (keyof T & string)[],
+  scope: Record<string, unknown> = {},
 ): T {
   const filePath = path.resolve(process.cwd(), relativePath);
   const sourceText = fs.readFileSync(filePath, "utf8");
@@ -59,5 +62,7 @@ export function loadSourceDeclarations<T extends Record<string, unknown>>(
     },
   });
 
-  return new Function(outputText)() as T;
+  return new Function(...Object.keys(scope), outputText)(
+    ...Object.values(scope),
+  ) as T;
 }

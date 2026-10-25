@@ -33,6 +33,7 @@ import {
 } from "./actions";
 import { AdminActionForm, AdminRoleForm } from "./admin-action-controls";
 import { formatDateTimeJakarta } from "@/lib/format";
+import { STATUS_BADGE_CLASS } from "@/components/ui/status-tone";
 
 export const metadata: Metadata = {
   title: "Manajemen Pengguna | FTM",
@@ -176,13 +177,13 @@ function getRoleLabel(role: AuthRole) {
 function getStatusClass(status: AuthUserStatus) {
   switch (status) {
     case "active":
-      return "bg-emerald-50 text-emerald-700 ring-emerald-100";
+      return STATUS_BADGE_CLASS.success;
     case "disabled":
-      return "bg-red-50 text-red-700 ring-red-100";
+      return STATUS_BADGE_CLASS.danger;
     case "suspended":
-      return "bg-amber-50 text-amber-700 ring-amber-100";
+      return STATUS_BADGE_CLASS.warning;
     case "pending":
-      return "bg-zinc-100 text-zinc-700 ring-zinc-200";
+      return STATUS_BADGE_CLASS.neutral;
   }
 }
 
@@ -263,9 +264,7 @@ function EmailVerificationBadge({ verified }: { verified: boolean }) {
   return (
     <span
       className={`inline-flex min-w-[7.25rem] justify-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ${
-        verified
-          ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
-          : "bg-amber-50 text-amber-700 ring-amber-100"
+        verified ? STATUS_BADGE_CLASS.success : STATUS_BADGE_CLASS.warning
       }`}
     >
       {verified ? "Terverifikasi" : "Belum verifikasi"}

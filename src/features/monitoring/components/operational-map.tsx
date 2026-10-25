@@ -6,6 +6,10 @@ import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { Crosshair, MapPin, Minus, Plus, Search } from "lucide-react";
 
 import type { DashboardSiteStatus } from "../lib/dashboard-view-model";
+import {
+  STATUS_BADGE_CLASS,
+  STATUS_DOT_CLASS,
+} from "@/components/ui/status-tone";
 
 export type OperationalMapSite = {
   code: string;
@@ -75,27 +79,27 @@ const statusMeta: Record<
 > = {
   online: {
     label: "Online",
-    dot: "bg-emerald-500",
+    dot: STATUS_DOT_CLASS.success,
     pin: "text-emerald-500",
-    chip: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+    chip: STATUS_BADGE_CLASS.success,
   },
   warning: {
     label: "Waspada",
-    dot: "bg-amber-500",
+    dot: STATUS_DOT_CLASS.warning,
     pin: "text-amber-500",
-    chip: "bg-amber-50 text-amber-700 ring-amber-100",
+    chip: STATUS_BADGE_CLASS.warning,
   },
   critical: {
     label: "Kritis",
     dot: "bg-red-600",
     pin: "text-red-600",
-    chip: "bg-red-50 text-red-700 ring-red-100",
+    chip: STATUS_BADGE_CLASS.danger,
   },
   offline: {
     label: "Offline",
     dot: "bg-zinc-600",
     pin: "text-zinc-700",
-    chip: "bg-zinc-100 text-zinc-700 ring-zinc-200",
+    chip: STATUS_BADGE_CLASS.neutral,
   },
 };
 

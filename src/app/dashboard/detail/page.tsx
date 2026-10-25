@@ -27,6 +27,10 @@ import {
 import { listLatestMonitoringReadingsByTankWithSource } from "@/features/monitoring/lib/monitoring-storage";
 import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/lib/refresh-interval";
 import { formatNumber } from "@/lib/format";
+import {
+  STATUS_BADGE_CLASS,
+  STATUS_DOT_CLASS,
+} from "@/components/ui/status-tone";
 
 export const metadata: Metadata = {
   title: "Analisis Teknis Tangki Bahan Bakar | FTM",
@@ -48,29 +52,29 @@ const statusMeta: Record<
 > = {
   online: {
     label: "Online",
-    dot: "bg-emerald-500",
-    badge: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+    dot: STATUS_DOT_CLASS.success,
+    badge: STATUS_BADGE_CLASS.success,
     ring: "ring-emerald-200",
     text: "text-emerald-700",
   },
   warning: {
     label: "Waspada",
-    dot: "bg-amber-500",
-    badge: "bg-amber-50 text-amber-700 ring-amber-100",
+    dot: STATUS_DOT_CLASS.warning,
+    badge: STATUS_BADGE_CLASS.warning,
     ring: "ring-amber-200",
     text: "text-amber-700",
   },
   critical: {
     label: "Kritis",
     dot: "bg-red-600",
-    badge: "bg-red-50 text-red-700 ring-red-100",
+    badge: STATUS_BADGE_CLASS.danger,
     ring: "ring-red-200",
     text: "text-red-700",
   },
   offline: {
     label: "Offline",
     dot: "bg-zinc-950",
-    badge: "bg-zinc-100 text-zinc-700 ring-zinc-200",
+    badge: STATUS_BADGE_CLASS.neutral,
     ring: "ring-zinc-300",
     text: "text-zinc-700",
   },
@@ -90,32 +94,37 @@ function buildSummaryCards(dashboardOverview: DashboardOverview) {
       value: String(dashboardOverview.summary.criticalTanks),
       note: "berdasarkan runtime, level, dan perangkat",
       icon: AlertTriangle,
-      tone: "bg-red-50 text-red-700 ring-red-100",
+      tone: STATUS_BADGE_CLASS.danger,
     },
     {
       label: "Perangkat online",
       value: String(dashboardOverview.summary.onlineDevices),
       note: `${dashboardOverview.summary.delayedDevices} terlambat, ${dashboardOverview.summary.offlineDevices} offline`,
       icon: Wifi,
-      tone: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+      tone: STATUS_BADGE_CLASS.success,
     },
     {
       label: "Rata-rata update",
       value: dashboardOverview.summary.averageIntervalLabel,
       note: "target dapat diatur per perangkat",
       icon: Clock,
-      tone: "bg-zinc-100 text-zinc-700 ring-zinc-200",
+      tone: STATUS_BADGE_CLASS.neutral,
     },
   ];
 }
 
 const runtimeBands = [
-  { label: "Kritis", range: "< 13 jam", width: "24%", tone: "bg-red-500" },
+  {
+    label: "Kritis",
+    range: "< 13 jam",
+    width: "24%",
+    tone: STATUS_DOT_CLASS.danger,
+  },
   {
     label: "Waspada",
     range: "13 - 16 jam",
     width: "24%",
-    tone: "bg-amber-500",
+    tone: STATUS_DOT_CLASS.warning,
   },
   {
     label: "Aman terbatas",
@@ -127,7 +136,7 @@ const runtimeBands = [
     label: "Aman panjang",
     range: "> 24 jam",
     width: "28%",
-    tone: "bg-emerald-500",
+    tone: STATUS_DOT_CLASS.success,
   },
 ];
 

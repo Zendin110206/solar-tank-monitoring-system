@@ -47,6 +47,9 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Warna status (lencana dan titik penanda) diambil dari satu peta,
+  `src/components/ui/status-tone.ts`, di 16 berkas. Kelas CSS hasil build identik; tampilan
+  tidak berubah.
 - Format angka dan tanggal-jam Jakarta disatukan di `src/lib/format.ts` (`formatNumber`,
   `formatDateTimeJakarta`) dan dipakai 15 berkas: halaman, komponen dashboard, email paket
   firmware, dan pesan Telegram. Teks yang tampil tidak berubah.

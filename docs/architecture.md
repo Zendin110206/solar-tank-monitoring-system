@@ -161,6 +161,10 @@ Route handler membalas lewat `src/lib/http/json-response.ts`: `jsonOk` (`{ ok: t
 dan `jsonCaughtError` (pesan aman untuk error yang ditangkap). Hanya `/api/ready`,
 `/api/dashboard/overview`, dan unduhan paket firmware yang bentuk balasannya berbeda.
 
+Warna status (lencana dan titik penanda) diambil dari satu peta,
+`src/components/ui/status-tone.ts`: `success` hijau, `warning` kuning, `danger` merah,
+`neutral` abu-abu, `info` biru. Warna isi grafik dan hiasan tidak termasuk peta ini.
+
 Angka dan tanggal untuk teks yang dilihat pengguna ditulis lewat `src/lib/format.ts`
 (`formatNumber`, `formatDateTimeJakarta`), dipakai halaman, komponen, email, dan pesan
 Telegram.

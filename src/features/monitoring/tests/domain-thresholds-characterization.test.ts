@@ -19,11 +19,19 @@ import {
   calculateTankVolumeLiter,
   getMaxFuelHeightCm,
 } from "../lib/tank-volume";
+import {
+  STATUS_BADGE_CLASS,
+  STATUS_DOT_CLASS,
+} from "@/components/ui/status-tone";
+
 import { loadSourceDeclarations } from "./helpers/load-source-declarations";
 
 // Tes karakterisasi perhitungan domain. Mengunci perilaku saat ini, termasuk
 // perbedaan yang tercatat (FTM-011, FTM-018) dan akan dibahas di paket kerja
 // domain. Jangan "memperbaiki" angka di sini.
+
+// Nilai yang diimpor halaman detail tangki, dibutuhkan saat potongan kodenya dijalankan.
+const PAGE_SCOPE = { STATUS_BADGE_CLASS, STATUS_DOT_CLASS };
 
 type RuntimeLevel = { label: string; range: string };
 type PageThresholds = {
@@ -107,11 +115,15 @@ describe("ambang sisa jam genset di tiga tempat (FTM-018)", () => {
     "%s memakai 6 kelas dengan batas 13, 14, 16, 19, dan < 24 jam",
     (pagePath) => {
       const { getRuntimeLevelParameter } =
-        loadSourceDeclarations<PageThresholds>(pagePath, [
-          "runtimeLevelParameters",
-          "unknownRuntimeLevel",
-          "getRuntimeLevelParameter",
-        ] as never);
+        loadSourceDeclarations<PageThresholds>(
+          pagePath,
+          [
+            "runtimeLevelParameters",
+            "unknownRuntimeLevel",
+            "getRuntimeLevelParameter",
+          ] as never,
+          PAGE_SCOPE,
+        );
 
       expect(
         RUNTIME_SAMPLES.map((hour) => {
@@ -146,6 +158,7 @@ describe("ambang sisa jam genset di tiga tempat (FTM-018)", () => {
         "unknownRuntimeLevel",
         "getRuntimeLevelParameter",
       ] as never,
+      PAGE_SCOPE,
     );
 
     expect(getRuntimeStatus(24)).toBe("limited");

@@ -18,6 +18,7 @@ import type {
 } from "@/features/monitoring/types/monitoring";
 import { DeviceRequestForm } from "./device-request-form";
 import { formatDateTimeJakarta } from "@/lib/format";
+import { STATUS_BADGE_CLASS } from "@/components/ui/status-tone";
 
 export const metadata: Metadata = {
   title: "Ajukan Perangkat | FTM",
@@ -39,20 +40,20 @@ function formatDate(value: string | null | undefined) {
 function getStatusClass(status: DeviceRequestStatus) {
   switch (status) {
     case "pending_admin_review":
-      return "bg-amber-50 text-amber-700 ring-amber-100";
+      return STATUS_BADGE_CLASS.warning;
     case "rejected":
-      return "bg-red-50 text-red-700 ring-red-100";
+      return STATUS_BADGE_CLASS.danger;
     case "approved_waiting_package":
     case "approved_package_ready":
     case "waiting_firmware_download":
     case "waiting_first_valid_ping":
-      return "bg-blue-50 text-blue-700 ring-blue-100";
+      return STATUS_BADGE_CLASS.info;
     case "active":
-      return "bg-emerald-50 text-emerald-700 ring-emerald-100";
+      return STATUS_BADGE_CLASS.success;
     case "expired":
     case "revoked":
     case "package_generation_failed":
-      return "bg-zinc-100 text-zinc-700 ring-zinc-200";
+      return STATUS_BADGE_CLASS.neutral;
   }
 }
 

@@ -55,6 +55,10 @@ import type {
   TankShape,
 } from "@/features/monitoring/types/monitoring";
 import { formatNumber } from "@/lib/format";
+import {
+  STATUS_BADGE_CLASS,
+  STATUS_DOT_CLASS,
+} from "@/components/ui/status-tone";
 
 export const metadata: Metadata = {
   title: "Detail Tangki Bahan Bakar | FTM",
@@ -172,16 +176,16 @@ const statusMeta: Record<
 > = {
   online: {
     label: "Online",
-    dot: "bg-emerald-500",
-    badge: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+    dot: STATUS_DOT_CLASS.success,
+    badge: STATUS_BADGE_CLASS.success,
     ring: "ring-emerald-200",
     text: "text-emerald-700",
     soft: "bg-emerald-50",
   },
   warning: {
     label: "Waspada",
-    dot: "bg-amber-500",
-    badge: "bg-amber-50 text-amber-700 ring-amber-100",
+    dot: STATUS_DOT_CLASS.warning,
+    badge: STATUS_BADGE_CLASS.warning,
     ring: "ring-amber-200",
     text: "text-amber-700",
     soft: "bg-amber-50",
@@ -189,7 +193,7 @@ const statusMeta: Record<
   critical: {
     label: "Kritis",
     dot: "bg-red-600",
-    badge: "bg-red-50 text-red-700 ring-red-100",
+    badge: STATUS_BADGE_CLASS.danger,
     ring: "ring-red-200",
     text: "text-red-700",
     soft: "bg-red-50",
@@ -197,7 +201,7 @@ const statusMeta: Record<
   offline: {
     label: "Offline",
     dot: "bg-zinc-950",
-    badge: "bg-zinc-100 text-zinc-700 ring-zinc-200",
+    badge: STATUS_BADGE_CLASS.neutral,
     ring: "ring-zinc-300",
     text: "text-zinc-700",
     soft: "bg-zinc-100",
@@ -209,7 +213,7 @@ const runtimeLevelParameters: RuntimeLevelParameter[] = [
     label: "Kritis",
     range: "< 13 jam",
     description: "Sisa runtime sudah masuk prioritas tindakan cepat.",
-    badge: "bg-red-50 text-red-700 ring-red-100",
+    badge: STATUS_BADGE_CLASS.danger,
     card: "border-red-200 bg-red-50",
     dot: "bg-red-600",
   },
@@ -225,9 +229,9 @@ const runtimeLevelParameters: RuntimeLevelParameter[] = [
     label: "Under",
     range: "14 - <16 jam",
     description: "Masih di bawah zona ideal operasional.",
-    badge: "bg-amber-50 text-amber-700 ring-amber-100",
+    badge: STATUS_BADGE_CLASS.warning,
     card: "border-amber-200 bg-amber-50",
-    dot: "bg-amber-500",
+    dot: STATUS_DOT_CLASS.warning,
   },
   {
     label: "Threshold Upper",
@@ -241,7 +245,7 @@ const runtimeLevelParameters: RuntimeLevelParameter[] = [
     label: "Upper",
     range: "19 - <24 jam",
     description: "Runtime berada di zona atas yang masih normal.",
-    badge: "bg-blue-50 text-blue-700 ring-blue-100",
+    badge: STATUS_BADGE_CLASS.info,
     card: "border-blue-200 bg-blue-50",
     dot: "bg-blue-600",
   },
@@ -249,7 +253,7 @@ const runtimeLevelParameters: RuntimeLevelParameter[] = [
     label: "Overstock",
     range: ">= 24 jam",
     description: "Cadangan runtime sangat panjang dibanding batas parameter.",
-    badge: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+    badge: STATUS_BADGE_CLASS.success,
     card: "border-emerald-200 bg-emerald-50",
     dot: "bg-emerald-600",
   },
@@ -259,7 +263,7 @@ const unknownRuntimeLevel: RuntimeLevelParameter = {
   label: "Belum terbaca",
   range: "-",
   description: "Parameter sisa jam menunggu data volume dan konsumsi valid.",
-  badge: "bg-zinc-100 text-zinc-700 ring-zinc-200",
+  badge: STATUS_BADGE_CLASS.neutral,
   card: "border-zinc-200 bg-zinc-50",
   dot: "bg-zinc-400",
 };
@@ -1098,7 +1102,7 @@ export default async function TankDetailPage({
         ? `berdasarkan konsumsi ${tank.consumptionLiterPerHour} L/jam, dihitung ${formatSourceLabel(tank.dataSources.runtimeSource)}`
         : `akan dihitung setelah volume terbaca, konsumsi konfigurasi ${tank.consumptionLiterPerHour} L/jam`,
       icon: Clock,
-      tone: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+      tone: STATUS_BADGE_CLASS.success,
     },
     {
       label: "Status perangkat",
@@ -1112,7 +1116,7 @@ export default async function TankDetailPage({
       value: formatMeasurement(tank.rssiDbm, "dBm"),
       note: "nilai dari data perangkat jika tersedia",
       icon: Radio,
-      tone: "bg-zinc-100 text-zinc-700 ring-zinc-200",
+      tone: STATUS_BADGE_CLASS.neutral,
     },
   ];
   const deviceParameters: ParameterItem[] = [
