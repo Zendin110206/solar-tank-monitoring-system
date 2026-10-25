@@ -39,6 +39,9 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Lima pemanggil alur pengajuan perangkat kini memakai layanan modul untuk
+  pengajuan, tinjauan, dan unduhan paket. Fungsi repositori, transaksi, pemeriksaan
+  akses, email, dan tampilan tetap; tes integrasi pemasangan juga melewati layanan.
 - Halaman audit, manajemen pengguna, dan aksi profil mengambil data lewat pintu
   layanan `src/features/auth/server/` (ADR 0011), bukan langsung dari repositori MySQL.
 - Panduan pemeriksaan lokal disesuaikan dengan Node.js 22, pnpm 9.15.3, aturan

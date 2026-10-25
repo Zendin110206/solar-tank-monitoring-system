@@ -2,11 +2,11 @@ import type { RowDataPacket } from "mysql2/promise";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 import {
-  activateApprovedDeviceOnFirstPingFromMysql,
-  approveDeviceRequestInMysql,
-  createDeviceRequestInMysql,
-  downloadDevicePackageByTokenFromMysql,
-} from "../../lib/mysql-device-request-repository";
+  approveDeviceRequest as approveDeviceRequestInMysql,
+  submitDeviceRequest as createDeviceRequestInMysql,
+  downloadDevicePackage as downloadDevicePackageByTokenFromMysql,
+} from "../../server/device-request-service";
+import { activateApprovedDeviceOnFirstPingFromMysql } from "../../lib/mysql-device-request-repository";
 import {
   createTestDatabase,
   insertFictionalUser,
