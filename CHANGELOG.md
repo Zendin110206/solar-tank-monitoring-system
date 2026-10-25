@@ -47,6 +47,9 @@ dirilis ke `main`.
 
 ### Diubah
 
+- ADR 0011 diberi bagian **Pembaruan**: aturan lapisan `src/app` tercapai dan dicek
+  otomatis, penanda `server-only` dan katalog pengaturan dibuat, serta pembantu balasan
+  HTTP dibatalkan beserta alasannya.
 - Lima lokasi contoh pada penyimpanan memori memakai nama, kode tampilan, dan
   area fiktif tanpa koordinat; ID, hubungan perangkat/tangki, serta angka
   operasional tetap sama.
