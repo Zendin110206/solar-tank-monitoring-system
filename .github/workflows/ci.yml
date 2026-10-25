@@ -128,11 +128,12 @@ jobs:
         with:
           version: 9.15.3
 
+      # Tanpa cache: job ini tidak memasang dependensi, jadi folder cache pnpm
+      # tidak pernah ada dan langkah penyimpanan cache akan gagal.
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
           node-version: 22
-          cache: pnpm
 
       # Hanya melaporkan sampai pembaruan dependensi keamanan selesai: hasilnya
       # ditulis ke ringkasan job dan job tetap hijau. Setelah itu langkah ini
