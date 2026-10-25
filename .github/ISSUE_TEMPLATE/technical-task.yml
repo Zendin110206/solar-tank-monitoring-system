@@ -1,0 +1,49 @@
+name: Tugas teknis
+description: Pekerjaan perawatan tanpa perubahan perilaku (perapian kode, dependensi, tes, dokumentasi, CI).
+title: "chore(scope): "
+labels:
+  - documentation
+body:
+  - type: textarea
+    id: goal
+    attributes:
+      label: Tujuan
+      description: Apa yang menjadi lebih baik setelah tugas ini selesai?
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Ruang lingkup
+      description: File, modul, atau area yang disentuh, dan yang sengaja tidak disentuh.
+    validations:
+      required: true
+
+  - type: textarea
+    id: parity
+    attributes:
+      label: Cara membuktikan perilaku tetap sama
+      description: Tes, perbandingan respons API, atau screenshot yang akan dipakai.
+    validations:
+      required: true
+
+  - type: textarea
+    id: done
+    attributes:
+      label: Kriteria selesai
+      placeholder: |
+        - [ ] ...
+        - [ ] pnpm check lulus
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Pemeriksaan awal
+      options:
+        - label: Tugas ini tidak menambah fitur dan tidak mengubah kontrak perangkat v1.
+          required: true
+        - label: Tugas ini tidak memuat data rahasia, data pribadi, atau data operasional lokasi.
+          required: true

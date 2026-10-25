@@ -1,0 +1,54 @@
+name: Permintaan fitur
+description: Usulkan kemampuan baru atau perbaikan alur untuk FTM.
+title: "feat(scope): "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Jelaskan kebutuhan yang ingin diselesaikan. Usulan ditinjau berdasarkan manfaat
+        bagi tim lapangan, ruang lingkup, keamanan, dan dampaknya pada perangkat yang
+        sudah terpasang.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Masalah atau kebutuhan
+      description: Ceritakan kondisi yang membuat perubahan ini diperlukan.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Hasil yang diharapkan
+      description: Jelaskan kemampuan atau pengalaman pengguna yang ingin dicapai.
+    validations:
+      required: true
+
+  - type: textarea
+    id: users
+    attributes:
+      label: Pengguna yang terbantu
+      description: Sebutkan peran pengguna (misalnya petugas lapangan atau admin) dan kegiatannya.
+    validations:
+      required: true
+
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Batasan dan risiko
+      description: Hal yang belum pasti, misalnya data, perangkat, firmware, atau kebutuhan izin.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Pemeriksaan awal
+      options:
+        - label: Saya sudah memastikan usulan serupa belum ada.
+          required: true
+        - label: Usulan ini tidak memuat data rahasia, data pribadi, atau data operasional lokasi.
+          required: true
