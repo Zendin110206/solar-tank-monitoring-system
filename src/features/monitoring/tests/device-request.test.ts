@@ -94,7 +94,9 @@ describe("device request foundation", () => {
       capacityLiter: 540,
       consumptionLiterPerHour: 5.25,
     });
-    expect(validation.normalized?.deviceCode).toMatch(/^device-tph-[a-f0-9]{6}$/);
+    expect(validation.normalized?.deviceCode).toMatch(
+      /^device-tph-[a-f0-9]{6}$/,
+    );
     expect(validation.capacityCheck).toMatchObject({
       calculatedCapacityLiter: 540,
       declaredCapacityLiter: 540,
@@ -243,7 +245,9 @@ describe("device request foundation", () => {
     }
 
     expect(result.request.id).toMatch(/^device_request_/);
-    expect(result.request.requestCode).toMatch(/^REQ-TPH-20260705-[A-F0-9]{6}$/);
+    expect(result.request.requestCode).toMatch(
+      /^REQ-TPH-20260705-[A-F0-9]{6}$/,
+    );
     expect(result.request.deviceCode).toMatch(/^device-tph-[a-f0-9]{6}$/);
     expect(result.request.requesterEmail).toBe("user@example.com");
     expect(result.request.status).toBe("pending_admin_review");

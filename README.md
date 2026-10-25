@@ -38,12 +38,12 @@ lapangan.
 
 ## Status saat ini
 
-| Butir | Keadaan |
-|---|---|
-| Tahap | Pilot operasional. Sistem sudah menerima data dari perangkat nyata, tetapi belum dikeraskan untuk produksi penuh: belum ada jaminan layanan (SLA) dan belum ada dukungan 24 jam. |
-| Cakupan | Snapshot baca-saja per 11 Oktober 2026: 9 lokasi terdaftar dan 8 perangkat aktif, masing-masing mengirim data kira-kira setiap 20 detik. |
-| Aplikasi | Dijalankan di Vercel (layanan hosting awan). Setiap perubahan di branch `main` langsung terpasang ke aplikasi pilot. |
-| Database | MySQL terkelola (Aiven). |
+| Butir          | Keadaan                                                                                                                                                                                      |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Tahap          | Pilot operasional. Sistem sudah menerima data dari perangkat nyata, tetapi belum dikeraskan untuk produksi penuh: belum ada jaminan layanan (SLA) dan belum ada dukungan 24 jam.             |
+| Cakupan        | Snapshot baca-saja per 11 Oktober 2026: 9 lokasi terdaftar dan 8 perangkat aktif, masing-masing mengirim data kira-kira setiap 20 detik.                                                     |
+| Aplikasi       | Dijalankan di Vercel (layanan hosting awan). Setiap perubahan di branch `main` langsung terpasang ke aplikasi pilot.                                                                         |
+| Database       | MySQL terkelola (Aiven).                                                                                                                                                                     |
 | Yang belum ada | Backup otomatis, alarm otomatis (level kritis atau perangkat mati), dan pembatasan akses per lokasi. Ketiganya sudah tercatat sebagai pekerjaan berikutnya, bukan fitur yang sudah tersedia. |
 
 Per Oktober 2026, repositori sedang dirapikan bertahap tanpa fitur baru dan tanpa
@@ -53,7 +53,7 @@ perubahan perilaku. Arah besarnya dicatat di [catatan keputusan](docs/decisions/
 
 FTM adalah **satu aplikasi Next.js** (kerangka kerja web yang memuat tampilan dan
 API sekaligus) yang ditulis dalam TypeScript dan menyimpan data di MySQL. Isinya
-dipisah per modul (*modular monolith*: satu aplikasi yang dijalankan sebagai satu
+dipisah per modul (_modular monolith_: satu aplikasi yang dijalankan sebagai satu
 unit, tetapi bagian-bagiannya punya tanggung jawab yang jelas).
 
 ```mermaid
@@ -96,7 +96,7 @@ Penjelasan singkat:
   perangkat v1** dan **dibekukan**: perangkat yang sudah terpasang tidak bisa
   diperbarui dari jauh, jadi format, alamat, dan balasan server tidak boleh berubah.
 - **Penyimpanan.** Setiap kiriman memperbarui dua hal dalam satu transaksi
-  (sekelompok perubahan yang berhasil atau gagal bersama-sama): *snapshot* terbaru
+  (sekelompok perubahan yang berhasil atau gagal bersama-sama): _snapshot_ terbaru
   (satu baris per perangkat) dan ringkasan 5 menit (rata-rata, minimum, maksimum,
   dan jumlah sampel per perangkat per 5 menit).
 - **Pemasangan perangkat baru.** Petugas mengajukan perangkat, lalu admin
@@ -196,19 +196,19 @@ penerimaan data yang bisa dicoba. Login dan seluruh dashboard membutuhkan MySQL.
 
 ## Perintah
 
-| Perintah | Fungsi |
-|---|---|
-| `pnpm dev` | Menjalankan aplikasi untuk pengembangan |
-| `pnpm build` / `pnpm start` | Membuat dan menjalankan versi produksi di laptop |
-| `pnpm check` | Pemeriksaan lengkap: tipe TypeScript, lint, tes, build |
-| `pnpm typecheck` | Memeriksa tipe data TypeScript |
-| `pnpm lint` | Memeriksa pola kode dengan ESLint |
-| `pnpm test` | Menjalankan tes otomatis (Vitest) |
-| `pnpm simulate:device` | Mengirim data perangkat contoh ke server lokal |
-| `pnpm db:setup:mysql` | Membuat tabel dan data contoh di database lokal yang masih kosong |
-| `pnpm db:migrate:*` | Menjalankan satu migrasi (skrip perubahan struktur database) |
-| `pnpm auth:create-admin` | Membuat akun admin pertama |
-| `pnpm pilot:hash-key` | Membuat kunci perangkat beserta hash-nya |
+| Perintah                                                          | Fungsi                                                                                                                                         |
+| ----------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm dev`                                                        | Menjalankan aplikasi untuk pengembangan                                                                                                        |
+| `pnpm build` / `pnpm start`                                       | Membuat dan menjalankan versi produksi di laptop                                                                                               |
+| `pnpm check`                                                      | Pemeriksaan lengkap: tipe TypeScript, lint, tes, build                                                                                         |
+| `pnpm typecheck`                                                  | Memeriksa tipe data TypeScript                                                                                                                 |
+| `pnpm lint`                                                       | Memeriksa pola kode dengan ESLint                                                                                                              |
+| `pnpm test`                                                       | Menjalankan tes otomatis (Vitest)                                                                                                              |
+| `pnpm simulate:device`                                            | Mengirim data perangkat contoh ke server lokal                                                                                                 |
+| `pnpm db:setup:mysql`                                             | Membuat tabel dan data contoh di database lokal yang masih kosong                                                                              |
+| `pnpm db:migrate:*`                                               | Menjalankan satu migrasi (skrip perubahan struktur database)                                                                                   |
+| `pnpm auth:create-admin`                                          | Membuat akun admin pertama                                                                                                                     |
+| `pnpm pilot:hash-key`                                             | Membuat kunci perangkat beserta hash-nya                                                                                                       |
 | `pnpm pilot:registry`, `pnpm pilot:smoke`, `pnpm db:backup:mysql` | Alat operasional. Skrip ini menulis ke database atau alamat mana pun yang sedang diatur, jadi hanya dijalankan oleh pemelihara yang berwenang. |
 
 ## Struktur repositori
@@ -266,7 +266,7 @@ Daftar lengkap dokumen beserta tanggal pemeriksaannya ada di
 Ikuti [CONTRIBUTING.md](CONTRIBUTING.md). Ringkasnya: buat branch dari `dev`,
 pakai format commit `type(scope): deskripsi`, buka pull request ke `dev`, dan
 pastikan pemeriksaan lulus. `main` hanya menerima rilis yang sudah disetujui.
-Kontributor tercatat di riwayat Git dan halaman *Contributors* GitHub.
+Kontributor tercatat di riwayat Git dan halaman _Contributors_ GitHub.
 
 ## Keamanan
 

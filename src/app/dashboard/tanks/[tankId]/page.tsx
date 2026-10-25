@@ -874,9 +874,7 @@ function RuntimeParameterPanel({ tank }: { tank: TankDetail }) {
         description="Kategori ini membaca sisa runtime genset agar operator tahu posisi tangki terhadap batas operasional."
       />
 
-      <div
-        className={`mt-5 rounded-lg border p-4 ${activeParameter.card}`}
-      >
+      <div className={`mt-5 rounded-lg border p-4 ${activeParameter.card}`}>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-zinc-500">
@@ -1314,7 +1312,6 @@ export default async function TankDetailPage({
               />
               <ReadingTable tank={tank} />
             </section>
-
           </div>
 
           <aside className="min-w-0 space-y-5">
@@ -1415,7 +1412,10 @@ export default async function TankDetailPage({
                     ? formatMeasurement(tank.rawPayload.wifi_rssi, "dBm")
                     : "-",
                 ],
-                ["config.status", formatConfigStatusLabel(tank.configReview.status)],
+                [
+                  "config.status",
+                  formatConfigStatusLabel(tank.configReview.status),
+                ],
                 [
                   "source.volume",
                   formatSourceLabel(tank.dataSources.volumeSource),

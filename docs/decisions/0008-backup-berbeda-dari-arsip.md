@@ -30,7 +30,7 @@ Backup = salinan penuh untuk pemulihan: harian, terenkripsi, dengan uji pulih bu
 
 ## Konsekuensi
 
-- Prosedur backup dan uji pulih ditulis sebagai *runbook* (panduan langkah demi langkah).
+- Prosedur backup dan uji pulih ditulis sebagai _runbook_ (panduan langkah demi langkah).
 
 ## Risiko dan mitigasi
 

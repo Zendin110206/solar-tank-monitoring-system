@@ -235,11 +235,7 @@ function NumberInput({
   );
 }
 
-function SubmitButton({
-  disabled,
-}: {
-  disabled?: boolean;
-}) {
+function SubmitButton({ disabled }: { disabled?: boolean }) {
   const { pending } = useFormStatus();
 
   return (
@@ -492,7 +488,11 @@ export function DeviceRequestForm({
             label="Mode sensor"
             help="Paket firmware aktif saat ini untuk sensor fuel."
           >
-            <select className={inputClassName()} name="deviceSensorType" required>
+            <select
+              className={inputClassName()}
+              name="deviceSensorType"
+              required
+            >
               <option value="fuel">Sensor fuel</option>
               <option value="energy" disabled>
                 Sensor energy (belum aktif)
@@ -585,8 +585,8 @@ export function DeviceRequestForm({
           icon={<Gauge className="size-5" aria-hidden="true" />}
           title="Beban Genset"
         >
-          Sistem menghitung konsumsi bahan bakar per jam dari beban lokasi, kapasitas
-          diesel engine, dan cos phi.
+          Sistem menghitung konsumsi bahan bakar per jam dari beban lokasi,
+          kapasitas diesel engine, dan cos phi.
         </SectionHeader>
 
         <div className="grid w-full min-w-0 max-w-6xl gap-4 sm:grid-cols-2 xl:grid-cols-5">
@@ -603,7 +603,9 @@ export function DeviceRequestForm({
             <select
               className={inputClassName()}
               name="loadUnit"
-              onChange={(event) => setLoadUnit(event.target.value as LoadPowerUnit)}
+              onChange={(event) =>
+                setLoadUnit(event.target.value as LoadPowerUnit)
+              }
               required
               value={loadUnit}
             >
@@ -611,10 +613,7 @@ export function DeviceRequestForm({
               <option value="kva">kVA</option>
             </select>
           </FormField>
-          <FormField
-            label="Kapasitas diesel engine"
-            help="Isi dalam kVA."
-          >
+          <FormField label="Kapasitas diesel engine" help="Isi dalam kVA.">
             <NumberInput
               name="dieselEngineCapacityKva"
               onValueChange={setDieselEngineCapacityKva}

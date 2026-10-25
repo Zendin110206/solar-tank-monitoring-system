@@ -29,10 +29,7 @@ function parseSha256Hash(value?: string | null): Buffer | null {
     ? cleanValue.slice(DEVICE_KEY_HASH_PREFIX.length)
     : cleanValue;
 
-  if (
-    hexValue.length !== SHA256_HEX_LENGTH ||
-    !/^[a-f0-9]+$/.test(hexValue)
-  ) {
+  if (hexValue.length !== SHA256_HEX_LENGTH || !/^[a-f0-9]+$/.test(hexValue)) {
     return null;
   }
 
@@ -70,7 +67,9 @@ export function verifyDeviceKeyHash(
     return false;
   }
 
-  const actualHash = parseSha256Hash(hashDeviceKey(cleanDeviceKey(suppliedDeviceKey)));
+  const actualHash = parseSha256Hash(
+    hashDeviceKey(cleanDeviceKey(suppliedDeviceKey)),
+  );
 
   if (!actualHash || actualHash.length !== expectedHash.length) {
     return false;
@@ -111,7 +110,7 @@ export function verifyDeviceKey({
 
   return Boolean(
     allowGlobalFallback &&
-      cleanFallbackKey &&
-      timingSafeStringEqual(cleanSuppliedKey, cleanFallbackKey),
+    cleanFallbackKey &&
+    timingSafeStringEqual(cleanSuppliedKey, cleanFallbackKey),
   );
 }

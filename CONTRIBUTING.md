@@ -12,14 +12,14 @@ berjalan, mudah ditinjau, dan tidak menimpa pekerjaan orang lain.
    `dev` maupun `main`.
 3. **Satu perubahan, satu tujuan.** Jangan mencampur perapian format, penggantian
    nama, dan perubahan logika dalam satu commit.
-4. **Perilaku tidak berubah tanpa disengaja.** Perapian kode (*refactor*) dan
+4. **Perilaku tidak berubah tanpa disengaja.** Perapian kode (_refactor_) dan
    pembaruan dependensi harus membuktikan bahwa angka, status, pesan, respons API,
    dan tampilan tetap sama.
 5. **Kontrak perangkat v1 dibekukan.** Alamat `/api/ingest`, header, isi kiriman,
    kode status, isi balasan, dan paket firmware v1 tidak boleh berubah. Perangkat
    yang terpasang tidak bisa diperbarui dari jauh.
 6. **Seluruh diff dibaca sebelum commit.**
-7. **Riwayat yang sudah dibagikan tidak ditulis ulang.** Tidak ada *force push*.
+7. **Riwayat yang sudah dibagikan tidak ditulis ulang.** Tidak ada _force push_.
 
 ## Menyiapkan repositori
 
@@ -93,19 +93,19 @@ type(scope): deskripsi
 - Baris judul paling panjang 100 karakter.
 - Badan commit (opsional) menjelaskan **mengapa** perubahan dibuat.
 
-| Type | Dipakai untuk |
-|---|---|
-| `feat` | Kemampuan baru bagi pengguna |
-| `fix` | Perbaikan perilaku yang salah |
-| `perf` | Peningkatan kinerja |
+| Type       | Dipakai untuk                         |
+| ---------- | ------------------------------------- |
+| `feat`     | Kemampuan baru bagi pengguna          |
+| `fix`      | Perbaikan perilaku yang salah         |
+| `perf`     | Peningkatan kinerja                   |
 | `refactor` | Perapian kode tanpa mengubah perilaku |
-| `test` | Tes |
-| `docs` | Dokumentasi |
-| `style` | Format kode tanpa perubahan arti |
-| `build` | Proses build dan dependensi |
-| `ci` | Pemeriksaan otomatis GitHub |
-| `chore` | Pemeliharaan lain (konfigurasi, alat) |
-| `revert` | Membatalkan commit sebelumnya |
+| `test`     | Tes                                   |
+| `docs`     | Dokumentasi                           |
+| `style`    | Format kode tanpa perubahan arti      |
+| `build`    | Proses build dan dependensi           |
+| `ci`       | Pemeriksaan otomatis GitHub           |
+| `chore`    | Pemeliharaan lain (konfigurasi, alat) |
+| `revert`   | Membatalkan commit sebelumnya         |
 
 Scope yang dipakai: `ingest`, `monitoring`, `devices`, `firmware`, `auth`,
 `helpdesk`, `admin`, `ui`, `db`, `deps`, `config`, `ci`, `docs`, `repo`.
@@ -170,7 +170,7 @@ dan setiap pembaruan versi besar membaca catatan perubahan paketnya terlebih dul
 
 ## Menjaga riwayat
 
-- Jangan *force push* ke branch yang sudah dibagikan.
+- Jangan _force push_ ke branch yang sudah dibagikan.
 - Jangan menghapus atau membuat ulang repositori, dan jangan menjalankan
   `git init` di dalam hasil clone.
 - Jangan menghapus branch, worktree, atau pull request milik orang lain.

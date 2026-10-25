@@ -348,7 +348,9 @@ function buildTrendTicks({
 
 type ChartPointInput = Reading | TankReadingPoint | SimpleTankDetailChartPoint;
 
-function toSimpleChartPoint(reading: ChartPointInput): SimpleTankDetailChartPoint | null {
+function toSimpleChartPoint(
+  reading: ChartPointInput,
+): SimpleTankDetailChartPoint | null {
   if ("fullTimeLabel" in reading) {
     return reading;
   }
@@ -376,8 +378,7 @@ export function sampleSimpleTankDetailChartPoints(
   options: ChartSamplingOptions = {},
 ): SimpleTankDetailChartPoint[] {
   const minIntervalMs =
-    (options.minIntervalMinutes ??
-      SIMPLE_TANK_DETAIL_CHART_INTERVAL_MINUTES) *
+    (options.minIntervalMinutes ?? SIMPLE_TANK_DETAIL_CHART_INTERVAL_MINUTES) *
     60 *
     1000;
   const maxPoints = options.maxPoints ?? SIMPLE_TANK_DETAIL_CHART_MAX_POINTS;
@@ -485,10 +486,7 @@ export function buildSimpleTankTrend(
       totalVolume: 0,
       sampleCount: 0,
     };
-    const pointSampleCount = Math.max(
-      1,
-      Math.round(point.sampleCount ?? 1),
-    );
+    const pointSampleCount = Math.max(1, Math.round(point.sampleCount ?? 1));
 
     bucket.totalVolume += point.volumeLiter * pointSampleCount;
     bucket.sampleCount += pointSampleCount;
@@ -517,10 +515,7 @@ export function buildSimpleTankTrend(
             : 0,
       };
     });
-  const continuity = buildTrendContinuity(
-    trendPoints,
-    gapThresholdMinutes,
-  );
+  const continuity = buildTrendContinuity(trendPoints, gapThresholdMinutes);
 
   return {
     range,

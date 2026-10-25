@@ -68,11 +68,7 @@ function getTankShapeLabel(request: MonitoringDeviceRequest) {
     : "Tangki silinder horizontal";
 }
 
-function RequestHistory({
-  requests,
-}: {
-  requests: MonitoringDeviceRequest[];
-}) {
+function RequestHistory({ requests }: { requests: MonitoringDeviceRequest[] }) {
   return (
     <section className="w-full min-w-0 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm sm:p-5">
       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -124,8 +120,12 @@ function RequestHistory({
                   <p className="min-w-0 break-words">
                     Wilayah: {request.wilayahLabel}
                   </p>
-                  <p className="min-w-0 break-words">Area: {request.areaLabel}</p>
-                  <p className="min-w-0 break-words">Perangkat: {request.deviceCode}</p>
+                  <p className="min-w-0 break-words">
+                    Area: {request.areaLabel}
+                  </p>
+                  <p className="min-w-0 break-words">
+                    Perangkat: {request.deviceCode}
+                  </p>
                   <p>{getTankShapeLabel(request)}</p>
                   <p>{getDeviceSensorTypeLabel(request.deviceSensorType)}</p>
                   <p>Kapasitas: {request.capacityLiter} L</p>
@@ -236,7 +236,10 @@ export default async function DeviceRequestPage() {
         {!isMysqlEnabled ? (
           <section className="w-full min-w-0 break-words rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-800 sm:p-5">
             Fitur pengajuan perangkat memerlukan storage MySQL. Aktifkan
-            <span className="font-semibold"> SOLAR_TANK_STORAGE_DRIVER=mysql </span>
+            <span className="font-semibold">
+              {" "}
+              SOLAR_TANK_STORAGE_DRIVER=mysql{" "}
+            </span>
             dan jalankan migrasi provisioning perangkat sebelum dipakai.
           </section>
         ) : null}

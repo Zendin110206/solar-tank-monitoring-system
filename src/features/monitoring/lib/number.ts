@@ -35,6 +35,9 @@ export function formatCoordinate(value: number, maxFractionDigits = 7): string {
     .replace(/\.0+$/, "");
 }
 
-export function formatCoordinatePair(latitude: number, longitude: number): string {
+export function formatCoordinatePair(
+  latitude: number,
+  longitude: number,
+): string {
   return `${formatCoordinate(latitude)}, ${formatCoordinate(longitude)}`;
 }

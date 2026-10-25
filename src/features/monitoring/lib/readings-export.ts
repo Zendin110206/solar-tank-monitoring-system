@@ -256,41 +256,45 @@ export function createTankReadingsCsv(
 ): string {
   const period =
     options.period ?? buildReadingExportPeriod(readings, options.rangeKey);
-  const rows = filterReadingsForExportPeriod(readings, period).map((reading) => [
-    reading.id,
-    reading.tankId,
-    reading.deviceId,
-    reading.measuredAt,
-    formatCsvDateTime(reading.measuredAt),
-    reading.receivedAt,
-    formatCsvDateTime(reading.receivedAt),
-    reading.sensorDistanceCm,
-    reading.fuelHeightCm,
-    reading.volumeLiter,
-    reading.fillPercent,
-    reading.runtimeHour,
-    reading.batteryVolt,
-    reading.rssiDbm,
-    reading.quality?.configStatus,
-    reading.quality?.needsReview,
-    reading.quality?.warnings.join(" | "),
-    reading.resolution ?? "raw",
-    reading.bucketStart,
-    reading.bucketStart ? formatCsvDateTime(reading.bucketStart) : undefined,
-    reading.bucketEnd,
-    reading.bucketEnd ? formatCsvDateTime(reading.bucketEnd) : undefined,
-    reading.sampleCount ?? 1,
-    reading.volumeLiterMin ?? reading.volumeLiter,
-    reading.volumeLiterMax ?? reading.volumeLiter,
-    reading.fillPercentMin ?? reading.fillPercent,
-    reading.fillPercentMax ?? reading.fillPercent,
-    period.label,
-  ]);
+  const rows = filterReadingsForExportPeriod(readings, period).map(
+    (reading) => [
+      reading.id,
+      reading.tankId,
+      reading.deviceId,
+      reading.measuredAt,
+      formatCsvDateTime(reading.measuredAt),
+      reading.receivedAt,
+      formatCsvDateTime(reading.receivedAt),
+      reading.sensorDistanceCm,
+      reading.fuelHeightCm,
+      reading.volumeLiter,
+      reading.fillPercent,
+      reading.runtimeHour,
+      reading.batteryVolt,
+      reading.rssiDbm,
+      reading.quality?.configStatus,
+      reading.quality?.needsReview,
+      reading.quality?.warnings.join(" | "),
+      reading.resolution ?? "raw",
+      reading.bucketStart,
+      reading.bucketStart ? formatCsvDateTime(reading.bucketStart) : undefined,
+      reading.bucketEnd,
+      reading.bucketEnd ? formatCsvDateTime(reading.bucketEnd) : undefined,
+      reading.sampleCount ?? 1,
+      reading.volumeLiterMin ?? reading.volumeLiter,
+      reading.volumeLiterMax ?? reading.volumeLiter,
+      reading.fillPercentMin ?? reading.fillPercent,
+      reading.fillPercentMax ?? reading.fillPercent,
+      period.label,
+    ],
+  );
 
   return [
     TANK_READING_CSV_HEADERS.join(","),
     ...rows.map((row) => row.map(escapeCsvValue).join(",")),
-  ].join("\r\n").concat("\r\n");
+  ]
+    .join("\r\n")
+    .concat("\r\n");
 }
 
 export function createTankReadingsCsvFilename({
@@ -305,5 +309,7 @@ export function createTankReadingsCsvFilename({
     sanitizeFilenameSegment(tankName),
     "reading",
     period.filenameSegment,
-  ].join("_").concat(".csv");
+  ]
+    .join("_")
+    .concat(".csv");
 }

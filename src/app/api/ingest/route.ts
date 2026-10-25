@@ -22,7 +22,9 @@ function getClientAddress(headers: Headers): string {
   );
 }
 
-async function checkIngestRateLimit(request: Request): Promise<Response | null> {
+async function checkIngestRateLimit(
+  request: Request,
+): Promise<Response | null> {
   if (getMonitoringStorageDriver() !== "mysql") {
     return null;
   }

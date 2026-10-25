@@ -67,7 +67,9 @@ function assertValidAdminActionCsrf({
       token: csrfToken,
     })
   ) {
-    throw new Error("Sesi admin tidak valid. Muat ulang halaman lalu coba lagi.");
+    throw new Error(
+      "Sesi admin tidak valid. Muat ulang halaman lalu coba lagi.",
+    );
   }
 }
 
@@ -437,7 +439,9 @@ export async function cleanupDeviceRequestsAction(
     const requestIds = getRequestIdsFromForm(formData);
 
     if (requestIds.length === 0) {
-      throw new Error("Pilih minimal satu pengajuan perangkat untuk dibersihkan.");
+      throw new Error(
+        "Pilih minimal satu pengajuan perangkat untuk dibersihkan.",
+      );
     }
 
     if (cleanupMode === "single") {

@@ -78,9 +78,7 @@ function SummaryValue({
     >
       <span className={`absolute inset-x-0 top-0 h-1 ${toneClass.line}`} />
       <p className="text-xs font-semibold uppercase text-zinc-500">{label}</p>
-      <p className={`mt-1 text-2xl font-semibold ${toneClass.text}`}>
-        {value}
-      </p>
+      <p className={`mt-1 text-2xl font-semibold ${toneClass.text}`}>{value}</p>
     </div>
   );
 }

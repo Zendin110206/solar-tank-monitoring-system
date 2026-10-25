@@ -1,7 +1,4 @@
-import {
-  type PoolConnection,
-  type RowDataPacket,
-} from "mysql2/promise";
+import { type PoolConnection, type RowDataPacket } from "mysql2/promise";
 import { getMysqlPool } from "./mysql-connection";
 import type {
   Reading,
@@ -112,9 +109,7 @@ function toNumber(value: number | string | null): number {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
-function toOptionalNumber(
-  value: number | string | null,
-): number | undefined {
+function toOptionalNumber(value: number | string | null): number | undefined {
   return value === null ? undefined : toNumber(value);
 }
 

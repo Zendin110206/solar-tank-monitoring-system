@@ -105,7 +105,10 @@ function normalizePositiveNumber(value?: number | null): number | undefined {
     : undefined;
 }
 
-function normalizePercent(value: number | null | undefined, fallback: number): number {
+function normalizePercent(
+  value: number | null | undefined,
+  fallback: number,
+): number {
   return typeof value === "number" && Number.isFinite(value) ? value : fallback;
 }
 
@@ -130,7 +133,11 @@ function createIssue(
   };
 }
 
-function isValidCoordinate(value: number | undefined, min: number, max: number): boolean {
+function isValidCoordinate(
+  value: number | undefined,
+  min: number,
+  max: number,
+): boolean {
   return typeof value === "undefined" || (value >= min && value <= max);
 }
 
@@ -420,7 +427,10 @@ export function validateDeviceRequestDraft(
 
   if (!isValidCoordinate(draft.latitude ?? undefined, -90, 90)) {
     errors.push(
-      createIssue("latitude", "Latitude harus berada di rentang -90 sampai 90."),
+      createIssue(
+        "latitude",
+        "Latitude harus berada di rentang -90 sampai 90.",
+      ),
     );
   }
 
@@ -435,7 +445,9 @@ export function validateDeviceRequestDraft(
 
   if (draft.tankShape === "rectangular") {
     if (!lengthCm) {
-      errors.push(createIssue("lengthCm", "Tangki balok wajib memiliki panjang."));
+      errors.push(
+        createIssue("lengthCm", "Tangki balok wajib memiliki panjang."),
+      );
     }
 
     if (!widthCm) {
@@ -443,7 +455,9 @@ export function validateDeviceRequestDraft(
     }
 
     if (!heightCm) {
-      errors.push(createIssue("heightCm", "Tangki balok wajib memiliki tinggi."));
+      errors.push(
+        createIssue("heightCm", "Tangki balok wajib memiliki tinggi."),
+      );
     }
   } else if (draft.tankShape === "horizontal-cylinder") {
     if (!lengthCm) {
@@ -503,7 +517,10 @@ export function validateDeviceRequestDraft(
 
   if (!cosPhi) {
     errors.push(
-      createIssue("cosPhi", "Cos phi wajib diisi dengan angka lebih dari 0 sampai 1."),
+      createIssue(
+        "cosPhi",
+        "Cos phi wajib diisi dengan angka lebih dari 0 sampai 1.",
+      ),
     );
   }
 
@@ -610,7 +627,9 @@ export function validateDeviceRequestDraft(
           deviceSensorType,
           tankShape: draft.tankShape,
           capacityLiter,
-          ...(typeof draft.latitude === "number" ? { latitude: draft.latitude } : {}),
+          ...(typeof draft.latitude === "number"
+            ? { latitude: draft.latitude }
+            : {}),
           ...(typeof draft.longitude === "number"
             ? { longitude: draft.longitude }
             : {}),
@@ -679,7 +698,9 @@ export function buildPendingDeviceRequest({
   }
 
   if (!normalizedRequesterEmail) {
-    errors.push(createIssue("requesterEmail", "Email user pengaju wajib tersedia."));
+    errors.push(
+      createIssue("requesterEmail", "Email user pengaju wajib tersedia."),
+    );
   }
 
   if (!validation.ok || !validation.normalized || errors.length > 0) {
@@ -743,7 +764,9 @@ export function buildPendingDeviceRequest({
   };
 }
 
-export function getDeviceRequestStatusLabel(status: DeviceRequestStatus): string {
+export function getDeviceRequestStatusLabel(
+  status: DeviceRequestStatus,
+): string {
   switch (status) {
     case "pending_admin_review":
       return "Menunggu admin";

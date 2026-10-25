@@ -40,8 +40,8 @@ export default async function AccountSecurityPage() {
                 Password, sesi, dan Telegram
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-zinc-500">
-                Kelola akses akun sendiri. Perubahan password akan mencabut
-                sesi lain, dan sesi mencurigakan bisa dicabut dari daftar ini.
+                Kelola akses akun sendiri. Perubahan password akan mencabut sesi
+                lain, dan sesi mencurigakan bisa dicabut dari daftar ini.
               </p>
             </div>
           </div>

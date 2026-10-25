@@ -147,9 +147,9 @@ export default async function AdminDeviceRequestsPage({
                 Pengajuan perangkat sebelum paket firmware dibuat
               </h1>
               <p className="mt-2 max-w-4xl text-sm leading-6 text-zinc-500">
-                Admin cukup melihat daftar ringkas terlebih dahulu. Detail teknis,
-                validasi, dan aksi keputusan dibuka dari tombol tinjau agar halaman
-                tetap bersih.
+                Admin cukup melihat daftar ringkas terlebih dahulu. Detail
+                teknis, validasi, dan aksi keputusan dibuka dari tombol tinjau
+                agar halaman tetap bersih.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">

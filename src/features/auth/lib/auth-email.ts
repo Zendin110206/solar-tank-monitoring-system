@@ -1,6 +1,9 @@
 import nodemailer from "nodemailer";
 
-import { canLogOtpInDevelopment, isProductionLikeEnvironment } from "./auth-config";
+import {
+  canLogOtpInDevelopment,
+  isProductionLikeEnvironment,
+} from "./auth-config";
 
 type OtpDeliveryResult =
   | { delivered: true; delivery: "email" }
@@ -18,9 +21,9 @@ function getSmtpPort(): number {
 function hasSmtpConfig(): boolean {
   return Boolean(
     process.env.SMTP_HOST?.trim() &&
-      process.env.SMTP_USER?.trim() &&
-      process.env.SMTP_PASS?.trim() &&
-      process.env.SMTP_FROM?.trim(),
+    process.env.SMTP_USER?.trim() &&
+    process.env.SMTP_PASS?.trim() &&
+    process.env.SMTP_FROM?.trim(),
   );
 }
 
@@ -261,7 +264,6 @@ export async function sendEmailVerificationEmail({
     ],
     devLogLabel: "DEV-EMAIL-VERIFY",
     kind: "action",
-    warning:
-      "Jika Anda tidak merasa membuat akun FTM, abaikan email ini.",
+    warning: "Jika Anda tidak merasa membuat akun FTM, abaikan email ini.",
   });
 }

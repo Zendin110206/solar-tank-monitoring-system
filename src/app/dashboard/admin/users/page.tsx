@@ -140,7 +140,9 @@ function getPositiveInteger(value: string, fallback: number): number {
 function getPageSize(value: string): number {
   const parsed = getPositiveInteger(value, PAGE_SIZE_OPTIONS[0]);
 
-  return PAGE_SIZE_OPTIONS.includes(parsed as (typeof PAGE_SIZE_OPTIONS)[number])
+  return PAGE_SIZE_OPTIONS.includes(
+    parsed as (typeof PAGE_SIZE_OPTIONS)[number],
+  )
     ? parsed
     : PAGE_SIZE_OPTIONS[0];
 }
@@ -190,7 +192,9 @@ function getStatusClass(status: AuthUserStatus) {
   }
 }
 
-function getInitials(user: Pick<AuthUserDirectoryItem, "fullName" | "username">) {
+function getInitials(
+  user: Pick<AuthUserDirectoryItem, "fullName" | "username">,
+) {
   const source = user.fullName.trim() || user.username.trim();
   const parts = source.split(/\s+/).filter(Boolean);
   const initials = parts
@@ -890,7 +894,10 @@ export default async function AdminUsersPage({
                 <Filter className="size-4" aria-hidden="true" />
                 Terapkan
               </button>
-              <Link className={FILTER_RESET_CLASS} href="/dashboard/admin/users">
+              <Link
+                className={FILTER_RESET_CLASS}
+                href="/dashboard/admin/users"
+              >
                 Reset
               </Link>
             </div>

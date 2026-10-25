@@ -74,8 +74,7 @@ type IngestTelemetryFailure = {
 };
 
 export type IngestTelemetryResult =
-  | IngestTelemetrySuccess
-  | IngestTelemetryFailure;
+  IngestTelemetrySuccess | IngestTelemetryFailure;
 
 function isRecord(value: unknown): value is CatTelemetryPayload {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -203,11 +202,13 @@ export async function ingestTelemetry({
     referenceData = await getMonitoringReferenceData();
   } catch {
     if (getMonitoringStorageDriver() === "mysql") {
-      const activationResult = await activateApprovedDeviceOnFirstPingFromMysql({
-        deviceIdentifier: cleanDeviceIdentifier,
-        deviceKey: cleanDeviceKey,
-        receivedAt,
-      });
+      const activationResult = await activateApprovedDeviceOnFirstPingFromMysql(
+        {
+          deviceIdentifier: cleanDeviceIdentifier,
+          deviceKey: cleanDeviceKey,
+          receivedAt,
+        },
+      );
 
       if (activationResult.ok) {
         device = activationResult.device;
@@ -219,9 +220,8 @@ export async function ingestTelemetry({
           tanks: [activationResult.tank],
         };
       } else {
-        const activationFailure = activationFailureToIngestFailure(
-          activationResult,
-        );
+        const activationFailure =
+          activationFailureToIngestFailure(activationResult);
 
         if (activationFailure) {
           return activationFailure;
@@ -263,9 +263,8 @@ export async function ingestTelemetry({
       tank = activationResult.tank;
       activated = true;
     } else {
-      const activationFailure = activationFailureToIngestFailure(
-        activationResult,
-      );
+      const activationFailure =
+        activationFailureToIngestFailure(activationResult);
 
       if (activationFailure) {
         return activationFailure;
@@ -299,10 +298,7 @@ export async function ingestTelemetry({
     });
 
     if (!provisioningResult.ok) {
-      if (
-        provisioningResult.status === 403 &&
-        !allowDeviceAutoProvisioning
-      ) {
+      if (provisioningResult.status === 403 && !allowDeviceAutoProvisioning) {
         return {
           ok: false,
           status: 404,

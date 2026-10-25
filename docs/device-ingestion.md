@@ -49,8 +49,8 @@ X-Device-Key: demo-tph-key
 
 Key demo yang tersedia:
 
-| Device | Key demo |
-|---|---|
+| Device        | Key demo       |
+| ------------- | -------------- |
 | `demo-tph-01` | `demo-tph-key` |
 | `demo-nja-01` | `demo-nja-key` |
 | `demo-jto-01` | `demo-jto-key` |
@@ -79,16 +79,16 @@ Payload CAT-like:
 
 Penjelasan:
 
-| Field | Arti |
-|---|---|
-| `device` | kode device |
-| `ts` | timestamp dari device, boleh `0` untuk fallback waktu server |
-| `distance` | tinggi ruang kosong: jarak sensor di atas tangki ke permukaan cairan |
-| `voltage` | tegangan device |
-| `raw.H_cm` | tinggi cairan |
-| `raw.volume` | volume liter |
-| `raw.percent` | persen isi |
-| `raw.wifi_rssi` | sinyal WiFi |
+| Field           | Arti                                                                 |
+| --------------- | -------------------------------------------------------------------- |
+| `device`        | kode device                                                          |
+| `ts`            | timestamp dari device, boleh `0` untuk fallback waktu server         |
+| `distance`      | tinggi ruang kosong: jarak sensor di atas tangki ke permukaan cairan |
+| `voltage`       | tegangan device                                                      |
+| `raw.H_cm`      | tinggi cairan                                                        |
+| `raw.volume`    | volume liter                                                         |
+| `raw.percent`   | persen isi                                                           |
+| `raw.wifi_rssi` | sinyal WiFi                                                          |
 
 Catatan timestamp:
 
@@ -203,17 +203,17 @@ pnpm pilot:smoke -- --dry-run
 
 Jika smoke test gagal:
 
-| Status | Arti |
-|---|---|
-| `401` | key salah atau hash di registry tidak cocok |
-| `404` | device belum ada di registry aktif |
-| `503` | storage MySQL belum siap |
+| Status             | Arti                                                       |
+| ------------------ | ---------------------------------------------------------- |
+| `401`              | key salah atau hash di registry tidak cocok                |
+| `404`              | device belum ada di registry aktif                         |
+| `503`              | storage MySQL belum siap                                   |
 | `needsReview=true` | payload masuk, tetapi config payload berbeda dari registry |
 
 ## Device Contoh yang Tersedia
 
-| Device | Tangki |
-|---|---|
+| Device        | Tangki          |
+| ------------- | --------------- |
 | `demo-tph-01` | `tank-tph-main` |
 | `demo-nja-01` | `tank-nja-main` |
 | `demo-jto-01` | `tank-jto-main` |

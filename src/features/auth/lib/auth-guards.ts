@@ -47,8 +47,7 @@ export async function requireApiUser(
   request: NextRequest,
   allowedRoles?: AuthRole[],
 ): Promise<
-  | { ok: true; user: AuthSessionUser }
-  | { ok: false; response: NextResponse }
+  { ok: true; user: AuthSessionUser } | { ok: false; response: NextResponse }
 > {
   const user = await getRequestSessionUser(request);
 

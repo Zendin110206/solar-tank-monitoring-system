@@ -37,15 +37,14 @@ describe("auth crypto", () => {
   });
 
   it("tetap bisa membaca hash PBKDF2 lama dan menandainya untuk upgrade", async () => {
-    const legacyHash = await createLegacyPbkdf2PasswordHashForTest(
-      "password-lama-kuat",
-    );
+    const legacyHash =
+      await createLegacyPbkdf2PasswordHashForTest("password-lama-kuat");
 
     expect(legacyHash).toMatch(/^pbkdf2-sha256\$/);
     expect(passwordNeedsRehash(legacyHash)).toBe(true);
-    await expect(verifyPassword("password-lama-kuat", legacyHash)).resolves.toBe(
-      true,
-    );
+    await expect(
+      verifyPassword("password-lama-kuat", legacyHash),
+    ).resolves.toBe(true);
     await expect(verifyPassword("password-salah", legacyHash)).resolves.toBe(
       false,
     );

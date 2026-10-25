@@ -70,7 +70,7 @@ src/app → layanan modul → repositori (SQL) → koneksi database
   repositori. Tidak ada push langsung ke `main` atau `dev`.
 - Format commit dan judul pull request: `type(scope): deskripsi` (deskripsi bahasa
   Indonesia, huruf kecil, tanpa titik, judul maks. 100 karakter).
-- Tidak ada *force push*, penulisan ulang riwayat, atau melewati pemeriksaan
+- Tidak ada _force push_, penulisan ulang riwayat, atau melewati pemeriksaan
   (`--no-verify`).
 - Jangan mengubah, menghapus, atau menimpa branch, worktree, atau perubahan yang
   bukan milik sendiri.
@@ -79,7 +79,7 @@ src/app → layanan modul → repositori (SQL) → koneksi database
 
 - Membuka, menyalin, atau menampilkan isi `.env.local` atau rahasia apa pun.
 - Menjalankan migrasi, seed, skrip, atau aplikasi terhadap database produksi.
-- Mengirim permintaan ke alamat produksi, men-*deploy*, atau mengubah pengaturan
+- Mengirim permintaan ke alamat produksi, men-_deploy_, atau mengubah pengaturan
   hosting, database, atau GitHub.
 - Mengirim email atau pesan Telegram ke orang sungguhan dari lingkungan
   pengembangan.

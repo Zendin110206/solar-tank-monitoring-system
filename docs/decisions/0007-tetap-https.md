@@ -7,12 +7,12 @@
 
 ## Konteks
 
-- Perangkat mengirim lewat HTTPS. MQTT (protokol pesan untuk IoT) butuh *broker* yang selalu menyala.
+- Perangkat mengirim lewat HTTPS. MQTT (protokol pesan untuk IoT) butuh _broker_ yang selalu menyala.
 - Belum ada bukti terukur bahwa MQTT lebih hemat untuk pola kirim FTM.
 
 ## Keputusan
 
-Tetap HTTPS. Pengiriman berkelompok dan adaptif ditambahkan lewat kontrak v2. MQTT hanya dipertimbangkan bila pengukuran membuktikan manfaatnya dan ada host *broker* yang disetujui.
+Tetap HTTPS. Pengiriman berkelompok dan adaptif ditambahkan lewat kontrak v2. MQTT hanya dipertimbangkan bila pengukuran membuktikan manfaatnya dan ada host _broker_ yang disetujui.
 
 ## Pilihan yang dipertimbangkan
 

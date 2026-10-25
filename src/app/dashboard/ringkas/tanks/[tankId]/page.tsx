@@ -552,7 +552,9 @@ export default async function SimpleTankDetailPage({
               label="Sisa jam"
               note={`Konsumsi ${formatNumber(tank.consumptionLiterPerHour, 2)} L/jam`}
               tone="bg-blue-50 text-blue-700 ring-blue-100"
-              value={tank.hasReading ? formatRuntimeHour(tank.runtimeHour) : "-"}
+              value={
+                tank.hasReading ? formatRuntimeHour(tank.runtimeHour) : "-"
+              }
             />
             <SummaryCard
               icon={Clock3}

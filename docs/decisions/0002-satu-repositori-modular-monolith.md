@@ -13,7 +13,7 @@
 
 ## Keputusan
 
-FTM tetap satu repositori dan satu aplikasi Next.js yang isinya dipisah per modul (*modular monolith*). Modul berada di `src/features/<modul>/`. Arah ketergantungan: halaman/route handler → layanan modul → repositori → koneksi database. Proses pekerja terjadwal di masa depan memakai modul yang sama dari repositori yang sama.
+FTM tetap satu repositori dan satu aplikasi Next.js yang isinya dipisah per modul (_modular monolith_). Modul berada di `src/features/<modul>/`. Arah ketergantungan: halaman/route handler → layanan modul → repositori → koneksi database. Proses pekerja terjadwal di masa depan memakai modul yang sama dari repositori yang sama.
 
 ## Pilihan yang dipertimbangkan
 

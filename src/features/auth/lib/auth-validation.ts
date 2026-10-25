@@ -48,11 +48,15 @@ export type TelegramBindPayload = {
 };
 
 export function normalizeIdentity(value: unknown): string {
-  return String(value ?? "").trim().toLowerCase();
+  return String(value ?? "")
+    .trim()
+    .toLowerCase();
 }
 
 export function normalizeUsername(value: unknown): string {
-  return String(value ?? "").trim().toLowerCase();
+  return String(value ?? "")
+    .trim()
+    .toLowerCase();
 }
 
 export function normalizeText(value: unknown, maxLength: number): string {

@@ -2,12 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element -- Map tiles are external slippy-map tiles; routing them through next/image would add unnecessary proxying. */
 
-import {
-  useMemo,
-  useRef,
-  useState,
-  type PointerEvent,
-} from "react";
+import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { Crosshair, MapPin, Minus, Plus, Search } from "lucide-react";
 
 import type { DashboardSiteStatus } from "../lib/dashboard-view-model";
@@ -112,7 +107,9 @@ const statusFilters: Array<DashboardSiteStatus | "all"> = [
   "offline",
 ];
 
-function isValidCoordinate(site: OperationalMapSite): site is OperationalMapSite &
+function isValidCoordinate(
+  site: OperationalMapSite,
+): site is OperationalMapSite &
   Required<Pick<OperationalMapSite, "latitude" | "longitude">> {
   return (
     typeof site.latitude === "number" &&
@@ -138,8 +135,7 @@ function latLngToWorldPixel(point: LatLng, zoom: number): WorldPixel {
   const sinLatitude = Math.sin((point.latitude * Math.PI) / 180);
   const normalizedX = (point.longitude + 180) / 360;
   const normalizedY =
-    0.5 -
-    Math.log((1 + sinLatitude) / (1 - sinLatitude)) / (4 * Math.PI);
+    0.5 - Math.log((1 + sinLatitude) / (1 - sinLatitude)) / (4 * Math.PI);
   const worldSize = getWorldSize(zoom);
 
   return {
@@ -154,8 +150,7 @@ function worldPixelToLatLng(pixel: WorldPixel, zoom: number): LatLng {
   const normalizedY = 0.5 - pixel.y / worldSize;
   const longitude = normalizedX * 360;
   const latitude =
-    (90 -
-      (360 * Math.atan(Math.exp(-normalizedY * 2 * Math.PI))) / Math.PI);
+    90 - (360 * Math.atan(Math.exp(-normalizedY * 2 * Math.PI))) / Math.PI;
 
   return {
     latitude: clamp(latitude, -85, 85),
@@ -211,7 +206,11 @@ function buildTiles(center: LatLng, zoom: number): Tile[] {
   return tiles;
 }
 
-function getMarkerPosition(site: OperationalMapSite, center: LatLng, zoom: number) {
+function getMarkerPosition(
+  site: OperationalMapSite,
+  center: LatLng,
+  zoom: number,
+) {
   if (!isValidCoordinate(site)) {
     return null;
   }
@@ -257,7 +256,10 @@ export function OperationalMap({
   );
   const dragState = useRef<DragState | null>(null);
 
-  const coordinateSites = useMemo(() => sites.filter(isValidCoordinate), [sites]);
+  const coordinateSites = useMemo(
+    () => sites.filter(isValidCoordinate),
+    [sites],
+  );
   const hasCoordinates = coordinateSites.length > 0;
   const tiles = useMemo(() => buildTiles(center, zoom), [center, zoom]);
   const normalizedQuery = query.trim().toLowerCase();

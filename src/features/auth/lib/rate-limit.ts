@@ -9,8 +9,7 @@ type RateLimitRow = RowDataPacket & {
 };
 
 export type RateLimitResult =
-  | { allowed: true }
-  | { allowed: false; retryAfterSeconds: number };
+  { allowed: true } | { allowed: false; retryAfterSeconds: number };
 
 function hashBucketKey(key: string): string {
   return `hmac-sha256:${hmacSha256Hex(key)}`;

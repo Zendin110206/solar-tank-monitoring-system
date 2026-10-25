@@ -74,8 +74,7 @@ describe("mysql connection", () => {
       }),
     );
     const firstCreatePoolCall = createPoolMock.mock.calls[0] as unknown as
-      | [Record<string, unknown>]
-      | undefined;
+      [Record<string, unknown>] | undefined;
 
     expect(firstCreatePoolCall?.[0]).not.toHaveProperty("dateStrings");
   });

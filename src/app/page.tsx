@@ -121,11 +121,7 @@ export default async function Home() {
     >
       {/* Header */}
       <header className="sticky top-0 z-50 mx-auto flex h-20 max-w-[1480px] items-center justify-between border-b border-zinc-100 bg-white/85 px-5 backdrop-blur-xl sm:px-8 lg:px-12">
-        <a
-          href="#beranda"
-          className="flex items-center gap-3"
-          aria-label="FTM"
-        >
+        <a href="#beranda" className="flex items-center gap-3" aria-label="FTM">
           <BrandLogo
             markClassName="size-10 sm:size-11"
             priority

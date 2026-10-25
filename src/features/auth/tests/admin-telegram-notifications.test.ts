@@ -69,8 +69,7 @@ describe("admin telegram notifications", () => {
       }),
     );
 
-    const message = mocks.sendTelegramMessage.mock.calls[0]?.[0]
-      .text as string;
+    const message = mocks.sendTelegramMessage.mock.calls[0]?.[0].text as string;
 
     expect(message).toContain("Nama: Operator STO");
     expect(message).toContain("Email: operator@example.com");

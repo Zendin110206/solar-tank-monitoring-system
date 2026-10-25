@@ -21,16 +21,17 @@ describe("monitoring storage", () => {
     process.env.SOLAR_TANK_STORAGE_DRIVER = "mysql";
 
     vi.doMock("../lib/mysql-reading-repository", () => ({
-      listLatestMonitoringReadingsByTankFromMysql: vi.fn().mockResolvedValue([]),
+      listLatestMonitoringReadingsByTankFromMysql: vi
+        .fn()
+        .mockResolvedValue([]),
       listMonitoringReadingsForTankInRangeFromMysql: vi.fn(),
       listMonitoringReadingsForTankFromMysql: vi.fn(),
       listMonitoringReadingsFromMysql: vi.fn().mockResolvedValue([]),
       saveMonitoringReadingToMysql: vi.fn(),
     }));
 
-    const { listMonitoringReadingsWithSource } = await import(
-      "../lib/monitoring-storage"
-    );
+    const { listMonitoringReadingsWithSource } =
+      await import("../lib/monitoring-storage");
 
     const result = await listMonitoringReadingsWithSource();
 
@@ -71,9 +72,8 @@ describe("monitoring storage", () => {
       saveMonitoringReadingToMysql: vi.fn(),
     }));
 
-    const { listLatestMonitoringReadingsByTankWithSource } = await import(
-      "../lib/monitoring-storage"
-    );
+    const { listLatestMonitoringReadingsByTankWithSource } =
+      await import("../lib/monitoring-storage");
 
     const result = await listLatestMonitoringReadingsByTankWithSource();
 
@@ -115,9 +115,8 @@ describe("monitoring storage", () => {
       saveMonitoringReadingToMysql: vi.fn(),
     }));
 
-    const { listMonitoringReadingsForTankInRange } = await import(
-      "../lib/monitoring-storage"
-    );
+    const { listMonitoringReadingsForTankInRange } =
+      await import("../lib/monitoring-storage");
 
     const result = await listMonitoringReadingsForTankInRange({
       end: "2026-07-08T17:00:00.000Z",

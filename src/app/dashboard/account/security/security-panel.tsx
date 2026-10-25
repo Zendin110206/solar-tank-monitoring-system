@@ -5,7 +5,10 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { KeyRound, Link2, LogOut, RefreshCcw, Send } from "lucide-react";
 
-import type { AuthSessionSummary, AuthSessionUser } from "@/features/auth/types";
+import type {
+  AuthSessionSummary,
+  AuthSessionUser,
+} from "@/features/auth/types";
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("id-ID", {
@@ -18,9 +21,11 @@ function formatDate(value: string) {
 }
 
 async function readJson(response: Response) {
-  return (await response.json().catch(() => null)) as
-    | { ok?: boolean; error?: string; data?: Record<string, unknown> }
-    | null;
+  return (await response.json().catch(() => null)) as {
+    ok?: boolean;
+    error?: string;
+    data?: Record<string, unknown>;
+  } | null;
 }
 
 export default function AccountSecurityPanel({
@@ -46,12 +51,10 @@ export default function AccountSecurityPanel({
 
   async function refreshSessions() {
     const response = await fetch("/api/auth/sessions", { cache: "no-store" });
-    const result = (await readJson(response)) as
-      | {
-          ok?: boolean;
-          data?: { sessions?: AuthSessionSummary[] };
-        }
-      | null;
+    const result = (await readJson(response)) as {
+      ok?: boolean;
+      data?: { sessions?: AuthSessionSummary[] };
+    } | null;
 
     if (response.ok && result?.ok && Array.isArray(result.data?.sessions)) {
       setSessions(result.data.sessions);
@@ -140,16 +143,16 @@ export default function AccountSecurityPanel({
       const response = await fetch("/api/auth/telegram/bind/start", {
         method: "POST",
       });
-      const result = (await readJson(response)) as
-        | {
-            ok?: boolean;
-            error?: string;
-            data?: { deepLink?: string | null; token?: string };
-          }
-        | null;
+      const result = (await readJson(response)) as {
+        ok?: boolean;
+        error?: string;
+        data?: { deepLink?: string | null; token?: string };
+      } | null;
 
       if (!response.ok || !result?.ok) {
-        throw new Error(result?.error ?? "Binding Telegram belum bisa dimulai.");
+        throw new Error(
+          result?.error ?? "Binding Telegram belum bisa dimulai.",
+        );
       }
 
       setTelegramLink(result.data?.deepLink ?? null);
@@ -175,13 +178,11 @@ export default function AccountSecurityPanel({
 
     try {
       const response = await fetch("/api/auth/me", { cache: "no-store" });
-      const result = (await readJson(response)) as
-        | {
-            ok?: boolean;
-            error?: string;
-            data?: { user?: AuthSessionUser };
-          }
-        | null;
+      const result = (await readJson(response)) as {
+        ok?: boolean;
+        error?: string;
+        data?: { user?: AuthSessionUser };
+      } | null;
 
       if (!response.ok || !result?.ok || !result.data?.user) {
         throw new Error(result?.error ?? "Status Telegram belum bisa dicek.");
@@ -345,7 +346,8 @@ export default function AccountSecurityPanel({
 
         <div className="mt-5 grid gap-3">
           {sessions.map((session) => {
-            const active = !session.revokedAt && new Date(session.expiresAt) > new Date();
+            const active =
+              !session.revokedAt && new Date(session.expiresAt) > new Date();
 
             return (
               <article

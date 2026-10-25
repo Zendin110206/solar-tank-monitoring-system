@@ -284,9 +284,7 @@ function rowToAccessRequest(row: AuthAccessRequestRow): AuthAccessRequest {
       passwordChangedAt: toIso(row.password_changed_at),
       lastLoginAt: toIso(row.last_login_at),
     },
-    requestedRole: isAuthRole(row.requested_role)
-      ? row.requested_role
-      : "user",
+    requestedRole: isAuthRole(row.requested_role) ? row.requested_role : "user",
     accessReason: row.access_reason,
     status:
       row.request_status === "approved" ||
@@ -331,9 +329,18 @@ function rowToSessionSummary(
   };
 }
 
+// Prettier 3.9 tidak stabil memformat tipe kembalian ini (berganti bentuk setiap dijalankan).
+// prettier-ignore
 export async function findAuthUserByIdentity(
   identity: string,
-): Promise<(AuthSafeUser & { passwordHash: string; lockedUntil: string | null; failedLoginCount: number }) | null> {
+): Promise<
+  | (AuthSafeUser & {
+      passwordHash: string;
+      lockedUntil: string | null;
+      failedLoginCount: number;
+    })
+  | null
+> {
   const pool = getMysqlPool();
   const [rows] = await pool.execute<AuthUserRow[]>(
     `SELECT id, email, username, full_name, phone, role, status, password_hash,
@@ -969,7 +976,9 @@ export async function createPendingAccessRequest({
   return { userId, accessRequestId, created: true, email };
 }
 
-export async function listPendingAccessRequests(): Promise<AuthAccessRequest[]> {
+export async function listPendingAccessRequests(): Promise<
+  AuthAccessRequest[]
+> {
   const pool = getMysqlPool();
   const [rows] = await pool.execute<AuthAccessRequestRow[]>(
     `SELECT r.id AS request_id, r.requested_role, r.status AS request_status,
@@ -1029,7 +1038,9 @@ function getAuthUserDirectoryWhere({
 } {
   const clauses: string[] = [];
   const values: string[] = [];
-  const cleanQuery = String(query ?? "").trim().slice(0, 120);
+  const cleanQuery = String(query ?? "")
+    .trim()
+    .slice(0, 120);
 
   if (cleanQuery) {
     const likeQuery = `%${cleanQuery}%`;
@@ -1176,10 +1187,7 @@ export async function approveAccessRequest({
       throw new Error("Pengajuan akses tidak ditemukan.");
     }
 
-    if (
-      shouldRequireEmailVerificationForApproval() &&
-      !row.email_verified_at
-    ) {
+    if (shouldRequireEmailVerificationForApproval() && !row.email_verified_at) {
       throw new Error(
         "Email pengguna belum diverifikasi. Kirim ulang link verifikasi bila perlu.",
       );
@@ -1373,7 +1381,15 @@ export async function createPasswordResetTokenRecord({
     `INSERT INTO auth_password_reset_tokens
       (id, user_id, token_hash, destination_hash, expires_at, ip_hash, user_agent_hash)
      VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [tokenId, userId, tokenHash, destinationHash, expiresAt, ipHash, userAgentHash],
+    [
+      tokenId,
+      userId,
+      tokenHash,
+      destinationHash,
+      expiresAt,
+      ipHash,
+      userAgentHash,
+    ],
   );
 
   return tokenId;
@@ -1394,7 +1410,9 @@ export async function findPasswordResetTokenRecord(
   return rows[0] ?? null;
 }
 
-export async function markPasswordResetTokenUsed(tokenId: string): Promise<void> {
+export async function markPasswordResetTokenUsed(
+  tokenId: string,
+): Promise<void> {
   const pool = getMysqlPool();
   await pool.execute(
     `UPDATE auth_password_reset_tokens
@@ -1434,7 +1452,15 @@ export async function createEmailVerificationTokenRecord({
     `INSERT INTO auth_email_verification_tokens
       (id, user_id, token_hash, destination_hash, expires_at, ip_hash, user_agent_hash)
      VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [tokenId, userId, tokenHash, destinationHash, expiresAt, ipHash, userAgentHash],
+    [
+      tokenId,
+      userId,
+      tokenHash,
+      destinationHash,
+      expiresAt,
+      ipHash,
+      userAgentHash,
+    ],
   );
 
   return tokenId;

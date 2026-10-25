@@ -63,13 +63,13 @@ Penjelasan diagram:
 
 ## Modul
 
-| Modul | Isi utama |
-|---|---|
+| Modul                     | Isi utama                                                                                                                                                                                                                                                                                                 |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `src/features/monitoring` | Perhitungan domain (volume, status, sisa jam genset, kapasitas, konsumsi), normalisasi kiriman perangkat, registry lokasi/tangki/perangkat, penyimpanan pembacaan, pengajuan perangkat, paket firmware, perawatan data, pemeriksaan kesiapan, ekspor CSV, komponen dashboard, peta, grafik, dan visual 3D |
-| `src/features/auth` | Akun, sesi, peran, OTP admin, CSRF (pengaman agar aksi tidak bisa dipicu dari situs lain), captcha, email, pembatas jumlah permintaan, audit, dan Telegram (binding, perintah, notifikasi admin) |
-| `src/features/helpdesk` | Widget bantuan di web dan relay pesan ke topik Telegram |
-| `src/components` | Kerangka halaman bersama (header, footer, menu, halaman akun) dan logo |
-| `src/lib` | Utilitas umum, misalnya pesan error yang aman ditampilkan |
+| `src/features/auth`       | Akun, sesi, peran, OTP admin, CSRF (pengaman agar aksi tidak bisa dipicu dari situs lain), captcha, email, pembatas jumlah permintaan, audit, dan Telegram (binding, perintah, notifikasi admin)                                                                                                          |
+| `src/features/helpdesk`   | Widget bantuan di web dan relay pesan ke topik Telegram                                                                                                                                                                                                                                                   |
+| `src/components`          | Kerangka halaman bersama (header, footer, menu, halaman akun) dan logo                                                                                                                                                                                                                                    |
+| `src/lib`                 | Utilitas umum, misalnya pesan error yang aman ditampilkan                                                                                                                                                                                                                                                 |
 
 Di dalam modul, pola file yang dipakai sekarang:
 
@@ -148,7 +148,7 @@ Format kiriman ini adalah **kontrak perangkat v1** dan dibekukan (lihat
    firmware ZIP yang disimpan terenkripsi.
 4. Tautan unduh bertoken (dengan masa berlaku dan batas jumlah unduhan) dikirim
    ke email pengaju.
-5. Petugas mengisi Wi-Fi, meng-*compile*, dan mengunggah firmware ke perangkat.
+5. Petugas mengisi Wi-Fi, meng-_compile_, dan mengunggah firmware ke perangkat.
 6. Kiriman valid pertama dengan kunci yang cocok mengaktifkan lokasi, tangki, dan
    perangkat.
 

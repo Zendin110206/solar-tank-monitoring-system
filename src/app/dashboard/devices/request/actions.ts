@@ -196,7 +196,9 @@ export async function createDeviceRequestAction(
     });
 
     if (result.ok) {
-      await notifyAdminsDeviceRequestCreated(result.request).catch(() => undefined);
+      await notifyAdminsDeviceRequestCreated(result.request).catch(
+        () => undefined,
+      );
     }
 
     revalidatePath(USER_DEVICE_REQUEST_PATH);

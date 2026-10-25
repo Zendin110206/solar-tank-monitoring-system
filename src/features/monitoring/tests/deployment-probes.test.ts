@@ -9,8 +9,7 @@ const originalStorageDriver = process.env.SOLAR_TANK_STORAGE_DRIVER;
 const originalGlobalDeviceKeyFallback =
   process.env.SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK;
 const originalAutoProvisioning = process.env.SOLAR_TANK_AUTO_PROVISION_DEVICES;
-const originalProvisioningKey =
-  process.env.SOLAR_TANK_DEVICE_PROVISIONING_KEY;
+const originalProvisioningKey = process.env.SOLAR_TANK_DEVICE_PROVISIONING_KEY;
 const originalMysqlDatabaseUrl = process.env.MYSQL_DATABASE_URL;
 const originalAppEnv = process.env.NEXT_PUBLIC_APP_ENV;
 const originalAppBaseUrl = process.env.APP_BASE_URL;
@@ -150,8 +149,7 @@ function restoreEnv() {
   if (typeof originalMysqlBackupRetentionDays === "undefined") {
     delete process.env.MYSQL_BACKUP_RETENTION_DAYS;
   } else {
-    process.env.MYSQL_BACKUP_RETENTION_DAYS =
-      originalMysqlBackupRetentionDays;
+    process.env.MYSQL_BACKUP_RETENTION_DAYS = originalMysqlBackupRetentionDays;
   }
 }
 
