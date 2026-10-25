@@ -85,7 +85,10 @@ Di dalam modul, pola file yang dipakai sekarang:
 
 ## Lapisan dan arah ketergantungan
 
-Arah yang dituju (ADR [0002](decisions/0002-satu-repositori-modular-monolith.md)):
+Arah yang dituju (ADR [0002](decisions/0002-satu-repositori-modular-monolith.md),
+rinciannya di ADR [0011](decisions/0011-struktur-modul-dan-aturan-lapisan.md): daftar
+modul `monitoring`, `devices`, `auth`, `helpdesk`, `admin`; bentuk folder
+`components/`, `domain/`, `server/`, `server/repositories/`, `types/`):
 
 ```text
 src/app (halaman, route handler, server action — tipis)
