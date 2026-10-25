@@ -18,7 +18,7 @@ petugas dan admin.
 ## Perjalanan satu angka, dari tangki sampai layar
 
 ```mermaid
-flowchart LR
+flowchart TB
   A[Sensor di atas tangki<br/>mengukur jarak] --> B[Perangkat ESP8266<br/>mengirim lewat internet]
   B --> C[Pintu penerima data<br/>/api/ingest]
   C --> D[Periksa kunci perangkat<br/>dan rapikan angka]
@@ -114,7 +114,7 @@ diubah. Kalau ada yang melanggar, perubahan ditolak sebelum sampai ke pengguna.
 ## Dari perubahan kode sampai ke pengguna
 
 ```mermaid
-flowchart LR
+flowchart TB
   A[Branch kerja<br/>salinan untuk satu perubahan] --> B[Pull request ke dev<br/>usulan perubahan]
   B --> C{Pemeriksaan otomatis<br/>CI + pratinjau Vercel}
   C -- gagal --> A
