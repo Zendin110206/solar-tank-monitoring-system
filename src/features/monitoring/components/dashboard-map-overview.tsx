@@ -17,6 +17,8 @@ import {
   STATUS_BADGE_CLASS,
   STATUS_DOT_CLASS,
 } from "@/components/ui/status-tone";
+import { Card } from "@/components/ui/card";
+import { StatusPill } from "@/components/ui/status-pill";
 
 type DashboardMapOverviewProps = {
   sites: DashboardMonitoringSite[];
@@ -58,12 +60,9 @@ function StatusBadge({ status }: { status: DashboardSiteStatus }) {
   const meta = statusMeta[status];
 
   return (
-    <span
-      className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ring-1 ${meta.badge}`}
-    >
-      <span className={`size-2 rounded-full ${meta.dot}`} />
+    <StatusPill badgeClass={meta.badge} dotClass={meta.dot}>
       {meta.label}
-    </span>
+    </StatusPill>
   );
 }
 
@@ -150,7 +149,7 @@ export function DashboardMapOverview({
       </section>
 
       {/* Right Detail Overview */}
-      <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+      <Card className="animate-soft-fade">
         {selectedSite ? (
           <>
             <div className="flex items-start justify-between gap-4">
@@ -229,7 +228,7 @@ export function DashboardMapOverview({
             Belum ada STO yang bisa ditampilkan.
           </p>
         )}
-      </section>
+      </Card>
     </>
   );
 }

@@ -8,6 +8,7 @@ import {
   STATUS_BADGE_CLASS,
   STATUS_DOT_CLASS,
 } from "@/components/ui/status-tone";
+import { StatusPill } from "@/components/ui/status-pill";
 
 export type TankLocationMapStatus =
   "online" | "warning" | "critical" | "offline";
@@ -73,12 +74,9 @@ function StatusBadge({ status }: { status: TankLocationMapStatus }) {
   const meta = statusMeta[status];
 
   return (
-    <span
-      className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ring-1 ${meta.badge}`}
-    >
-      <span className={`size-2 rounded-full ${meta.dot}`} />
+    <StatusPill badgeClass={meta.badge} dotClass={meta.dot}>
       {meta.label}
-    </span>
+    </StatusPill>
   );
 }
 

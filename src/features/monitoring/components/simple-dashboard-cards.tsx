@@ -17,6 +17,8 @@ import {
   STATUS_BADGE_CLASS,
   STATUS_DOT_CLASS,
 } from "@/components/ui/status-tone";
+import { SECONDARY_BUTTON_CLASS } from "@/components/ui/button-class";
+import { ActionMessage } from "@/components/ui/message";
 
 type SimpleDashboardCardsProps = {
   adminCleanupToken?: string;
@@ -142,19 +144,15 @@ function DeleteTankDialog({
           />
 
           {state.status === "error" && state.message ? (
-            <p className="rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm font-semibold leading-6 text-red-700">
-              {state.message}
-            </p>
+            <ActionMessage tone="danger">{state.message}</ActionMessage>
           ) : null}
           {state.status === "success" && state.message ? (
-            <p className="rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-2 text-sm font-semibold leading-6 text-emerald-700">
-              {state.message}
-            </p>
+            <ActionMessage tone="success">{state.message}</ActionMessage>
           ) : null}
 
           <div className="grid gap-2 sm:grid-cols-2">
             <button
-              className="inline-flex h-11 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-zinc-600/15 disabled:cursor-not-allowed disabled:opacity-60"
+              className={SECONDARY_BUTTON_CLASS}
               disabled={pending}
               onClick={onClose}
               type="button"
@@ -254,19 +252,15 @@ function ResetTankReadingsDialog({
           />
 
           {state.status === "error" && state.message ? (
-            <p className="rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm font-semibold leading-6 text-red-700">
-              {state.message}
-            </p>
+            <ActionMessage tone="danger">{state.message}</ActionMessage>
           ) : null}
           {state.status === "success" && state.message ? (
-            <p className="rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-2 text-sm font-semibold leading-6 text-emerald-700">
-              {state.message}
-            </p>
+            <ActionMessage tone="success">{state.message}</ActionMessage>
           ) : null}
 
           <div className="grid gap-2 sm:grid-cols-2">
             <button
-              className="inline-flex h-11 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-zinc-600/15 disabled:cursor-not-allowed disabled:opacity-60"
+              className={SECONDARY_BUTTON_CLASS}
               disabled={pending}
               onClick={onClose}
               type="button"
@@ -370,19 +364,15 @@ function ResetAllReadingsDialog({
           </label>
 
           {state.status === "error" && state.message ? (
-            <p className="rounded-lg border border-red-100 bg-red-50 px-3 py-2 text-sm font-semibold leading-6 text-red-700">
-              {state.message}
-            </p>
+            <ActionMessage tone="danger">{state.message}</ActionMessage>
           ) : null}
           {state.status === "success" && state.message ? (
-            <p className="rounded-lg border border-emerald-100 bg-emerald-50 px-3 py-2 text-sm font-semibold leading-6 text-emerald-700">
-              {state.message}
-            </p>
+            <ActionMessage tone="success">{state.message}</ActionMessage>
           ) : null}
 
           <div className="grid gap-2 sm:grid-cols-2">
             <button
-              className="inline-flex h-11 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-zinc-600/15 disabled:cursor-not-allowed disabled:opacity-60"
+              className={SECONDARY_BUTTON_CLASS}
               disabled={pending}
               onClick={onClose}
               type="button"

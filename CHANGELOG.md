@@ -11,6 +11,9 @@ dirilis ke `main`.
 
 ### Ditambahkan
 
+- Kit UI dasar di `src/components/ui/`: `Card` (24 kartu), `StatusPill` (5 lencana status),
+  `FormErrorMessage` dan `ActionMessage` (10 kotak pesan), serta kelas tombol utama dan
+  sekunder (8 tombol). HTML yang dihasilkan sama persis; tampilan tidak berubah.
 - Dokumen `docs/cara-kerja-ftm.md`: cara kerja FTM, bagian aplikasi, pagar pengaman
   otomatis, dan alur rilis dalam bahasa sehari-hari untuk pembaca yang tidak menulis kode.
 - Alur kerja GitHub untuk branch `dev`: CI berjalan untuk `dev` dan `main`,

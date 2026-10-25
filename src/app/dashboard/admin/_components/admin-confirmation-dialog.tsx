@@ -5,6 +5,7 @@ import { useEffect, useId, useRef } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { STATUS_BADGE_CLASS } from "@/components/ui/status-tone";
+import { SECONDARY_BUTTON_CLASS } from "@/components/ui/button-class";
 
 export type AdminConfirmationTone = "danger" | "primary" | "warning";
 
@@ -124,7 +125,7 @@ export function AdminConfirmationDialog(props: AdminConfirmationDialogProps) {
       {children}
       <div className="grid gap-2 sm:grid-cols-2">
         <button
-          className="inline-flex h-11 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-zinc-600/15 disabled:cursor-not-allowed disabled:opacity-60"
+          className={SECONDARY_BUTTON_CLASS}
           disabled={pending}
           onClick={onClose}
           ref={cancelButtonRef}

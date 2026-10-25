@@ -59,6 +59,8 @@ import {
   STATUS_BADGE_CLASS,
   STATUS_DOT_CLASS,
 } from "@/components/ui/status-tone";
+import { Card } from "@/components/ui/card";
+import { StatusPill } from "@/components/ui/status-pill";
 
 export const metadata: Metadata = {
   title: "Detail Tangki Bahan Bakar | FTM",
@@ -425,12 +427,9 @@ function StatusBadge({ status }: { status: TankStatus }) {
   const meta = statusMeta[status];
 
   return (
-    <span
-      className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ring-1 ${meta.badge}`}
-    >
-      <span className={`size-2 rounded-full ${meta.dot}`} />
+    <StatusPill badgeClass={meta.badge} dotClass={meta.dot}>
       {meta.label}
-    </span>
+    </StatusPill>
   );
 }
 
@@ -576,7 +575,7 @@ function TankVisual({ tank }: { tank: TankDetail }) {
   ];
 
   return (
-    <div className="relative overflow-hidden rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+    <Card as="div" className="relative overflow-hidden">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <SectionHeading
           label="Visual tangki"
@@ -671,7 +670,7 @@ function TankVisual({ tank }: { tank: TankDetail }) {
           })}
         </div>
       </div>
-    </div>
+    </Card>
   );
 }
 
@@ -866,7 +865,7 @@ function RuntimeParameterPanel({ tank }: { tank: TankDetail }) {
   );
 
   return (
-    <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+    <Card className="animate-soft-fade">
       <SectionHeading
         label="Sisa jam"
         title="Level parameter runtime"
@@ -922,7 +921,7 @@ function RuntimeParameterPanel({ tank }: { tank: TankDetail }) {
           );
         })}
       </div>
-    </section>
+    </Card>
   );
 }
 
@@ -952,10 +951,7 @@ function TankConfigurationPanel({ tank }: { tank: TankDetail }) {
   ];
 
   return (
-    <section
-      id="konfigurasi"
-      className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
-    >
+    <Card id="konfigurasi" className="animate-soft-fade">
       <SectionHeading
         label="Konfigurasi"
         title="Spesifikasi tangki dan perangkat"
@@ -975,7 +971,7 @@ function TankConfigurationPanel({ tank }: { tank: TankDetail }) {
           </div>
         ))}
       </div>
-    </section>
+    </Card>
   );
 }
 
@@ -1293,10 +1289,7 @@ export default async function TankDetailPage({
             </section>
 
             {/* History Section */}
-            <section
-              id="riwayat"
-              className="animate-soft-fade min-w-0 rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
-            >
+            <Card id="riwayat" className="animate-soft-fade min-w-0">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <SectionHeading
                   label="Riwayat"
@@ -1310,12 +1303,12 @@ export default async function TankDetailPage({
                 trends={tank.chartTrends}
               />
               <ReadingTable tank={tank} />
-            </section>
+            </Card>
           </div>
 
           <aside className="min-w-0 space-y-5">
             {/* Device Health Section */}
-            <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+            <Card className="animate-soft-fade">
               <div className="flex items-start justify-between gap-4">
                 <SectionHeading
                   label="Perangkat"
@@ -1325,7 +1318,7 @@ export default async function TankDetailPage({
                 <StatusBadge status={tank.status} />
               </div>
               <ParameterList items={deviceParameters} />
-            </section>
+            </Card>
 
             {/* Runtime Parameter Section */}
             <RuntimeParameterPanel tank={tank} />
@@ -1342,7 +1335,7 @@ export default async function TankDetailPage({
 
         <div className="mt-5 grid min-w-0 gap-5 xl:grid-cols-3">
           {/* Data Flow Section */}
-          <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+          <Card className="animate-soft-fade">
             <SectionHeading
               label="Alur baca"
               title="Dari sensor ke keputusan"
@@ -1372,13 +1365,10 @@ export default async function TankDetailPage({
                 </div>
               ))}
             </div>
-          </section>
+          </Card>
 
           {/* Device Data Section */}
-          <section
-            id="data-perangkat"
-            className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
-          >
+          <Card id="data-perangkat" className="animate-soft-fade">
             <SectionHeading
               label="Data perangkat"
               title="Field kompatibel CAT"
@@ -1448,10 +1438,10 @@ export default async function TankDetailPage({
                 sensor secara langsung.
               </p>
             </div>
-          </section>
+          </Card>
 
           {/* Validation Notes Section */}
-          <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+          <Card className="animate-soft-fade">
             <SectionHeading
               label="Validasi lapangan"
               title="Data yang perlu dikonfirmasi"
@@ -1477,7 +1467,7 @@ export default async function TankDetailPage({
                 </div>
               ))}
             </div>
-          </section>
+          </Card>
         </div>
       </div>
     </main>

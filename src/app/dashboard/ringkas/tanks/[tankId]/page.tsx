@@ -37,6 +37,7 @@ import { mergeMonitoringReadingsById } from "@/features/monitoring/lib/latest-re
 import type { DeviceStatus } from "@/features/monitoring/types/monitoring";
 import { formatNumber } from "@/lib/format";
 import { STATUS_BADGE_CLASS } from "@/components/ui/status-tone";
+import { Card } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "Detail Operasional Tangki | FTM",
@@ -268,7 +269,7 @@ function RuntimeParameterPanel({ tank }: { tank: SimpleTankDetail }) {
   );
 
   return (
-    <article className="min-w-0 rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+    <Card as="article" className="min-w-0">
       <div className="flex items-start gap-3">
         <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-700 ring-1 ring-blue-100">
           <Timer className="size-5" aria-hidden="true" />
@@ -331,7 +332,7 @@ function RuntimeParameterPanel({ tank }: { tank: SimpleTankDetail }) {
           );
         })}
       </div>
-    </article>
+    </Card>
   );
 }
 
@@ -352,7 +353,7 @@ function TankDimensionPanel({ tank }: { tank: SimpleTankDetail }) {
         ];
 
   return (
-    <article className="min-w-0 rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+    <Card as="article" className="min-w-0">
       <div className="flex items-start gap-3">
         <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-700 ring-1 ring-blue-100">
           <Ruler className="size-5" aria-hidden="true" />
@@ -384,7 +385,7 @@ function TankDimensionPanel({ tank }: { tank: SimpleTankDetail }) {
           },
         ]}
       />
-    </article>
+    </Card>
   );
 }
 
@@ -564,7 +565,7 @@ export default async function SimpleTankDetailPage({
         </section>
 
         <section className="mt-4 grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
-          <article className="min-w-0 rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+          <Card as="article" className="min-w-0">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <p className="text-sm font-semibold uppercase text-zinc-500">
@@ -585,7 +586,7 @@ export default async function SimpleTankDetailPage({
               exportHrefBase={`/api/tanks/${tank.id}/readings/export`}
               trends={tank.chartTrends}
             />
-          </article>
+          </Card>
 
           <RuntimeParameterPanel tank={tank} />
         </section>
@@ -593,7 +594,7 @@ export default async function SimpleTankDetailPage({
         <section className="mt-4 grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
           <TankDimensionPanel tank={tank} />
 
-          <article className="min-w-0 rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+          <Card as="article" className="min-w-0">
             <div className="flex items-start gap-3">
               <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-700 ring-1 ring-blue-100">
                 <MapPin className="size-5" aria-hidden="true" />
@@ -621,7 +622,7 @@ export default async function SimpleTankDetailPage({
               <Server className="size-4" aria-hidden="true" />
               Lihat semua STO
             </Link>
-          </article>
+          </Card>
         </section>
       </div>
     </main>
