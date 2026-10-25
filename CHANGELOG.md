@@ -11,6 +11,8 @@ dirilis ke `main`.
 
 ### Ditambahkan
 
+- Dokumen `docs/cara-kerja-ftm.md`: cara kerja FTM, bagian aplikasi, pagar pengaman
+  otomatis, dan alur rilis dalam bahasa sehari-hari untuk pembaca yang tidak menulis kode.
 - Alur kerja GitHub untuk branch `dev`: CI berjalan untuk `dev` dan `main`,
   template pull request, formulir issue (bug, fitur, tugas teknis), dan
   CODEOWNERS (#18).
