@@ -19,6 +19,8 @@ dirilis ke `main`.
 - Indeks dokumentasi `docs/README.md`, catatan keputusan arsitektur ADR 0001–0010,
   dan dokumen arsitektur yang sesuai kode per Oktober 2026 (#20).
 - `CODE_OF_CONDUCT.md`, `SUPPORT.md`, `CHANGELOG.md`, dan `AGENTS.md` (#21).
+- ADR 0011: struktur modul (`monitoring`, `devices`, `auth`, `helpdesk`, `admin`),
+  bentuk folder per modul, dan aturan lapisan.
 - Prettier sebagai pemformat kode (`pnpm format`, `pnpm format:check`) dan `.nvmrc`
   untuk Node.js 22 (#22).
 - commitlint untuk format pesan commit dan judul pull request, hook git lefthook

@@ -22,6 +22,7 @@ Keputusan baru ditulis dengan [templat](0000-template.md). Status:
 | [0008](0008-backup-berbeda-dari-arsip.md)          | Backup berbeda dari arsip                                    | Diusulkan — belum disetujui |
 | [0009](0009-akses-per-lokasi.md)                   | Akses data dibatasi per lokasi                               | Diusulkan — belum disetujui |
 | [0010](0010-alarm-operasional-dan-sistem.md)       | Alarm operasional dipisah dari alarm sistem                  | Diusulkan — belum disetujui |
+| [0011](0011-struktur-modul-dan-aturan-lapisan.md)  | Struktur modul dan aturan lapisan                            | Diterima                    |
 
 Catatan keputusan sebelum Oktober 2026 tersimpan sebagai riwayat di
 [decision-log.md](../decision-log.md).
