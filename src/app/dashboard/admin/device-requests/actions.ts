@@ -15,9 +15,9 @@ import {
   revokeDeviceProvisioning as revokeDeviceProvisioningInMysql,
 } from "@/features/monitoring/server/device-request-service";
 import {
-  cleanupMonitoringDeviceRequestsInMysql,
-  resetMonitoringDeviceDataInMysql,
-} from "@/features/monitoring/lib/mysql-maintenance-repository";
+  cleanupMonitoringDeviceRequests as cleanupMonitoringDeviceRequestsInMysql,
+  resetMonitoringDeviceData as resetMonitoringDeviceDataInMysql,
+} from "@/features/monitoring/server/maintenance-service";
 import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
 

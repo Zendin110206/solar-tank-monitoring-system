@@ -49,6 +49,9 @@ dirilis ke `main`.
   layanan `src/features/auth/server/` (ADR 0011), bukan langsung dari repositori MySQL.
 - Route bantuan web `/api/helpdesk/session` dan `/api/helpdesk/messages` memakai
   layanan `src/features/helpdesk/server/`; isi balasan, batas permintaan, dan notifikasi tetap.
+- Aksi perawatan data di dashboard dan halaman pengajuan perangkat (reset pembacaan,
+  pembersihan data uji) memakai layanan `src/features/monitoring/server/maintenance-service.ts`;
+  konfirmasi, cakupan penghapusan, dan pesan tetap. Tidak ada lagi impor repositori di `src/app`.
 - Panduan pemeriksaan lokal disesuaikan dengan Node.js 22, pnpm 9.15.3, aturan
   login, kesiapan layanan, simulator, dan tes MySQL; status audit keamanan dibatasi
   pada branch yang diperiksa dan diberi tanggal (#35).

@@ -1,7 +1,7 @@
 import type { RowDataPacket } from "mysql2/promise";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { resetMonitoringReadingsInMysql } from "../../lib/mysql-maintenance-repository";
+import { resetMonitoringReadings as resetMonitoringReadingsInMysql } from "../../server/maintenance-service";
 import { saveMonitoringReadingToMysql } from "../../lib/mysql-reading-repository";
 import type { Reading } from "../../types/monitoring";
 import {
