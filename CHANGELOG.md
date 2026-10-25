@@ -21,6 +21,8 @@ dirilis ke `main`.
 - `CODE_OF_CONDUCT.md`, `SUPPORT.md`, `CHANGELOG.md`, dan `AGENTS.md` (#21).
 - ADR 0011: struktur modul (`monitoring`, `devices`, `auth`, `helpdesk`, `admin`),
   bentuk folder per modul, dan aturan lapisan.
+- Aturan ESLint `no-restricted-imports` untuk `src/app`: impor repositori, koneksi
+  database, atau `mysql2` ditolak saat lint dan di CI (ADR 0011).
 - Prettier sebagai pemformat kode (`pnpm format`, `pnpm format:check`) dan `.nvmrc`
   untuk Node.js 22 (#22).
 - commitlint untuk format pesan commit dan judul pull request, hook git lefthook

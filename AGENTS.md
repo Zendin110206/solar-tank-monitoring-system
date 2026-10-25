@@ -45,8 +45,9 @@ Node.js 22 dan pnpm 9.15.3. Dokumentasi Next.js versi yang terpasang ada di
 src/app → layanan modul → repositori (SQL) → koneksi database
 ```
 
-- Halaman dan route handler tidak mengimpor repositori atau koneksi database
-  secara langsung pada kode baru. Penyimpangan lama sedang dirapikan bertahap.
+- Halaman, route handler, dan server action tidak mengimpor repositori, koneksi
+  database, atau `mysql2`. Aturan ini dicek ESLint; data diambil lewat layanan di
+  `server/` modul.
 - Rumus operasional (volume, status, sisa jam genset, konsumsi) hanya di satu
   tempat, tanpa I/O, dan diberi tes.
 - Client component tidak mengimpor kode khusus server.

@@ -108,12 +108,20 @@ CSRF, pengiriman email, dan pembaruan halaman masih berada di pemanggilnya denga
 urutan yang sama. Pemisahan modul `devices` dan pemindahan alur tersebut dilakukan
 bertahap sesuai ADR 0011.
 
+Pintu layanan lain dengan pola yang sama:
+
+- `src/features/auth/server/`: audit keamanan akun, profil, dan manajemen pengguna;
+- `src/features/helpdesk/server/helpdesk-service.ts`: route bantuan web;
+- `src/features/monitoring/server/maintenance-service.ts`: aksi perawatan data
+  (reset pembacaan, pembersihan data uji).
+
+Sejak Oktober 2026 tidak ada lagi berkas di `src/app` yang mengimpor repositori,
+koneksi database, atau `mysql2`. Aturan ini dicek ESLint (`no-restricted-imports`
+di `eslint.config.mjs`), sehingga `pnpm lint` dan CI gagal bila dilanggar.
+
 Penyimpangan yang **masih ada** per 25 Oktober 2026 dan akan dirapikan bertahap
 tanpa mengubah perilaku:
 
-- 6 file di `src/app` masih mengimpor repositori MySQL secara langsung: aksi
-  perawatan data, tinjauan perangkat (bagian pembersihan), audit, manajemen akun,
-  dan profil;
 - ambang status sisa jam genset ditulis di tiga tempat dengan kelas yang berbeda
   (`status.ts` dan dua halaman detail tangki);
 - pola tampilan yang sama (kartu, format angka, warna status) ditulis ulang di
