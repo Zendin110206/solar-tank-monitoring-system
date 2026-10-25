@@ -1,5 +1,8 @@
 # Deployment
 
+> **Status dokumen:** terakhir diperiksa 14 Juli 2026. Isinya belum diverifikasi ulang
+> terhadap kode per Oktober 2026; cara menjalankan lokal yang terkini ada di README.
+
 Dokumen ini menjelaskan deployment yang aktif, cara menyiapkan environment lain,
 dan batas klaim operasionalnya.
 

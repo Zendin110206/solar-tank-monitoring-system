@@ -1,5 +1,8 @@
 # Batas Sistem
 
+> **Status dokumen:** terakhir diperiksa 14 Juli 2026. Isinya belum diverifikasi ulang
+> terhadap kode per Oktober 2026; arah pengembangan terkini ada di catatan keputusan.
+
 Dokumen ini menjelaskan hal yang masuk dan tidak masuk ke repositori.
 
 ## Masuk Scope Saat Ini

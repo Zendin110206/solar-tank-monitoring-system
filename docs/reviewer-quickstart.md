@@ -1,5 +1,8 @@
 # Reviewer Quickstart
 
+> **Status dokumen:** terakhir diperiksa 14 Juli 2026. Isinya belum diverifikasi ulang
+> terhadap kode per Oktober 2026; versi Node.js yang dipakai sekarang adalah 22 dan cara menjalankan lokal yang terkini ada di README.
+
 Dokumen ini untuk orang yang ingin mengecek repo dengan cepat.
 
 ## 1. Clone dan Install

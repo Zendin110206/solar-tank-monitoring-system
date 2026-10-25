@@ -1,5 +1,9 @@
 # Development Log
 
+> **Status dokumen:** riwayat per 14 Juli 2026. Isinya tidak lagi diperbarui. Kondisi
+> terkini ada di [status operasional](current-operational-truth.md) dan arah
+> pengembangan di [catatan keputusan](decisions/README.md).
+
 Dokumen ini mencatat perkembangan implementasi secara ringkas.
 
 ## 2026-06-24 - Fondasi Repo dan Dokumentasi Awal

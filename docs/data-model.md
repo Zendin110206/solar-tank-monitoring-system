@@ -1,5 +1,8 @@
 # Model Data
 
+> **Status dokumen:** terakhir diperiksa 14 Juli 2026. Isinya belum diverifikasi ulang
+> terhadap kode per Oktober 2026; struktur tabel tetap mengikuti migrasi 001–009.
+
 Dokumen ini menjelaskan data utama yang dipakai dalam sistem monitoring.
 
 ## Gambaran Awam

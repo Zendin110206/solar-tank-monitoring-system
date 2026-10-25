@@ -1,5 +1,8 @@
 # Model Domain dan Perhitungan
 
+> **Status dokumen:** terakhir diperiksa 14 Juli 2026. Isinya belum diverifikasi ulang
+> terhadap kode per Oktober 2026; pemeriksaan ulang dilakukan bersama tes karakterisasi perhitungan.
+
 Dokumen ini menjelaskan rumus dan status yang menjadi inti sistem monitoring.
 
 ## Konsep Utama

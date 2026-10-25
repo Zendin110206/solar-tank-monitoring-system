@@ -1,5 +1,8 @@
 # Database Backup
 
+> **Status dokumen:** terakhir diperiksa 8 Juli 2026. Isinya belum diverifikasi ulang
+> terhadap kode per Oktober 2026; backup otomatis dan uji pulih belum berjalan per Oktober 2026.
+
 Backup database wajib disiapkan sebelum aplikasi dipakai sebagai sistem operasional.
 
 ## Prinsip
