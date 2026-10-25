@@ -128,8 +128,23 @@ Logika murni tidak boleh mengakses database dan hanya ada di satu tempat.
 Pengajuan perangkat memakai pintu layanan
 `src/features/monitoring/server/device-request-service.ts`. Dua halaman pengajuan,
 aksi formulir pengguna dan admin, serta route unduhan paket memanggil layanan ini.
-Selama transisi, layanan meneruskan fungsi repositori yang sama; kueri SQL dan
-transaksi tetap di `lib/mysql-device-request-repository.ts`. Pemeriksaan akun,
+Selama transisi, layanan meneruskan fungsi repositori yang sama melalui pintu
+kompatibilitas `lib/mysql-device-request-repository.ts`. Implementasi SQL berada
+di `server/repositories/device-requests/`, dipisahkan menurut tanggung jawab:
+
+| Berkas                                                                     | Tanggung jawab                                                                                           |
+| -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `requests.ts`                                                              | Daftar, pembuatan, dan pembacaan pengajuan dengan penguncian baris                                       |
+| `review.ts`                                                                | Persetujuan, penolakan, dan pencabutan akses perangkat                                                   |
+| `packages.ts`                                                              | Pencatatan email, pembaruan token, pembuatan ulang, dan unduhan paket                                    |
+| `activation.ts`                                                            | Pemeriksaan kunci dan aktivasi pada kiriman valid pertama                                                |
+| `catalog.ts`, `registry.ts`, `package-queries.ts`, `package-generation.ts` | Katalog hardware/template, registry nonaktif, kueri paket, dan pembuatan paket dalam transaksi pemanggil |
+| `types.ts`, `row-mappers.ts`, `events.ts`, `shared.ts`                     | Tipe baris/hasil, pemetaan baris, pencatatan peristiwa, dan serialisasi                                  |
+
+`index.ts` dan pintu lama mengekspor fungsi serta tipe publik yang sama secara
+eksplisit. Setiap alur tetap memakai koneksi transaksi yang sama; SQL, urutan
+operasi, penguncian baris, commit, rollback, dan pelepasan koneksi tidak berubah.
+Seluruh berkas repositori ditandai `server-only`. Pemeriksaan akun,
 CSRF, pengiriman email, dan pembaruan halaman masih berada di pemanggilnya dengan
 urutan yang sama. Pemisahan modul `devices` dan pemindahan alur tersebut dilakukan
 bertahap sesuai ADR 0011.
@@ -185,8 +200,8 @@ tanpa mengubah perilaku:
   (`status.ts` dan dua halaman detail tangki);
 - pola tampilan yang sama (kartu, format angka, warna status) ditulis ulang di
   banyak file;
-- beberapa file sangat besar, misalnya `mysql-device-request-repository.ts`
-  (±2.400 baris) dan `mysql-auth-repository.ts` (±1.700 baris);
+- beberapa file masih sangat besar, misalnya `mysql-auth-repository.ts`
+  (±1.700 baris); repositori pengajuan perangkat sudah dipecah menurut tanggung jawab;
 - `auth/server/rate-limit.ts` dan `auth/server/admin-telegram-notifications.ts` masih
   menjalankan kueri SQL sendiri, bukan lewat repositori. Keduanya dikecualikan dari
   aturan ESLint layanan secara tertulis di `eslint.config.mjs` sampai SQL-nya dipindah;
