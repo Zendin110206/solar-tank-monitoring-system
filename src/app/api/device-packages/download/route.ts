@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { downloadDevicePackageByTokenFromMysql } from "@/features/monitoring/lib/mysql-device-request-repository";
+import { downloadDevicePackage as downloadDevicePackageByTokenFromMysql } from "@/features/monitoring/server/device-request-service";
 import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
 
 export const runtime = "nodejs";

@@ -7,13 +7,13 @@ import { verifyAdminActionCsrfToken } from "@/features/auth/lib/auth-csrf";
 import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
 import { sendDevicePackageReadyEmail } from "@/features/monitoring/lib/device-package-email";
 import {
-  approveDeviceRequestInMysql,
-  recordFirmwarePackageEmailDeliveryInMysql,
-  refreshDevicePackageDownloadTokenInMysql,
-  rejectDeviceRequestInMysql,
-  reissueDevicePackageInMysql,
-  revokeDeviceProvisioningInMysql,
-} from "@/features/monitoring/lib/mysql-device-request-repository";
+  approveDeviceRequest as approveDeviceRequestInMysql,
+  recordDevicePackageEmailDelivery as recordFirmwarePackageEmailDeliveryInMysql,
+  refreshDevicePackageDownload as refreshDevicePackageDownloadTokenInMysql,
+  rejectDeviceRequest as rejectDeviceRequestInMysql,
+  reissueDevicePackage as reissueDevicePackageInMysql,
+  revokeDeviceProvisioning as revokeDeviceProvisioningInMysql,
+} from "@/features/monitoring/server/device-request-service";
 import {
   cleanupMonitoringDeviceRequestsInMysql,
   resetMonitoringDeviceDataInMysql,

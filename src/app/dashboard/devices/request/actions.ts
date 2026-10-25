@@ -4,9 +4,9 @@ import { revalidatePath } from "next/cache";
 
 import { requirePageUser } from "@/features/auth/lib/auth-guards";
 import {
-  createDeviceRequestInMysql,
-  type CreateDeviceRequestFromMysqlResult,
-} from "@/features/monitoring/lib/mysql-device-request-repository";
+  submitDeviceRequest as createDeviceRequestInMysql,
+  type SubmitDeviceRequestResult as CreateDeviceRequestFromMysqlResult,
+} from "@/features/monitoring/server/device-request-service";
 import { notifyAdminsDeviceRequestCreated } from "@/features/monitoring/lib/device-request-notifications";
 import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
