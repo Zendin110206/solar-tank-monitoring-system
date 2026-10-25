@@ -116,7 +116,7 @@ jobs:
         run: printf '%s\n' "$PR_TITLE" | pnpm exec commitlint --verbose
 
   audit:
-    name: Dependency audit (report only)
+    name: Dependency audit
     runs-on: ubuntu-latest
 
     steps:
@@ -135,9 +135,8 @@ jobs:
         with:
           node-version: 22
 
-      # Hanya melaporkan sampai pembaruan dependensi keamanan selesai: hasilnya
-      # ditulis ke ringkasan job dan job tetap hijau. Setelah itu langkah ini
-      # dibuat wajib lulus.
+      # Wajib lulus: kerentanan tingkat tinggi atau kritis pada dependensi
+      # produksi menggagalkan pull request. Hasil lengkap ditulis ke ringkasan job.
       - name: Audit production dependencies (high and critical)
         run: |
           set +e
@@ -150,7 +149,5 @@ jobs:
             tail -n 5 audit.txt
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-          if [ "$status" -ne 0 ]; then
-            echo "::warning title=Audit dependensi::Ada kerentanan tingkat tinggi atau kritis. Lihat ringkasan job."
-          fi
-          exit 0
+          cat audit.txt
+          exit $status

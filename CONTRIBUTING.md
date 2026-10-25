@@ -135,7 +135,8 @@ git status
 
 `pnpm check` juga dijalankan GitHub Actions untuk setiap pull request ke `dev`
 dan `main`, dan wajib lulus sebelum digabung. GitHub Actions juga memeriksa
-format judul pull request dan melaporkan hasil `pnpm audit --prod`.
+format judul pull request dan menjalankan `pnpm audit --prod`; kerentanan tingkat
+tinggi atau kritis pada dependensi produksi membuat pull request gagal.
 
 ### Tes
 

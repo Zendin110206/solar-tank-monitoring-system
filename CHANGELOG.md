@@ -64,6 +64,8 @@ dirilis ke `main`.
 - Versi aman dipaksa lewat `pnpm.overrides` untuk paket turunan Next.js:
   `browserslist` 4.28.9, `baseline-browser-mapping` 2.11.0, dan `source-map-js` 1.2.2.
   `pnpm audit --prod` kini tidak menemukan kerentanan.
+- Job CI audit dependensi kini wajib lulus: kerentanan tinggi atau kritis pada
+  dependensi produksi menggagalkan pull request.
 
 ## [0.1.0] - 2026-08-02
 
