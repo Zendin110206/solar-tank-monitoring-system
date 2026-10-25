@@ -223,7 +223,8 @@ FTM adalah satu aplikasi Next.js yang dibagi per modul di `src/features/`
 - Halaman, route handler, dan server action di `src/app` dibuat tipis dan
   memanggil layanan modul. ESLint menolak impor repositori, koneksi database, atau
   `mysql2` dari `src/app` (ADR 0011).
-- Kueri SQL hanya ada di repositori modul.
+- Kueri SQL hanya ada di repositori modul. Layanan hanya memakai repositori modulnya
+  sendiri; ESLint menolak repositori atau koneksi database modul lain.
 - Rumus operasional (volume, status, sisa jam genset) ada di satu tempat, tanpa
   akses database, dan diberi tes.
 - Komponen yang berjalan di browser tidak mengimpor kode khusus server.

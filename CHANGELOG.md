@@ -47,6 +47,10 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Modul `helpdesk` memakai bentuk folder ADR 0011: layanan, notifikasi, dan relay
+  Telegram di `server/`, kueri SQL di `server/repositories/mysql-helpdesk-repository.ts`,
+  tipe di `types/helpdesk.ts`. Isi berkas tidak berubah selain alamat impor. ESLint kini
+  menolak layanan yang memakai repositori atau koneksi database modul lain.
 - ADR 0011 diberi bagian **Pembaruan**: aturan lapisan `src/app` tercapai dan dicek
   otomatis, penanda `server-only` dan katalog pengaturan dibuat, serta pembantu balasan
   HTTP dibatalkan beserta alasannya.

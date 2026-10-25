@@ -11,7 +11,7 @@ import {
   findHelpdeskSessionByCode,
   normalizeHelpdeskMessage,
   summarizeHelpdeskSession,
-} from "./helpdesk-repository";
+} from "./repositories/mysql-helpdesk-repository";
 
 type ParsedHelpdeskCommand =
   | {

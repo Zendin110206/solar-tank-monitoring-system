@@ -79,10 +79,25 @@ Di dalam modul, pola file yang dipakai sekarang:
 - **view model** (menyiapkan data untuk tampilan): `dashboard-view-model.ts`,
   `simple-dashboard-model.ts`, `simple-tank-detail-model.ts`,
   `tank-detail-view-model.ts`;
-- **repositori** (kueri SQL): `mysql-*-repository.ts`, `helpdesk-repository.ts`;
+- **repositori** (kueri SQL): `mysql-*-repository.ts`;
 - **layanan** (alur kerja yang menggabungkan beberapa langkah):
   `ingest-telemetry.ts`, `device-provisioning.ts`, `auth-service.ts`;
 - **komponen** tampilan di folder `components/`.
+
+Modul yang sudah memakai bentuk folder ADR 0011:
+
+```text
+src/features/helpdesk/
+├── components/helpdesk-widget.tsx         tombol dan jendela bantuan
+├── server/
+│   ├── helpdesk-service.ts                pintu untuk src/app
+│   ├── helpdesk-notifications.ts          kabar pesan baru ke admin
+│   ├── helpdesk-telegram.ts               relay balasan dari Telegram
+│   └── repositories/mysql-helpdesk-repository.ts   kueri SQL
+└── types/helpdesk.ts
+```
+
+Modul lain masih memakai folder `lib/` dan dipindah satu per satu.
 
 ## Lapisan dan arah ketergantungan
 
@@ -119,6 +134,9 @@ Pintu layanan lain dengan pola yang sama:
 Sejak Oktober 2026 tidak ada lagi berkas di `src/app` yang mengimpor repositori,
 koneksi database, atau `mysql2`. Aturan ini dicek ESLint (`no-restricted-imports`
 di `eslint.config.mjs`), sehingga `pnpm lint` dan CI gagal bila dilanggar.
+ESLint juga menolak layanan di `server/` yang memakai repositori atau koneksi database
+milik modul lain (aturan 2 ADR 0011). Repositori modul sendiri diimpor dengan jalur
+relatif pendek, misalnya `./repositories/...` atau `../lib/...`.
 
 Modul khusus server (repositori, koneksi database, layanan di `server/`, email,
 Telegram, sesi, CSRF, kunci perangkat, paket firmware, dan konfigurasi rahasia)

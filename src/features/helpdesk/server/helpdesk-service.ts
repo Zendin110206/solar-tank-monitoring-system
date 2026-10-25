@@ -6,4 +6,4 @@ export {
   addUserHelpdeskMessage,
   getOrCreateHelpdeskSession,
   normalizeHelpdeskMessage,
-} from "../lib/helpdesk-repository";
+} from "./repositories/mysql-helpdesk-repository";

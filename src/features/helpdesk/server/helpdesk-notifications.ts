@@ -4,8 +4,8 @@ import {
   sendAdminTelegramNotification,
   type AdminTelegramNotifyResult,
 } from "@/features/auth/lib/admin-telegram-notifications";
-import type { HelpdeskMessage, HelpdeskSession } from "../types";
-import { summarizeHelpdeskSession } from "./helpdesk-repository";
+import type { HelpdeskMessage, HelpdeskSession } from "../types/helpdesk";
+import { summarizeHelpdeskSession } from "./repositories/mysql-helpdesk-repository";
 
 export async function notifyAdminsHelpdeskMessageCreated({
   message,

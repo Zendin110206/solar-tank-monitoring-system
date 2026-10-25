@@ -7,7 +7,7 @@ import {
   getOrCreateHelpdeskSession,
   normalizeHelpdeskMessage,
 } from "@/features/helpdesk/server/helpdesk-service";
-import { notifyAdminsHelpdeskMessageCreated } from "@/features/helpdesk/lib/helpdesk-notifications";
+import { notifyAdminsHelpdeskMessageCreated } from "@/features/helpdesk/server/helpdesk-notifications";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
 
 export const dynamic = "force-dynamic";
