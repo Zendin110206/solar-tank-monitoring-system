@@ -39,6 +39,30 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  // Aturan 2 ADR 0011: layanan di server/ hanya memakai repositori modulnya sendiri.
+  // Repositori modul sendiri diimpor dengan jalur relatif pendek (../lib/..., ./repositories/...);
+  // repositori modul lain tertangkap pola di bawah. Folder repositories/ dikecualikan.
+  {
+    files: ["src/features/*/server/**/*.{ts,tsx}"],
+    ignores: ["src/features/*/server/repositories/**"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              // Alias @/features/<modul>/... atau jalur relatif ../../<modul>/... (kedalaman berapa pun)
+              // yang berakhir di repositori atau koneksi database.
+              regex:
+                "^(@/features/[^/]+|(\\.\\./)+[^/.][^/]*)/(server/repositories/[^/]+|lib/[^/]*-repository|lib/mysql-connection)$",
+              message:
+                "Layanan tidak memakai repositori atau koneksi database modul lain; panggil layanan modul itu (ADR 0011).",
+            },
+          ],
+        },
+      ],
+    },
+  },
   // Variabel lingkungan hanya dibaca di katalog src/lib/config/ (server-env.ts dan
   // public-env.ts), sesuai panduan keamanan data Next.js. Tes boleh mengatur process.env.
   {

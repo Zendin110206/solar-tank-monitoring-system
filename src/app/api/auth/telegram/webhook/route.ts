@@ -11,7 +11,7 @@ import { handlePrivateTelegramCommand } from "@/features/auth/lib/auth-telegram-
 import {
   handleTelegramHelpdeskCommand,
   handleTelegramTopicInfoCommand,
-} from "@/features/helpdesk/lib/helpdesk-telegram";
+} from "@/features/helpdesk/server/helpdesk-telegram";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

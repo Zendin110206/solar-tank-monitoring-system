@@ -15,7 +15,7 @@ import type {
   HelpdeskSenderType,
   HelpdeskSession,
   HelpdeskSessionBundle,
-} from "../types";
+} from "../../types/helpdesk";
 
 const MAX_MESSAGE_LENGTH = 1500;
 const MAX_SOURCE_PATH_LENGTH = 255;

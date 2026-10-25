@@ -50,6 +50,8 @@ src/app → layanan modul → repositori (SQL) → koneksi database
   `server/` modul.
 - Rumus operasional (volume, status, sisa jam genset, konsumsi) hanya di satu
   tempat, tanpa I/O, dan diberi tes.
+- Layanan di `server/` hanya memakai repositori modulnya sendiri (jalur relatif pendek);
+  repositori modul lain diakses lewat layanan modul itu. Aturan ini dicek ESLint.
 - Client component tidak mengimpor kode khusus server.
 - Modul yang mengakses database, email, berkas, jaringan luar, rahasia, atau data permintaan
   (cookie/header) diawali `import "server-only";`. Build gagal bila modul seperti ini
