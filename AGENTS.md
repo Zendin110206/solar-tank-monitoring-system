@@ -54,6 +54,8 @@ src/app → layanan modul → repositori (SQL) → koneksi database
 - Layanan di `server/` hanya memakai repositori modulnya sendiri (jalur relatif pendek);
   repositori modul lain diakses lewat layanan modul itu. Aturan ini dicek ESLint.
 - Client component tidak mengimpor kode khusus server.
+- Route handler membalas JSON lewat `src/lib/http/json-response.ts` (`jsonOk`, `jsonError`,
+  `jsonTooManyRequests`, `jsonCaughtError`) agar bentuk `{ ok, data | error }` seragam.
 - Modul yang mengakses database, email, berkas, jaringan luar, rahasia, atau data permintaan
   (cookie/header) diawali `import "server-only";`. Build gagal bila modul seperti ini
   terimpor ke komponen browser.

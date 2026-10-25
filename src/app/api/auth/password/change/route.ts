@@ -1,13 +1,14 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 import { requireApiUser } from "@/features/auth/server/auth-guards";
 import { changePasswordForSession } from "@/features/auth/server/auth-service";
 import { parseChangePasswordPayload } from "@/features/auth/domain/auth-validation";
 import { checkRateLimit } from "@/features/auth/server/rate-limit";
 import {
-  getSafeErrorMessage,
-  getSafeErrorStatus,
-} from "@/lib/safe-error-message";
+  jsonCaughtError,
+  jsonOk,
+  jsonTooManyRequests,
+} from "@/lib/http/json-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -27,15 +28,9 @@ export async function POST(request: NextRequest) {
     });
 
     if (!rateLimit.allowed) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: "Terlalu banyak percobaan. Coba lagi nanti.",
-        },
-        {
-          status: 429,
-          headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
-        },
+      return jsonTooManyRequests(
+        "Terlalu banyak percobaan. Coba lagi nanti.",
+        rateLimit.retryAfterSeconds,
       );
     }
 
@@ -45,23 +40,14 @@ export async function POST(request: NextRequest) {
       request,
     });
 
-    return NextResponse.json({
-      ok: true,
-      data: {
-        message: "Kata sandi berhasil diganti. Sesi lain sudah dicabut.",
-      },
+    return jsonOk({
+      message: "Kata sandi berhasil diganti. Sesi lain sudah dicabut.",
     });
   } catch (error) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: getSafeErrorMessage(error, {
-          fallbackMessage: "Kata sandi belum bisa diganti.",
-          internalMessage:
-            "Kata sandi belum bisa diganti karena layanan sedang disiapkan. Coba lagi nanti.",
-        }),
-      },
-      { status: getSafeErrorStatus(error) },
-    );
+    return jsonCaughtError(error, {
+      fallbackMessage: "Kata sandi belum bisa diganti.",
+      internalMessage:
+        "Kata sandi belum bisa diganti karena layanan sedang disiapkan. Coba lagi nanti.",
+    });
   }
 }

@@ -7,6 +7,7 @@ import {
 } from "@/features/monitoring/lib/monitoring-storage";
 import { getMonitoringReferenceData } from "@/features/monitoring/lib/monitoring-registry";
 import type { NextRequest } from "next/server";
+import { jsonError, jsonOk } from "@/lib/http/json-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -40,17 +41,8 @@ export async function GET(
   });
 
   if (!detail) {
-    return Response.json(
-      {
-        ok: false,
-        error: "Tangki tidak ditemukan.",
-      },
-      { status: 404 },
-    );
+    return jsonError("Tangki tidak ditemukan.", 404);
   }
 
-  return Response.json({
-    ok: true,
-    data: detail,
-  });
+  return jsonOk(detail);
 }

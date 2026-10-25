@@ -1,4 +1,4 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 import { completeTelegramBinding } from "@/features/auth/server/auth-service";
 import {
@@ -12,22 +12,20 @@ import {
   handleTelegramHelpdeskCommand,
   handleTelegramTopicInfoCommand,
 } from "@/features/helpdesk/server/helpdesk-telegram";
+import { jsonError, jsonOk } from "@/lib/http/json-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export async function POST(request: NextRequest) {
   if (!verifyTelegramWebhookSecret(request.headers)) {
-    return NextResponse.json(
-      { ok: false, error: "Webhook Telegram tidak valid." },
-      { status: 401 },
-    );
+    return jsonError("Webhook Telegram tidak valid.", 401);
   }
 
   const message = parseTelegramMessage(await request.json());
 
   if (!message) {
-    return NextResponse.json({ ok: true });
+    return jsonOk();
   }
 
   const topicInfoHandled = await handleTelegramTopicInfoCommand(message).catch(
@@ -42,7 +40,7 @@ export async function POST(request: NextRequest) {
   );
 
   if (topicInfoHandled) {
-    return NextResponse.json({ ok: true });
+    return jsonOk();
   }
 
   const helpdeskHandled = await handleTelegramHelpdeskCommand(message).catch(
@@ -57,11 +55,11 @@ export async function POST(request: NextRequest) {
   );
 
   if (helpdeskHandled) {
-    return NextResponse.json({ ok: true });
+    return jsonOk();
   }
 
   if (message.chatType !== "private") {
-    return NextResponse.json({ ok: true });
+    return jsonOk();
   }
 
   const privateCommandHandled = await handlePrivateTelegramCommand(
@@ -75,7 +73,7 @@ export async function POST(request: NextRequest) {
   });
 
   if (privateCommandHandled) {
-    return NextResponse.json({ ok: true });
+    return jsonOk();
   }
 
   const token = extractTelegramStartToken(message.text);
@@ -85,7 +83,7 @@ export async function POST(request: NextRequest) {
       chatId: message.chatId,
       text: "Buka link binding dari halaman Keamanan Akun FTM.",
     }).catch(() => undefined);
-    return NextResponse.json({ ok: true });
+    return jsonOk();
   }
 
   try {
@@ -107,5 +105,5 @@ export async function POST(request: NextRequest) {
     }).catch(() => undefined);
   }
 
-  return NextResponse.json({ ok: true });
+  return jsonOk();
 }

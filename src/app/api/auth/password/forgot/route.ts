@@ -1,13 +1,15 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 import { verifyCaptchaToken } from "@/features/auth/server/auth-captcha";
 import { requestPasswordReset } from "@/features/auth/server/auth-service";
 import { parseForgotPasswordPayload } from "@/features/auth/domain/auth-validation";
 import { checkRateLimit } from "@/features/auth/server/rate-limit";
 import {
-  getSafeErrorMessage,
-  getSafeErrorStatus,
-} from "@/lib/safe-error-message";
+  jsonCaughtError,
+  jsonError,
+  jsonOk,
+  jsonTooManyRequests,
+} from "@/lib/http/json-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -31,15 +33,9 @@ export async function POST(request: NextRequest) {
     });
 
     if (!rateLimit.allowed) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: "Terlalu banyak permintaan reset. Coba lagi nanti.",
-        },
-        {
-          status: 429,
-          headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
-        },
+      return jsonTooManyRequests(
+        "Terlalu banyak permintaan reset. Coba lagi nanti.",
+        rateLimit.retryAfterSeconds,
       );
     }
 
@@ -49,10 +45,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!captcha.ok) {
-      return NextResponse.json(
-        { ok: false, error: captcha.error },
-        { status: 400 },
-      );
+      return jsonError(captcha.error, 400);
     }
 
     await requestPasswordReset({
@@ -60,24 +53,15 @@ export async function POST(request: NextRequest) {
       request,
     });
 
-    return NextResponse.json({
-      ok: true,
-      data: {
-        message:
-          "Jika akun ditemukan, link reset akan dikirim ke email terdaftar.",
-      },
+    return jsonOk({
+      message:
+        "Jika akun ditemukan, link reset akan dikirim ke email terdaftar.",
     });
   } catch (error) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: getSafeErrorMessage(error, {
-          fallbackMessage: "Permintaan reset belum bisa diproses.",
-          internalMessage:
-            "Permintaan reset belum bisa diproses karena layanan sedang disiapkan. Coba lagi nanti.",
-        }),
-      },
-      { status: getSafeErrorStatus(error) },
-    );
+    return jsonCaughtError(error, {
+      fallbackMessage: "Permintaan reset belum bisa diproses.",
+      internalMessage:
+        "Permintaan reset belum bisa diproses karena layanan sedang disiapkan. Coba lagi nanti.",
+    });
   }
 }

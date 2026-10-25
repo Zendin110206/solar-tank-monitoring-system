@@ -47,6 +47,9 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Route handler membalas JSON lewat pembantu `src/lib/http/json-response.ts` (`jsonOk`,
+  `jsonError`, `jsonTooManyRequests`, `jsonCaughtError`) di 21 route. Status, isi JSON, dan
+  header tidak berubah. ADR 0011 dikoreksi karena pembantu ini sebelumnya dinyatakan batal.
 - Modul `auth` memakai bentuk folder ADR 0011: validasi dan aturan alamat tujuan di
   `domain/`, layanan di `server/`, kueri SQL di `server/repositories/`, tipe di
   `types/auth.ts`. Isi berkas tidak berubah selain alamat impor. ESLint kini menolak I/O

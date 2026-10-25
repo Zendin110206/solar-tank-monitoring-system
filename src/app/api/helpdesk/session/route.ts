@@ -1,9 +1,14 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 import { getRequestSessionUser } from "@/features/auth/server/auth-session";
 import { checkRateLimit } from "@/features/auth/server/rate-limit";
 import { getOrCreateHelpdeskSession } from "@/features/helpdesk/server/helpdesk-service";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
+import {
+  jsonError,
+  jsonOk,
+  jsonTooManyRequests,
+} from "@/lib/http/json-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -33,12 +38,9 @@ export async function POST(request: NextRequest) {
     });
 
     if (!rateLimit.allowed) {
-      return NextResponse.json(
-        { ok: false, error: "Terlalu banyak permintaan helpdesk." },
-        {
-          status: 429,
-          headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
-        },
+      return jsonTooManyRequests(
+        "Terlalu banyak permintaan helpdesk.",
+        rateLimit.retryAfterSeconds,
       );
     }
 
@@ -50,21 +52,15 @@ export async function POST(request: NextRequest) {
       user,
     });
 
-    return NextResponse.json({
-      ok: true,
-      data: bundle,
-    });
+    return jsonOk(bundle);
   } catch (error) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: getSafeErrorMessage(error, {
-          fallbackMessage: "Sesi helpdesk belum bisa dibuka.",
-          internalMessage:
-            "Sesi helpdesk belum bisa dibuka karena layanan database belum siap.",
-        }),
-      },
-      { status: 500 },
+    return jsonError(
+      getSafeErrorMessage(error, {
+        fallbackMessage: "Sesi helpdesk belum bisa dibuka.",
+        internalMessage:
+          "Sesi helpdesk belum bisa dibuka karena layanan database belum siap.",
+      }),
+      500,
     );
   }
 }

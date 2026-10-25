@@ -167,3 +167,25 @@ tidak diubah.
   atau kejelasan, tetapi menambah satu lapisan yang harus dipelajari. Bentuk balasan
   dijaga lewat tes karakterisasi route dan pembandingan respons API. Keputusan ini
   ditinjau ulang bila bentuk balasan mulai berbeda-beda antar-route.
+
+### 26 Oktober 2026 — koreksi: pembantu balasan HTTP dibuat
+
+Pembatalan pada pembaruan sebelumnya keliru dan dikoreksi di sini. Pemeriksaan lebih
+teliti menunjukkan pengulangan yang nyata di route handler: balasan 429 dengan
+`Retry-After` ditulis ulang di 11 route, pola tangkap-error dengan pesan aman di 10
+route, dan gaya `Response.json` bercampur dengan `NextResponse.json`. Rencana kerja
+fondasi juga menetapkan satu pembantu balasan JSON.
+
+`src/lib/http/json-response.ts` kini menyediakan `jsonOk`, `jsonError`,
+`jsonTooManyRequests`, dan `jsonCaughtError`. Status, isi JSON, dan header tetap sama
+persis. Route yang bentuk balasannya berbeda (`/api/ready`, `/api/dashboard/overview`,
+dan unduhan paket firmware) tetap memakai `Response.json` / `NextResponse.json`
+langsung.
+
+### 26 Oktober 2026 — modul helpdesk dan auth dipindah
+
+Modul `helpdesk` (#46) dan `auth` (#47) memakai bentuk folder di atas. Urutannya
+diubah dari rencana (monitoring lebih dulu) karena modul `monitoring` menunggu
+pemecahan repositori perangkat yang sedang berjalan. ESLint kini juga mengecek
+aturan 2 (layanan tidak memakai repositori modul lain) dan aturan 3 (`domain/` tanpa
+I/O).
