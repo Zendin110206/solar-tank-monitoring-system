@@ -75,7 +75,7 @@ describe("latest reading selection", () => {
       devices,
       readings: selectLatestReadingPerTank([staleSnapshot, freshRaw]),
     });
-    const tph = overview.rows.find((row) => row.code === "TPH");
+    const tph = overview.rows.find((row) => row.code === "CONTOH-A");
 
     expect(tph).toMatchObject({
       deviceStatus: "online",
