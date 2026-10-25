@@ -19,7 +19,7 @@ import {
   listAuthUsersForAdmin,
   listPendingAccessRequests,
   type AuthUserDirectoryItem,
-} from "@/features/auth/lib/mysql-auth-repository";
+} from "@/features/auth/server/user-admin-service";
 import {
   activateAuthUserAction,
   approveAccessRequestAction,

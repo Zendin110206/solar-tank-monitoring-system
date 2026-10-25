@@ -3,7 +3,7 @@ import { ClipboardList } from "lucide-react";
 
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
-import { listAuthAuditEvents } from "@/features/auth/lib/mysql-auth-repository";
+import { listAuthAuditEvents } from "@/features/auth/server/audit-service";
 
 export const metadata: Metadata = {
   title: "Audit Keamanan | FTM",

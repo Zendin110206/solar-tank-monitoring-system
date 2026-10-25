@@ -7,10 +7,8 @@ import {
   normalizeIndonesianMobilePhone,
   normalizeText,
 } from "@/features/auth/lib/auth-validation";
-import {
-  recordAuthAuditEvent,
-  updateAuthUserProfile,
-} from "@/features/auth/lib/mysql-auth-repository";
+import { updateAuthUserProfile } from "@/features/auth/server/account-service";
+import { recordAuthAuditEvent } from "@/features/auth/server/audit-service";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
 
 export type ProfileActionState = {

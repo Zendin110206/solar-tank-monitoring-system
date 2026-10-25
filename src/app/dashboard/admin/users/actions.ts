@@ -10,15 +10,15 @@ import {
   sendEmailVerificationForUserId,
   sendPasswordResetForUserId,
 } from "@/features/auth/lib/auth-service";
+import { recordAuthAuditEvent } from "@/features/auth/server/audit-service";
 import {
   approveAccessRequest,
   deleteAuthUser,
-  recordAuthAuditEvent,
   rejectAccessRequest,
   revokeAllUserSessions,
   setAuthUserStatus,
   updateAuthUserRole,
-} from "@/features/auth/lib/mysql-auth-repository";
+} from "@/features/auth/server/user-admin-service";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
 
 const ADMIN_USERS_PATH = "/dashboard/admin/users";
