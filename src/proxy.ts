@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import {
   buildDashboardNextPath,
   buildLoginRedirectPath,
-} from "@/features/auth/lib/auth-redirect";
+} from "@/features/auth/domain/auth-redirect";
 
 const AUTH_COOKIE_NAME =
   serverEnv.AUTH_SESSION_COOKIE_NAME?.trim() || "solar_tank_session";

@@ -3,7 +3,7 @@ import "server-only";
 import {
   sendTelegramMessage,
   type TelegramMessage,
-} from "@/features/auth/lib/auth-telegram";
+} from "@/features/auth/server/auth-telegram";
 import {
   addHelpdeskMessage,
   closeHelpdeskSession,

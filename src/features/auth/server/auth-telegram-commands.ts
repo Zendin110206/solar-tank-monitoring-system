@@ -2,8 +2,8 @@ import "server-only";
 
 import { getAppBaseUrl } from "./auth-config";
 import { sendTelegramMessage, type TelegramMessage } from "./auth-telegram";
-import { findAuthUserByVerifiedTelegramChatId } from "./mysql-auth-repository";
-import type { AuthSafeUser } from "../types";
+import { findAuthUserByVerifiedTelegramChatId } from "./repositories/mysql-auth-repository";
+import type { AuthSafeUser } from "../types/auth";
 
 type PrivateTelegramCommand = "dashboard" | "help" | "status";
 

@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { requireApiUser } from "@/features/auth/lib/auth-guards";
-import { listCurrentUserSessions } from "@/features/auth/lib/auth-service";
+import { requireApiUser } from "@/features/auth/server/auth-guards";
+import { listCurrentUserSessions } from "@/features/auth/server/auth-service";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

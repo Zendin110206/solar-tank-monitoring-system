@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { resetPasswordWithToken } from "@/features/auth/lib/auth-service";
-import { parseResetPasswordPayload } from "@/features/auth/lib/auth-validation";
-import { checkRateLimit } from "@/features/auth/lib/rate-limit";
+import { resetPasswordWithToken } from "@/features/auth/server/auth-service";
+import { parseResetPasswordPayload } from "@/features/auth/domain/auth-validation";
+import { checkRateLimit } from "@/features/auth/server/rate-limit";
 import {
   getSafeErrorMessage,
   getSafeErrorStatus,

@@ -2,7 +2,7 @@ import "server-only";
 
 import { publicEnv } from "@/lib/config/public-env";
 import { serverEnv, type ServerEnvName } from "@/lib/config/server-env";
-import type { AuthRole } from "../types";
+import type { AuthRole } from "../types/auth";
 
 const DEFAULT_SESSION_COOKIE_NAME = "solar_tank_session";
 const DEFAULT_USER_SESSION_TTL_SECONDS = 60 * 60 * 12;

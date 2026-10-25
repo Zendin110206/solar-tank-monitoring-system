@@ -11,14 +11,14 @@ vi.mock("@/features/monitoring/lib/mysql-connection", () => ({
   getMysqlPool: () => mocks.pool,
 }));
 
-vi.mock("../lib/auth-telegram", () => ({
+vi.mock("../server/auth-telegram", () => ({
   sendTelegramMessage: mocks.sendTelegramMessage,
 }));
 
 import {
   notifyAdminsAccessRequestSubmitted,
   sendAdminTelegramNotification,
-} from "../lib/admin-telegram-notifications";
+} from "../server/admin-telegram-notifications";
 
 describe("admin telegram notifications", () => {
   beforeEach(() => {

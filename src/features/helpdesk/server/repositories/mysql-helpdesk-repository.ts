@@ -3,12 +3,12 @@ import "server-only";
 import { randomBytes } from "node:crypto";
 import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 
-import type { AuthSessionUser } from "@/features/auth/types";
+import type { AuthSessionUser } from "@/features/auth/types/auth";
 import {
   createAuthId,
   createRandomToken,
   hashOneTimeToken,
-} from "@/features/auth/lib/auth-crypto";
+} from "@/features/auth/server/auth-crypto";
 import { getMysqlPool } from "@/features/monitoring/lib/mysql-connection";
 import type {
   HelpdeskMessage,

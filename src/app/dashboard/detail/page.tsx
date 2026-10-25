@@ -1,4 +1,4 @@
-import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
+import { requirePageAdmin } from "@/features/auth/server/auth-guards";
 import { getMonitoringReferenceDataWithSource } from "@/features/monitoring/lib/monitoring-registry";
 import type { Metadata } from "next";
 import Link from "next/link";

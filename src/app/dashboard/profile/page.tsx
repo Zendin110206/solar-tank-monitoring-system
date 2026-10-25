@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { MapPin, Pencil, UserRound } from "lucide-react";
 
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { requirePageUser } from "@/features/auth/lib/auth-guards";
-import type { AuthSafeUser } from "@/features/auth/types";
+import { requirePageUser } from "@/features/auth/server/auth-guards";
+import type { AuthSafeUser } from "@/features/auth/types/auth";
 import { ProfileForm } from "./profile-form";
 
 export const metadata: Metadata = {

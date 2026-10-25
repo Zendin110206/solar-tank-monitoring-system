@@ -2,11 +2,11 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requirePageUser } from "@/features/auth/lib/auth-guards";
+import { requirePageUser } from "@/features/auth/server/auth-guards";
 import {
   normalizeIndonesianMobilePhone,
   normalizeText,
-} from "@/features/auth/lib/auth-validation";
+} from "@/features/auth/domain/auth-validation";
 import { updateAuthUserProfile } from "@/features/auth/server/account-service";
 import { recordAuthAuditEvent } from "@/features/auth/server/audit-service";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";

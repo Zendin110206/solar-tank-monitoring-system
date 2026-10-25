@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { setSessionCookie } from "@/features/auth/lib/auth-session";
-import { verifyAdminOtpLogin } from "@/features/auth/lib/auth-service";
-import { checkRateLimit } from "@/features/auth/lib/rate-limit";
+import { setSessionCookie } from "@/features/auth/server/auth-session";
+import { verifyAdminOtpLogin } from "@/features/auth/server/auth-service";
+import { checkRateLimit } from "@/features/auth/server/rate-limit";
 import {
   getSafeErrorMessage,
   getSafeErrorStatus,

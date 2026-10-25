@@ -4,7 +4,7 @@ import type { RowDataPacket } from "mysql2/promise";
 
 import { getMysqlPool } from "@/features/monitoring/lib/mysql-connection";
 
-import type { RegisterAccessPayload } from "./auth-validation";
+import type { RegisterAccessPayload } from "../domain/auth-validation";
 import {
   getAppBaseUrl,
   getTelegramAdminGroupChatId,

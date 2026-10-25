@@ -8,7 +8,7 @@ import { KeyRound, Link2, LogOut, RefreshCcw, Send } from "lucide-react";
 import type {
   AuthSessionSummary,
   AuthSessionUser,
-} from "@/features/auth/types";
+} from "@/features/auth/types/auth";
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("id-ID", {

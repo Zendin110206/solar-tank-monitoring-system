@@ -47,6 +47,10 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Modul `auth` memakai bentuk folder ADR 0011: validasi dan aturan alamat tujuan di
+  `domain/`, layanan di `server/`, kueri SQL di `server/repositories/`, tipe di
+  `types/auth.ts`. Isi berkas tidak berubah selain alamat impor. ESLint kini menolak I/O
+  di `domain/` dan impor `server/repositories/` dari `src/app`.
 - Modul `helpdesk` memakai bentuk folder ADR 0011: layanan, notifikasi, dan relay
   Telegram di `server/`, kueri SQL di `server/repositories/mysql-helpdesk-repository.ts`,
   tipe di `types/helpdesk.ts`. Isi berkas tidak berubah selain alamat impor. ESLint kini

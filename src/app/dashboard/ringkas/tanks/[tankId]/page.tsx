@@ -1,4 +1,4 @@
-import { requirePageUser } from "@/features/auth/lib/auth-guards";
+import { requirePageUser } from "@/features/auth/server/auth-guards";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";

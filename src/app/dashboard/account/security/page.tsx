@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { ShieldCheck } from "lucide-react";
 
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { requirePageUser } from "@/features/auth/lib/auth-guards";
-import { listCurrentUserSessions } from "@/features/auth/lib/auth-service";
+import { requirePageUser } from "@/features/auth/server/auth-guards";
+import { listCurrentUserSessions } from "@/features/auth/server/auth-service";
 import AccountSecurityPanel from "./security-panel";
 
 export const metadata: Metadata = {

@@ -2,9 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 
-import { getAppBaseUrl } from "@/features/auth/lib/auth-config";
-import { verifyAdminActionCsrfToken } from "@/features/auth/lib/auth-csrf";
-import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
+import { getAppBaseUrl } from "@/features/auth/server/auth-config";
+import { verifyAdminActionCsrfToken } from "@/features/auth/server/auth-csrf";
+import { requirePageAdmin } from "@/features/auth/server/auth-guards";
 import { sendDevicePackageReadyEmail } from "@/features/monitoring/lib/device-package-email";
 import {
   approveDeviceRequest as approveDeviceRequestInMysql,

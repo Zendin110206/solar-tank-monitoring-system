@@ -1,6 +1,6 @@
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { createAdminActionCsrfToken } from "@/features/auth/lib/auth-csrf";
-import { requirePageUser } from "@/features/auth/lib/auth-guards";
+import { createAdminActionCsrfToken } from "@/features/auth/server/auth-csrf";
+import { requirePageUser } from "@/features/auth/server/auth-guards";
 import { SimpleDashboardView } from "@/features/monitoring/components/simple-dashboard-view";
 import { buildDashboardOverview } from "@/features/monitoring/lib/dashboard-view-model";
 import { getMonitoringReferenceDataWithSource } from "@/features/monitoring/lib/monitoring-registry";

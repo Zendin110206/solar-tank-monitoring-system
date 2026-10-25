@@ -12,9 +12,9 @@ import {
 } from "lucide-react";
 
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import type { AuthRole, AuthUserStatus } from "@/features/auth/types";
-import { createAdminActionCsrfToken } from "@/features/auth/lib/auth-csrf";
-import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
+import type { AuthRole, AuthUserStatus } from "@/features/auth/types/auth";
+import { createAdminActionCsrfToken } from "@/features/auth/server/auth-csrf";
+import { requirePageAdmin } from "@/features/auth/server/auth-guards";
 import {
   listAuthUsersForAdmin,
   listPendingAccessRequests,

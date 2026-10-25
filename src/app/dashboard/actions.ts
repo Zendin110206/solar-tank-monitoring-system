@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
-import { verifyAdminActionCsrfToken } from "@/features/auth/lib/auth-csrf";
-import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
+import { verifyAdminActionCsrfToken } from "@/features/auth/server/auth-csrf";
+import { requirePageAdmin } from "@/features/auth/server/auth-guards";
 import {
   cleanupMonitoringTanks as cleanupMonitoringTanksInMysql,
   resetMonitoringReadings as resetMonitoringReadingsInMysql,

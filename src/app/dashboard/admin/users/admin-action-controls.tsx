@@ -15,7 +15,7 @@ import {
   X,
 } from "lucide-react";
 
-import type { AuthRole } from "@/features/auth/types";
+import type { AuthRole } from "@/features/auth/types/auth";
 import {
   AdminConfirmationDialog,
   type AdminConfirmationContent,

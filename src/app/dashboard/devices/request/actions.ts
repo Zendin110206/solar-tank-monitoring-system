@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requirePageUser } from "@/features/auth/lib/auth-guards";
+import { requirePageUser } from "@/features/auth/server/auth-guards";
 import {
   submitDeviceRequest as createDeviceRequestInMysql,
   type SubmitDeviceRequestResult as CreateDeviceRequestFromMysqlResult,

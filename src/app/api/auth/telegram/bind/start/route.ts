@@ -1,9 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { requireApiUser } from "@/features/auth/lib/auth-guards";
-import { startTelegramBinding } from "@/features/auth/lib/auth-service";
-import { isTelegramConfigured } from "@/features/auth/lib/auth-telegram";
-import { checkRateLimit } from "@/features/auth/lib/rate-limit";
+import { requireApiUser } from "@/features/auth/server/auth-guards";
+import { startTelegramBinding } from "@/features/auth/server/auth-service";
+import { isTelegramConfigured } from "@/features/auth/server/auth-telegram";
+import { checkRateLimit } from "@/features/auth/server/rate-limit";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

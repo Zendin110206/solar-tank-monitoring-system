@@ -30,7 +30,11 @@ const eslintConfig = defineConfig([
           ],
           patterns: [
             {
-              group: ["**/*-repository", "**/mysql-connection"],
+              group: [
+                "**/*-repository",
+                "**/mysql-connection",
+                "**/server/repositories/**",
+              ],
               message:
                 "src/app tidak mengimpor repositori atau koneksi database; panggil layanan di server/ modul (ADR 0011).",
             },
@@ -44,7 +48,14 @@ const eslintConfig = defineConfig([
   // repositori modul lain tertangkap pola di bawah. Folder repositories/ dikecualikan.
   {
     files: ["src/features/*/server/**/*.{ts,tsx}"],
-    ignores: ["src/features/*/server/repositories/**"],
+    ignores: [
+      "src/features/*/server/repositories/**",
+      // Pengecualian sementara: dua layanan auth ini masih menjalankan kueri SQL sendiri
+      // lewat koneksi database bersama. SQL-nya dipindah ke repositori di paket perapian
+      // berkas (lihat docs/architecture.md, bagian penyimpangan); hapus baris ini setelahnya.
+      "src/features/auth/server/admin-telegram-notifications.ts",
+      "src/features/auth/server/rate-limit.ts",
+    ],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -57,6 +68,37 @@ const eslintConfig = defineConfig([
                 "^(@/features/[^/]+|(\\.\\./)+[^/.][^/]*)/(server/repositories/[^/]+|lib/[^/]*-repository|lib/mysql-connection)$",
               message:
                 "Layanan tidak memakai repositori atau koneksi database modul lain; panggil layanan modul itu (ADR 0011).",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  // Aturan 3 ADR 0011: domain/ berisi logika murni tanpa I/O. Hanya boleh memakai
+  // domain/ dan types/; tidak boleh database, server/, jaringan, berkas, atau pengaturan.
+  {
+    files: ["src/features/*/domain/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: [
+                "**/server/**",
+                "**/lib/*-repository",
+                "**/lib/mysql-connection",
+                "mysql2",
+                "mysql2/*",
+                "nodemailer",
+                "node:fs",
+                "node:fs/*",
+                "next/headers",
+                "server-only",
+                "@/lib/config/*",
+              ],
+              message:
+                "domain/ hanya berisi logika murni tanpa I/O; pindahkan bagian ini ke server/ (ADR 0011).",
             },
           ],
         },

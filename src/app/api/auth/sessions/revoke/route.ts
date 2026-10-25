@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { requireApiUser } from "@/features/auth/lib/auth-guards";
-import { revokeCurrentUserSessionById } from "@/features/auth/lib/auth-service";
+import { requireApiUser } from "@/features/auth/server/auth-guards";
+import { revokeCurrentUserSessionById } from "@/features/auth/server/auth-service";
 import {
   getSafeErrorMessage,
   getSafeErrorStatus,

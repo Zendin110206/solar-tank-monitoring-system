@@ -1,4 +1,4 @@
-import { requireApiUser } from "@/features/auth/lib/auth-guards";
+import { requireApiUser } from "@/features/auth/server/auth-guards";
 import { getMonitoringReferenceData } from "@/features/monitoring/lib/monitoring-registry";
 import {
   listMonitoringReadingsForTank,

@@ -1,9 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { verifyCaptchaToken } from "@/features/auth/lib/auth-captcha";
-import { resendEmailVerification } from "@/features/auth/lib/auth-service";
-import { parseResendVerificationPayload } from "@/features/auth/lib/auth-validation";
-import { checkRateLimit } from "@/features/auth/lib/rate-limit";
+import { verifyCaptchaToken } from "@/features/auth/server/auth-captcha";
+import { resendEmailVerification } from "@/features/auth/server/auth-service";
+import { parseResendVerificationPayload } from "@/features/auth/domain/auth-validation";
+import { checkRateLimit } from "@/features/auth/server/rate-limit";
 import {
   getSafeErrorMessage,
   getSafeErrorStatus,

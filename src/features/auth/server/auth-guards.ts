@@ -5,12 +5,12 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import type { AuthRole, AuthSessionUser } from "../types";
+import type { AuthRole, AuthSessionUser } from "../types/auth";
 import { getCurrentSessionUser, getRequestSessionUser } from "./auth-session";
 import {
   buildDashboardNextPath,
   buildLoginRedirectPath,
-} from "./auth-redirect";
+} from "../domain/auth-redirect";
 
 async function getCurrentDashboardNextPath(): Promise<string> {
   try {

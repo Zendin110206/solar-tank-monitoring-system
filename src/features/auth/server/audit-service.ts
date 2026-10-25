@@ -5,4 +5,4 @@ import "server-only";
 export {
   listAuthAuditEvents,
   recordAuthAuditEvent,
-} from "../lib/mysql-auth-repository";
+} from "./repositories/mysql-auth-repository";

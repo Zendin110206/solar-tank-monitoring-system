@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Clock3, Cpu, FileCheck2, ShieldCheck } from "lucide-react";
 
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { requirePageUser } from "@/features/auth/lib/auth-guards";
+import { requirePageUser } from "@/features/auth/server/auth-guards";
 import {
   getDeviceRequestStatusLabel,
   getDeviceSensorTypeLabel,

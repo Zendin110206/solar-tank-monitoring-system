@@ -6,7 +6,7 @@ import type {
   RowDataPacket,
 } from "mysql2/promise";
 
-import { getMysqlPool } from "../../monitoring/lib/mysql-connection";
+import { getMysqlPool } from "../../../monitoring/lib/mysql-connection";
 import type {
   AuthAccessRequest,
   AuthAuditEvent,
@@ -15,18 +15,18 @@ import type {
   AuthSessionSummary,
   AuthSessionUser,
   AuthUserStatus,
-} from "../types";
-import { isAuthRole, isAuthUserStatus } from "../types";
+} from "../../types/auth";
+import { isAuthRole, isAuthUserStatus } from "../../types/auth";
 import {
   createAuthId,
   hashPassword,
   hashRequestFingerprint,
-} from "./auth-crypto";
+} from "../auth-crypto";
 import {
   getLoginLockSeconds,
   getLoginMaxAttempts,
   shouldRequireEmailVerificationForApproval,
-} from "./auth-config";
+} from "../auth-config";
 
 type AuthUserRow = RowDataPacket & {
   id: string;
