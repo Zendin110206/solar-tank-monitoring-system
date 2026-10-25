@@ -5,9 +5,9 @@ import { revalidatePath } from "next/cache";
 import { verifyAdminActionCsrfToken } from "@/features/auth/lib/auth-csrf";
 import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
 import {
-  cleanupMonitoringTanksInMysql,
-  resetMonitoringReadingsInMysql,
-} from "@/features/monitoring/lib/mysql-maintenance-repository";
+  cleanupMonitoringTanks as cleanupMonitoringTanksInMysql,
+  resetMonitoringReadings as resetMonitoringReadingsInMysql,
+} from "@/features/monitoring/server/maintenance-service";
 import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
 
