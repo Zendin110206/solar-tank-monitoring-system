@@ -125,6 +125,15 @@ diawali `import "server-only";`, sesuai panduan keamanan data Next.js. Bila sala
 satunya terimpor ke komponen browser, `pnpm build` gagal dan menunjuk berkas
 penyebabnya. Di tes Vitest penanda ini diganti modul kosong.
 
+Semua pengaturan dibaca dari dua katalog di `src/lib/config/`:
+
+- `server-env.ts`: pengaturan dan rahasia yang hanya boleh dibaca server (database,
+  email, kunci, Telegram, aturan akun), dikelompokkan dan diberi penjelasan singkat;
+- `public-env.ts`: tiga nilai `NEXT_PUBLIC_*` yang memang ikut terkirim ke browser.
+
+Nilai dibaca saat dipakai, sama seperti membaca `process.env` langsung. ESLint
+(`no-restricted-properties`) menolak `process.env` di luar katalog ini, kecuali di tes.
+
 Penyimpangan yang **masih ada** per 25 Oktober 2026 dan akan dirapikan bertahap
 tanpa mengubah perilaku:
 

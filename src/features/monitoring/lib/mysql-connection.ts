@@ -1,5 +1,6 @@
 import "server-only";
 
+import { serverEnv } from "@/lib/config/server-env";
 import mysql, { type Pool } from "mysql2/promise";
 
 type MysqlPoolGlobal = typeof globalThis & {
@@ -17,7 +18,7 @@ const DEFAULT_MYSQL_CONNECTION_LIMIT = 3;
 const MAX_MYSQL_CONNECTION_LIMIT = 10;
 
 export function getMysqlDatabaseUrl(): string {
-  const value = process.env.MYSQL_DATABASE_URL?.trim();
+  const value = serverEnv.MYSQL_DATABASE_URL?.trim();
 
   if (!value) {
     throw new Error(
@@ -29,7 +30,7 @@ export function getMysqlDatabaseUrl(): string {
 }
 
 function getMysqlConnectionLimit(): number {
-  const parsed = Number(process.env.MYSQL_CONNECTION_LIMIT);
+  const parsed = Number(serverEnv.MYSQL_CONNECTION_LIMIT);
 
   if (!Number.isInteger(parsed) || parsed <= 0) {
     return DEFAULT_MYSQL_CONNECTION_LIMIT;
@@ -39,13 +40,13 @@ function getMysqlConnectionLimit(): number {
 }
 
 function getMysqlSslConfig(): MysqlSslConfig | undefined {
-  const mode = process.env.MYSQL_SSL_MODE?.trim().toLowerCase();
+  const mode = serverEnv.MYSQL_SSL_MODE?.trim().toLowerCase();
 
   if (mode !== "required") {
     return undefined;
   }
 
-  const ca = process.env.MYSQL_SSL_CA?.replaceAll("\\n", "\n").trim();
+  const ca = serverEnv.MYSQL_SSL_CA?.replaceAll("\\n", "\n").trim();
 
   if (ca) {
     return { ca };

@@ -1,5 +1,6 @@
 import "server-only";
 
+import { serverEnv } from "@/lib/config/server-env";
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import type { Device } from "../types/monitoring";
 
@@ -81,7 +82,7 @@ export function verifyDeviceKeyHash(
 }
 
 export function isGlobalDeviceKeyFallbackAllowed(
-  envValue = process.env.SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK,
+  envValue = serverEnv.SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK,
 ): boolean {
   const cleanValue = envValue?.trim().toLowerCase();
 

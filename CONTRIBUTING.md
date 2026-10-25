@@ -230,6 +230,9 @@ FTM adalah satu aplikasi Next.js yang dibagi per modul di `src/features/`
 - Modul yang mengakses database, email, berkas, jaringan luar, rahasia, atau data permintaan
   (cookie/header) diawali `import "server-only";`. Build gagal bila modul seperti ini
   terimpor ke komponen browser.
+- Pengaturan (variabel lingkungan) dibaca lewat `serverEnv` atau `publicEnv` di
+  `src/lib/config/`, bukan `process.env` langsung. Variabel baru didaftarkan di sana
+  beserta penjelasan singkat dan contoh nilainya di `.env.example`.
 - Keputusan struktur yang penting dicatat sebagai ADR di `docs/decisions/`.
 
 ## Database

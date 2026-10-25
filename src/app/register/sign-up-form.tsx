@@ -1,5 +1,6 @@
 "use client";
 
+import { publicEnv } from "@/lib/config/public-env";
 import type { FormEvent } from "react";
 import { useState } from "react";
 import {
@@ -21,7 +22,7 @@ const labelClassName =
 const captchaRequiredMessage =
   "Selesaikan verifikasi keamanan terlebih dahulu.";
 const isCaptchaEnabled = Boolean(
-  process.env.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY?.trim(),
+  publicEnv.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY?.trim(),
 );
 
 function PasswordField({

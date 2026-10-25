@@ -1,5 +1,7 @@
 import "server-only";
 
+import { publicEnv } from "@/lib/config/public-env";
+import { serverEnv } from "@/lib/config/server-env";
 import {
   createCipheriv,
   createDecipheriv,
@@ -86,8 +88,8 @@ function toCppCoordinate(value: number | undefined, fallback = 0): string {
 
 function getProductionLikeEnvironment(): boolean {
   return (
-    process.env.NODE_ENV === "production" ||
-    process.env.NEXT_PUBLIC_APP_ENV?.trim().toLowerCase() === "production"
+    serverEnv.NODE_ENV === "production" ||
+    publicEnv.NEXT_PUBLIC_APP_ENV?.trim().toLowerCase() === "production"
   );
 }
 
@@ -137,7 +139,7 @@ function parseEncryptionKeyFromEnv(value: string): Buffer | null {
 }
 
 export function getDevicePackageEncryptionKey(): Buffer {
-  const configuredKey = process.env.DEVICE_PACKAGE_ENCRYPTION_KEY;
+  const configuredKey = serverEnv.DEVICE_PACKAGE_ENCRYPTION_KEY;
 
   if (configuredKey) {
     const parsedKey = parseEncryptionKeyFromEnv(configuredKey);
@@ -159,7 +161,7 @@ export function getDevicePackageEncryptionKey(): Buffer {
 
   return createHash("sha256")
     .update(
-      process.env.AUTH_SECRET ??
+      serverEnv.AUTH_SECRET ??
         "development-device-package-encryption-key-change-before-production",
       "utf8",
     )
@@ -347,7 +349,7 @@ export function findUnresolvedTemplatePlaceholders(content: string): string[] {
 
 export function getDevicePackageDownloadTtlDays(): number {
   return parsePositiveIntegerEnv({
-    envValue: process.env.DEVICE_PACKAGE_DOWNLOAD_TTL_DAYS,
+    envValue: serverEnv.DEVICE_PACKAGE_DOWNLOAD_TTL_DAYS,
     fallback: DEFAULT_DOWNLOAD_TTL_DAYS,
     max: 30,
     min: 1,
@@ -356,7 +358,7 @@ export function getDevicePackageDownloadTtlDays(): number {
 
 export function getDevicePackageMaxDownloads(): number {
   return parsePositiveIntegerEnv({
-    envValue: process.env.DEVICE_PACKAGE_MAX_DOWNLOADS,
+    envValue: serverEnv.DEVICE_PACKAGE_MAX_DOWNLOADS,
     fallback: DEFAULT_MAX_DOWNLOADS,
     max: 10,
     min: 1,

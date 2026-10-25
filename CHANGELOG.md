@@ -21,6 +21,10 @@ dirilis ke `main`.
 - `CODE_OF_CONDUCT.md`, `SUPPORT.md`, `CHANGELOG.md`, dan `AGENTS.md` (#21).
 - ADR 0011: struktur modul (`monitoring`, `devices`, `auth`, `helpdesk`, `admin`),
   bentuk folder per modul, dan aturan lapisan.
+- Katalog pengaturan `src/lib/config/server-env.ts` dan `public-env.ts`: semua 53
+  variabel lingkungan yang dibaca aplikasi terdaftar di satu tempat dengan penjelasan
+  singkat. Kode lain membaca lewat katalog ini; ESLint menolak `process.env` di luar
+  katalog dan tes. Nilai dan cara pembacaan tidak berubah.
 - Aturan ESLint `no-restricted-imports` untuk `src/app`: impor repositori, koneksi
   database, atau `mysql2` ditolak saat lint dan di CI (ADR 0011).
 - Prettier sebagai pemformat kode (`pnpm format`, `pnpm format:check`) dan `.nvmrc`

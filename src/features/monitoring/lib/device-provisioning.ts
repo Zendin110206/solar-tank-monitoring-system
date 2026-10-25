@@ -1,5 +1,6 @@
 import "server-only";
 
+import { serverEnv } from "@/lib/config/server-env";
 import type {
   CatTelemetryPayload,
   Device,
@@ -62,13 +63,13 @@ function parseBooleanEnv(value?: string): boolean {
 }
 
 export function isDeviceAutoProvisioningEnabled(
-  envValue = process.env.SOLAR_TANK_AUTO_PROVISION_DEVICES,
+  envValue = serverEnv.SOLAR_TANK_AUTO_PROVISION_DEVICES,
 ): boolean {
   return parseBooleanEnv(envValue);
 }
 
 export function getExpectedProvisioningKey(
-  envValue = process.env.SOLAR_TANK_DEVICE_PROVISIONING_KEY,
+  envValue = serverEnv.SOLAR_TANK_DEVICE_PROVISIONING_KEY,
 ): string | null {
   const cleanValue = envValue?.trim();
   return cleanValue ? cleanValue : null;

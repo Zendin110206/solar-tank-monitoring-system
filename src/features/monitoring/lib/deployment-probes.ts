@@ -1,5 +1,7 @@
 import "server-only";
 
+import { publicEnv } from "@/lib/config/public-env";
+import { serverEnv } from "@/lib/config/server-env";
 import type { RowDataPacket } from "mysql2/promise";
 
 import {
@@ -65,14 +67,12 @@ export type DeploymentReadiness = {
 
 function getAppEnv(): string {
   return (
-    process.env.NEXT_PUBLIC_APP_ENV?.trim() ||
-    process.env.NODE_ENV ||
-    "development"
+    publicEnv.NEXT_PUBLIC_APP_ENV?.trim() || serverEnv.NODE_ENV || "development"
   );
 }
 
 function getNodeEnv(): string {
-  return process.env.NODE_ENV || "development";
+  return serverEnv.NODE_ENV || "development";
 }
 
 function getElapsedMs(startedAtMs: number): number {
@@ -243,10 +243,10 @@ async function checkAuthTelegramSchemaReadiness(): Promise<DeploymentCheck> {
 
 function hasSmtpConfig(): boolean {
   return Boolean(
-    process.env.SMTP_HOST?.trim() &&
-    process.env.SMTP_USER?.trim() &&
-    process.env.SMTP_PASS?.trim() &&
-    process.env.SMTP_FROM?.trim(),
+    serverEnv.SMTP_HOST?.trim() &&
+    serverEnv.SMTP_USER?.trim() &&
+    serverEnv.SMTP_PASS?.trim() &&
+    serverEnv.SMTP_FROM?.trim(),
   );
 }
 
@@ -254,7 +254,7 @@ function checkAuthSecretReadiness(): DeploymentCheck {
   try {
     getRequiredAuthSecret();
 
-    if (!process.env.AUTH_SECRET?.trim()) {
+    if (!serverEnv.AUTH_SECRET?.trim()) {
       return {
         name: "auth-secret",
         ok: true,
@@ -424,10 +424,7 @@ function checkCaptchaReadiness(): DeploymentCheck {
     };
   }
 
-  if (
-    !getCaptchaSecretKey() ||
-    !process.env.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY
-  ) {
+  if (!getCaptchaSecretKey() || !publicEnv.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY) {
     return {
       name: "auth-captcha",
       ok: false,
@@ -524,7 +521,7 @@ function checkDevicePackageEncryptionReadiness(): DeploymentCheck {
   try {
     getDevicePackageEncryptionKey();
 
-    if (!process.env.DEVICE_PACKAGE_ENCRYPTION_KEY?.trim()) {
+    if (!serverEnv.DEVICE_PACKAGE_ENCRYPTION_KEY?.trim()) {
       return {
         name: "device-package-encryption",
         ok: true,
@@ -564,8 +561,8 @@ function checkDatabaseBackupReadiness(
     };
   }
 
-  const outputDir = process.env.MYSQL_BACKUP_OUTPUT_DIR?.trim();
-  const retentionDays = process.env.MYSQL_BACKUP_RETENTION_DAYS?.trim();
+  const outputDir = serverEnv.MYSQL_BACKUP_OUTPUT_DIR?.trim();
+  const retentionDays = serverEnv.MYSQL_BACKUP_RETENTION_DAYS?.trim();
 
   if (!outputDir) {
     return {

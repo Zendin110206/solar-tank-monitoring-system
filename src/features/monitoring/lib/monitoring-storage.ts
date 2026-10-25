@@ -1,5 +1,6 @@
 import "server-only";
 
+import { serverEnv } from "@/lib/config/server-env";
 import type { Reading } from "../types/monitoring";
 import {
   getMonitoringReadings,
@@ -34,7 +35,7 @@ export type ListMonitoringReadingsResult = {
 };
 
 export function getMonitoringStorageDriver(
-  envValue = process.env.SOLAR_TANK_STORAGE_DRIVER,
+  envValue = serverEnv.SOLAR_TANK_STORAGE_DRIVER,
 ): MonitoringStorageDriver {
   return envValue?.trim().toLowerCase() === "mysql" ? "mysql" : "memory";
 }
