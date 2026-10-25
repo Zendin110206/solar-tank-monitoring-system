@@ -6,7 +6,7 @@ import {
   addUserHelpdeskMessage,
   getOrCreateHelpdeskSession,
   normalizeHelpdeskMessage,
-} from "@/features/helpdesk/lib/helpdesk-repository";
+} from "@/features/helpdesk/server/helpdesk-service";
 import { notifyAdminsHelpdeskMessageCreated } from "@/features/helpdesk/lib/helpdesk-notifications";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
 
