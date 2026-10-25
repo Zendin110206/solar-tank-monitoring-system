@@ -55,6 +55,8 @@ dirilis ke `main`.
   `/dashboard/locations` kini membalas pengalihan HTTP 307/308, bukan halaman 200 yang
   mengalihkan di browser; halaman tujuannya tetap sama. `AGENTS.md` memuat blok
   aturan bawaan Next.js.
+- mysql2 dinaikkan dari 3.22.5 ke 3.23.4 untuk menutup kerentanan dekompresi paket
+  tanpa batas; tidak ada perubahan data atau perilaku yang terlihat.
 
 ## [0.1.0] - 2026-08-02
 
