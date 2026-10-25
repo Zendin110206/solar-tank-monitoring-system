@@ -1,232 +1,186 @@
 # Arsitektur Sistem
 
-Dokumen ini menjelaskan gambaran arsitektur FTM (Fuel Tank Management) dalam bahasa yang mudah diikuti.
+Status: **terkini**, diperiksa terhadap kode pada 25 Oktober 2026.
+Arah jangka panjang dicatat di [catatan keputusan](decisions/README.md).
 
 ## Ringkasan
 
-Aplikasi ini dirancang sebagai sistem monitoring berbasis web.
+FTM adalah **satu aplikasi Next.js** (kerangka kerja web yang memuat halaman dan
+API sekaligus) yang ditulis dalam TypeScript dan menyimpan data di MySQL. Aplikasi
+ini menerima data dari perangkat ESP8266 di lapangan, menyimpannya, lalu
+menampilkannya di dashboard.
 
-Alur sederhananya:
+```mermaid
+flowchart TB
+  subgraph Lapangan
+    DEV[Perangkat ESP8266 + HC-SR04<br/>firmware v1]
+  end
+  subgraph Aplikasi[Aplikasi FTM - Next.js]
+    PROXY[src/proxy.ts<br/>cek cookie untuk /dashboard]
+    RH[Route handler src/app/api/*]
+    PG[Halaman server src/app/**/page.tsx]
+    SA[Server action src/app/**/actions.ts]
+    subgraph Modul[src/features]
+      MON[monitoring]
+      AUTH[auth]
+      HD[helpdesk]
+    end
+  end
+  DB[(MySQL)]
+  SMTP[Email SMTP]
+  TG[Telegram Bot API]
+  OSM[Tile peta OpenStreetMap]
+
+  DEV -->|HTTPS POST /api/ingest| RH
+  RH --> MON
+  RH --> AUTH
+  RH --> HD
+  PG --> MON
+  PG --> AUTH
+  SA --> MON
+  SA --> AUTH
+  MON --> DB
+  AUTH --> DB
+  HD --> DB
+  AUTH --> SMTP
+  MON --> SMTP
+  AUTH <-->|webhook| TG
+  HD --> TG
+  PG -. browser memuat tile .-> OSM
+```
+
+Penjelasan diagram:
+
+- **Route handler** (`src/app/api/**/route.ts`) adalah pintu API: menerima data
+  perangkat, login, data dashboard, ekspor CSV, unduhan paket firmware, helpdesk,
+  pemeriksaan kesehatan, dan webhook Telegram.
+- **Halaman server** dirender di server dan membaca data lewat modul.
+- **Server action** (fungsi server yang dipanggil langsung dari formulir) dipakai
+  untuk aksi admin dan pengajuan perangkat.
+- **Modul** di `src/features/` memuat logika dan akses database.
+- Aplikasi tidak punya proses latar belakang: tidak ada tugas terjadwal, backup
+  otomatis, atau alarm.
+
+## Modul
+
+| Modul | Isi utama |
+|---|---|
+| `src/features/monitoring` | Perhitungan domain (volume, status, sisa jam genset, kapasitas, konsumsi), normalisasi kiriman perangkat, registry lokasi/tangki/perangkat, penyimpanan pembacaan, pengajuan perangkat, paket firmware, perawatan data, pemeriksaan kesiapan, ekspor CSV, komponen dashboard, peta, grafik, dan visual 3D |
+| `src/features/auth` | Akun, sesi, peran, OTP admin, CSRF (pengaman agar aksi tidak bisa dipicu dari situs lain), captcha, email, pembatas jumlah permintaan, audit, dan Telegram (binding, perintah, notifikasi admin) |
+| `src/features/helpdesk` | Widget bantuan di web dan relay pesan ke topik Telegram |
+| `src/components` | Kerangka halaman bersama (header, footer, menu, halaman akun) dan logo |
+| `src/lib` | Utilitas umum, misalnya pesan error yang aman ditampilkan |
+
+Di dalam modul, pola file yang dipakai sekarang:
+
+- **logika murni** (tanpa database): misalnya `tank-volume.ts`, `status.ts`,
+  `runtime.ts`, `device-request.ts`, `normalize-reading.ts`, `reading-rollup.ts`;
+- **view model** (menyiapkan data untuk tampilan): `dashboard-view-model.ts`,
+  `simple-dashboard-model.ts`, `simple-tank-detail-model.ts`,
+  `tank-detail-view-model.ts`;
+- **repositori** (kueri SQL): `mysql-*-repository.ts`, `helpdesk-repository.ts`;
+- **layanan** (alur kerja yang menggabungkan beberapa langkah):
+  `ingest-telemetry.ts`, `device-provisioning.ts`, `auth-service.ts`;
+- **komponen** tampilan di folder `components/`.
+
+## Lapisan dan arah ketergantungan
+
+Arah yang dituju (ADR [0002](decisions/0002-satu-repositori-modular-monolith.md)):
 
 ```text
-Device atau simulator
-  -> API ingest
-  -> normalisasi data
-  -> storage aktif
-  -> API baca
-  -> dashboard web
+src/app (halaman, route handler, server action — tipis)
+    → layanan modul
+        → repositori (SQL)
+            → koneksi database
 ```
 
-Dashboard tidak membaca sensor secara langsung. Device atau simulator yang mengirim data ke server.
+Logika murni tidak boleh mengakses database dan hanya ada di satu tempat.
 
-## Komponen Saat Ini
+Penyimpangan yang **masih ada** per 25 Oktober 2026 dan akan dirapikan bertahap
+tanpa mengubah perilaku:
 
-| Komponen | Lokasi | Status |
-|---|---|---|
-| Landing page | `src/app/page.tsx` | Ada |
-| Login | `src/app/login/page.tsx` dan `src/app/api/auth/login/route.ts` | Ada, membuat session database |
-| Pengajuan akses | `src/app/register/page.tsx` dan `src/app/api/auth/register-request/route.ts` | Ada, pending approval admin dan bisa dilindungi Turnstile |
-| Lupa/reset password | `src/app/forgot-password`, `src/app/reset-password`, dan API auth password | Ada, memakai token sekali pakai |
-| Manajemen pengguna | `src/app/dashboard/admin/users/page.tsx` | Ada, khusus admin |
-| Audit keamanan auth | `src/app/dashboard/admin/audit/page.tsx` | Ada, khusus admin |
-| Keamanan akun | `src/app/dashboard/account/security/page.tsx` | Ada, session aktif, ganti password, dan Telegram binding |
-| Monitoring operasional | `src/app/dashboard/page.tsx` | Ada, membaca storage aktif |
-| Detail tangki | `src/app/dashboard/tanks/[tankId]/page.tsx` | Ada, membaca storage aktif |
-| API health | `src/app/api/health/route.ts` | Ada, mengecek aplikasi hidup |
-| API readiness | `src/app/api/ready/route.ts` | Ada, mengecek storage aktif |
-| API overview | `src/app/api/dashboard/overview/route.ts` | Ada |
-| API detail tangki | `src/app/api/tanks/[tankId]/route.ts` | Ada |
-| API history tangki | `src/app/api/tanks/[tankId]/readings/route.ts` | Ada |
-| API ingest | `src/app/api/ingest/route.ts` | Ada |
-| Memory store | `src/features/monitoring/lib/telemetry-store.ts` | Ada untuk development lokal |
-| MySQL reading repository | `src/features/monitoring/lib/mysql-reading-repository.ts` | Ada, opsional |
-| MySQL reference repository | `src/features/monitoring/lib/mysql-reference-repository.ts` | Ada, registry site/tangki/device |
-| Storage facade | `src/features/monitoring/lib/monitoring-storage.ts` | Ada |
-| Monitoring registry | `src/features/monitoring/lib/monitoring-registry.ts` | Ada, memilih registry memory atau MySQL |
-| Device key validation | `src/features/monitoring/lib/device-key.ts` | Ada |
-| Payload config review | `src/features/monitoring/lib/reading-tank-config.ts` | Ada, membandingkan config payload vs registry |
-| Auto-refresh UI | `src/features/monitoring/components/live-refresh-control.tsx` | Ada |
-| Jam real-time | `src/features/monitoring/components/live-clock.tsx` | Ada |
-| Simulator | `scripts/simulate-device.mjs` | Ada |
-| Pilot registry apply | `scripts/apply-pilot-registry.mjs` | Ada, membaca file lokal yang tidak di-commit |
-| Pilot smoke ingest | `scripts/smoke-pilot-ingest.mjs` | Ada, mengirim payload real-format |
-| Operational map | `src/features/monitoring/components/operational-map.tsx` | Ada, menampilkan marker dari latitude/longitude registry |
-| Unit test | `src/features/monitoring/tests` | Ada |
-| Unit test auth | `src/features/auth/tests` | Ada |
+- 10 file di `src/app` mengimpor repositori MySQL secara langsung (antara lain
+  halaman dan aksi admin, pengajuan perangkat, profil, dan unduhan paket);
+- ambang status sisa jam genset ditulis di tiga tempat dengan kelas yang berbeda
+  (`status.ts` dan dua halaman detail tangki);
+- pola tampilan yang sama (kartu, format angka, warna status) ditulis ulang di
+  banyak file;
+- beberapa file sangat besar, misalnya `mysql-device-request-repository.ts`
+  (±2.400 baris) dan `mysql-auth-repository.ts` (±1.700 baris).
 
-## Batas Frontend dan Backend
+## Alur penerimaan data perangkat
 
-Frontend bertugas:
-
-- menampilkan halaman;
-- menampilkan form login, pengajuan akses, reset password, dan keamanan akun;
-- menampilkan status dan angka yang sudah rapi;
-- memberi pengalaman baca yang mudah;
-- tidak menghitung hal operasional penting secara tersebar.
-
-Backend/API bertugas:
-
-- memberi sinyal aplikasi hidup melalui `/api/health`;
-- memberi sinyal storage siap melalui `/api/ready`;
-- menerima payload;
-- memvalidasi device;
-- memvalidasi key;
-- menormalisasi payload;
-- membaca config tangki dari payload sebagai snapshot;
-- membandingkan snapshot payload dengan registry resmi;
-- memberi status review jika config payload dan registry berbeda;
-- menyediakan data siap baca untuk dashboard;
-- membaca registry site, tangki, device, dan hash key dari memory atau MySQL sesuai mode storage;
-- menangani autentikasi, session, role admin/user, OTP admin, reset password, verifikasi email, pengajuan akses, CAPTCHA form publik, dan audit auth;
-- menyimpan data reading ke storage aktif.
-
-## Alur Ingest
-
-Ketika simulator dijalankan:
-
-```powershell
-pnpm simulate:device --once
+```mermaid
+sequenceDiagram
+  participant D as Perangkat
+  participant R as /api/ingest
+  participant I as ingestTelemetry
+  participant DB as MySQL
+  D->>R: POST JSON + X-Device-Id + X-Api-Key/X-Device-Key
+  R->>DB: cek pembatas permintaan (120 per menit per perangkat dan alamat)
+  R->>I: identitas, kunci, isi kiriman
+  I->>DB: baca registry, cocokkan hash kunci
+  I->>DB: aktifkan perangkat baru pada kiriman valid pertama
+  I->>I: normalisasi: registry vs konfigurasi dari perangkat
+  I->>DB: satu transaksi: upsert snapshot terbaru + upsert ringkasan 5 menit
+  R-->>D: 201 (sukses) atau 400/401/404/429/500
 ```
 
-yang terjadi:
+- **Snapshot terbaru** (`monitoring_latest_readings`): satu baris per perangkat,
+  selalu ditimpa kiriman terbaru. Sumber tampilan langsung.
+- **Ringkasan 5 menit** (`monitoring_readings`): satu baris per perangkat per
+  5 menit dengan rata-rata berjalan, minimum, maksimum, dan jumlah sampel. Waktu
+  bucket memakai **waktu terima server**. Sumber grafik dan ekspor.
+- Konfigurasi tangki yang dikirim perangkat dibandingkan dengan registry. Bila
+  berbeda jauh, nilai perangkat diabaikan dan server menghitung ulang dengan
+  registry.
 
-```text
-1. Simulator membuat payload.
-2. Simulator POST ke /api/ingest.
-3. API membaca header X-Device-Id.
-4. API membaca X-Api-Key.
-5. API mencari device di registry aktif, yaitu memory atau MySQL.
-6. Payload dinormalisasi.
-7. Reading disimpan ke storage aktif. Memory menambah reading biasa; MySQL menjalankan satu transaksi untuk meng-upsert snapshot live per device dan bucket history 5 menit.
-8. Response HTTP 201 dikirim.
-```
+Format kiriman ini adalah **kontrak perangkat v1** dan dibekukan (lihat
+[kontrak API](api-contract.md) dan
+[ADR 0006](decisions/0006-kontrak-perangkat-berversi.md)).
 
-## Alur Baca
+## Alur pemasangan perangkat baru
 
-Endpoint baca mengambil data dari storage aktif:
+1. Petugas mengisi formulir pengajuan (lokasi, dimensi tangki, beban genset).
+2. Server menghitung kapasitas dan perkiraan konsumsi, lalu menyimpan pengajuan.
+3. Admin menyetujui. Dalam satu transaksi dengan penguncian baris, server membuat
+   lokasi, tangki, dan perangkat (belum aktif), kunci perangkat, serta paket
+   firmware ZIP yang disimpan terenkripsi.
+4. Tautan unduh bertoken (dengan masa berlaku dan batas jumlah unduhan) dikirim
+   ke email pengaju.
+5. Petugas mengisi Wi-Fi, meng-*compile*, dan mengunggah firmware ke perangkat.
+6. Kiriman valid pertama dengan kunci yang cocok mengaktifkan lokasi, tangki, dan
+   perangkat.
 
-```text
-GET /api/health
-GET /api/ready
-GET /api/dashboard/overview
-GET /api/tanks/[tankId]
-GET /api/tanks/[tankId]/readings
-```
+## Akses dan peran
 
-Overview dan detail memakai aturan freshness yang sama. Repository mengambil
-snapshot `monitoring_latest_readings` dan kandidat history terbaru, lalu memilih
-`receivedAt` paling baru per tangki. Fallback history ini menjaga kompatibilitas
-selama deployment lama masih menulis raw. Setelah writer baru aktif, snapshot
-menjadi sumber live utama dan `monitoring_readings` menjadi history agregat.
+- Halaman `/dashboard/*` membutuhkan sesi login. `src/proxy.ts` mengarahkan
+  pengunjung tanpa cookie sesi ke `/login`.
+- Peran `admin` membuka analisis teknis, detail teknis tangki, tinjauan pengajuan,
+  manajemen pengguna, dan audit. Peran `user` membuka dashboard, detail ringkas
+  tangki, pengajuan perangkat, profil, dan keamanan akun.
+- Semua akun aktif melihat semua lokasi. Belum ada pembatasan per lokasi
+  ([ADR 0009](decisions/0009-akses-per-lokasi.md)).
 
-`GET /api/health` tidak menyentuh database. Endpoint ini hanya memastikan
-aplikasi hidup.
+## Penyimpanan memori untuk pengembangan
 
-`GET /api/ready` mengecek storage aktif. Jika mode MySQL aktif dan koneksi
-database gagal, endpoint ini mengembalikan HTTP 503 supaya masalah deployment
-tidak tersembunyi di dashboard.
+Dengan `SOLAR_TANK_STORAGE_DRIVER="memory"`, registry dan pembacaan disimpan di
+memori proses beserta data contoh. Mode ini hanya untuk mencoba halaman publik dan
+API penerimaan data. Login dan dashboard membutuhkan MySQL.
 
-Saat dev server restart, memory store kembali ke data contoh awal yang waktunya digeser relatif ke waktu server start. Ini membuat demo awal tetap terbaca tanpa memakai data real. Jika mode MySQL aktif, registry site/tangki/device dibaca dari database dan reading disimpan di database selama database tetap tersedia.
+## Alat operasional di luar aplikasi
 
-## Data Contoh vs Data Real
+Skrip di `scripts/` (registry pilot, smoke test, backup, pembuat admin) dijalankan
+dari terminal dan menulis ke database atau alamat yang sedang diatur. Cara
+pakainya ada di [kesiapan pilot](pilot-readiness.md) dan
+[pencadangan database](database-backup.md). Versi dokumen arsitektur sebelum
+25 Oktober 2026 tetap tersedia di riwayat Git.
 
-Data contoh dipakai untuk:
+## Prinsip desain
 
-- membangun UI;
-- menguji status;
-- menguji API;
-- menguji simulator;
-- menghindari penggunaan data sensitif.
-
-Alat pilot sudah tersedia untuk memakai data real yang sudah disetujui. Data real tidak boleh ditaruh di repo. Registry real harus disimpan di file lokal seperti:
-
-```text
-config/pilot-registry.local.json
-```
-
-File lokal itu diabaikan Git.
-
-Sebelum data real masuk, perlu validasi:
-
-- izin penggunaan data;
-- keamanan endpoint;
-- dimensi tangki;
-- posisi sensor;
-- format payload final;
-- deployment target.
-
-## Alur Target Rollout Awal 5 STO
-
-Kondisi terverifikasi per 13–14 Juli 2026 adalah 3 site, 3 tangki, dan 3
-perangkat terdaftar. Bagian ini menjelaskan perluasan menuju target awal 5 STO,
-bukan menyatakan lima lokasi sudah aktif.
-
-Alur pilot yang disiapkan:
-
-```text
-config/pilot-registry.local.json
-  -> pnpm pilot:registry
-  -> MySQL registry
-  -> device real atau pnpm pilot:smoke
-  -> POST /api/ingest
-  -> MySQL readings
-  -> dashboard/detail
-```
-
-Registry pilot wajib memakai:
-
-- minimal 5 site;
-- koordinat yang sudah disetujui;
-- hash key device, bukan key asli;
-- dimensi tangki yang sudah dicek;
-- fallback global key dimatikan.
-
-Dashboard membaca `latitude` dan `longitude` dari registry site untuk marker
-peta. Payload device boleh membawa data sensor dan config tangki, tetapi lokasi
-STO tetap dikelola dari registry karena device saat ini tidak memakai GPS.
-
-## Target Arsitektur Berikutnya
-
-Kondisi fondasi monitoring saat ini:
-
-```text
-UI dashboard/detail
-  -> storage facade
-  -> monitoring registry memory atau MySQL
-  -> memory store atau MySQL reading repository
-  -> pilot registry lokal dapat diaplikasikan ke MySQL
-  -> smoke payload real-format dapat dikirim ke API ingest
-  -> peta koordinat membaca latitude/longitude registry
-  -> berubah saat device/smoke mengirim data dan halaman di-refresh
-```
-
-Setelah fondasi auth tersedia, sisa pematangan production:
-
-```text
-SMTP real, Turnstile real, HTTPS, backup/restore, rate limit ingest, rotasi key device
-  -> divalidasi sebelum production
-```
-
-Kondisi sekarang untuk auth:
-
-```text
-login/register/reset password
-  -> API auth
-  -> validasi payload, rate limit, CAPTCHA form publik bila aktif
-  -> MySQL auth tables
-  -> session cookie httpOnly
-  -> halaman user/admin dibatasi role
-```
-
-Sisa pematangan sebelum production adalah environment production, SMTP real,
-Turnstile real, backup/restore, HTTPS final, rate limit ingest, rotasi key
-device, dan prosedur operasional.
-
-## Prinsip Desain
-
-- Gunakan API sebagai batas antara device dan dashboard.
-- Simpan rumus di modul domain, bukan di komponen UI.
-- Jangan menyimpan credential di repo.
-- Jangan mengklaim production-ready sebelum deployment dan kalibrasi divalidasi.
-- Buat dokumentasi cukup jelas agar kontributor baru bisa melanjutkan.
-- Jangan menjadikan seluruh dashboard sebagai Client Component; gunakan client kecil hanya untuk interaksi seperti refresh dan jam.
+- Perangkat dan dashboard hanya berhubungan lewat API.
+- Rumus operasional berada di modul domain, bukan di komponen tampilan.
+- Client component (bagian tampilan yang berjalan di browser) dibuat kecil, hanya
+  untuk interaksi seperti refresh otomatis, jam, peta, dan formulir.
+- Tidak ada kredensial atau data operasional di repositori.
+- Klaim kesiapan produksi hanya dibuat setelah dibuktikan.

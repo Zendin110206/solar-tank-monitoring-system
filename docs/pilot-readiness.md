@@ -1,5 +1,9 @@
 # Target Rollout Awal 5 STO
 
+> **Status dokumen:** riwayat per 14 Juli 2026. Isinya tidak lagi diperbarui. Kondisi
+> terkini ada di [status operasional](current-operational-truth.md) dan arah
+> pengembangan di [catatan keputusan](decisions/README.md).
+
 Dokumen ini menjelaskan cara memperluas pilot operasional menuju target awal 5
 STO dengan data yang sudah disetujui. Per 13–14 Juli 2026, kondisi yang
 terverifikasi adalah 3 site, 3 tangki, dan 3 perangkat terdaftar; angka 5 pada

@@ -1,5 +1,9 @@
 # Decision Log
 
+> **Status dokumen:** riwayat per 14 Juli 2026. Isinya tidak lagi diperbarui. Kondisi
+> terkini ada di [status operasional](current-operational-truth.md) dan keputusan baru
+> dicatat sebagai [ADR](decisions/README.md).
+
 Dokumen ini mencatat keputusan teknis penting agar alasan perubahan tetap bisa dilacak.
 
 ## 2026-06-24 - Gunakan Next.js App Router

@@ -1,5 +1,8 @@
 # Batasan dan Keselamatan
 
+> **Status dokumen:** terakhir diperiksa 14 Juli 2026. Isinya belum diverifikasi ulang
+> terhadap kode per Oktober 2026; ringkasan batasan terkini ada di status operasional.
+
 Dokumen ini menjelaskan batas sistem dan hal keselamatan yang harus diperhatikan.
 
 ## Status Keamanan Saat Ini
