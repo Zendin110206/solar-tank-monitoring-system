@@ -57,6 +57,10 @@ dirilis ke `main`.
   aturan bawaan Next.js.
 - mysql2 dinaikkan dari 3.22.5 ke 3.23.4 untuk menutup kerentanan dekompresi paket
   tanpa batas; tidak ada perubahan data atau perilaku yang terlihat.
+- nodemailer dinaikkan dari 9.0.3 ke 10.1.7 untuk menutup 2 kerentanan tinggi dan 9
+  sedang; isi keempat jenis email (OTP admin, reset kata sandi, verifikasi email,
+  paket firmware) tetap sama. `@types/nodemailer` dihapus karena tipe data kini ada
+  di paket nodemailer.
 
 ## [0.1.0] - 2026-08-02
 
