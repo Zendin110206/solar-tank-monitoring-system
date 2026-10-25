@@ -43,6 +43,49 @@ jobs:
       - name: Run project checks
         run: pnpm check
 
+  integration:
+    name: Integration tests (MySQL)
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        # Disamakan dengan versi MySQL pilot per Oktober 2026.
+        image: mysql:8.4.8
+        env:
+          MYSQL_ROOT_PASSWORD: ftm-ci-root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -pftm-ci-root"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=30
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 9.15.3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Setiap berkas tes membuat database sementara di MySQL layanan CI,
+      # menerapkan migrasi 001-009, lalu menghapusnya.
+      - name: Run integration tests
+        env:
+          FTM_TEST_MYSQL_URL: mysql://root:ftm-ci-root@127.0.0.1:3306
+        run: pnpm test:integration
+
   pr-title:
     name: Pull request title format
     if: github.event_name == 'pull_request'
