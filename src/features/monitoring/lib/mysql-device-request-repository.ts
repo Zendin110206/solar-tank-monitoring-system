@@ -1,3 +1,5 @@
+import "server-only";
+
 import { randomBytes } from "node:crypto";
 
 import type { PoolConnection, RowDataPacket } from "mysql2/promise";

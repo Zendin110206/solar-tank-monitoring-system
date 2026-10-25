@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { NextRequest } from "next/server";
 
 import { getSafeErrorMessage } from "@/lib/safe-error-message";

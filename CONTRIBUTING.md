@@ -227,6 +227,9 @@ FTM adalah satu aplikasi Next.js yang dibagi per modul di `src/features/`
 - Rumus operasional (volume, status, sisa jam genset) ada di satu tempat, tanpa
   akses database, dan diberi tes.
 - Komponen yang berjalan di browser tidak mengimpor kode khusus server.
+- Modul yang mengakses database, email, berkas, jaringan luar, rahasia, atau data permintaan
+  (cookie/header) diawali `import "server-only";`. Build gagal bila modul seperti ini
+  terimpor ke komponen browser.
 - Keputusan struktur yang penting dicatat sebagai ADR di `docs/decisions/`.
 
 ## Database

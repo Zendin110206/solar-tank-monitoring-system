@@ -51,6 +51,9 @@ src/app → layanan modul → repositori (SQL) → koneksi database
 - Rumus operasional (volume, status, sisa jam genset, konsumsi) hanya di satu
   tempat, tanpa I/O, dan diberi tes.
 - Client component tidak mengimpor kode khusus server.
+- Modul yang mengakses database, email, berkas, jaringan luar, rahasia, atau data permintaan
+  (cookie/header) diawali `import "server-only";`. Build gagal bila modul seperti ini
+  terimpor ke komponen browser.
 - Kode memakai bahasa Inggris; teks yang dilihat pengguna memakai bahasa Indonesia.
 
 ## Aturan perilaku

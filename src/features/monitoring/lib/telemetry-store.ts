@@ -1,3 +1,5 @@
+import "server-only";
+
 import { mockReadings } from "../data/mock-readings";
 import type { Reading } from "../types/monitoring";
 

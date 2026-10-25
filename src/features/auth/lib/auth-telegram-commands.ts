@@ -1,3 +1,5 @@
+import "server-only";
+
 import { getAppBaseUrl } from "./auth-config";
 import { sendTelegramMessage, type TelegramMessage } from "./auth-telegram";
 import { findAuthUserByVerifiedTelegramChatId } from "./mysql-auth-repository";

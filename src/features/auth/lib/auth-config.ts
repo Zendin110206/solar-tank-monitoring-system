@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { AuthRole } from "../types";
 
 const DEFAULT_SESSION_COOKIE_NAME = "solar_tank_session";

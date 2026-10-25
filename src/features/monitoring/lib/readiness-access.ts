@@ -1,3 +1,5 @@
+import "server-only";
+
 import { timingSafeEqual } from "node:crypto";
 
 const READINESS_TOKEN_HEADER = "x-solar-tank-readiness-token";

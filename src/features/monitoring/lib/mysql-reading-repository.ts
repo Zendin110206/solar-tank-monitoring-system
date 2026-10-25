@@ -1,3 +1,5 @@
+import "server-only";
+
 import { type PoolConnection, type RowDataPacket } from "mysql2/promise";
 import { getMysqlPool } from "./mysql-connection";
 import type {
