@@ -12,6 +12,7 @@ import {
   type DashboardAdminActionState,
 } from "@/app/dashboard/actions";
 import type { SimpleDashboardSite } from "@/features/monitoring/lib/simple-dashboard-model";
+import { formatNumber } from "@/lib/format";
 
 type SimpleDashboardCardsProps = {
   adminCleanupToken?: string;
@@ -26,12 +27,6 @@ const DELETE_TANK_CONFIRMATION = "HAPUS DATA STO";
 const RESET_TANK_READINGS_CONFIRMATION = "RESET READING STO";
 const RESET_ALL_READINGS_CONFIRMATION = "RESET SEMUA READING";
 const TELKOM_WATERMARK_SRC = "/brand/Logo_Telkom1.png";
-
-function formatLiter(value: number) {
-  return new Intl.NumberFormat("id-ID", {
-    maximumFractionDigits: 0,
-  }).format(value);
-}
 
 function getTankIcon(site: SimpleDashboardSite) {
   return site.tankShape === "rectangular"
@@ -516,8 +511,8 @@ export function SimpleDashboardCards({
                     Isi tangki
                   </p>
                   <p className="mt-2 text-2xl font-semibold tracking-normal text-zinc-950">
-                    {formatLiter(site.volumeLiter)} /{" "}
-                    {formatLiter(site.capacityLiter)} L
+                    {formatNumber(site.volumeLiter, 0)} /{" "}
+                    {formatNumber(site.capacityLiter, 0)} L
                   </p>
                   <p className="mt-1 text-sm text-zinc-500">
                     saat ini / kapasitas maksimal

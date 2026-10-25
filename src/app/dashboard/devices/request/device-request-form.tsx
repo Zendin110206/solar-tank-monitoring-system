@@ -26,6 +26,7 @@ import {
   createDeviceRequestAction,
   type DeviceRequestFormState,
 } from "./actions";
+import { formatNumber } from "@/lib/format";
 
 const INITIAL_STATE: DeviceRequestFormState = {
   status: "idle",
@@ -93,12 +94,6 @@ function parsePositiveFormNumber(value: string): number | null {
 
 function roundMetric(value: number): number {
   return Math.round(value * 100) / 100;
-}
-
-function formatMetric(value: number): string {
-  return new Intl.NumberFormat("id-ID", {
-    maximumFractionDigits: 2,
-  }).format(value);
 }
 
 function calculateCapacityPreview({
@@ -188,7 +183,7 @@ function ComputedMetric({
     <div className="flex h-full w-full min-w-0 flex-col gap-2 text-sm font-semibold text-zinc-900">
       <span className="break-words">{label}</span>
       <output className="flex min-h-11 w-full min-w-0 max-w-full items-center rounded-lg border border-blue-100 bg-blue-50 px-3 text-sm font-semibold text-blue-950 shadow-sm">
-        {value === null ? emptyLabel : `${formatMetric(value)} ${unit}`}
+        {value === null ? emptyLabel : `${formatNumber(value, 2)} ${unit}`}
       </output>
       {help ? (
         <span className="min-h-5 break-words text-xs font-normal leading-5 text-zinc-500">

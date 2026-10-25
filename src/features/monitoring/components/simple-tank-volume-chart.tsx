@@ -8,6 +8,7 @@ import {
   type SimpleTankChartRangeKey,
   type SimpleTankTrendByRange,
 } from "@/features/monitoring/lib/simple-tank-detail-model";
+import { formatNumber } from "@/lib/format";
 
 type SimpleTankVolumeChartProps = {
   trends: SimpleTankTrendByRange;
@@ -19,12 +20,6 @@ const FALLBACK_CHART_SIZE = {
   width: 960,
   height: 288,
 };
-
-function formatLiter(value: number) {
-  return new Intl.NumberFormat("id-ID", {
-    maximumFractionDigits: 0,
-  }).format(value);
-}
 
 function clamp(value: number, min: number, max: number) {
   return Math.min(Math.max(value, min), max);
@@ -421,7 +416,7 @@ export function SimpleTankVolumeChart({
                 x={padding.left - 12}
                 y={tick.y + 4}
               >
-                {formatLiter(tick.value)} L
+                {formatNumber(tick.value, 0)} L
               </text>
             </g>
           ))}
@@ -529,8 +524,8 @@ export function SimpleTankVolumeChart({
             }}
           >
             <p className="font-semibold text-zinc-950">
-              {formatLiter(activePoint.volumeLiter)} /{" "}
-              {formatLiter(capacityLiter)} L
+              {formatNumber(activePoint.volumeLiter, 0)} /{" "}
+              {formatNumber(capacityLiter, 0)} L
             </p>
             <p className="mt-1 text-xs font-medium text-zinc-500">
               {activePoint.fullTimeLabel}

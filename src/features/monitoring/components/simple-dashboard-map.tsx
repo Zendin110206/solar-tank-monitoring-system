@@ -7,6 +7,7 @@ import { Crosshair, MapPin, Minus, Plus } from "lucide-react";
 import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { formatCoordinatePair } from "@/features/monitoring/lib/number";
 import type { SimpleDashboardSite } from "@/features/monitoring/lib/simple-dashboard-model";
+import { formatNumber } from "@/lib/format";
 
 type LatLng = {
   latitude: number;
@@ -38,12 +39,6 @@ const MAP_HEIGHT = 560;
 const MIN_ZOOM = 9;
 const MAX_ZOOM = 16;
 const DEFAULT_ZOOM = 12;
-
-function formatLiter(value: number) {
-  return new Intl.NumberFormat("id-ID", {
-    maximumFractionDigits: 0,
-  }).format(value);
-}
 
 function isValidCoordinate(
   site: SimpleDashboardSite,
@@ -347,7 +342,7 @@ export function SimpleDashboardMap({
 
               return (
                 <button
-                  aria-label={`${site.name}, ${formatLiter(site.volumeLiter)} dari ${formatLiter(site.capacityLiter)} liter, ${getStatusLabel(site)}`}
+                  aria-label={`${site.name}, ${formatNumber(site.volumeLiter, 0)} dari ${formatNumber(site.capacityLiter, 0)} liter, ${getStatusLabel(site)}`}
                   className="group absolute z-20 -translate-x-1/2 -translate-y-full text-left outline-none"
                   key={site.tankId}
                   onClick={(event) => {
@@ -388,8 +383,8 @@ export function SimpleDashboardMap({
                         {site.name}
                       </p>
                       <p className="mt-1 text-sm font-semibold tracking-normal text-zinc-950">
-                        {formatLiter(site.volumeLiter)} /{" "}
-                        {formatLiter(site.capacityLiter)} L
+                        {formatNumber(site.volumeLiter, 0)} /{" "}
+                        {formatNumber(site.capacityLiter, 0)} L
                       </p>
                     </div>
                   </div>
@@ -467,8 +462,8 @@ export function SimpleDashboardMap({
             <div className="mt-5 rounded-lg border border-zinc-100 bg-zinc-50 p-4">
               <p className="text-sm font-medium text-zinc-500">Isi tangki</p>
               <p className="mt-2 text-2xl font-semibold tracking-normal text-zinc-950">
-                {formatLiter(activeSite.volumeLiter)} /{" "}
-                {formatLiter(activeSite.capacityLiter)} L
+                {formatNumber(activeSite.volumeLiter, 0)} /{" "}
+                {formatNumber(activeSite.capacityLiter, 0)} L
               </p>
               <p className="mt-1 text-sm text-zinc-500">
                 saat ini / kapasitas maksimal

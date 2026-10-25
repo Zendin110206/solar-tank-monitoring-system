@@ -12,6 +12,7 @@ import type {
   DashboardMonitoringSite,
   DashboardSiteStatus,
 } from "@/features/monitoring/lib/dashboard-view-model";
+import { formatNumber } from "@/lib/format";
 
 type DashboardMapOverviewProps = {
   sites: DashboardMonitoringSite[];
@@ -48,10 +49,6 @@ const statusMeta: Record<
     badge: "bg-zinc-100 text-zinc-700 ring-zinc-200",
   },
 };
-
-function formatLiter(value: number) {
-  return new Intl.NumberFormat("id-ID").format(value);
-}
 
 function StatusBadge({ status }: { status: DashboardSiteStatus }) {
   const meta = statusMeta[status];
@@ -186,7 +183,7 @@ export function DashboardMapOverview({
                   </span>
                 </div>
                 <p className="mt-2 text-sm leading-6 text-zinc-500">
-                  {formatLiter(selectedSite.volumeLiter)} liter tersedia.
+                  {formatNumber(selectedSite.volumeLiter)} liter tersedia.
                   Runtime estimasi {selectedSite.runtimeHour} jam dengan asumsi
                   konsumsi konfigurasi {selectedSite.consumptionLiterPerHour}{" "}
                   L/jam.
@@ -203,7 +200,7 @@ export function DashboardMapOverview({
 
             <div className="mt-6 grid grid-cols-3 gap-3">
               {[
-                ["Volume", `${formatLiter(selectedSite.volumeLiter)} L`],
+                ["Volume", `${formatNumber(selectedSite.volumeLiter)} L`],
                 ["Runtime", `${selectedSite.runtimeHour} jam`],
                 ["RSSI", selectedSite.signal],
               ].map(([label, value]) => (

@@ -35,6 +35,7 @@ import {
 import { buildTankDetail } from "@/features/monitoring/lib/tank-detail-view-model";
 import { mergeMonitoringReadingsById } from "@/features/monitoring/lib/latest-reading";
 import type { DeviceStatus } from "@/features/monitoring/types/monitoring";
+import { formatNumber } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: "Detail Operasional Tangki | FTM",
@@ -139,18 +140,6 @@ const unknownRuntimeLevel: RuntimeLevelParameter = {
   badge: "bg-zinc-100 text-zinc-700 ring-zinc-200",
   card: "border-zinc-200 bg-zinc-50",
 };
-
-function formatLiter(value: number) {
-  return new Intl.NumberFormat("id-ID", {
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
-function formatNumber(value: number, maximumFractionDigits = 2) {
-  return new Intl.NumberFormat("id-ID", {
-    maximumFractionDigits,
-  }).format(value);
-}
 
 function formatRuntimeHour(value: number | null) {
   if (value === null || !Number.isFinite(value)) {
@@ -386,7 +375,7 @@ function TankDimensionPanel({ tank }: { tank: SimpleTankDetail }) {
           ...dimensionItems,
           {
             label: "Kapasitas",
-            value: `${formatLiter(tank.capacityLiter)} L`,
+            value: `${formatNumber(tank.capacityLiter, 0)} L`,
           },
           {
             label: "Konsumsi/jam",
@@ -458,7 +447,7 @@ export default async function SimpleTankDetailPage({
     { label: "Area", value: tank.areaLabel },
     { label: "Perangkat", value: tank.deviceCode },
     { label: "Jenis tangki", value: tank.shapeLabel },
-    { label: "Kapasitas", value: `${formatLiter(tank.capacityLiter)} L` },
+    { label: "Kapasitas", value: `${formatNumber(tank.capacityLiter, 0)} L` },
     {
       label: "Sisa jam",
       value: tank.hasReading ? formatRuntimeHour(tank.runtimeHour) : "-",
@@ -527,8 +516,8 @@ export default async function SimpleTankDetailPage({
                   Isi tangki
                 </p>
                 <p className="mt-2 text-4xl font-semibold tracking-normal text-zinc-950 sm:text-5xl">
-                  {formatLiter(tank.volumeLiter)} /{" "}
-                  {formatLiter(tank.capacityLiter)} L
+                  {formatNumber(tank.volumeLiter, 0)} /{" "}
+                  {formatNumber(tank.capacityLiter, 0)} L
                 </p>
                 <p className="mt-2 text-base text-zinc-500">
                   saat ini / kapasitas maksimal

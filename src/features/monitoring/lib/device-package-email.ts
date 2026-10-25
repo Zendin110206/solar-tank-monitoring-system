@@ -7,6 +7,7 @@ import {
   canLogOtpInDevelopment,
   isProductionLikeEnvironment,
 } from "@/features/auth/server/auth-config";
+import { formatDateTimeJakarta } from "@/lib/format";
 
 export type DevicePackageEmailDeliveryResult =
   | { delivered: true; delivery: "email" | "log" }
@@ -97,17 +98,6 @@ function buildPackageEmailHtml({
 </html>`;
 }
 
-function formatExpiresAt(value: string): string {
-  return new Intl.DateTimeFormat("id-ID", {
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    month: "short",
-    timeZone: "Asia/Jakarta",
-    year: "numeric",
-  }).format(new Date(value));
-}
-
 export async function sendDevicePackageReadyEmail({
   deviceCode,
   downloadExpiresAt,
@@ -123,7 +113,7 @@ export async function sendDevicePackageReadyEmail({
   requestCode: string;
   siteName: string;
 }): Promise<DevicePackageEmailDeliveryResult> {
-  const expiresAtLabel = formatExpiresAt(downloadExpiresAt);
+  const expiresAtLabel = formatDateTimeJakarta(downloadExpiresAt);
   const subject = `Firmware FTM siap - ${deviceCode}`;
   const text = [
     `Pengajuan ${requestCode} untuk ${siteName} sudah disetujui.`,

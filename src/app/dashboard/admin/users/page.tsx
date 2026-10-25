@@ -32,6 +32,7 @@ import {
   sendUserPasswordResetAction,
 } from "./actions";
 import { AdminActionForm, AdminRoleForm } from "./admin-action-controls";
+import { formatDateTimeJakarta } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: "Manajemen Pengguna | FTM",
@@ -152,14 +153,7 @@ function formatDate(value: string | null) {
     return "-";
   }
 
-  return new Intl.DateTimeFormat("id-ID", {
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    month: "short",
-    timeZone: "Asia/Jakarta",
-    year: "numeric",
-  }).format(new Date(value));
+  return formatDateTimeJakarta(value);
 }
 
 function getStatusLabel(status: AuthUserStatus) {
