@@ -45,6 +45,8 @@
     "three": "^0.185.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "21.2.3",
+    "@commitlint/config-conventional": "21.2.3",
     "@next/env": "^16.2.9",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
@@ -55,6 +57,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "eslint-config-prettier": "10.1.8",
+    "lefthook": "2.2.0",
     "prettier": "3.9.10",
     "tailwindcss": "^4",
     "typescript": "^5",
