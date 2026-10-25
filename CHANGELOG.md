@@ -28,6 +28,8 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Data contoh MySQL memakai kode dan nama lokasi fiktif dengan koordinat kosong;
+  identitas perangkat, hubungan data, dan angka operasional tetap sama.
 - `.env.example` mencantumkan semua variabel yang dibaca kode; contoh alamat smoke
   test diarahkan ke `localhost` (#19).
 - README, CONTRIBUTING, dan SECURITY ditulis ulang: status bertanggal, cara
