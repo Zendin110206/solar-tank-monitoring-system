@@ -39,6 +39,9 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Panduan pemeriksaan lokal disesuaikan dengan Node.js 22, pnpm 9.15.3, aturan
+  login, kesiapan layanan, simulator, dan tes MySQL; status audit keamanan dibatasi
+  pada branch yang diperiksa dan diberi tanggal (#35).
 - Data contoh MySQL memakai kode dan nama lokasi fiktif dengan koordinat kosong;
   identitas perangkat, hubungan data, dan angka operasional tetap sama.
 - `.env.example` mencantumkan semua variabel yang dibaca kode; contoh alamat smoke
