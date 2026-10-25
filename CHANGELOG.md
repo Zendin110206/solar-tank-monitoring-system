@@ -29,7 +29,11 @@ dirilis ke `main`.
   `/api/ingest` v1, aktivasi kiriman pertama, normalisasi kiriman, ambang status di
   tiga tempat, volume, konsumsi, bucket 5 menit, paket firmware v1, serta hash sesi,
   OTP, dan CSRF. Konfigurasi Vitest kini mengenali alias `@/` dan memisahkan tes
-  integrasi.
+  integrasi (#26).
+- Tes integrasi dengan MySQL sungguhan (`pnpm test:integration`) untuk transaksi
+  penyimpanan pembacaan, alur pengajuan sampai aktivasi kiriman pertama (termasuk
+  dua kiriman bersamaan), dan cakupan reset pembacaan; dijalankan di CI dengan
+  MySQL 8.4.8.
 
 ### Diubah
 

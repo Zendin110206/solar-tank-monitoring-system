@@ -137,6 +137,26 @@ git status
 dan `main`, dan wajib lulus sebelum digabung. GitHub Actions juga memeriksa
 format judul pull request dan melaporkan hasil `pnpm audit --prod`.
 
+### Tes
+
+- `pnpm test`: tes unit dan tes karakterisasi (tes yang mengunci perilaku sekarang,
+  termasuk perilaku yang tercatat perlu diperbaiki; namanya menyebut nomor temuannya).
+- `pnpm test:integration`: tes dengan MySQL sungguhan. Setiap berkas tes membuat
+  database sementara, menerapkan migrasi 001–009, lalu menghapusnya. Tes ini hanya
+  mau berjalan ke MySQL di `localhost`/`127.0.0.1`:
+
+  ```powershell
+  docker compose -f deploy/local/compose.yaml up -d
+  $env:FTM_TEST_MYSQL_URL="mysql://root:ftm-local-root@127.0.0.1:3307"
+  pnpm test:integration
+  ```
+
+  CI menjalankannya otomatis di job `Integration tests (MySQL)`.
+
+- Tes tidak boleh dihapus, dilewati, atau dilemahkan agar lulus. Bila perilaku
+  memang sengaja diubah, ubah tes karakterisasinya di pull request yang sama dan
+  jelaskan alasannya.
+
 ### Hook git otomatis
 
 `pnpm install` memasang hook git lewat lefthook (alat yang menjalankan

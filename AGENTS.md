@@ -19,6 +19,7 @@ pnpm dev                 # pengembangan, http://localhost:3000
 pnpm format              # rapikan format (Prettier)
 pnpm check               # format:check + typecheck + lint + test + build (wajib lulus)
 pnpm typecheck | pnpm lint | pnpm test | pnpm build
+pnpm test:integration    # butuh FTM_TEST_MYSQL_URL ke MySQL lokal (localhost saja)
 pnpm audit --prod
 git diff --check
 docker compose -f deploy/local/compose.yaml up -d   # MySQL + email lokal
