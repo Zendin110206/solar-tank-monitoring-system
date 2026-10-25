@@ -62,5 +62,12 @@
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.1.9"
+  },
+  "pnpm": {
+    "overrides": {
+      "browserslist": "4.28.9",
+      "baseline-browser-mapping": "2.11.0",
+      "source-map-js": "1.2.2"
+    }
   }
 }
