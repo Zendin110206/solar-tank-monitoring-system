@@ -47,6 +47,9 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Repositori pengajuan perangkat dipecah ke `server/repositories/device-requests/`
+  menurut pengajuan, peninjauan, paket, dan aktivasi. Pintu impor lama serta semua
+  fungsi dan tipe publik tetap; SQL, transaksi, penguncian baris, dan firmware tidak berubah.
 - Warna status (lencana dan titik penanda) diambil dari satu peta,
   `src/components/ui/status-tone.ts`, di 16 berkas. Kelas CSS hasil build identik; tampilan
   tidak berubah.
