@@ -5,6 +5,7 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { requirePageAdmin } from "@/features/auth/server/auth-guards";
 import { listAuthAuditEvents } from "@/features/auth/server/audit-service";
 import { formatDateTimeJakarta } from "@/lib/format";
+import { Card } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "Audit Keamanan | FTM",
@@ -38,7 +39,7 @@ export default async function AdminAuditPage() {
       />
 
       <div className="mx-auto flex max-w-[1540px] flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
-        <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+        <Card>
           <div className="flex items-start gap-3">
             <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-700 ring-1 ring-blue-100">
               <ClipboardList className="size-5" aria-hidden="true" />
@@ -56,9 +57,9 @@ export default async function AdminAuditPage() {
               </p>
             </div>
           </div>
-        </section>
+        </Card>
 
-        <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+        <Card>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[980px] border-separate border-spacing-y-2 text-left text-sm">
               <thead className="text-xs uppercase text-zinc-500">
@@ -95,7 +96,7 @@ export default async function AdminAuditPage() {
               </tbody>
             </table>
           </div>
-        </section>
+        </Card>
       </div>
     </main>
   );

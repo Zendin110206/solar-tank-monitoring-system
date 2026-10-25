@@ -10,6 +10,8 @@ import type {
   AuthSessionUser,
 } from "@/features/auth/types/auth";
 import { STATUS_BADGE_CLASS } from "@/components/ui/status-tone";
+import { Card } from "@/components/ui/card";
+import { FormErrorMessage } from "@/components/ui/message";
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("id-ID", {
@@ -215,7 +217,7 @@ export default function AccountSecurityPanel({
 
   return (
     <div className="grid gap-5 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-      <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+      <Card>
         <div className="flex items-center gap-3">
           <span className="grid size-10 place-items-center rounded-lg bg-blue-50 text-blue-700 ring-1 ring-blue-100">
             <KeyRound className="size-5" aria-hidden="true" />
@@ -325,9 +327,9 @@ export default function AccountSecurityPanel({
             </div>
           ) : null}
         </div>
-      </section>
+      </Card>
 
-      <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+      <Card>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-sm font-semibold uppercase text-zinc-500">
@@ -395,11 +397,9 @@ export default function AccountSecurityPanel({
           </div>
         ) : null}
         {error ? (
-          <div className="mt-4 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm leading-6 text-red-800">
-            {error}
-          </div>
+          <FormErrorMessage className="mt-4">{error}</FormErrorMessage>
         ) : null}
-      </section>
+      </Card>
     </div>
   );
 }

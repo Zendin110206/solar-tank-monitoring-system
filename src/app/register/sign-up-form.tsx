@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 
 import { TurnstileWidget } from "@/features/auth/components/turnstile-widget";
+import { PRIMARY_BLOCK_BUTTON_CLASS } from "@/components/ui/button-class";
+import { FormErrorMessage } from "@/components/ui/message";
 
 const inputClassName =
   "h-11 w-full rounded-lg border border-zinc-300 bg-white px-3.5 text-sm text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10";
@@ -301,14 +303,10 @@ export default function SignUpForm() {
         </div>
       ) : null}
 
-      {error ? (
-        <div className="rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm leading-6 text-red-800">
-          {error}
-        </div>
-      ) : null}
+      {error ? <FormErrorMessage>{error}</FormErrorMessage> : null}
 
       <button
-        className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20 disabled:cursor-not-allowed disabled:opacity-70"
+        className={PRIMARY_BLOCK_BUTTON_CLASS}
         disabled={pending}
         type="submit"
       >

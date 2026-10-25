@@ -5,6 +5,7 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { requirePageUser } from "@/features/auth/server/auth-guards";
 import { listCurrentUserSessions } from "@/features/auth/server/auth-service";
 import AccountSecurityPanel from "./security-panel";
+import { Card } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "Keamanan Akun | FTM",
@@ -27,7 +28,7 @@ export default async function AccountSecurityPage() {
       />
 
       <div className="mx-auto flex max-w-[1540px] flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
-        <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+        <Card>
           <div className="flex items-start gap-3">
             <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-700 ring-1 ring-blue-100">
               <ShieldCheck className="size-5" aria-hidden="true" />
@@ -45,7 +46,7 @@ export default async function AccountSecurityPage() {
               </p>
             </div>
           </div>
-        </section>
+        </Card>
 
         <AccountSecurityPanel initialSessions={sessions} user={user} />
       </div>

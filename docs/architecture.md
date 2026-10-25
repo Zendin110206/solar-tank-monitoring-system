@@ -176,6 +176,19 @@ Route handler membalas lewat `src/lib/http/json-response.ts`: `jsonOk` (`{ ok: t
 dan `jsonCaughtError` (pesan aman untuk error yang ditangkap). Hanya `/api/ready`,
 `/api/dashboard/overview`, dan unduhan paket firmware yang bentuk balasannya berbeda.
 
+Kit UI bersama ada di `src/components/ui/`:
+
+| Berkas            | Isi                                                                                     |
+| ----------------- | --------------------------------------------------------------------------------------- |
+| `card.tsx`        | `Card`: kartu putih standar (`as` untuk `section`/`article`/`div`)                      |
+| `status-pill.tsx` | `StatusPill`: lencana status berbentuk pil dengan titik warna                           |
+| `message.tsx`     | `FormErrorMessage` (kotak error formulir), `ActionMessage` (hasil aksi di dialog)       |
+| `button-class.ts` | `PRIMARY_BLOCK_BUTTON_CLASS`, `SECONDARY_BUTTON_CLASS` untuk `<button>` maupun `<Link>` |
+| `status-tone.ts`  | peta warna status                                                                       |
+
+Tes `ui-kit.test.tsx` memastikan setiap komponen menghasilkan HTML yang sama persis
+dengan markup lama.
+
 Warna status (lencana dan titik penanda) diambil dari satu peta,
 `src/components/ui/status-tone.ts`: `success` hijau, `warning` kuning, `danger` merah,
 `neutral` abu-abu, `info` biru. Warna isi grafik dan hiasan tidak termasuk peta ini.

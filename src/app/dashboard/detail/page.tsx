@@ -31,6 +31,8 @@ import {
   STATUS_BADGE_CLASS,
   STATUS_DOT_CLASS,
 } from "@/components/ui/status-tone";
+import { Card } from "@/components/ui/card";
+import { StatusPill } from "@/components/ui/status-pill";
 
 export const metadata: Metadata = {
   title: "Analisis Teknis Tangki Bahan Bakar | FTM",
@@ -158,12 +160,9 @@ function StatusBadge({ status }: { status: SiteStatus }) {
   const meta = statusMeta[status];
 
   return (
-    <span
-      className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ring-1 ${meta.badge}`}
-    >
-      <span className={`size-2 rounded-full ${meta.dot}`} />
+    <StatusPill badgeClass={meta.badge} dotClass={meta.dot}>
       {meta.label}
-    </span>
+    </StatusPill>
   );
 }
 
@@ -326,10 +325,7 @@ export default async function DashboardPage() {
           <div className="space-y-5">
             {/* Lower Insights Section */}
             <section className="grid gap-5 lg:grid-cols-[0.72fr_1.28fr]">
-              <article
-                id="prioritas"
-                className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
-              >
+              <Card id="prioritas" as="article" className="animate-soft-fade">
                 <SectionHeader
                   label="Prioritas"
                   title="Tindak lanjut hari ini"
@@ -368,9 +364,9 @@ export default async function DashboardPage() {
                 >
                   Lihat semua prioritas
                 </button>
-              </article>
+              </Card>
 
-              <article className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+              <Card as="article" className="animate-soft-fade">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <SectionHeader
                     label="Tren volume"
@@ -425,13 +421,13 @@ export default async function DashboardPage() {
                     </div>
                   ))}
                 </div>
-              </article>
+              </Card>
             </section>
           </div>
 
           {/* Supporting Status Panels */}
           <aside className="space-y-5">
-            <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+            <Card className="animate-soft-fade">
               <SectionHeader
                 label="Kesehatan data"
                 title="Status perangkat"
@@ -458,9 +454,9 @@ export default async function DashboardPage() {
                   ))}
                 </div>
               </div>
-            </section>
+            </Card>
 
-            <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+            <Card className="animate-soft-fade">
               <SectionHeader
                 label="Alur data"
                 title="Siap disambung bertahap"
@@ -492,15 +488,12 @@ export default async function DashboardPage() {
                   </div>
                 ))}
               </div>
-            </section>
+            </Card>
           </aside>
         </div>
 
         {/* Monitoring Table Section */}
-        <section
-          id="log"
-          className="mt-5 animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
-        >
+        <Card id="log" className="mt-5 animate-soft-fade">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <SectionHeader
               label="Log perangkat"
@@ -601,7 +594,7 @@ export default async function DashboardPage() {
               </tbody>
             </table>
           </div>
-        </section>
+        </Card>
       </div>
     </main>
   );
