@@ -29,24 +29,24 @@ import {
   TankRectangularScene3D,
 } from "@/features/monitoring/components/tank-rectangular-scene-3d";
 import { SimpleTankVolumeChart } from "@/features/monitoring/components/simple-tank-volume-chart";
-import { getMonitoringReferenceData } from "@/features/monitoring/lib/monitoring-registry";
+import { getMonitoringReferenceData } from "@/features/monitoring/server/monitoring-registry";
 import {
   buildTankDetail,
   type NearbyTankSite,
   type TankDetailStatus,
   type TankDetailView,
   type TankReadingPoint,
-} from "@/features/monitoring/lib/tank-detail-view-model";
+} from "@/features/monitoring/domain/tank-detail-view-model";
 import {
   listLatestMonitoringReadingsByTankWithSource,
   listMonitoringReadingsForTank,
-} from "@/features/monitoring/lib/monitoring-storage";
-import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/lib/refresh-interval";
+} from "@/features/monitoring/server/monitoring-storage";
+import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/components/refresh-interval";
 import {
   buildSimpleTankDetail,
   type SimpleTankTrendByRange,
-} from "@/features/monitoring/lib/simple-tank-detail-model";
-import { mergeMonitoringReadingsById } from "@/features/monitoring/lib/latest-reading";
+} from "@/features/monitoring/domain/simple-tank-detail-model";
+import { mergeMonitoringReadingsById } from "@/features/monitoring/domain/latest-reading";
 import type {
   ReadingQuality,
   ReadingValueSource,

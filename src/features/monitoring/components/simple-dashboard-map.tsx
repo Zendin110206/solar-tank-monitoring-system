@@ -5,8 +5,8 @@
 import Link from "next/link";
 import { Crosshair, MapPin, Minus, Plus } from "lucide-react";
 import { useMemo, useRef, useState, type PointerEvent } from "react";
-import { formatCoordinatePair } from "@/features/monitoring/lib/number";
-import type { SimpleDashboardSite } from "@/features/monitoring/lib/simple-dashboard-model";
+import { formatCoordinatePair } from "@/features/monitoring/domain/number";
+import type { SimpleDashboardSite } from "@/features/monitoring/domain/simple-dashboard-model";
 import { formatNumber } from "@/lib/format";
 import {
   STATUS_BADGE_CLASS,

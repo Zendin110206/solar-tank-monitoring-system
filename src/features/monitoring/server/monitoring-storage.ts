@@ -12,8 +12,8 @@ import {
   listMonitoringReadingsForTankFromMysql,
   listMonitoringReadingsFromMysql,
   saveMonitoringReadingToMysql,
-} from "./mysql-reading-repository";
-import { selectLatestReadingPerTank } from "./latest-reading";
+} from "./repositories/mysql-reading-repository";
+import { selectLatestReadingPerTank } from "../domain/latest-reading";
 
 export type MonitoringStorageDriver = "memory" | "mysql";
 

@@ -6,19 +6,19 @@ import {
   calculateOperationalConsumptionLiterPerHour,
   calculateOperationalLoadKw,
 } from "../lib/device-request";
-import { buildMonitoringRollupWindow } from "../lib/reading-rollup";
-import { calculateRuntimeHours } from "../lib/runtime";
+import { buildMonitoringRollupWindow } from "../domain/reading-rollup";
+import { calculateRuntimeHours } from "../domain/runtime";
 import {
   getDeviceStatus,
   getLevelStatus,
   getOperationalStatus,
   getRuntimeStatus,
-} from "../lib/status";
+} from "../domain/status";
 import {
   calculateFillPercent,
   calculateTankVolumeLiter,
   getMaxFuelHeightCm,
-} from "../lib/tank-volume";
+} from "../domain/tank-volume";
 import {
   STATUS_BADGE_CLASS,
   STATUS_DOT_CLASS,

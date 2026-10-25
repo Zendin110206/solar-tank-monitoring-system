@@ -16,9 +16,9 @@ import type {
 import {
   isGlobalDeviceKeyFallbackAllowed,
   verifyDeviceKey,
-} from "./device-key";
-import { provisionMonitoringDevice } from "./device-provisioning";
-import { normalizeCatPayload } from "./normalize-reading";
+} from "../lib/device-key";
+import { provisionMonitoringDevice } from "../lib/device-provisioning";
+import { normalizeCatPayload } from "../domain/normalize-reading";
 import {
   saveMonitoringReading,
   getMonitoringStorageDriver,
@@ -27,7 +27,7 @@ import {
 import {
   activateApprovedDeviceOnFirstPingFromMysql,
   type ActivateApprovedDeviceResult,
-} from "./mysql-device-request-repository";
+} from "../lib/mysql-device-request-repository";
 
 const DEFAULT_LOCAL_DEVICE_KEY = "local-development-key";
 

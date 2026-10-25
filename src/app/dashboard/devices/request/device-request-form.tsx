@@ -21,7 +21,7 @@ import type {
 import {
   FTM_REGIONAL_OPTIONS,
   FTM_WILAYAH_OPTIONS,
-} from "@/features/monitoring/lib/location-taxonomy";
+} from "@/features/monitoring/domain/location-taxonomy";
 import {
   createDeviceRequestAction,
   type DeviceRequestFormState,

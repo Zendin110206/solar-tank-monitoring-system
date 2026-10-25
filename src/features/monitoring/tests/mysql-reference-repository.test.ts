@@ -4,7 +4,7 @@ const mocks = vi.hoisted(() => ({
   query: vi.fn(),
 }));
 
-vi.mock("../lib/mysql-connection", () => ({
+vi.mock("../../../lib/database/mysql-connection", () => ({
   getMysqlPool: () => ({ query: mocks.query }),
 }));
 
@@ -13,7 +13,7 @@ import {
   rowToDevice,
   rowToSite,
   rowToTank,
-} from "../lib/mysql-reference-repository";
+} from "../server/repositories/mysql-reference-repository";
 
 describe("mysql reference repository mappers", () => {
   beforeEach(() => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { mockTanks } from "../data/mock-tanks";
-import { normalizeCatPayload } from "../lib/normalize-reading";
+import { normalizeCatPayload } from "../domain/normalize-reading";
 
 describe("normalizeCatPayload", () => {
   it("normalizes CAT-like telemetry payload into a standard reading", () => {

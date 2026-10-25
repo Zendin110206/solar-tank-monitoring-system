@@ -18,7 +18,7 @@ const mocks = vi.hoisted(() => {
   };
 });
 
-vi.mock("../lib/mysql-connection", () => ({
+vi.mock("../../../lib/database/mysql-connection", () => ({
   getMysqlPool: () => mocks.pool,
 }));
 
@@ -27,7 +27,7 @@ import {
   listLatestMonitoringReadingsByTankFromMysql,
   parseMysqlDateTimeAsUtc,
   saveMonitoringReadingToMysql,
-} from "../lib/mysql-reading-repository";
+} from "../server/repositories/mysql-reading-repository";
 import type { Reading } from "../types/monitoring";
 
 const reading: Reading = {

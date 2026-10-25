@@ -5,7 +5,7 @@
 import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { Crosshair, MapPin, Minus, Plus, Search } from "lucide-react";
 
-import type { DashboardSiteStatus } from "../lib/dashboard-view-model";
+import type { DashboardSiteStatus } from "../domain/dashboard-view-model";
 import {
   STATUS_BADGE_CLASS,
   STATUS_DOT_CLASS,

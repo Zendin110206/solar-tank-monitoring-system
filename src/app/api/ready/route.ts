@@ -5,8 +5,8 @@ import {
   isProductionLikeEnvironment,
 } from "@/features/auth/server/auth-config";
 import { requireApiUser } from "@/features/auth/server/auth-guards";
-import { getDeploymentReadiness } from "@/features/monitoring/lib/deployment-probes";
-import { hasValidReadinessToken } from "@/features/monitoring/lib/readiness-access";
+import { getDeploymentReadiness } from "@/features/monitoring/server/deployment-probes";
+import { hasValidReadinessToken } from "@/features/monitoring/server/readiness-access";
 import { jsonError } from "@/lib/http/json-response";
 
 export const dynamic = "force-dynamic";

@@ -3,12 +3,12 @@ import { mockReadings } from "../data/mock-readings";
 import {
   getMonitoringReadings,
   resetMonitoringReadings,
-} from "../lib/telemetry-store";
-import { ingestTelemetry } from "../lib/ingest-telemetry";
+} from "../server/telemetry-store";
+import { ingestTelemetry } from "../server/ingest-telemetry";
 import {
   listMonitoringReadings,
   listMonitoringReadingsWithSource,
-} from "../lib/monitoring-storage";
+} from "../server/monitoring-storage";
 
 describe("telemetry store", () => {
   afterEach(() => {

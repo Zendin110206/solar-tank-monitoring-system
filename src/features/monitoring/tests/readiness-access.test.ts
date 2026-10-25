@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   getProvidedReadinessToken,
   hasValidReadinessToken,
-} from "../lib/readiness-access";
+} from "../server/readiness-access";
 
 describe("readiness access", () => {
   it("accepts the explicit readiness header", () => {

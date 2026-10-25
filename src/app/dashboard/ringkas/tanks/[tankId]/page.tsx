@@ -21,19 +21,19 @@ import {
   TankHorizontalCylinderScene3D,
   TankRectangularScene3D,
 } from "@/features/monitoring/components/tank-rectangular-scene-3d";
-import { getMonitoringReferenceData } from "@/features/monitoring/lib/monitoring-registry";
+import { getMonitoringReferenceData } from "@/features/monitoring/server/monitoring-registry";
 import {
   listLatestMonitoringReadingsByTankWithSource,
   listMonitoringReadingsForTank,
-} from "@/features/monitoring/lib/monitoring-storage";
+} from "@/features/monitoring/server/monitoring-storage";
 import { LiveRefreshControl } from "@/features/monitoring/components/live-refresh-control";
-import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/lib/refresh-interval";
+import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/components/refresh-interval";
 import {
   buildSimpleTankDetail,
   type SimpleTankDetail,
-} from "@/features/monitoring/lib/simple-tank-detail-model";
-import { buildTankDetail } from "@/features/monitoring/lib/tank-detail-view-model";
-import { mergeMonitoringReadingsById } from "@/features/monitoring/lib/latest-reading";
+} from "@/features/monitoring/domain/simple-tank-detail-model";
+import { buildTankDetail } from "@/features/monitoring/domain/tank-detail-view-model";
+import { mergeMonitoringReadingsById } from "@/features/monitoring/domain/latest-reading";
 import type { DeviceStatus } from "@/features/monitoring/types/monitoring";
 import { formatNumber } from "@/lib/format";
 import { STATUS_BADGE_CLASS } from "@/components/ui/status-tone";

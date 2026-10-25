@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   getDeploymentHealth,
   getDeploymentReadiness,
-} from "../lib/deployment-probes";
+} from "../server/deployment-probes";
 
 const originalStorageDriver = process.env.SOLAR_TANK_STORAGE_DRIVER;
 const originalGlobalDeviceKeyFallback =

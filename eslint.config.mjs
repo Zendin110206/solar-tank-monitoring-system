@@ -55,6 +55,8 @@ const eslintConfig = defineConfig([
       // berkas (lihat docs/architecture.md, bagian penyimpangan); hapus baris ini setelahnya.
       "src/features/auth/server/admin-telegram-notifications.ts",
       "src/features/auth/server/rate-limit.ts",
+      // Pemeriksaan kesiapan (/api/ready) memang menguji koneksi database secara langsung.
+      "src/features/monitoring/server/deployment-probes.ts",
     ],
     rules: {
       "no-restricted-imports": [
@@ -68,6 +70,12 @@ const eslintConfig = defineConfig([
                 "^(@/features/[^/]+|(\\.\\./)+[^/.][^/]*)/(server/repositories/[^/]+|lib/[^/]*-repository|lib/mysql-connection)$",
               message:
                 "Layanan tidak memakai repositori atau koneksi database modul lain; panggil layanan modul itu (ADR 0011).",
+            },
+            {
+              // Koneksi database bersama hanya dipakai repositori.
+              group: ["@/lib/database/*"],
+              message:
+                "Koneksi database hanya dipakai repositori di server/repositories/ (ADR 0011).",
             },
           ],
         },
@@ -96,6 +104,7 @@ const eslintConfig = defineConfig([
                 "next/headers",
                 "server-only",
                 "@/lib/config/*",
+                "@/lib/database/*",
               ],
               message:
                 "domain/ hanya berisi logika murni tanpa I/O; pindahkan bagian ini ke server/ (ADR 0011).",

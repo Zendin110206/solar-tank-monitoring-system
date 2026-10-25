@@ -8,7 +8,7 @@ import {
   cleanupMonitoringTanks as cleanupMonitoringTanksInMysql,
   resetMonitoringReadings as resetMonitoringReadingsInMysql,
 } from "@/features/monitoring/server/maintenance-service";
-import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
+import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
 
 const DELETE_TANK_CONFIRMATION = "HAPUS DATA STO";

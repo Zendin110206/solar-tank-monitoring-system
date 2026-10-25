@@ -2,7 +2,7 @@ import type { RowDataPacket } from "mysql2/promise";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import type { Reading } from "../../types/monitoring";
-import { saveMonitoringReadingToMysql } from "../../lib/mysql-reading-repository";
+import { saveMonitoringReadingToMysql } from "../../server/repositories/mysql-reading-repository";
 import {
   createTestDatabase,
   insertFictionalLocation,

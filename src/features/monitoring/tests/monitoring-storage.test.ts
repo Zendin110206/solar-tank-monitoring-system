@@ -20,7 +20,7 @@ describe("monitoring storage", () => {
   it("keeps mysql as the active source when mysql readings are empty", async () => {
     process.env.SOLAR_TANK_STORAGE_DRIVER = "mysql";
 
-    vi.doMock("../lib/mysql-reading-repository", () => ({
+    vi.doMock("../server/repositories/mysql-reading-repository", () => ({
       listLatestMonitoringReadingsByTankFromMysql: vi
         .fn()
         .mockResolvedValue([]),
@@ -31,7 +31,7 @@ describe("monitoring storage", () => {
     }));
 
     const { listMonitoringReadingsWithSource } =
-      await import("../lib/monitoring-storage");
+      await import("../server/monitoring-storage");
 
     const result = await listMonitoringReadingsWithSource();
 
@@ -62,7 +62,7 @@ describe("monitoring storage", () => {
       },
     ];
 
-    vi.doMock("../lib/mysql-reading-repository", () => ({
+    vi.doMock("../server/repositories/mysql-reading-repository", () => ({
       listLatestMonitoringReadingsByTankFromMysql: vi
         .fn()
         .mockResolvedValue(latestReadings),
@@ -73,7 +73,7 @@ describe("monitoring storage", () => {
     }));
 
     const { listLatestMonitoringReadingsByTankWithSource } =
-      await import("../lib/monitoring-storage");
+      await import("../server/monitoring-storage");
 
     const result = await listLatestMonitoringReadingsByTankWithSource();
 
@@ -107,7 +107,7 @@ describe("monitoring storage", () => {
       .fn()
       .mockResolvedValue(readings);
 
-    vi.doMock("../lib/mysql-reading-repository", () => ({
+    vi.doMock("../server/repositories/mysql-reading-repository", () => ({
       listLatestMonitoringReadingsByTankFromMysql: vi.fn(),
       listMonitoringReadingsForTankInRangeFromMysql,
       listMonitoringReadingsForTankFromMysql: vi.fn(),
@@ -116,7 +116,7 @@ describe("monitoring storage", () => {
     }));
 
     const { listMonitoringReadingsForTankInRange } =
-      await import("../lib/monitoring-storage");
+      await import("../server/monitoring-storage");
 
     const result = await listMonitoringReadingsForTankInRange({
       end: "2026-07-08T17:00:00.000Z",

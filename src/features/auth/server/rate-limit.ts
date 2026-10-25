@@ -2,7 +2,7 @@ import "server-only";
 
 import type { RowDataPacket } from "mysql2/promise";
 
-import { getMysqlPool } from "@/features/monitoring/lib/mysql-connection";
+import { getMysqlPool } from "@/lib/database/mysql-connection";
 import { hmacSha256Hex } from "./auth-crypto";
 
 type RateLimitRow = RowDataPacket & {

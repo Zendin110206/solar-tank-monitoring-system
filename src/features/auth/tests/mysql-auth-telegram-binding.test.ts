@@ -10,7 +10,7 @@ const mocks = vi.hoisted(() => ({
   rollback: vi.fn(),
 }));
 
-vi.mock("../../monitoring/lib/mysql-connection", () => ({
+vi.mock("../../../lib/database/mysql-connection", () => ({
   getMysqlPool: () => ({
     execute: mocks.execute,
     getConnection: mocks.getConnection,

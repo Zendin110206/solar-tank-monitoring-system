@@ -9,7 +9,7 @@ import {
   createRandomToken,
   hashOneTimeToken,
 } from "@/features/auth/server/auth-crypto";
-import { getMysqlPool } from "@/features/monitoring/lib/mysql-connection";
+import { getMysqlPool } from "@/lib/database/mysql-connection";
 import type {
   HelpdeskMessage,
   HelpdeskSenderType,

@@ -7,7 +7,7 @@ const mocks = vi.hoisted(() => ({
   sendTelegramMessage: vi.fn(),
 }));
 
-vi.mock("@/features/monitoring/lib/mysql-connection", () => ({
+vi.mock("@/lib/database/mysql-connection", () => ({
   getMysqlPool: () => mocks.pool,
 }));
 

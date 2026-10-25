@@ -18,7 +18,7 @@ import {
   cleanupMonitoringDeviceRequests as cleanupMonitoringDeviceRequestsInMysql,
   resetMonitoringDeviceData as resetMonitoringDeviceDataInMysql,
 } from "@/features/monitoring/server/maintenance-service";
-import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
+import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
 
 const ADMIN_DEVICE_REQUEST_PATH = "/dashboard/admin/device-requests";

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { mockSites } from "../data/mock-sites";
-import { buildDashboardOverview } from "../lib/dashboard-view-model";
+import { buildDashboardOverview } from "../domain/dashboard-view-model";
 
 describe("dashboard overview view model", () => {
   it("builds dashboard rows from monitoring mock data", () => {

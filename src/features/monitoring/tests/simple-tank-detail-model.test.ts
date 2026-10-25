@@ -4,9 +4,9 @@ import {
   buildSimpleTankDetail,
   sampleSimpleTankDetailChartPoints,
   type SimpleTankDetailChartPoint,
-} from "../lib/simple-tank-detail-model";
-import { buildTankDetail } from "../lib/tank-detail-view-model";
-import type { TankReadingPoint } from "../lib/tank-detail-view-model";
+} from "../domain/simple-tank-detail-model";
+import { buildTankDetail } from "../domain/tank-detail-view-model";
+import type { TankReadingPoint } from "../domain/tank-detail-view-model";
 import type { Reading } from "../types/monitoring";
 
 const WIB_OFFSET_MS = 7 * 60 * 60 * 1000;
