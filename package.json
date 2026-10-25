@@ -15,6 +15,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest --passWithNoTests",
+    "test:integration": "vitest run --config vitest.integration.config.mts",
     "simulate:device": "node scripts/simulate-device.mjs",
     "pilot:hash-key": "node scripts/generate-device-key.mjs",
     "pilot:registry": "node scripts/apply-pilot-registry.mjs",
