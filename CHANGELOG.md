@@ -47,6 +47,15 @@ dirilis ke `main`.
 - Dokumen bulan Juli ditandai riwayat atau perlu diperiksa ulang tanpa menghapus
   isinya (#20).
 
+### Keamanan
+
+- Next.js dinaikkan dari 16.2.9 ke 16.4.3 untuk menutup 5 kerentanan kritis dan 6
+  tinggi (antara lain eksekusi kode jarak jauh di optimasi gambar dan DoS pada server
+  action). Perubahan perilaku yang terlihat: halaman alias `/dashboard/ringkasan` dan
+  `/dashboard/locations` kini membalas pengalihan HTTP 307/308, bukan halaman 200 yang
+  mengalihkan di browser; halaman tujuannya tetap sama. `AGENTS.md` memuat blok
+  aturan bawaan Next.js.
+
 ## [0.1.0] - 2026-08-02
 
 Versi yang berjalan di pilot sejak 2 Agustus 2026 (commit `4bda023`). Isinya

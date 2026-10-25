@@ -87,3 +87,20 @@ src/app → layanan modul → repositori (SQL) → koneksi database
   pengembangan.
 - Memasukkan rahasia, data pribadi, kode lokasi nyata, koordinat, path laptop,
   atau catatan kerja lokal ke repositori.
+
+## Aturan bawaan Next.js
+
+Blok di bawah ini adalah aturan resmi Next.js untuk alat bantu pemrograman. Blok itu
+dibuat dan diperbarui otomatis oleh `next dev` (opsi `agentRules`, aktif sejak Next.js
+16.3) agar alat bantu membaca dokumentasi yang cocok dengan versi Next.js terpasang.
+Jangan mengubah isi di antara penanda `BEGIN`/`END` secara manual.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
