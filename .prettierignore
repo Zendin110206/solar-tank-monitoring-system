@@ -1,0 +1,19 @@
+# Dependensi dan hasil build
+node_modules
+.next
+out
+build
+coverage
+
+# Berkas yang dibuat otomatis
+pnpm-lock.yaml
+next-env.d.ts
+*.tsbuildinfo
+
+# Aset dan dokumen hasil ekspor
+public
+docs/panduan-user-manual-ftm.html
+
+# Data lokal yang tidak dilacak Git
+backups
+tmp
