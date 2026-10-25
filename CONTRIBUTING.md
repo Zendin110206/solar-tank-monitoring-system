@@ -90,7 +90,9 @@ type(scope): deskripsi
   tanda hubung bila lebih dari satu kata.
 - Deskripsi memakai bahasa Indonesia yang ringkas dan wajar, huruf kecil, tanpa
   titik di akhir.
-- Baris judul paling panjang 100 karakter.
+- Baris judul paling panjang 100 karakter; baris badan juga paling panjang
+  100 karakter.
+- Aturan ini diperiksa otomatis oleh commitlint (`.commitlintrc.json`).
 - Badan commit (opsional) menjelaskan **mengapa** perubahan dibuat.
 
 | Type       | Dipakai untuk                         |
@@ -124,14 +126,28 @@ Hindari pesan seperti `update`, `revisi`, `coba`, atau `fix lagi`.
 ## Pemeriksaan sebelum push
 
 ```powershell
-pnpm check          # tipe TypeScript, lint, tes, build
+pnpm format         # rapikan format dengan Prettier
+pnpm check          # format, tipe TypeScript, lint, tes, build
 pnpm audit --prod   # kerentanan dependensi
 git diff --check    # spasi berlebih dan konflik yang tertinggal
 git status
 ```
 
 `pnpm check` juga dijalankan GitHub Actions untuk setiap pull request ke `dev`
-dan `main`, dan wajib lulus sebelum digabung.
+dan `main`, dan wajib lulus sebelum digabung. GitHub Actions juga memeriksa
+format judul pull request dan melaporkan hasil `pnpm audit --prod`.
+
+### Hook git otomatis
+
+`pnpm install` memasang hook git lewat lefthook (alat yang menjalankan
+pemeriksaan otomatis saat commit dan push):
+
+- sebelum commit: format Prettier dan ESLint untuk berkas yang di-_stage_;
+- saat menulis pesan commit: commitlint memeriksa format `type(scope): deskripsi`;
+- sebelum push: `pnpm typecheck` dan `pnpm test`.
+
+Bila hook belum terpasang, jalankan `pnpm exec lefthook install`. Jangan melewati
+hook dengan `--no-verify`; perbaiki penyebab kegagalannya.
 
 Pastikan tidak ada yang ikut ter-commit:
 
