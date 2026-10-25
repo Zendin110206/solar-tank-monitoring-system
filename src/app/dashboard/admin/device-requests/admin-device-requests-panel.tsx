@@ -19,6 +19,7 @@ import {
   ResendDevicePackageForm,
   RevokeDeviceProvisioningForm,
 } from "./admin-device-request-controls";
+import { formatDateTimeJakarta, formatNumber } from "@/lib/format";
 
 type AdminDeviceRequestsPanelProps = {
   csrfToken: string;
@@ -46,24 +47,15 @@ function formatDate(value: string | null | undefined) {
     return "-";
   }
 
-  return new Intl.DateTimeFormat("id-ID", {
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    month: "short",
-    timeZone: "Asia/Jakarta",
-    year: "numeric",
-  }).format(new Date(value));
+  return formatDateTimeJakarta(value);
 }
 
-function formatNumber(value: number | null | undefined, suffix = "") {
+function formatOptionalNumber(value: number | null | undefined, suffix = "") {
   if (typeof value !== "number" || Number.isNaN(value)) {
     return "-";
   }
 
-  return `${new Intl.NumberFormat("id-ID", {
-    maximumFractionDigits: 2,
-  }).format(value)}${suffix}`;
+  return `${formatNumber(value, 2)}${suffix}`;
 }
 
 function getStatusClass(status: DeviceRequestStatus) {
@@ -110,13 +102,13 @@ function getSensorTypeLabel(
 
 function getDimensionSummary(request: MonitoringDeviceRequest) {
   if (request.tankShape === "rectangular") {
-    return `${formatNumber(request.lengthCm, " cm")} × ${formatNumber(
+    return `${formatOptionalNumber(request.lengthCm, " cm")} × ${formatOptionalNumber(
       request.widthCm,
       " cm",
-    )} × ${formatNumber(request.heightCm, " cm")}`;
+    )} × ${formatOptionalNumber(request.heightCm, " cm")}`;
   }
 
-  return `Panjang ${formatNumber(request.lengthCm, " cm")} · diameter ${formatNumber(
+  return `Panjang ${formatOptionalNumber(request.lengthCm, " cm")} · diameter ${formatOptionalNumber(
     request.diameterCm,
     " cm",
   )}`;
@@ -279,19 +271,19 @@ function RequestDetailModal({
                     {getTankShapeLabel(request.tankShape)}
                   </DetailItem>
                   <DetailItem label="Kapasitas">
-                    {formatNumber(request.capacityLiter, " L")}
+                    {formatOptionalNumber(request.capacityLiter, " L")}
                   </DetailItem>
                   <DetailItem label="Dimensi">
                     {getDimensionSummary(request)}
                   </DetailItem>
                   <DetailItem label="Tinggi sensor">
-                    {formatNumber(request.sensorMountHeightCm, " cm")}
+                    {formatOptionalNumber(request.sensorMountHeightCm, " cm")}
                   </DetailItem>
                   <DetailItem label="Low level">
-                    {formatNumber(request.lowLevelPercent, "%")}
+                    {formatOptionalNumber(request.lowLevelPercent, "%")}
                   </DetailItem>
                   <DetailItem label="Critical level">
-                    {formatNumber(request.criticalLevelPercent, "%")}
+                    {formatOptionalNumber(request.criticalLevelPercent, "%")}
                   </DetailItem>
                 </dl>
               </section>
@@ -305,19 +297,25 @@ function RequestDetailModal({
                     {getSensorTypeLabel(request.deviceSensorType)}
                   </DetailItem>
                   <DetailItem label="Beban lokasi">
-                    {formatNumber(
+                    {formatOptionalNumber(
                       request.loadValue,
                       ` ${request.loadUnit.toUpperCase()}`,
                     )}
                   </DetailItem>
                   <DetailItem label="Diesel engine">
-                    {formatNumber(request.dieselEngineCapacityKva, " kVA")}
+                    {formatOptionalNumber(
+                      request.dieselEngineCapacityKva,
+                      " kVA",
+                    )}
                   </DetailItem>
                   <DetailItem label="Cos phi">
-                    {formatNumber(request.cosPhi)}
+                    {formatOptionalNumber(request.cosPhi)}
                   </DetailItem>
                   <DetailItem label="Konsumsi hitung">
-                    {formatNumber(request.consumptionLiterPerHour, " L/jam")}
+                    {formatOptionalNumber(
+                      request.consumptionLiterPerHour,
+                      " L/jam",
+                    )}
                   </DetailItem>
                   <DetailItem label="Ditinjau">
                     {formatDate(request.adminReviewedAt)}

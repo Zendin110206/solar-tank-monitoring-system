@@ -47,6 +47,9 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Format angka dan tanggal-jam Jakarta disatukan di `src/lib/format.ts` (`formatNumber`,
+  `formatDateTimeJakarta`) dan dipakai 15 berkas: halaman, komponen dashboard, email paket
+  firmware, dan pesan Telegram. Teks yang tampil tidak berubah.
 - Route handler membalas JSON lewat pembantu `src/lib/http/json-response.ts` (`jsonOk`,
   `jsonError`, `jsonTooManyRequests`, `jsonCaughtError`) di 21 route. Status, isi JSON, dan
   header tidak berubah. ADR 0011 dikoreksi karena pembantu ini sebelumnya dinyatakan batal.

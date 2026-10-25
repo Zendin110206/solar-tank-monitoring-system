@@ -54,6 +54,7 @@ import type {
   TankConfigStatus,
   TankShape,
 } from "@/features/monitoring/types/monitoring";
+import { formatNumber } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: "Detail Tangki Bahan Bakar | FTM",
@@ -263,10 +264,6 @@ const unknownRuntimeLevel: RuntimeLevelParameter = {
   dot: "bg-zinc-400",
 };
 
-function formatLiter(value: number) {
-  return new Intl.NumberFormat("id-ID").format(value);
-}
-
 function formatMeasurement(value: number | null, unit: string) {
   return value === null ? "-" : `${value} ${unit}`;
 }
@@ -303,9 +300,7 @@ function formatRuntimeHour(value: number | null) {
     return "-";
   }
 
-  return `${new Intl.NumberFormat("id-ID", {
-    maximumFractionDigits: 2,
-  }).format(value)} jam`;
+  return `${formatNumber(value, 2)} jam`;
 }
 
 function clampPercent(value: number) {
@@ -517,7 +512,7 @@ function TankVisual({ tank }: { tank: TankDetail }) {
     },
     {
       label: "Kapasitas tangki",
-      value: `${formatLiter(tank.capacityLiter)} L`,
+      value: `${formatNumber(tank.capacityLiter)} L`,
       note: "kapasitas konfigurasi perangkat",
       icon: Fuel,
     },
@@ -624,7 +619,7 @@ function TankVisual({ tank }: { tank: TankDetail }) {
           <div className="mt-1 grid grid-cols-3 gap-2 text-xs font-medium text-zinc-500">
             <span>0%</span>
             <span className="text-center">
-              kapasitas {formatLiter(tank.capacityLiter)} L
+              kapasitas {formatNumber(tank.capacityLiter)} L
             </span>
             <span className="text-right">100%</span>
           </div>
@@ -735,7 +730,7 @@ function formatSnapshotItem(
     return "-";
   }
 
-  return typeof value === "number" ? `${formatLiter(value)}${suffix}` : value;
+  return typeof value === "number" ? `${formatNumber(value)}${suffix}` : value;
 }
 
 function ConfigReviewPanel({ tank }: { tank: TankDetail }) {
@@ -943,7 +938,7 @@ function TankConfigurationPanel({ tank }: { tank: TankDetail }) {
     ["Status config", tank.configReview.summaryLabel],
     ["Sumber config", tank.configReview.configSource],
     ["Tipe visual", tank.shapeLabel],
-    ["Kapasitas", `${formatLiter(tank.capacityLiter)} L`],
+    ["Kapasitas", `${formatNumber(tank.capacityLiter)} L`],
     ...dimensionRows,
     ["Tinggi sensor", formatMeasurement(tank.sensorMountHeightCm, "cm")],
     ["Konsumsi per jam", `${tank.consumptionLiterPerHour} L/jam`],
@@ -1030,7 +1025,7 @@ function ReadingTable({ tank }: { tank: TankDetail }) {
                   </div>
                 </td>
                 <td className="px-4 py-4 font-semibold">
-                  {formatLiter(reading.volumeLiter)} L
+                  {formatNumber(reading.volumeLiter)} L
                 </td>
                 <td className="px-4 py-4 text-zinc-600">
                   {reading.distanceCm} cm
@@ -1089,10 +1084,10 @@ export default async function TankDetailPage({
   const metrics = [
     {
       label: "Volume saat ini",
-      value: tank.hasReading ? `${formatLiter(tank.volumeLiter)} L` : "-",
+      value: tank.hasReading ? `${formatNumber(tank.volumeLiter)} L` : "-",
       note: tank.hasReading
-        ? `${tank.fillPercent}% dari kapasitas konfigurasi ${formatLiter(tank.capacityLiter)} L, sumber volume ${formatSourceLabel(tank.dataSources.volumeSource)}`
-        : `menunggu pembacaan pertama dari perangkat, kapasitas konfigurasi ${formatLiter(tank.capacityLiter)} L`,
+        ? `${tank.fillPercent}% dari kapasitas konfigurasi ${formatNumber(tank.capacityLiter)} L, sumber volume ${formatSourceLabel(tank.dataSources.volumeSource)}`
+        : `menunggu pembacaan pertama dari perangkat, kapasitas konfigurasi ${formatNumber(tank.capacityLiter)} L`,
       icon: Fuel,
       tone: "bg-cyan-50 text-cyan-700 ring-cyan-100",
     },
@@ -1164,7 +1159,7 @@ export default async function TankDetailPage({
     {
       label: "Volume dan persen",
       value: tank.hasReading
-        ? `${formatLiter(tank.volumeLiter)} L / ${tank.fillPercent}%`
+        ? `${formatNumber(tank.volumeLiter)} L / ${tank.fillPercent}%`
         : "-",
       detail: tank.hasReading
         ? `volume dari ${formatSourceLabel(tank.dataSources.volumeSource)}, persen dari ${formatSourceLabel(tank.dataSources.fillPercentSource)}`
@@ -1399,7 +1394,7 @@ export default async function TankDetailPage({
                 [
                   "raw.volume",
                   tank.hasReading
-                    ? `${formatLiter(tank.rawPayload.volume)} L`
+                    ? `${formatNumber(tank.rawPayload.volume)} L`
                     : "-",
                 ],
                 [

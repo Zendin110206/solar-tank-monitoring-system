@@ -26,6 +26,7 @@ import {
 
 import { listLatestMonitoringReadingsByTankWithSource } from "@/features/monitoring/lib/monitoring-storage";
 import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/lib/refresh-interval";
+import { formatNumber } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: "Analisis Teknis Tangki Bahan Bakar | FTM",
@@ -129,10 +130,6 @@ const runtimeBands = [
     tone: "bg-emerald-500",
   },
 ];
-
-function formatLiter(value: number) {
-  return new Intl.NumberFormat("id-ID").format(value);
-}
 
 function formatJakartaTime(value: Date) {
   const time = new Intl.DateTimeFormat("id-ID", {
@@ -553,7 +550,7 @@ export default async function DashboardPage() {
                     </td>
                     <td className="px-4 py-4 text-zinc-600">{site.tank}</td>
                     <td className="px-4 py-4 font-semibold">
-                      {formatLiter(site.volumeLiter)} L
+                      {formatNumber(site.volumeLiter)} L
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">

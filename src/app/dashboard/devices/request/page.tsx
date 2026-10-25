@@ -17,6 +17,7 @@ import type {
   MonitoringDeviceRequest,
 } from "@/features/monitoring/types/monitoring";
 import { DeviceRequestForm } from "./device-request-form";
+import { formatDateTimeJakarta } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: "Ajukan Perangkat | FTM",
@@ -32,14 +33,7 @@ function formatDate(value: string | null | undefined) {
     return "-";
   }
 
-  return new Intl.DateTimeFormat("id-ID", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Asia/Jakarta",
-  }).format(new Date(value));
+  return formatDateTimeJakarta(value);
 }
 
 function getStatusClass(status: DeviceRequestStatus) {

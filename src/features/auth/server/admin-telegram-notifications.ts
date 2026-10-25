@@ -12,6 +12,7 @@ import {
   type TelegramAdminTopic,
 } from "./auth-config";
 import { sendTelegramMessage } from "./auth-telegram";
+import { formatDateTimeJakarta } from "@/lib/format";
 
 type AdminTelegramRow = RowDataPacket & {
   telegram_chat_id: string | null;
@@ -37,17 +38,6 @@ type AccessRequestNotificationInput = {
   >;
   userId: string;
 };
-
-function formatJakartaDate(value: Date): string {
-  return new Intl.DateTimeFormat("id-ID", {
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    month: "short",
-    timeZone: "Asia/Jakarta",
-    year: "numeric",
-  }).format(value);
-}
 
 function formatOptionalText(value: string | null | undefined): string {
   const text = value?.trim();
@@ -167,7 +157,7 @@ export async function notifyAdminsAccessRequestSubmitted({
     `Role diminta: ${payload.requestedRole}`,
     `User ID: ${userId}`,
     `Kode pengajuan: ${accessRequestId}`,
-    `Waktu: ${formatJakartaDate(createdAt)}`,
+    `Waktu: ${formatDateTimeJakarta(createdAt)}`,
     `Alasan: ${formatOptionalText(payload.accessReason)}`,
     "",
     "Admin perlu meninjau akses pengguna lewat dashboard.",

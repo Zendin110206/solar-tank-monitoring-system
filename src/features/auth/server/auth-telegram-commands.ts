@@ -4,6 +4,7 @@ import { getAppBaseUrl } from "./auth-config";
 import { sendTelegramMessage, type TelegramMessage } from "./auth-telegram";
 import { findAuthUserByVerifiedTelegramChatId } from "./repositories/mysql-auth-repository";
 import type { AuthSafeUser } from "../types/auth";
+import { formatDateTimeJakarta } from "@/lib/format";
 
 type PrivateTelegramCommand = "dashboard" | "help" | "status";
 
@@ -44,14 +45,7 @@ function formatTelegramDate(value: string | null): string {
     return "-";
   }
 
-  return new Intl.DateTimeFormat("id-ID", {
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    month: "short",
-    timeZone: "Asia/Jakarta",
-    year: "numeric",
-  }).format(new Date(value));
+  return formatDateTimeJakarta(value);
 }
 
 function buildDashboardUrl(): string | null {

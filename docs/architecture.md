@@ -161,6 +161,10 @@ Route handler membalas lewat `src/lib/http/json-response.ts`: `jsonOk` (`{ ok: t
 dan `jsonCaughtError` (pesan aman untuk error yang ditangkap). Hanya `/api/ready`,
 `/api/dashboard/overview`, dan unduhan paket firmware yang bentuk balasannya berbeda.
 
+Angka dan tanggal untuk teks yang dilihat pengguna ditulis lewat `src/lib/format.ts`
+(`formatNumber`, `formatDateTimeJakarta`), dipakai halaman, komponen, email, dan pesan
+Telegram.
+
 Semua pengaturan dibaca dari dua katalog di `src/lib/config/`:
 
 - `server-env.ts`: pengaturan dan rahasia yang hanya boleh dibaca server (database,
@@ -183,7 +187,13 @@ tanpa mengubah perilaku:
   menjalankan kueri SQL sendiri, bukan lewat repositori. Keduanya dikecualikan dari
   aturan ESLint layanan secara tertulis di `eslint.config.mjs` sampai SQL-nya dipindah;
 - koneksi database bersama masih berada di `monitoring/lib/mysql-connection.ts`,
-  padahal dipakai semua modul.
+  padahal dipakai semua modul;
+- jumlah liter ditulis dengan dua cara: `/dashboard/detail` (termasuk petanya) dan teks
+  halaman `/dashboard/tanks/[id]` menampilkan sampai 3 angka desimal, sedangkan dashboard
+  utama, halaman `/dashboard/ringkas/tanks/[id]`, dan grafik volume di kedua halaman tangki
+  membulatkan ke bilangan bulat. Keduanya sudah memakai `formatNumber` dengan jumlah
+  desimal tertulis jelas; penyeragamannya adalah perubahan tampilan dan menunggu
+  keputusan pemilik.
 
 ## Alur penerimaan data perangkat
 
