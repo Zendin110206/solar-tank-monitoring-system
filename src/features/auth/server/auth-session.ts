@@ -3,7 +3,7 @@ import "server-only";
 import { cookies } from "next/headers";
 import type { NextRequest, NextResponse } from "next/server";
 
-import type { AuthSessionUser } from "../types";
+import type { AuthSessionUser } from "../types/auth";
 import { getAuthCookieName, shouldUseSecureCookies } from "./auth-config";
 import { getSessionUserFromToken, logoutSession } from "./auth-service";
 

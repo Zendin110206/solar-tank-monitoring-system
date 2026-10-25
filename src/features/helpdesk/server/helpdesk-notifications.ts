@@ -3,7 +3,7 @@ import "server-only";
 import {
   sendAdminTelegramNotification,
   type AdminTelegramNotifyResult,
-} from "@/features/auth/lib/admin-telegram-notifications";
+} from "@/features/auth/server/admin-telegram-notifications";
 import type { HelpdeskMessage, HelpdeskSession } from "../types/helpdesk";
 import { summarizeHelpdeskSession } from "./repositories/mysql-helpdesk-repository";
 

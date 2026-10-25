@@ -1,10 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { verifyCaptchaToken } from "@/features/auth/lib/auth-captcha";
-import { isAccessRequestEnabled } from "@/features/auth/lib/auth-config";
-import { submitAccessRequest } from "@/features/auth/lib/auth-service";
-import { parseRegisterAccessPayload } from "@/features/auth/lib/auth-validation";
-import { checkRateLimit } from "@/features/auth/lib/rate-limit";
+import { verifyCaptchaToken } from "@/features/auth/server/auth-captcha";
+import { isAccessRequestEnabled } from "@/features/auth/server/auth-config";
+import { submitAccessRequest } from "@/features/auth/server/auth-service";
+import { parseRegisterAccessPayload } from "@/features/auth/domain/auth-validation";
+import { checkRateLimit } from "@/features/auth/server/rate-limit";
 import {
   getSafeErrorMessage,
   getSafeErrorStatus,

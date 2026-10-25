@@ -10,11 +10,11 @@ import {
   passwordNeedsRehash,
   verifyOtpHash,
   verifyPassword,
-} from "../lib/auth-crypto";
+} from "../server/auth-crypto";
 import {
   createAdminActionCsrfToken,
   verifyAdminActionCsrfToken,
-} from "../lib/auth-csrf";
+} from "../server/auth-csrf";
 import {
   parseLoginPayload,
   parseChangePasswordPayload,
@@ -22,7 +22,7 @@ import {
   normalizeIndonesianMobilePhone,
   parseRegisterAccessPayload,
   parseResetPasswordPayload,
-} from "../lib/auth-validation";
+} from "../domain/auth-validation";
 
 describe("auth crypto", () => {
   it("memverifikasi password hanya untuk input yang benar", async () => {

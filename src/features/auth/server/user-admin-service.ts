@@ -12,4 +12,4 @@ export {
   setAuthUserStatus,
   updateAuthUserRole,
   type AuthUserDirectoryItem,
-} from "../lib/mysql-auth-repository";
+} from "./repositories/mysql-auth-repository";

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { BrandLogo } from "@/components/brand-logo";
-import { getCurrentSessionUser } from "@/features/auth/lib/auth-session";
+import { getCurrentSessionUser } from "@/features/auth/server/auth-session";
 
 const navItems = [
   { label: "Fitur", href: "#fitur" },

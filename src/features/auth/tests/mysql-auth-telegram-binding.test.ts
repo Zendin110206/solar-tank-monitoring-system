@@ -20,7 +20,7 @@ vi.mock("../../monitoring/lib/mysql-connection", () => ({
 import {
   completeTelegramBindingInMysql,
   findAuthUserByVerifiedTelegramChatId,
-} from "../lib/mysql-auth-repository";
+} from "../server/repositories/mysql-auth-repository";
 
 describe("mysql auth Telegram binding", () => {
   beforeEach(() => {

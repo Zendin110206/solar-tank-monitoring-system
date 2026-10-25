@@ -1,9 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { checkRateLimit } from "@/features/auth/lib/rate-limit";
-import { loginWithPassword } from "@/features/auth/lib/auth-service";
-import { parseLoginPayload } from "@/features/auth/lib/auth-validation";
-import { setSessionCookie } from "@/features/auth/lib/auth-session";
+import { checkRateLimit } from "@/features/auth/server/rate-limit";
+import { loginWithPassword } from "@/features/auth/server/auth-service";
+import { parseLoginPayload } from "@/features/auth/domain/auth-validation";
+import { setSessionCookie } from "@/features/auth/server/auth-session";
 import {
   getSafeErrorMessage,
   getSafeErrorStatus,

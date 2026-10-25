@@ -1,9 +1,9 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { requireApiUser } from "@/features/auth/lib/auth-guards";
-import { changePasswordForSession } from "@/features/auth/lib/auth-service";
-import { parseChangePasswordPayload } from "@/features/auth/lib/auth-validation";
-import { checkRateLimit } from "@/features/auth/lib/rate-limit";
+import { requireApiUser } from "@/features/auth/server/auth-guards";
+import { changePasswordForSession } from "@/features/auth/server/auth-service";
+import { parseChangePasswordPayload } from "@/features/auth/domain/auth-validation";
+import { checkRateLimit } from "@/features/auth/server/rate-limit";
 import {
   getSafeErrorMessage,
   getSafeErrorStatus,

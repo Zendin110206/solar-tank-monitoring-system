@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ClipboardList } from "lucide-react";
 
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
+import { requirePageAdmin } from "@/features/auth/server/auth-guards";
 import { listAuthAuditEvents } from "@/features/auth/server/audit-service";
 
 export const metadata: Metadata = {

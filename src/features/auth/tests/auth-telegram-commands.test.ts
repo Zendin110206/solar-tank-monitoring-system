@@ -5,17 +5,17 @@ const mocks = vi.hoisted(() => ({
   sendTelegramMessage: vi.fn(),
 }));
 
-vi.mock("../lib/auth-telegram", () => ({
+vi.mock("../server/auth-telegram", () => ({
   sendTelegramMessage: mocks.sendTelegramMessage,
 }));
 
-vi.mock("../lib/mysql-auth-repository", () => ({
+vi.mock("../server/repositories/mysql-auth-repository", () => ({
   findAuthUserByVerifiedTelegramChatId:
     mocks.findAuthUserByVerifiedTelegramChatId,
 }));
 
-import { handlePrivateTelegramCommand } from "../lib/auth-telegram-commands";
-import type { TelegramMessage } from "../lib/auth-telegram";
+import { handlePrivateTelegramCommand } from "../server/auth-telegram-commands";
+import type { TelegramMessage } from "../server/auth-telegram";
 
 function buildMessage(text: string): TelegramMessage {
   return {

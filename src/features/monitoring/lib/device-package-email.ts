@@ -6,7 +6,7 @@ import nodemailer from "nodemailer";
 import {
   canLogOtpInDevelopment,
   isProductionLikeEnvironment,
-} from "@/features/auth/lib/auth-config";
+} from "@/features/auth/server/auth-config";
 
 export type DevicePackageEmailDeliveryResult =
   | { delivered: true; delivery: "email" | "log" }

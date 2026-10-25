@@ -3,8 +3,8 @@ import type { Metadata } from "next";
 import { Clock3, Database, Search, ShieldCheck } from "lucide-react";
 
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { createAdminActionCsrfToken } from "@/features/auth/lib/auth-csrf";
-import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
+import { createAdminActionCsrfToken } from "@/features/auth/server/auth-csrf";
+import { requirePageAdmin } from "@/features/auth/server/auth-guards";
 import { getDeviceRequestStatusLabel } from "@/features/monitoring/lib/device-request";
 import {
   listDeviceRequestsForAdmin as listDeviceRequestsForAdminFromMysql,

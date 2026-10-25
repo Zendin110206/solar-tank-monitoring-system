@@ -81,7 +81,7 @@ Di dalam modul, pola file yang dipakai sekarang:
   `tank-detail-view-model.ts`;
 - **repositori** (kueri SQL): `mysql-*-repository.ts`;
 - **layanan** (alur kerja yang menggabungkan beberapa langkah):
-  `ingest-telemetry.ts`, `device-provisioning.ts`, `auth-service.ts`;
+  `ingest-telemetry.ts`, `device-provisioning.ts`, `auth/server/auth-service.ts`;
 - **komponen** tampilan di folder `components/`.
 
 Modul yang sudah memakai bentuk folder ADR 0011:
@@ -95,9 +95,19 @@ src/features/helpdesk/
 │   ├── helpdesk-telegram.ts               relay balasan dari Telegram
 │   └── repositories/mysql-helpdesk-repository.ts   kueri SQL
 └── types/helpdesk.ts
+
+src/features/auth/
+├── components/          tombol keluar, widget captcha
+├── domain/              validasi isian akun, aturan alamat tujuan setelah login
+├── server/              layanan akun, sesi, guard, CSRF, kripto, pengaturan auth,
+│                        email, captcha, Telegram, pembatas permintaan
+│   └── repositories/mysql-auth-repository.ts   kueri SQL akun dan sesi
+├── tests/
+└── types/auth.ts
 ```
 
-Modul lain masih memakai folder `lib/` dan dipindah satu per satu.
+Modul `monitoring` masih memakai folder `lib/` dan dipindah setelah pemecahan
+repositori perangkat selesai.
 
 ## Lapisan dan arah ketergantungan
 
@@ -136,7 +146,9 @@ koneksi database, atau `mysql2`. Aturan ini dicek ESLint (`no-restricted-imports
 di `eslint.config.mjs`), sehingga `pnpm lint` dan CI gagal bila dilanggar.
 ESLint juga menolak layanan di `server/` yang memakai repositori atau koneksi database
 milik modul lain (aturan 2 ADR 0011). Repositori modul sendiri diimpor dengan jalur
-relatif pendek, misalnya `./repositories/...` atau `../lib/...`.
+relatif pendek, misalnya `./repositories/...` atau `../lib/...`. Berkas di `domain/`
+tidak boleh memakai database, `server/`, email, berkas, data permintaan, atau
+pengaturan; aturan ini juga dicek ESLint.
 
 Modul khusus server (repositori, koneksi database, layanan di `server/`, email,
 Telegram, sesi, CSRF, kunci perangkat, paket firmware, dan konfigurasi rahasia)
@@ -161,7 +173,12 @@ tanpa mengubah perilaku:
 - pola tampilan yang sama (kartu, format angka, warna status) ditulis ulang di
   banyak file;
 - beberapa file sangat besar, misalnya `mysql-device-request-repository.ts`
-  (±2.400 baris) dan `mysql-auth-repository.ts` (±1.700 baris).
+  (±2.400 baris) dan `mysql-auth-repository.ts` (±1.700 baris);
+- `auth/server/rate-limit.ts` dan `auth/server/admin-telegram-notifications.ts` masih
+  menjalankan kueri SQL sendiri, bukan lewat repositori. Keduanya dikecualikan dari
+  aturan ESLint layanan secara tertulis di `eslint.config.mjs` sampai SQL-nya dipindah;
+- koneksi database bersama masih berada di `monitoring/lib/mysql-connection.ts`,
+  padahal dipakai semua modul.
 
 ## Alur penerimaan data perangkat
 

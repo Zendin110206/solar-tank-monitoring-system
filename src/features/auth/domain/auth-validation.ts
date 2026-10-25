@@ -1,4 +1,4 @@
-import type { AuthRole } from "../types";
+import type { AuthRole } from "../types/auth";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const USERNAME_PATTERN = /^[a-zA-Z0-9._-]{3,40}$/;

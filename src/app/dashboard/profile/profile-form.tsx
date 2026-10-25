@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useMemo, useState } from "react";
 import { useFormStatus } from "react-dom";
 
-import type { AuthSafeUser } from "@/features/auth/types";
+import type { AuthSafeUser } from "@/features/auth/types/auth";
 import {
   updateCurrentUserProfileAction,
   type ProfileActionState,

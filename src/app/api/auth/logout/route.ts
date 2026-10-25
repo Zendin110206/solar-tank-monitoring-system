@@ -3,8 +3,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import {
   clearSessionCookie,
   getRequestSessionUser,
-} from "@/features/auth/lib/auth-session";
-import { logoutSession } from "@/features/auth/lib/auth-service";
+} from "@/features/auth/server/auth-session";
+import { logoutSession } from "@/features/auth/server/auth-service";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";

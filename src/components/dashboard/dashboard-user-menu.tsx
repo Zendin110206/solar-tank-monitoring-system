@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { AlertTriangle, KeyRound, LogOut, Send, UserRound } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-import type { AuthSafeUser } from "@/features/auth/types";
+import type { AuthSafeUser } from "@/features/auth/types/auth";
 
 type DashboardUserMenuProps = {
   user: Pick<

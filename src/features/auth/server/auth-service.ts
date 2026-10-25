@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
 
-import type { AuthSafeUser, AuthSessionUser } from "../types";
+import type { AuthSafeUser, AuthSessionUser } from "../types/auth";
 import {
   createOtpCode,
   createRandomToken,
@@ -65,13 +65,13 @@ import {
   revokeOtherUserSessions,
   touchAuthSessionIfStale,
   updateAuthUserPasswordHash,
-} from "./mysql-auth-repository";
+} from "./repositories/mysql-auth-repository";
 import type {
   ChangePasswordPayload,
   RegisterAccessPayload,
   ResetPasswordPayload,
-} from "./auth-validation";
-import type { AuthSessionSummary } from "../types";
+} from "../domain/auth-validation";
+import type { AuthSessionSummary } from "../types/auth";
 
 type AuthRequestContext = Pick<NextRequest, "headers">;
 

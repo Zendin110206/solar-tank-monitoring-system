@@ -9,11 +9,11 @@ import {
   hashRequestFingerprint,
   hashSessionToken,
   verifyOtpHash,
-} from "../lib/auth-crypto";
+} from "../server/auth-crypto";
 import {
   createAdminActionCsrfToken,
   verifyAdminActionCsrfToken,
-} from "../lib/auth-csrf";
+} from "../server/auth-csrf";
 
 // Tes karakterisasi pembantu akun. Hash yang tersimpan di database (sesi,
 // token sekali pakai, OTP) harus tetap sama setelah perapian; bila berubah,

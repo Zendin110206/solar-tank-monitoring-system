@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { getRequestSessionUser } from "@/features/auth/lib/auth-session";
-import { checkRateLimit } from "@/features/auth/lib/rate-limit";
+import { getRequestSessionUser } from "@/features/auth/server/auth-session";
+import { checkRateLimit } from "@/features/auth/server/rate-limit";
 import {
   addUserHelpdeskMessage,
   getOrCreateHelpdeskSession,

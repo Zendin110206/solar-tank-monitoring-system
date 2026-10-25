@@ -17,7 +17,7 @@ import {
   isProductionLikeEnvironment,
   shouldRequireAdminOtp,
   shouldRequireEmailVerificationForApproval,
-} from "../../auth/lib/auth-config";
+} from "../../auth/server/auth-config";
 import {
   getExpectedProvisioningKey,
   isDeviceAutoProvisioningEnabled,

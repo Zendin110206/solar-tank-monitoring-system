@@ -3,13 +3,13 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
-import { isAuthRole } from "@/features/auth/types";
-import { verifyAdminActionCsrfToken } from "@/features/auth/lib/auth-csrf";
-import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
+import { isAuthRole } from "@/features/auth/types/auth";
+import { verifyAdminActionCsrfToken } from "@/features/auth/server/auth-csrf";
+import { requirePageAdmin } from "@/features/auth/server/auth-guards";
 import {
   sendEmailVerificationForUserId,
   sendPasswordResetForUserId,
-} from "@/features/auth/lib/auth-service";
+} from "@/features/auth/server/auth-service";
 import { recordAuthAuditEvent } from "@/features/auth/server/audit-service";
 import {
   approveAccessRequest,

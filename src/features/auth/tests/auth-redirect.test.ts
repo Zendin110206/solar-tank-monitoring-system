@@ -5,7 +5,7 @@ import {
   buildLoginRedirectPath,
   getSafeLoginRedirectPath,
   isDashboardPath,
-} from "../lib/auth-redirect";
+} from "../domain/auth-redirect";
 
 describe("auth redirect helpers", () => {
   it("allows dashboard redirect paths only", () => {

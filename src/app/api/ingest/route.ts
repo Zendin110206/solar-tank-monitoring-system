@@ -2,7 +2,7 @@ import {
   getLocalDeviceKey,
   ingestTelemetry,
 } from "@/features/monitoring/lib/ingest-telemetry";
-import { checkRateLimit } from "@/features/auth/lib/rate-limit";
+import { checkRateLimit } from "@/features/auth/server/rate-limit";
 import {
   getExpectedProvisioningKey,
   isDeviceAutoProvisioningEnabled,

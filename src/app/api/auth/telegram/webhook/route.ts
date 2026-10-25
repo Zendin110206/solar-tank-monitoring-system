@@ -1,13 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { completeTelegramBinding } from "@/features/auth/lib/auth-service";
+import { completeTelegramBinding } from "@/features/auth/server/auth-service";
 import {
   extractTelegramStartToken,
   parseTelegramMessage,
   sendTelegramMessage,
   verifyTelegramWebhookSecret,
-} from "@/features/auth/lib/auth-telegram";
-import { handlePrivateTelegramCommand } from "@/features/auth/lib/auth-telegram-commands";
+} from "@/features/auth/server/auth-telegram";
+import { handlePrivateTelegramCommand } from "@/features/auth/server/auth-telegram-commands";
 import {
   handleTelegramHelpdeskCommand,
   handleTelegramTopicInfoCommand,

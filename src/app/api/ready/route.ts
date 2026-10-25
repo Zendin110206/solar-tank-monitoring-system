@@ -3,8 +3,8 @@ import type { NextRequest } from "next/server";
 import {
   getReadinessCheckToken,
   isProductionLikeEnvironment,
-} from "@/features/auth/lib/auth-config";
-import { requireApiUser } from "@/features/auth/lib/auth-guards";
+} from "@/features/auth/server/auth-config";
+import { requireApiUser } from "@/features/auth/server/auth-guards";
 import { getDeploymentReadiness } from "@/features/monitoring/lib/deployment-probes";
 import { hasValidReadinessToken } from "@/features/monitoring/lib/readiness-access";
 
