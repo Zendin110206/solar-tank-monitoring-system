@@ -1,7 +1,8 @@
 # Arsitektur Sistem
 
 Status: **terkini**, diperiksa terhadap kode pada 25 Oktober 2026.
-Arah jangka panjang dicatat di [catatan keputusan](decisions/README.md).
+Arah jangka panjang dicatat di [catatan keputusan](decisions/README.md). Versi tanpa
+istilah pemrograman: [cara kerja FTM](cara-kerja-ftm.md).
 
 ## Ringkasan
 
@@ -69,7 +70,7 @@ Penjelasan diagram:
 | `src/features/auth`       | Akun, sesi, peran, OTP admin, CSRF (pengaman agar aksi tidak bisa dipicu dari situs lain), captcha, email, pembatas jumlah permintaan, audit, dan Telegram (binding, perintah, notifikasi admin)                                                                                                          |
 | `src/features/helpdesk`   | Widget bantuan di web dan relay pesan ke topik Telegram                                                                                                                                                                                                                                                   |
 | `src/components`          | Kerangka halaman bersama (header, footer, menu, halaman akun) dan logo                                                                                                                                                                                                                                    |
-| `src/lib`                 | Utilitas umum, misalnya pesan error yang aman ditampilkan                                                                                                                                                                                                                                                 |
+| `src/lib`                 | Utilitas umum (pesan error yang aman ditampilkan) dan katalog pengaturan `src/lib/config/`                                                                                                                                                                                                                |
 
 Di dalam modul, pola file yang dipakai sekarang:
 

@@ -16,6 +16,7 @@ Arti status:
 | ------------------------------------------------------------ | ---------------------------------------------- | ----------------------------- | ----------- |
 | [../README.md](../README.md)                                 | Gambaran FTM, cara menjalankan lokal, perintah | Terkini                       | 25 Okt 2026 |
 | [current-operational-truth.md](current-operational-truth.md) | Status operasional bertanggal                  | Terkini (bagian Oktober 2026) | 25 Okt 2026 |
+| [cara-kerja-ftm.md](cara-kerja-ftm.md)                       | Cara kerja FTM dalam bahasa sehari-hari        | Terkini                       | 25 Okt 2026 |
 | [architecture.md](architecture.md)                           | Arsitektur, modul, lapisan, alur data          | Terkini                       | 25 Okt 2026 |
 | [decisions/](decisions/README.md)                            | Catatan keputusan arsitektur (ADR)             | Terkini                       | 25 Okt 2026 |
 

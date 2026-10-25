@@ -108,7 +108,8 @@ Penjelasan singkat:
   peran, `admin` dan `user`. Admin memakai OTP (kode sekali pakai) lewat email.
   Kata sandi disimpan sebagai hash Argon2id (bentuk acak yang tidak bisa dibalik).
 
-Rincian ada di [docs/architecture.md](docs/architecture.md).
+Penjelasan tanpa istilah pemrograman ada di [docs/cara-kerja-ftm.md](docs/cara-kerja-ftm.md);
+rincian teknis ada di [docs/architecture.md](docs/architecture.md).
 
 ## Menjalankan secara lokal
 
