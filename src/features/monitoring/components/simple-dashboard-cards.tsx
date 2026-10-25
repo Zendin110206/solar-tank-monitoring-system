@@ -13,6 +13,10 @@ import {
 } from "@/app/dashboard/actions";
 import type { SimpleDashboardSite } from "@/features/monitoring/lib/simple-dashboard-model";
 import { formatNumber } from "@/lib/format";
+import {
+  STATUS_BADGE_CLASS,
+  STATUS_DOT_CLASS,
+} from "@/components/ui/status-tone";
 
 type SimpleDashboardCardsProps = {
   adminCleanupToken?: string;
@@ -38,9 +42,7 @@ function OnlineBadge({ isOnline }: { isOnline: boolean }) {
   return (
     <span
       className={`inline-flex shrink-0 rounded-full px-3 py-1 text-xs font-semibold ring-1 ${
-        isOnline
-          ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
-          : "bg-red-50 text-red-700 ring-red-100"
+        isOnline ? STATUS_BADGE_CLASS.success : STATUS_BADGE_CLASS.danger
       }`}
     >
       {isOnline ? "Online" : "Offline"}
@@ -454,7 +456,9 @@ export function SimpleDashboardCards({
               />
               <span
                 className={`pointer-events-none absolute inset-x-0 top-0 h-1 ${
-                  site.isOnline ? "bg-emerald-500" : "bg-red-500"
+                  site.isOnline
+                    ? STATUS_DOT_CLASS.success
+                    : STATUS_DOT_CLASS.danger
                 }`}
               />
 

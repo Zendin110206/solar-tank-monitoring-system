@@ -24,6 +24,7 @@ import {
   getRuntimeStatus,
 } from "./status";
 import { buildMapPositionsFromCoordinates } from "./map-position";
+import { STATUS_DOT_CLASS } from "@/components/ui/status-tone";
 
 export type DashboardSiteStatus = "online" | "warning" | "critical" | "offline";
 
@@ -424,17 +425,17 @@ export function buildDashboardOverview({
       {
         label: "Online",
         width: getPercentWidth(onlineDevices, totalRows),
-        tone: "bg-emerald-500",
+        tone: STATUS_DOT_CLASS.success,
       },
       {
         label: "Terlambat",
         width: getPercentWidth(delayedDevices, totalRows),
-        tone: "bg-amber-500",
+        tone: STATUS_DOT_CLASS.warning,
       },
       {
         label: "Kritis",
         width: getPercentWidth(criticalTanks, totalRows),
-        tone: "bg-red-500",
+        tone: STATUS_DOT_CLASS.danger,
       },
       {
         label: "Offline",

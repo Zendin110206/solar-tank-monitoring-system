@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { BrandLogo } from "@/components/brand-logo";
 import { getCurrentSessionUser } from "@/features/auth/server/auth-session";
+import { STATUS_DOT_CLASS } from "@/components/ui/status-tone";
 
 const navItems = [
   { label: "Fitur", href: "#fitur" },
@@ -40,7 +41,7 @@ const monitoredSites = [
     status: "Online",
     level: "78%",
     runtime: "18 jam",
-    tone: "bg-emerald-500",
+    tone: STATUS_DOT_CLASS.success,
   },
   {
     code: "NJA",
@@ -48,7 +49,7 @@ const monitoredSites = [
     status: "Waspada",
     level: "42%",
     runtime: "13 jam",
-    tone: "bg-amber-500",
+    tone: STATUS_DOT_CLASS.warning,
   },
   {
     code: "JTO",
@@ -56,7 +57,7 @@ const monitoredSites = [
     status: "Perlu cek",
     level: "19%",
     runtime: "7 jam",
-    tone: "bg-red-500",
+    tone: STATUS_DOT_CLASS.danger,
   },
 ];
 
@@ -68,18 +69,23 @@ const readingRows = [
 ];
 
 const runtimeBands = [
-  { label: "Kritis", range: "< 13 jam", width: "w-[24%]", tone: "bg-red-500" },
+  {
+    label: "Kritis",
+    range: "< 13 jam",
+    width: "w-[24%]",
+    tone: STATUS_DOT_CLASS.danger,
+  },
   {
     label: "Waspada",
     range: "13 - 16 jam",
     width: "w-[32%]",
-    tone: "bg-amber-500",
+    tone: STATUS_DOT_CLASS.warning,
   },
   {
     label: "Aman",
     range: "> 16 jam",
     width: "w-[44%]",
-    tone: "bg-emerald-500",
+    tone: STATUS_DOT_CLASS.success,
   },
 ];
 
@@ -498,9 +504,9 @@ export default async function Home() {
                   </div>
                   <div className="mt-7 space-y-2">
                     {[
-                      ["Online", "bg-emerald-500"],
-                      ["Stale", "bg-amber-500"],
-                      ["Offline", "bg-red-500"],
+                      ["Online", STATUS_DOT_CLASS.success],
+                      ["Stale", STATUS_DOT_CLASS.warning],
+                      ["Offline", STATUS_DOT_CLASS.danger],
                     ].map(([label, tone]) => (
                       <div key={label} className="flex items-center gap-2">
                         <span className={`size-2.5 rounded-full ${tone}`} />

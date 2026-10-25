@@ -4,6 +4,10 @@ import type { CSSProperties } from "react";
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { MapPin } from "lucide-react";
+import {
+  STATUS_BADGE_CLASS,
+  STATUS_DOT_CLASS,
+} from "@/components/ui/status-tone";
 
 export type TankLocationMapStatus =
   "online" | "warning" | "critical" | "offline";
@@ -37,31 +41,31 @@ const statusMeta: Record<
 > = {
   online: {
     label: "Online",
-    dot: "bg-emerald-500",
+    dot: STATUS_DOT_CLASS.success,
     pin: "text-emerald-500",
     ring: "ring-emerald-100",
-    badge: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+    badge: STATUS_BADGE_CLASS.success,
   },
   warning: {
     label: "Waspada",
-    dot: "bg-amber-500",
+    dot: STATUS_DOT_CLASS.warning,
     pin: "text-amber-500",
     ring: "ring-amber-100",
-    badge: "bg-amber-50 text-amber-700 ring-amber-100",
+    badge: STATUS_BADGE_CLASS.warning,
   },
   critical: {
     label: "Kritis",
     dot: "bg-red-600",
     pin: "text-red-600",
     ring: "ring-red-100",
-    badge: "bg-red-50 text-red-700 ring-red-100",
+    badge: STATUS_BADGE_CLASS.danger,
   },
   offline: {
     label: "Offline",
     dot: "bg-zinc-600",
     pin: "text-zinc-700",
     ring: "ring-zinc-200",
-    badge: "bg-zinc-100 text-zinc-700 ring-zinc-200",
+    badge: STATUS_BADGE_CLASS.neutral,
   },
 };
 

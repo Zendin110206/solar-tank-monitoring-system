@@ -54,6 +54,8 @@ src/app → layanan modul → repositori (SQL) → koneksi database
 - Layanan di `server/` hanya memakai repositori modulnya sendiri (jalur relatif pendek);
   repositori modul lain diakses lewat layanan modul itu. Aturan ini dicek ESLint.
 - Client component tidak mengimpor kode khusus server.
+- Warna status memakai `STATUS_BADGE_CLASS` / `STATUS_DOT_CLASS` dari
+  `src/components/ui/status-tone.ts`, bukan kelas warna yang ditulis ulang.
 - Angka dan tanggal yang dilihat pengguna ditulis lewat `src/lib/format.ts`; jangan membuat
   `Intl.NumberFormat` atau format tanggal baru di halaman.
 - Route handler membalas JSON lewat `src/lib/http/json-response.ts` (`jsonOk`, `jsonError`,

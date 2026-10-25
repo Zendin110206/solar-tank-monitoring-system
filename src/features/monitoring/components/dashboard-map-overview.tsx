@@ -13,6 +13,10 @@ import type {
   DashboardSiteStatus,
 } from "@/features/monitoring/lib/dashboard-view-model";
 import { formatNumber } from "@/lib/format";
+import {
+  STATUS_BADGE_CLASS,
+  STATUS_DOT_CLASS,
+} from "@/components/ui/status-tone";
 
 type DashboardMapOverviewProps = {
   sites: DashboardMonitoringSite[];
@@ -30,23 +34,23 @@ const statusMeta: Record<
 > = {
   online: {
     label: "Online",
-    dot: "bg-emerald-500",
-    badge: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+    dot: STATUS_DOT_CLASS.success,
+    badge: STATUS_BADGE_CLASS.success,
   },
   warning: {
     label: "Waspada",
-    dot: "bg-amber-500",
-    badge: "bg-amber-50 text-amber-700 ring-amber-100",
+    dot: STATUS_DOT_CLASS.warning,
+    badge: STATUS_BADGE_CLASS.warning,
   },
   critical: {
     label: "Kritis",
     dot: "bg-red-600",
-    badge: "bg-red-50 text-red-700 ring-red-100",
+    badge: STATUS_BADGE_CLASS.danger,
   },
   offline: {
     label: "Offline",
     dot: "bg-zinc-950",
-    badge: "bg-zinc-100 text-zinc-700 ring-zinc-200",
+    badge: STATUS_BADGE_CLASS.neutral,
   },
 };
 

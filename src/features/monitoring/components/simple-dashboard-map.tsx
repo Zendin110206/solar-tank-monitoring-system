@@ -8,6 +8,10 @@ import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { formatCoordinatePair } from "@/features/monitoring/lib/number";
 import type { SimpleDashboardSite } from "@/features/monitoring/lib/simple-dashboard-model";
 import { formatNumber } from "@/lib/format";
+import {
+  STATUS_BADGE_CLASS,
+  STATUS_DOT_CLASS,
+} from "@/components/ui/status-tone";
 
 type LatLng = {
   latitude: number;
@@ -166,14 +170,14 @@ function getStatusClasses(site: SimpleDashboardSite) {
   return site.isOnline
     ? {
         pin: "text-emerald-500",
-        badge: "bg-emerald-50 text-emerald-700 ring-emerald-100",
-        bar: "bg-emerald-500",
+        badge: STATUS_BADGE_CLASS.success,
+        bar: STATUS_DOT_CLASS.success,
         row: "border-emerald-200 bg-emerald-50/70",
       }
     : {
         pin: "text-red-500",
-        badge: "bg-red-50 text-red-700 ring-red-100",
-        bar: "bg-red-500",
+        badge: STATUS_BADGE_CLASS.danger,
+        bar: STATUS_DOT_CLASS.danger,
         row: "border-red-200 bg-red-50/70",
       };
 }

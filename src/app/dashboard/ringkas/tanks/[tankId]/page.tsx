@@ -36,6 +36,7 @@ import { buildTankDetail } from "@/features/monitoring/lib/tank-detail-view-mode
 import { mergeMonitoringReadingsById } from "@/features/monitoring/lib/latest-reading";
 import type { DeviceStatus } from "@/features/monitoring/types/monitoring";
 import { formatNumber } from "@/lib/format";
+import { STATUS_BADGE_CLASS } from "@/components/ui/status-tone";
 
 export const metadata: Metadata = {
   title: "Detail Operasional Tangki | FTM",
@@ -67,22 +68,22 @@ const deviceStatusTone: Record<
   }
 > = {
   online: {
-    badge: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+    badge: STATUS_BADGE_CLASS.success,
     border: "border-emerald-200",
     icon: "text-emerald-600 bg-emerald-50 ring-emerald-100",
   },
   delayed: {
-    badge: "bg-amber-50 text-amber-700 ring-amber-100",
+    badge: STATUS_BADGE_CLASS.warning,
     border: "border-amber-200",
     icon: "text-amber-600 bg-amber-50 ring-amber-100",
   },
   offline: {
-    badge: "bg-red-50 text-red-700 ring-red-100",
+    badge: STATUS_BADGE_CLASS.danger,
     border: "border-red-200",
     icon: "text-red-600 bg-red-50 ring-red-100",
   },
   unknown: {
-    badge: "bg-zinc-100 text-zinc-700 ring-zinc-200",
+    badge: STATUS_BADGE_CLASS.neutral,
     border: "border-zinc-200",
     icon: "text-zinc-600 bg-zinc-100 ring-zinc-200",
   },
@@ -93,7 +94,7 @@ const runtimeLevelParameters: RuntimeLevelParameter[] = [
     label: "Kritis",
     range: "< 13 jam",
     description: "Sisa runtime sudah masuk prioritas tindakan cepat.",
-    badge: "bg-red-50 text-red-700 ring-red-100",
+    badge: STATUS_BADGE_CLASS.danger,
     card: "border-red-200 bg-red-50",
   },
   {
@@ -107,7 +108,7 @@ const runtimeLevelParameters: RuntimeLevelParameter[] = [
     label: "Under",
     range: "14 - <16 jam",
     description: "Masih di bawah zona ideal operasional.",
-    badge: "bg-amber-50 text-amber-700 ring-amber-100",
+    badge: STATUS_BADGE_CLASS.warning,
     card: "border-amber-200 bg-amber-50",
   },
   {
@@ -121,14 +122,14 @@ const runtimeLevelParameters: RuntimeLevelParameter[] = [
     label: "Upper",
     range: "19 - <24 jam",
     description: "Runtime berada di zona atas yang masih normal.",
-    badge: "bg-blue-50 text-blue-700 ring-blue-100",
+    badge: STATUS_BADGE_CLASS.info,
     card: "border-blue-200 bg-blue-50",
   },
   {
     label: "Overstock",
     range: ">= 24 jam",
     description: "Cadangan runtime sangat panjang dibanding batas parameter.",
-    badge: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+    badge: STATUS_BADGE_CLASS.success,
     card: "border-emerald-200 bg-emerald-50",
   },
 ];
@@ -137,7 +138,7 @@ const unknownRuntimeLevel: RuntimeLevelParameter = {
   label: "Belum terbaca",
   range: "-",
   description: "Parameter sisa jam menunggu data volume valid.",
-  badge: "bg-zinc-100 text-zinc-700 ring-zinc-200",
+  badge: STATUS_BADGE_CLASS.neutral,
   card: "border-zinc-200 bg-zinc-50",
 };
 
@@ -540,7 +541,7 @@ export default async function SimpleTankDetailPage({
               icon={Activity}
               label="Sisa jam"
               note={`Konsumsi ${formatNumber(tank.consumptionLiterPerHour, 2)} L/jam`}
-              tone="bg-blue-50 text-blue-700 ring-blue-100"
+              tone={STATUS_BADGE_CLASS.info}
               value={
                 tank.hasReading ? formatRuntimeHour(tank.runtimeHour) : "-"
               }
@@ -549,14 +550,14 @@ export default async function SimpleTankDetailPage({
               icon={Clock3}
               label="Data diterima"
               note="Waktu terakhir data masuk ke sistem"
-              tone="bg-blue-50 text-blue-700 ring-blue-100"
+              tone={STATUS_BADGE_CLASS.info}
               value={tank.receivedAtLabel}
             />
             <SummaryCard
               icon={Database}
               label="Perangkat"
               note={tank.deviceLabel}
-              tone="bg-zinc-100 text-zinc-700 ring-zinc-200"
+              tone={STATUS_BADGE_CLASS.neutral}
               value={tank.deviceCode}
             />
           </div>

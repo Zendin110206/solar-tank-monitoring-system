@@ -9,6 +9,7 @@ import type {
   AuthSessionSummary,
   AuthSessionUser,
 } from "@/features/auth/types/auth";
+import { STATUS_BADGE_CLASS } from "@/components/ui/status-tone";
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("id-ID", {
@@ -362,7 +363,7 @@ export default function AccountSecurityPanel({
                     <span
                       className={`rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${
                         active
-                          ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
+                          ? STATUS_BADGE_CLASS.success
                           : "bg-zinc-100 text-zinc-600 ring-zinc-200"
                       }`}
                     >

@@ -4,6 +4,7 @@ import type { KeyboardEvent, ReactNode } from "react";
 import { useEffect, useId, useRef } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
+import { STATUS_BADGE_CLASS } from "@/components/ui/status-tone";
 
 export type AdminConfirmationTone = "danger" | "primary" | "warning";
 
@@ -44,13 +45,13 @@ const toneClasses: Record<
     button:
       "bg-red-600 text-white shadow-red-600/15 hover:bg-red-700 focus-visible:ring-red-600/20 disabled:bg-red-300",
     eyebrow: "text-red-600",
-    icon: "bg-red-50 text-red-700 ring-red-100",
+    icon: STATUS_BADGE_CLASS.danger,
   },
   primary: {
     button:
       "bg-blue-600 text-white shadow-blue-600/15 hover:bg-blue-700 focus-visible:ring-blue-600/20 disabled:bg-blue-300",
     eyebrow: "text-blue-600",
-    icon: "bg-blue-50 text-blue-700 ring-blue-100",
+    icon: STATUS_BADGE_CLASS.info,
   },
   warning: {
     button:
