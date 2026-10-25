@@ -1,7 +1,7 @@
 # ADR 0011 — Struktur modul dan aturan lapisan
 
 - **Status:** Diterima
-- **Tanggal:** 2026-10-25 (diterima)
+- **Tanggal:** 2026-10-25 (diterima; pembaruan 2026-10-25)
 - **Pemilik keputusan:** pemelihara repositori
 - **Terkait:** [ADR 0002](0002-satu-repositori-modular-monolith.md),
   [arsitektur](../architecture.md), [indeks keputusan](README.md)
@@ -145,3 +145,25 @@ bentuk folder di atas. Tidak dipakai kerangka arsitektur tambahan.
 Ditinjau bila modul baru ditambahkan, bila ada aplikasi kedua yang memakai modul yang
 sama (pemicu monorepo di ADR 0002), atau bila aturan ESLint terbukti terlalu sering
 dikecualikan.
+
+## Pembaruan
+
+Bagian ini mencatat perkembangan setelah keputusan diterima. Isi keputusan di atas
+tidak diubah.
+
+### 25 Oktober 2026 — aturan 1 tercapai, pembantu balasan HTTP dibatalkan
+
+- **Aturan 1 tercapai dan dicek otomatis.** Semua pemanggil langsung di `src/app`
+  sudah memakai layanan modul (#36, #38, #39, #40). ESLint `no-restricted-imports`
+  kini menolak impor repositori, koneksi database, dan `mysql2` dari `src/app` (#41).
+- **Aturan 4 diperkuat.** 38 modul khusus server ditandai `import "server-only";`.
+  Build gagal bila modul seperti itu terimpor ke kode browser (#42).
+- **Modul konfigurasi dibuat.** `src/lib/config/server-env.ts` dan `public-env.ts`
+  menjadi satu-satunya tempat membaca variabel lingkungan; ESLint menolak
+  `process.env` di luar katalog dan tes (#43).
+- **Pembantu balasan HTTP (`src/lib/http/`) tidak dibuat.** Semua 24 route handler
+  sudah memakai `NextResponse.json` bawaan Next.js dengan bentuk `{ ok, data }` atau
+  `{ ok: false, error }`. Membungkusnya dengan fungsi sendiri tidak menambah keamanan
+  atau kejelasan, tetapi menambah satu lapisan yang harus dipelajari. Bentuk balasan
+  dijaga lewat tes karakterisasi route dan pembandingan respons API. Keputusan ini
+  ditinjau ulang bila bentuk balasan mulai berbeda-beda antar-route.
