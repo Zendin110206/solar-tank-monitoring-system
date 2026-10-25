@@ -42,3 +42,57 @@ jobs:
 
       - name: Run project checks
         run: pnpm check
+
+  pr-title:
+    name: Pull request title format
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 9.15.3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Judul pull request menjadi pesan commit saat squash merge.
+      - name: Check pull request title
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: printf '%s\n' "$PR_TITLE" | pnpm exec commitlint --verbose
+
+  audit:
+    name: Dependency audit (report only)
+    runs-on: ubuntu-latest
+    # Hanya melaporkan sampai pembaruan dependensi keamanan selesai;
+    # setelah itu langkah ini dibuat wajib lulus.
+    continue-on-error: true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 9.15.3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Audit production dependencies (high and critical)
+        run: pnpm audit --prod --audit-level high

@@ -32,7 +32,7 @@
     "db:setup:mysql": "pnpm db:migrate:mysql && pnpm db:migrate:auth && pnpm db:migrate:auth-recovery && pnpm db:migrate:device-provisioning && pnpm db:migrate:device-request-fields && pnpm db:migrate:helpdesk && pnpm db:migrate:reading-rollup && pnpm db:migrate:auth-telegram && pnpm db:migrate:site-taxonomy && pnpm db:seed:mysql",
     "db:backup:mysql": "node scripts/backup-mysql.mjs",
     "auth:create-admin": "node scripts/create-auth-admin.mjs",
-    "check": "pnpm typecheck && pnpm lint && pnpm test && pnpm build"
+    "check": "pnpm format:check && pnpm typecheck && pnpm lint && pnpm test && pnpm build"
   },
   "dependencies": {
     "argon2": "^0.44.0",
