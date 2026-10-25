@@ -24,7 +24,12 @@ dirilis ke `main`.
 - commitlint untuk format pesan commit dan judul pull request, hook git lefthook
   (format dan lint sebelum commit, commitlint, typecheck dan tes sebelum push),
   Dependabot mingguan untuk npm dan bulanan untuk GitHub Actions ke branch `dev`,
-  serta laporan `pnpm audit --prod` di CI.
+  serta laporan `pnpm audit --prod` di CI (#24).
+- Tes karakterisasi yang mengunci perilaku sekarang sebelum kode dirapikan: kontrak
+  `/api/ingest` v1, aktivasi kiriman pertama, normalisasi kiriman, ambang status di
+  tiga tempat, volume, konsumsi, bucket 5 menit, paket firmware v1, serta hash sesi,
+  OTP, dan CSRF. Konfigurasi Vitest kini mengenali alias `@/` dan memisahkan tes
+  integrasi.
 
 ### Diubah
 
