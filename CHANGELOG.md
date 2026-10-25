@@ -39,6 +39,9 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Lima lokasi contoh pada penyimpanan memori memakai nama, kode tampilan, dan
+  area fiktif tanpa koordinat; ID, hubungan perangkat/tangki, serta angka
+  operasional tetap sama.
 - Lima pemanggil alur pengajuan perangkat kini memakai layanan modul untuk
   pengajuan, tinjauan, dan unduhan paket. Fungsi repositori, transaksi, pemeriksaan
   akses, email, dan tampilan tetap; tes integrasi pemasangan juga melewati layanan.

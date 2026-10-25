@@ -40,3 +40,17 @@ secara manual, sehingga hanya digunakan pada database pengembangan.
 Perubahan seed tidak mengubah database yang sudah berjalan sampai perintahnya
 dijalankan secara eksplisit. Alamat dan cara memakai simulator tetap mengikuti
 panduan di README utama.
+
+## Data contoh dalam memori
+
+Mode `SOLAR_TANK_STORAGE_DRIVER="memory"` memakai lima lokasi contoh dari
+`src/features/monitoring/data/mock-sites.ts`, bukan empat lokasi dari seed MySQL.
+Nama, kode tampilan, dan area memakai `STO Contoh A` sampai `STO Contoh E`,
+`CONTOH-A` sampai `CONTOH-E`, serta `Area Contoh`. Koordinat tidak diisi.
+Empat lokasi yang berbagi ID dengan seed MySQL memakai nama dan kode fiktif yang
+sama; satu lokasi tambahan hanya ada di contoh memori.
+
+ID internal serta kode perangkat contoh tetap dipertahankan untuk simulator dan
+hubungan data. Nilai tangki, pembacaan, konsumsi, ambang, interval, dan kunci contoh
+juga tetap. Identitas teknis lama tersebut bukan daftar lokasi pilot. Perubahan
+berkas contoh memori tidak memperbarui registry atau data di MySQL.

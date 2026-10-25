@@ -86,7 +86,7 @@ describe("simple tank detail model", () => {
     }
 
     expect(buildSimpleTankDetail(detail)).toMatchObject({
-      siteCode: "TPH",
+      siteCode: "CONTOH-A",
       deviceCode: "demo-tph-01",
       deviceStatusLabel: "Online",
       volumeLiter: 3900,

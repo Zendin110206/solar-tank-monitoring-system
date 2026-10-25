@@ -13,7 +13,7 @@ describe("tank detail view model", () => {
   it("builds tank detail from monitoring mock data", () => {
     const detail = buildTankDetail("tank-tph-main", { now });
 
-    expect(detail?.siteCode).toBe("TPH");
+    expect(detail?.siteCode).toBe("CONTOH-A");
     expect(detail?.deviceCode).toBe("demo-tph-01");
     expect(detail?.volumeLiter).toBe(3900);
     expect(detail?.fillPercent).toBe(78);
@@ -50,7 +50,7 @@ describe("tank detail view model", () => {
 
     expect(detail).not.toBeNull();
     expect(detail).toMatchObject({
-      siteCode: "NJA",
+      siteCode: "CONTOH-B",
       status: "offline",
       fillPercent: 0,
       volumeLiter: 0,
