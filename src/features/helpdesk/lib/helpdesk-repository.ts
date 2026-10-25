@@ -1,3 +1,5 @@
+import "server-only";
+
 import { randomBytes } from "node:crypto";
 import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 

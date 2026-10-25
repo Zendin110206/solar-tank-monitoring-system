@@ -1,3 +1,5 @@
+import "server-only";
+
 // Pintu layanan pengajuan perangkat selama transisi lapisan pada ADR 0011.
 // Delegasi mempertahankan fungsi, tipe hasil, dan transaksi repositori yang sama.
 export {

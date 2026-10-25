@@ -69,6 +69,10 @@ dirilis ke `main`.
 
 ### Keamanan
 
+- Penanda `server-only` (paket resmi React) di 38 modul khusus server: repositori,
+  koneksi database, layanan, email, Telegram, sesi, CSRF, kunci perangkat, paket
+  firmware, dan konfigurasi rahasia. Build gagal bila modul ini terimpor ke kode
+  browser. Perilaku aplikasi tidak berubah.
 - Next.js dinaikkan dari 16.2.9 ke 16.4.3 untuk menutup 5 kerentanan kritis dan 6
   tinggi (antara lain eksekusi kode jarak jauh di optimasi gambar dan DoS pada server
   action). Perubahan perilaku yang terlihat: halaman alias `/dashboard/ringkasan` dan

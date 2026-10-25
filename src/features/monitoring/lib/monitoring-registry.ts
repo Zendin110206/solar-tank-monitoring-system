@@ -1,3 +1,5 @@
+import "server-only";
+
 import { mockDevices } from "../data/mock-devices";
 import { mockSites } from "../data/mock-sites";
 import { mockTanks } from "../data/mock-tanks";

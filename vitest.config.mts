@@ -5,6 +5,10 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": fileURLToPath(new URL("./src", import.meta.url)),
+      // Penanda modul khusus server; di luar Next.js (tes) diganti modul kosong.
+      "server-only": fileURLToPath(
+        new URL("./node_modules/server-only/empty.js", import.meta.url),
+      ),
     },
   },
   test: {

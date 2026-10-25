@@ -119,6 +119,12 @@ Sejak Oktober 2026 tidak ada lagi berkas di `src/app` yang mengimpor repositori,
 koneksi database, atau `mysql2`. Aturan ini dicek ESLint (`no-restricted-imports`
 di `eslint.config.mjs`), sehingga `pnpm lint` dan CI gagal bila dilanggar.
 
+Modul khusus server (repositori, koneksi database, layanan di `server/`, email,
+Telegram, sesi, CSRF, kunci perangkat, paket firmware, dan konfigurasi rahasia)
+diawali `import "server-only";`, sesuai panduan keamanan data Next.js. Bila salah
+satunya terimpor ke komponen browser, `pnpm build` gagal dan menunjuk berkas
+penyebabnya. Di tes Vitest penanda ini diganti modul kosong.
+
 Penyimpangan yang **masih ada** per 25 Oktober 2026 dan akan dirapikan bertahap
 tanpa mengubah perilaku:
 

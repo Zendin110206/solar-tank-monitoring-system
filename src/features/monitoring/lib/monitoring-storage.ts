@@ -1,3 +1,5 @@
+import "server-only";
+
 import type { Reading } from "../types/monitoring";
 import {
   getMonitoringReadings,
