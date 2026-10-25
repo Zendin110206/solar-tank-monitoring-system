@@ -18,7 +18,9 @@ dirilis ke `main`.
   email Mailpit) (#19).
 - Indeks dokumentasi `docs/README.md`, catatan keputusan arsitektur ADR 0001–0010,
   dan dokumen arsitektur yang sesuai kode per Oktober 2026 (#20).
-- `CODE_OF_CONDUCT.md`, `SUPPORT.md`, `CHANGELOG.md`, dan `AGENTS.md`.
+- `CODE_OF_CONDUCT.md`, `SUPPORT.md`, `CHANGELOG.md`, dan `AGENTS.md` (#21).
+- Prettier sebagai pemformat kode (`pnpm format`, `pnpm format:check`) dan `.nvmrc`
+  untuk Node.js 22.
 
 ### Diubah
 
