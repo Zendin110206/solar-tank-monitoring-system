@@ -61,6 +61,9 @@ dirilis ke `main`.
   sedang; isi keempat jenis email (OTP admin, reset kata sandi, verifikasi email,
   paket firmware) tetap sama. `@types/nodemailer` dihapus karena tipe data kini ada
   di paket nodemailer.
+- Versi aman dipaksa lewat `pnpm.overrides` untuk paket turunan Next.js:
+  `browserslist` 4.28.9, `baseline-browser-mapping` 2.11.0, dan `source-map-js` 1.2.2.
+  `pnpm audit --prod` kini tidak menemukan kerentanan.
 
 ## [0.1.0] - 2026-08-02
 
