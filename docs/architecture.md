@@ -99,11 +99,21 @@ src/app (halaman, route handler, server action — tipis)
 
 Logika murni tidak boleh mengakses database dan hanya ada di satu tempat.
 
+Pengajuan perangkat memakai pintu layanan
+`src/features/monitoring/server/device-request-service.ts`. Dua halaman pengajuan,
+aksi formulir pengguna dan admin, serta route unduhan paket memanggil layanan ini.
+Selama transisi, layanan meneruskan fungsi repositori yang sama; kueri SQL dan
+transaksi tetap di `lib/mysql-device-request-repository.ts`. Pemeriksaan akun,
+CSRF, pengiriman email, dan pembaruan halaman masih berada di pemanggilnya dengan
+urutan yang sama. Pemisahan modul `devices` dan pemindahan alur tersebut dilakukan
+bertahap sesuai ADR 0011.
+
 Penyimpangan yang **masih ada** per 25 Oktober 2026 dan akan dirapikan bertahap
 tanpa mengubah perilaku:
 
-- 10 file di `src/app` mengimpor repositori MySQL secara langsung (antara lain
-  halaman dan aksi admin, pengajuan perangkat, profil, dan unduhan paket);
+- 6 file di `src/app` masih mengimpor repositori MySQL secara langsung: aksi
+  perawatan data, tinjauan perangkat (bagian pembersihan), audit, manajemen akun,
+  dan profil;
 - ambang status sisa jam genset ditulis di tiga tempat dengan kelas yang berbeda
   (`status.ts` dan dua halaman detail tangki);
 - pola tampilan yang sama (kartu, format angka, warna status) ditulis ulang di

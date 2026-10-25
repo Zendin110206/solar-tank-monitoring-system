@@ -7,9 +7,9 @@ import { createAdminActionCsrfToken } from "@/features/auth/lib/auth-csrf";
 import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
 import { getDeviceRequestStatusLabel } from "@/features/monitoring/lib/device-request";
 import {
-  listDeviceRequestsForAdminFromMysql,
-  listHardwareProfilesFromMysql,
-} from "@/features/monitoring/lib/mysql-device-request-repository";
+  listDeviceRequestsForAdmin as listDeviceRequestsForAdminFromMysql,
+  listDeviceHardwareProfiles as listHardwareProfilesFromMysql,
+} from "@/features/monitoring/server/device-request-service";
 import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
 import type {
   DeviceRequestStatus,
