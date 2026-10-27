@@ -1,7 +1,7 @@
 import "server-only";
 
 import { verifyDeviceKeyHash } from "../../../lib/device-key";
-import { getMysqlPool } from "../../../lib/mysql-connection";
+import { getMysqlPool } from "@/lib/database/mysql-connection";
 import { insertProvisioningEvent } from "./events";
 import {
   rowToActivationDevice,

@@ -10,7 +10,7 @@ import {
   listDeviceRequestsForAdmin as listDeviceRequestsForAdminFromMysql,
   listDeviceHardwareProfiles as listHardwareProfilesFromMysql,
 } from "@/features/monitoring/server/device-request-service";
-import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
+import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
 import type {
   DeviceRequestStatus,
   MonitoringDeviceRequest,

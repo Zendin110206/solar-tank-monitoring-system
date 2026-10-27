@@ -1,6 +1,6 @@
 import "server-only";
 
-import { getMysqlPool } from "../../../lib/mysql-connection";
+import { getMysqlPool } from "@/lib/database/mysql-connection";
 import type { MonitoringDeviceRequest } from "../../../types/monitoring";
 import { insertProvisioningEvent } from "./events";
 import { createPackageForRequest } from "./package-generation";

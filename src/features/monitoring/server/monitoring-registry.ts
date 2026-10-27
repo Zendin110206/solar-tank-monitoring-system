@@ -4,7 +4,7 @@ import { mockDevices } from "../data/mock-devices";
 import { mockSites } from "../data/mock-sites";
 import { mockTanks } from "../data/mock-tanks";
 import type { Device, Site, Tank } from "../types/monitoring";
-import { listMonitoringReferenceFromMysql } from "./mysql-reference-repository";
+import { listMonitoringReferenceFromMysql } from "./repositories/mysql-reference-repository";
 import {
   getMonitoringStorageDriver,
   type MonitoringStorageDriver,

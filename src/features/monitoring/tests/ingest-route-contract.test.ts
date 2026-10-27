@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { POST } from "@/app/api/ingest/route";
 import { checkRateLimit } from "@/features/auth/server/rate-limit";
-import { resetMonitoringReadings } from "../lib/telemetry-store";
+import { resetMonitoringReadings } from "../server/telemetry-store";
 
 // Tes karakterisasi kontrak perangkat v1: mengunci perilaku POST /api/ingest
 // apa adanya (status, isi balasan, header) karena firmware yang terpasang

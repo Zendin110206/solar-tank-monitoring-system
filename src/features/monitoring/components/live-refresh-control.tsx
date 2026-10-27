@@ -14,7 +14,7 @@ import {
   DEFAULT_MONITORING_REFRESH_INTERVAL_MS,
   formatMonitoringRefreshInterval,
   normalizeMonitoringRefreshInterval,
-} from "../lib/refresh-interval";
+} from "./refresh-interval";
 
 type LiveRefreshControlProps = {
   intervalMs?: number;

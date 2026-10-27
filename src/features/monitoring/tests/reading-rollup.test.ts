@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   buildMonitoringRollupWindow,
   MONITORING_ROLLUP_INTERVAL_MINUTES,
-} from "../lib/reading-rollup";
+} from "../domain/reading-rollup";
 
 describe("monitoring reading rollup", () => {
   it("maps a reading to a stable five-minute UTC bucket", () => {

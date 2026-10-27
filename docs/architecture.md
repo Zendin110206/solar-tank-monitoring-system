@@ -70,19 +70,16 @@ Penjelasan diagram:
 | `src/features/auth`       | Akun, sesi, peran, OTP admin, CSRF (pengaman agar aksi tidak bisa dipicu dari situs lain), captcha, email, pembatas jumlah permintaan, audit, dan Telegram (binding, perintah, notifikasi admin)                                                                                                          |
 | `src/features/helpdesk`   | Widget bantuan di web dan relay pesan ke topik Telegram                                                                                                                                                                                                                                                   |
 | `src/components`          | Kerangka halaman bersama (header, footer, menu, halaman akun) dan logo                                                                                                                                                                                                                                    |
-| `src/lib`                 | Utilitas umum (pesan error yang aman ditampilkan) dan katalog pengaturan `src/lib/config/`                                                                                                                                                                                                                |
+| `src/lib`                 | Utilitas umum (pesan error yang aman ditampilkan), katalog pengaturan `src/lib/config/`, dan koneksi database bersama `src/lib/database/`                                                                                                                                                                 |
 
-Di dalam modul, pola file yang dipakai sekarang:
+Di dalam modul, setiap jenis berkas punya foldernya sendiri:
 
-- **logika murni** (tanpa database): misalnya `tank-volume.ts`, `status.ts`,
-  `runtime.ts`, `device-request.ts`, `normalize-reading.ts`, `reading-rollup.ts`;
-- **view model** (menyiapkan data untuk tampilan): `dashboard-view-model.ts`,
-  `simple-dashboard-model.ts`, `simple-tank-detail-model.ts`,
-  `tank-detail-view-model.ts`;
-- **repositori** (kueri SQL): `mysql-*-repository.ts`;
-- **layanan** (alur kerja yang menggabungkan beberapa langkah):
-  `ingest-telemetry.ts`, `device-provisioning.ts`, `auth/server/auth-service.ts`;
-- **komponen** tampilan di folder `components/`.
+- **logika murni** (tanpa database) dan **view model** di `domain/`, misalnya
+  `tank-volume.ts`, `status.ts`, `normalize-reading.ts`, `dashboard-view-model.ts`;
+- **layanan** (alur kerja yang menggabungkan beberapa langkah) di `server/`, misalnya
+  `monitoring/server/ingest-telemetry.ts` dan `auth/server/auth-service.ts`;
+- **repositori** (kueri SQL) di `server/repositories/`, bernama `mysql-*-repository.ts`;
+- **komponen** tampilan di `components/`.
 
 Modul yang sudah memakai bentuk folder ADR 0011:
 
@@ -104,10 +101,24 @@ src/features/auth/
 │   └── repositories/mysql-auth-repository.ts   kueri SQL akun dan sesi
 ├── tests/
 └── types/auth.ts
+
+src/features/monitoring/
+├── components/          dashboard, peta, grafik, jam, kontrol muat ulang, visual 3D,
+│                        jeda muat ulang dashboard (refresh-interval.ts)
+├── data/                data contoh untuk mode penyimpanan memori (konstanta murni)
+├── domain/              rumus volume, status, sisa jam genset, normalisasi kiriman,
+│                        ringkasan 5 menit, view model dashboard dan detail tangki, ekspor CSV
+├── server/              penyimpanan, registry, penerimaan data perangkat, pemeriksaan kesiapan
+│   └── repositories/    kueri SQL pembacaan dan registry
+├── tests/
+└── types/monitoring.ts
 ```
 
-Modul `monitoring` masih memakai folder `lib/` dan dipindah setelah pemecahan
-repositori perangkat selesai.
+Koneksi database bersama ada di `src/lib/database/mysql-connection.ts` karena dipakai
+semua modul; hanya repositori yang boleh memakainya (dicek ESLint).
+
+Berkas pengajuan perangkat dan perawatan data masih berada di `monitoring/lib/` dan
+`monitoring/server/`; keduanya dipindah ke modul `devices` dan `admin` berikutnya.
 
 ## Lapisan dan arah ketergantungan
 
@@ -218,8 +229,8 @@ tanpa mengubah perilaku:
 - `auth/server/rate-limit.ts` dan `auth/server/admin-telegram-notifications.ts` masih
   menjalankan kueri SQL sendiri, bukan lewat repositori. Keduanya dikecualikan dari
   aturan ESLint layanan secara tertulis di `eslint.config.mjs` sampai SQL-nya dipindah;
-- koneksi database bersama masih berada di `monitoring/lib/mysql-connection.ts`,
-  padahal dipakai semua modul;
+- `monitoring/server/deployment-probes.ts` (pemeriksaan kesiapan `/api/ready`) menguji
+  koneksi database secara langsung; dikecualikan secara tertulis dari aturan layanan;
 - jumlah liter ditulis dengan dua cara: `/dashboard/detail` (termasuk petanya) dan teks
   halaman `/dashboard/tanks/[id]` menampilkan sampai 3 angka desimal, sedangkan dashboard
   utama, halaman `/dashboard/ringkas/tanks/[id]`, dan grafik volume di kedua halaman tangki

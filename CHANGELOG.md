@@ -50,6 +50,10 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Modul `monitoring` memakai bentuk folder ADR 0011: rumus dan view model di `domain/`,
+  layanan di `server/`, kueri SQL di `server/repositories/`. Koneksi database bersama pindah
+  ke `src/lib/database/mysql-connection.ts`. Isi berkas tidak berubah selain alamat impor.
+  ESLint kini menolak layanan dan `domain/` yang memakai koneksi database langsung.
 - Repositori pengajuan perangkat dipecah ke `server/repositories/device-requests/`
   menurut pengajuan, peninjauan, paket, dan aktivasi. Pintu impor lama serta semua
   fungsi dan tipe publik tetap; SQL, transaksi, penguncian baris, dan firmware tidak berubah.

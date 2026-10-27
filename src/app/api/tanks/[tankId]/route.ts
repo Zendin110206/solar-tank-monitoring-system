@@ -1,11 +1,11 @@
 import { requireApiUser } from "@/features/auth/server/auth-guards";
-import { mergeMonitoringReadingsById } from "@/features/monitoring/lib/latest-reading";
-import { buildTankDetail } from "@/features/monitoring/lib/tank-detail-view-model";
+import { mergeMonitoringReadingsById } from "@/features/monitoring/domain/latest-reading";
+import { buildTankDetail } from "@/features/monitoring/domain/tank-detail-view-model";
 import {
   listLatestMonitoringReadingsByTankWithSource,
   listMonitoringReadingsForTank,
-} from "@/features/monitoring/lib/monitoring-storage";
-import { getMonitoringReferenceData } from "@/features/monitoring/lib/monitoring-registry";
+} from "@/features/monitoring/server/monitoring-storage";
+import { getMonitoringReferenceData } from "@/features/monitoring/server/monitoring-registry";
 import type { NextRequest } from "next/server";
 import { jsonError, jsonOk } from "@/lib/http/json-response";
 

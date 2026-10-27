@@ -11,8 +11,8 @@ import {
   SIMPLE_DASHBOARD_ALL_WILAYAHS,
   sortSimpleDashboardSites,
   type SimpleDashboardSite,
-} from "../lib/simple-dashboard-model";
-import type { DashboardMonitoringSite } from "../lib/dashboard-view-model";
+} from "../domain/simple-dashboard-model";
+import type { DashboardMonitoringSite } from "../domain/dashboard-view-model";
 
 const sites: SimpleDashboardSite[] = [
   {

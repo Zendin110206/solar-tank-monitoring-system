@@ -7,7 +7,7 @@ import {
   SIMPLE_TANK_CHART_RANGES,
   type SimpleTankChartRangeKey,
   type SimpleTankTrendByRange,
-} from "@/features/monitoring/lib/simple-tank-detail-model";
+} from "@/features/monitoring/domain/simple-tank-detail-model";
 import { formatNumber } from "@/lib/format";
 
 type SimpleTankVolumeChartProps = {

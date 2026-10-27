@@ -61,7 +61,7 @@ describe("mysql connection", () => {
     delete process.env.MYSQL_SSL_MODE;
     delete process.env.MYSQL_SSL_CA;
 
-    const { getMysqlPool } = await import("../lib/mysql-connection");
+    const { getMysqlPool } = await import("@/lib/database/mysql-connection");
 
     getMysqlPool();
 

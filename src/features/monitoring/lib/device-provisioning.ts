@@ -14,11 +14,11 @@ import {
   DEFAULT_WILAYAH_LABEL,
   normalizeRegionalLabel,
   normalizeWilayahLabel,
-} from "./location-taxonomy";
-import { getMonitoringStorageDriver } from "./monitoring-storage";
-import { getMysqlPool } from "./mysql-connection";
-import { toFiniteNumber } from "./number";
-import { extractPayloadTankConfig } from "./reading-tank-config";
+} from "../domain/location-taxonomy";
+import { getMonitoringStorageDriver } from "../server/monitoring-storage";
+import { getMysqlPool } from "@/lib/database/mysql-connection";
+import { toFiniteNumber } from "../domain/number";
+import { extractPayloadTankConfig } from "../domain/reading-tank-config";
 
 const DEFAULT_EXPECTED_REPORT_INTERVAL_SEC = 300;
 const DEFAULT_LOW_LEVEL_PERCENT = 30;

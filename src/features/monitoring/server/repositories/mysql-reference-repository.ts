@@ -2,12 +2,12 @@ import "server-only";
 
 import { type RowDataPacket } from "mysql2/promise";
 
-import type { Device, Site, Tank, TankShape } from "../types/monitoring";
+import type { Device, Site, Tank, TankShape } from "../../types/monitoring";
 import {
   normalizeRegionalLabel,
   normalizeWilayahLabel,
-} from "./location-taxonomy";
-import { getMysqlPool } from "./mysql-connection";
+} from "../../domain/location-taxonomy";
+import { getMysqlPool } from "@/lib/database/mysql-connection";
 
 type SiteRow = RowDataPacket & {
   id: string;

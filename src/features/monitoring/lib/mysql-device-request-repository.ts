@@ -21,11 +21,11 @@ export {
   downloadDevicePackageByTokenFromMysql,
   rejectDeviceRequestInMysql,
   isPackageStatus,
-} from "../server/repositories/device-requests";
+} from "../server/repositories/device-requests/index";
 export type {
   CreateDeviceRequestFromMysqlResult,
   ApprovedDeviceRequestPackageResult,
   DownloadDevicePackageResult,
   DevicePackageAdminMutationResult,
   ActivateApprovedDeviceResult,
-} from "../server/repositories/device-requests";
+} from "../server/repositories/device-requests/index";

@@ -1,15 +1,15 @@
 import { requireApiUser } from "@/features/auth/server/auth-guards";
-import { getMonitoringReferenceData } from "@/features/monitoring/lib/monitoring-registry";
+import { getMonitoringReferenceData } from "@/features/monitoring/server/monitoring-registry";
 import {
   listMonitoringReadingsForTank,
   listMonitoringReadingsForTankInRange,
-} from "@/features/monitoring/lib/monitoring-storage";
+} from "@/features/monitoring/server/monitoring-storage";
 import {
   buildReadingExportPeriod,
   createTankReadingsCsv,
   createTankReadingsCsvFilename,
   parseReadingExportRange,
-} from "@/features/monitoring/lib/readings-export";
+} from "@/features/monitoring/domain/readings-export";
 import type { NextRequest } from "next/server";
 import { jsonError } from "@/lib/http/json-response";
 

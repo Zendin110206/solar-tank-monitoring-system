@@ -16,8 +16,8 @@ import type {
 import {
   normalizeRegionalLabel,
   normalizeWilayahLabel,
-} from "./location-taxonomy";
-import { roundTo } from "./number";
+} from "../domain/location-taxonomy";
+import { roundTo } from "../domain/number";
 
 const DEFAULT_LOW_LEVEL_PERCENT = 30;
 const DEFAULT_CRITICAL_LEVEL_PERCENT = 15;

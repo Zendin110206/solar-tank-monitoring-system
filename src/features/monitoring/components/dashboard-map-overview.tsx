@@ -11,7 +11,7 @@ import {
 import type {
   DashboardMonitoringSite,
   DashboardSiteStatus,
-} from "@/features/monitoring/lib/dashboard-view-model";
+} from "@/features/monitoring/domain/dashboard-view-model";
 import { formatNumber } from "@/lib/format";
 import {
   STATUS_BADGE_CLASS,

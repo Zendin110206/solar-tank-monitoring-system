@@ -1,14 +1,14 @@
 import "server-only";
 
 import { type PoolConnection, type RowDataPacket } from "mysql2/promise";
-import { getMysqlPool } from "./mysql-connection";
+import { getMysqlPool } from "@/lib/database/mysql-connection";
 import type {
   Reading,
   ReadingQuality,
   ReadingResolution,
-} from "../types/monitoring";
-import { buildMonitoringRollupWindow } from "./reading-rollup";
-import { selectLatestReadingPerTank } from "./latest-reading";
+} from "../../types/monitoring";
+import { buildMonitoringRollupWindow } from "../../domain/reading-rollup";
+import { selectLatestReadingPerTank } from "../../domain/latest-reading";
 
 const DEFAULT_MYSQL_READINGS_LIMIT = 1000;
 const DEFAULT_MYSQL_TANK_HISTORY_LIMIT = 10_000;

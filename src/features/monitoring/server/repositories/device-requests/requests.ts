@@ -1,7 +1,7 @@
 import "server-only";
 
 import { buildPendingDeviceRequest } from "../../../lib/device-request";
-import { getMysqlPool } from "../../../lib/mysql-connection";
+import { getMysqlPool } from "@/lib/database/mysql-connection";
 import type {
   DeviceRequestDraft,
   DeviceRequestStatus,

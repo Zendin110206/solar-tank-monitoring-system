@@ -59,7 +59,7 @@ volumeLiter = area * L / 1000
 Kode perhitungan berada di:
 
 ```text
-src/features/monitoring/lib/tank-volume.ts
+src/features/monitoring/domain/tank-volume.ts
 ```
 
 ## Volume Tangki Balok
@@ -122,7 +122,7 @@ runtimeHour = 146
 Kode runtime berada di:
 
 ```text
-src/features/monitoring/lib/runtime.ts
+src/features/monitoring/domain/runtime.ts
 ```
 
 ## Status Runtime
@@ -181,7 +181,7 @@ Contoh mapping:
 Kode normalizer:
 
 ```text
-src/features/monitoring/lib/normalize-reading.ts
+src/features/monitoring/domain/normalize-reading.ts
 ```
 
 ## Kenapa Perlu Test

@@ -10,7 +10,7 @@ import type {
   MonitoringHardwareProfile,
   TankShape,
 } from "@/features/monitoring/types/monitoring";
-import { formatCoordinatePair } from "@/features/monitoring/lib/number";
+import { formatCoordinatePair } from "@/features/monitoring/domain/number";
 import {
   ApproveDeviceRequestForm,
   CleanupDeviceRequestForm,

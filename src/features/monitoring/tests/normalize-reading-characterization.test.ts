@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { Tank } from "../types/monitoring";
-import { normalizeCatPayload } from "../lib/normalize-reading";
+import { normalizeCatPayload } from "../domain/normalize-reading";
 
 // Tes karakterisasi normalisasi kiriman perangkat. Mengunci perilaku saat ini,
 // termasuk perilaku yang tercatat perlu diperbaiki di paket kerja domain.

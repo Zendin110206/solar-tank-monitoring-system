@@ -1,5 +1,5 @@
 import { requirePageAdmin } from "@/features/auth/server/auth-guards";
-import { getMonitoringReferenceDataWithSource } from "@/features/monitoring/lib/monitoring-registry";
+import { getMonitoringReferenceDataWithSource } from "@/features/monitoring/server/monitoring-registry";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
@@ -22,10 +22,10 @@ import {
   buildDashboardOverview,
   type DashboardOverview,
   type DashboardSiteStatus as SiteStatus,
-} from "@/features/monitoring/lib/dashboard-view-model";
+} from "@/features/monitoring/domain/dashboard-view-model";
 
-import { listLatestMonitoringReadingsByTankWithSource } from "@/features/monitoring/lib/monitoring-storage";
-import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/lib/refresh-interval";
+import { listLatestMonitoringReadingsByTankWithSource } from "@/features/monitoring/server/monitoring-storage";
+import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/components/refresh-interval";
 import { formatNumber } from "@/lib/format";
 import {
   STATUS_BADGE_CLASS,

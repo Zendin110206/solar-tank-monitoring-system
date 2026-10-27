@@ -6,7 +6,7 @@ import type {
   RowDataPacket,
 } from "mysql2/promise";
 
-import { getMysqlPool } from "../../../monitoring/lib/mysql-connection";
+import { getMysqlPool } from "@/lib/database/mysql-connection";
 import type {
   AuthAccessRequest,
   AuthAuditEvent,

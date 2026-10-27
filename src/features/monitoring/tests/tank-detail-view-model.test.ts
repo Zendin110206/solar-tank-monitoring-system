@@ -4,8 +4,8 @@ import { mockTanks } from "../data/mock-tanks";
 import {
   buildTankDetail,
   buildTankReadings,
-} from "../lib/tank-detail-view-model";
-import { normalizeCatPayload } from "../lib/normalize-reading";
+} from "../domain/tank-detail-view-model";
+import { normalizeCatPayload } from "../domain/normalize-reading";
 
 describe("tank detail view model", () => {
   const now = new Date("2026-06-25T07:45:00.000Z");

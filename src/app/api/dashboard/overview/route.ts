@@ -1,7 +1,7 @@
 import { requireApiUser } from "@/features/auth/server/auth-guards";
-import { getMonitoringReferenceDataWithSource } from "@/features/monitoring/lib/monitoring-registry";
-import { buildDashboardOverview } from "@/features/monitoring/lib/dashboard-view-model";
-import { listLatestMonitoringReadingsByTankWithSource } from "@/features/monitoring/lib/monitoring-storage";
+import { getMonitoringReferenceDataWithSource } from "@/features/monitoring/server/monitoring-registry";
+import { buildDashboardOverview } from "@/features/monitoring/domain/dashboard-view-model";
+import { listLatestMonitoringReadingsByTankWithSource } from "@/features/monitoring/server/monitoring-storage";
 import type { NextRequest } from "next/server";
 
 export const dynamic = "force-dynamic";

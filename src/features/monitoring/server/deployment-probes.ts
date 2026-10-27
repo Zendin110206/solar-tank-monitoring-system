@@ -21,15 +21,18 @@ import {
 import {
   getExpectedProvisioningKey,
   isDeviceAutoProvisioningEnabled,
-} from "./device-provisioning";
-import { isGlobalDeviceKeyFallbackAllowed } from "./device-key";
-import { getDevicePackageEncryptionKey } from "./firmware-package";
-import { checkMysqlConnection, getMysqlPool } from "./mysql-connection";
+} from "../lib/device-provisioning";
+import { isGlobalDeviceKeyFallbackAllowed } from "../lib/device-key";
+import { getDevicePackageEncryptionKey } from "../lib/firmware-package";
+import {
+  checkMysqlConnection,
+  getMysqlPool,
+} from "@/lib/database/mysql-connection";
 import {
   checkMonitoringLocationTaxonomySchemaFromMysql,
   countMonitoringReferenceRowsFromMysql,
-} from "./mysql-reference-repository";
-import { checkMonitoringReadingStorageSchemaFromMysql } from "./mysql-reading-repository";
+} from "./repositories/mysql-reference-repository";
+import { checkMonitoringReadingStorageSchemaFromMysql } from "./repositories/mysql-reading-repository";
 import {
   getMonitoringStorageDriver,
   type MonitoringStorageDriver,

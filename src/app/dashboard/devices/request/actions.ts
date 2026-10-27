@@ -8,7 +8,7 @@ import {
   type SubmitDeviceRequestResult as CreateDeviceRequestFromMysqlResult,
 } from "@/features/monitoring/server/device-request-service";
 import { notifyAdminsDeviceRequestCreated } from "@/features/monitoring/lib/device-request-notifications";
-import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
+import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
 import type {
   DeviceSensorType,

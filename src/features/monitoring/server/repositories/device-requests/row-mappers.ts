@@ -5,7 +5,7 @@ import {
   DEFAULT_WILAYAH_LABEL,
   normalizeRegionalLabel,
   normalizeWilayahLabel,
-} from "../../../lib/location-taxonomy";
+} from "../../../domain/location-taxonomy";
 import type {
   Device,
   DeviceRequestStatus,
