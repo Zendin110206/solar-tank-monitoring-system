@@ -110,6 +110,13 @@ dirilis ke `main`.
 - Dokumen bulan Juli ditandai riwayat atau perlu diperiksa ulang tanpa menghapus
   isinya (#20).
 
+### Dihapus
+
+- Kode yang terbukti tidak dipakai dihapus (±300 baris): tombol keluar `LogoutButton`
+  (tombol keluar yang aktif ada di menu pengguna), dua formulir admin yang tidak lagi dirender
+  sejak penyederhanaan halaman tinjauan perangkat (Juli 2026), serta 9 fungsi dan 3 tipe tanpa
+  pemakai. Tampilan dan perilaku tidak berubah.
+
 ### Keamanan
 
 - Penanda `server-only` (paket resmi React) di 38 modul khusus server: repositori,

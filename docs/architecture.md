@@ -253,6 +253,10 @@ tanpa mengubah perilaku:
   aturan ESLint layanan secara tertulis di `eslint.config.mjs` sampai SQL-nya dipindah;
 - `monitoring/server/deployment-probes.ts` (pemeriksaan kesiapan `/api/ready`) menguji
   koneksi database secara langsung; dikecualikan secara tertulis dari aturan layanan;
+- formulir admin "Bersihkan semua data perangkat" dan "Bersihkan pengajuan terpilih"
+  dicabut dari halaman pada Juli 2026, tetapi server action `resetMonitoringDeviceDataAction`,
+  layanan, dan kueri SQL di belakangnya masih ada tanpa pemakai. Komponen formulirnya sudah
+  dihapus; menghapus atau menampilkan kembali kemampuan itu menunggu keputusan pemilik;
 - jumlah liter ditulis dengan dua cara: `/dashboard/detail` (termasuk petanya) dan teks
   halaman `/dashboard/tanks/[id]` menampilkan sampai 3 angka desimal, sedangkan dashboard
   utama, halaman `/dashboard/ringkas/tanks/[id]`, dan grafik volume di kedua halaman tangki

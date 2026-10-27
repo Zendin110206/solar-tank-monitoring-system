@@ -338,11 +338,6 @@ export function createDeviceRequestCode({
 export function createDeviceRequestId(): string {
   return createMonitoringId("device_request");
 }
-
-export function createFirmwarePackageId(): string {
-  return createMonitoringId("device_package");
-}
-
 export function validateDeviceRequestDraft(
   draft: DeviceRequestDraft,
   options: DeviceRequestValidationOptions = {},

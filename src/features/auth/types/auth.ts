@@ -64,7 +64,3 @@ export function isAuthRole(value: string): value is AuthRole {
 export function isAuthUserStatus(value: string): value is AuthUserStatus {
   return AUTH_USER_STATUSES.includes(value as AuthUserStatus);
 }
-
-export function isAdmin(user: Pick<AuthSafeUser, "role">): boolean {
-  return user.role === "admin";
-}
