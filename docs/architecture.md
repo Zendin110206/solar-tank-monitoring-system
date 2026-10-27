@@ -247,9 +247,10 @@ tanpa mengubah perilaku:
   (`status.ts` dan dua halaman detail tangki);
 - pola tampilan yang sama (kartu, format angka, warna status) ditulis ulang di
   banyak file;
-- halaman `/dashboard/tanks/[id]` masih sangat besar (±1.500 baris); halaman
-  `/dashboard/admin/users` sudah dipecah ke `_components/`; repositori pengajuan perangkat dan repositori
-  akun sudah dipecah menurut tanggung jawab;
+- dua halaman detail tangki (`/dashboard/tanks/[id]` dan `/dashboard/ringkas/tanks/[id]`) hanya
+  berbagi 3 fungsi yang identik; tabel ambang sisa jam, lencana, dan panelnya sengaja bergaya
+  berbeda. Menyatukannya mengubah tampilan dan menunggu keputusan pemilik. Halaman besar
+  (`/dashboard/tanks/[id]`, `/dashboard/admin/users`) dan repositori besar sudah dipecah;
 - `auth/server/rate-limit.ts`, `auth/server/admin-telegram-notifications.ts`, dan
   `devices/server/device-provisioning.ts` masih menjalankan kueri SQL sendiri, bukan lewat
   repositori. Ketiganya dikecualikan dari

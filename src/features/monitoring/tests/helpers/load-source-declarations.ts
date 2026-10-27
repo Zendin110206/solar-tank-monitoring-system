@@ -31,7 +31,8 @@ export function loadSourceDeclarations<T extends Record<string, unknown>>(
       statement.name &&
       wanted.has(statement.name.text)
     ) {
-      snippets.push(statement.getText(source));
+      // Kata export dibuang: potongan dijalankan tanpa sistem modul.
+      snippets.push(statement.getText(source).replace(/^export\s+/, ""));
       wanted.delete(statement.name.text);
     }
 
@@ -41,7 +42,8 @@ export function loadSourceDeclarations<T extends Record<string, unknown>>(
           ts.isIdentifier(declaration.name) &&
           wanted.has(declaration.name.text)
         ) {
-          snippets.push(statement.getText(source));
+          // Kata export dibuang: potongan dijalankan tanpa sistem modul.
+          snippets.push(statement.getText(source).replace(/^export\s+/, ""));
           wanted.delete(declaration.name.text);
         }
       }
