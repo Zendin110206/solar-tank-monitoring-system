@@ -50,6 +50,9 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Halaman detail tangki admin `/dashboard/tanks/[id]` (±1.500 baris) dipecah ke
+  `tanks/[tankId]/_components/` (data detail, tabel ambang sisa jam, visual tangki, panel,
+  tabel pembacaan, format). Teks komponen tidak berubah; tampilan sama.
 - Halaman manajemen pengguna admin (±1.200 baris) dipecah: filter, lencana, tombol aksi, daftar
   pengajuan akses, dan pembacaan filter dari URL pindah ke `admin/users/_components/`. Halaman kini
   ±530 baris. Teks komponen tidak berubah; tampilan sama.
