@@ -50,6 +50,9 @@ dirilis ke `main`.
 
 ### Diubah
 
+- `auth/server/auth-service.ts` (±860 baris) dipecah per alur ke `auth/server/auth-flows/` (login,
+  pendaftaran, kata sandi, verifikasi email, sesi, Telegram). Teks deklarasi tidak berubah; berkas lama
+  menjadi pintu ekspor dengan daftar ekspor yang sama.
 - Data uji nomor telepon memakai nomor yang jelas fiktif (`0811-0000-0001`).
 - Halaman detail tangki admin `/dashboard/tanks/[id]` (±1.500 baris) dipecah ke
   `tanks/[tankId]/_components/` (data detail, tabel ambang sisa jam, visual tangki, panel,
