@@ -81,10 +81,11 @@ flowchart TB
 | ------------ | -------------------------------------------------------------------------------- |
 | `monitoring` | Data tangki, perhitungan, dashboard, penerimaan data perangkat                   |
 | `devices`    | Pengajuan perangkat baru, persetujuan, kunci perangkat, paket firmware, aktivasi |
+| `admin`      | Perawatan data: reset pembacaan dan pembersihan data uji                         |
 | `auth`       | Akun, login, kode OTP admin, sesi, audit keamanan, Telegram                      |
 | `helpdesk`   | Tombol bantuan di web dan penerusan pesan ke Telegram admin                      |
 
-Rencana pemisahan berikutnya (perawatan data menjadi modul `admin`) dicatat di [ADR 0011](decisions/0011-struktur-modul-dan-aturan-lapisan.md).
+Pembagian modul ini ditetapkan di [ADR 0011](decisions/0011-struktur-modul-dan-aturan-lapisan.md).
 
 ### Contoh: perangkat baru dipasang
 

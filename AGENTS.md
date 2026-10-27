@@ -31,10 +31,9 @@ Node.js 22 dan pnpm 9.15.3. Dokumentasi Next.js versi yang terpasang ada di
 ## Struktur
 
 - `src/app/` — halaman, route handler (`api/**/route.ts`), server action. Dibuat tipis.
-- `src/features/<modul>/` — `monitoring`, `devices`, `auth`, `helpdesk`. Bentuk folder (ADR 0011):
+- `src/features/<modul>/` — `monitoring`, `devices`, `admin`, `auth`, `helpdesk`. Bentuk folder (ADR 0011):
   `components/`, `domain/` (logika murni), `server/` (layanan), `server/repositories/`
-  (SQL), `types/`, `tests/`. Berkas perawatan data masih di `monitoring/` sampai dipindah
-  ke modul `admin`. Impor antar-modul memakai alias `@/features/<modul>/...`. Koneksi database
+  (SQL), `types/`, `tests/`. Impor antar-modul memakai alias `@/features/<modul>/...`. Koneksi database
   bersama ada di `src/lib/database/` dan hanya dipakai repositori.
 - `src/components/` — kerangka tampilan bersama.
 - `database/migrations/` — migrasi MySQL berurutan; `database/seeds/` — data fiktif.

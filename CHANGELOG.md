@@ -50,6 +50,9 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Modul baru `admin` (`src/features/admin/`) berisi layanan dan repositori perawatan data
+  beserta tesnya. Isi berkas tidak berubah selain alamat impor. Semua modul kini memakai
+  bentuk folder ADR 0011.
 - Modul baru `devices` (`src/features/devices/`) berisi pengajuan perangkat, pembuatan perangkat
   dari kiriman pertama, kunci perangkat, paket firmware, email paket, notifikasi admin, repositori
   pengajuan, dan tesnya. Isi berkas tidak berubah selain alamat impor. Penerimaan data kini

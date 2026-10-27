@@ -7,7 +7,7 @@ import { requirePageAdmin } from "@/features/auth/server/auth-guards";
 import {
   cleanupMonitoringTanks as cleanupMonitoringTanksInMysql,
   resetMonitoringReadings as resetMonitoringReadingsInMysql,
-} from "@/features/monitoring/server/maintenance-service";
+} from "@/features/admin/server/maintenance-service";
 import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
 

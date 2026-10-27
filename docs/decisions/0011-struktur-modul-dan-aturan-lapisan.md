@@ -189,3 +189,15 @@ diubah dari rencana (monitoring lebih dulu) karena modul `monitoring` menunggu
 pemecahan repositori perangkat yang sedang berjalan. ESLint kini juga mengecek
 aturan 2 (layanan tidak memakai repositori modul lain) dan aturan 3 (`domain/` tanpa
 I/O).
+
+### 27 Oktober 2026 — semua modul memakai bentuk folder
+
+Modul `monitoring` (#53), `devices` (#54), dan `admin` menyusul helpdesk dan auth.
+Tidak ada lagi folder `lib/` di dalam modul. Koneksi database bersama pindah ke
+`src/lib/database/mysql-connection.ts` dan hanya boleh dipakai repositori. Impor
+antar-modul memakai alias `@/features/<modul>/...`.
+
+Pengecualian tertulis yang tersisa di `eslint.config.mjs` (layanan yang masih
+menjalankan SQL sendiri): `auth/server/rate-limit.ts`,
+`auth/server/admin-telegram-notifications.ts`, `devices/server/device-provisioning.ts`,
+serta `monitoring/server/deployment-probes.ts` yang memang menguji koneksi database.
