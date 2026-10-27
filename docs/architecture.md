@@ -97,7 +97,9 @@ src/features/auth/
 ├── components/          tombol keluar, widget captcha
 ├── domain/              validasi isian akun, aturan alamat tujuan setelah login
 ├── server/              layanan akun, sesi, guard, CSRF, kripto, pengaturan auth,
-│                        email, captcha, Telegram, pembatas permintaan
+│                        email, captcha, Telegram, pembatas permintaan;
+│                        auth-service.ts (pintu kompatibilitas) dan auth-flows/: login,
+│                        pendaftaran, kata sandi, verifikasi email, sesi, Telegram
 │   └── repositories/    mysql-auth-repository.ts (pintu kompatibilitas) dan accounts/:
 │                        pengguna, sesi, administrasi pengguna, pengajuan akses, token
 │                        (OTP, atur ulang sandi, verifikasi email), Telegram, audit
