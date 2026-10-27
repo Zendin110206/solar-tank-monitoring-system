@@ -25,9 +25,9 @@ import {
   type MonitoringStorageDriver,
 } from "./monitoring-storage";
 import {
-  activateApprovedDeviceOnFirstPingFromMysql,
+  activateApprovedDeviceOnFirstPing as activateApprovedDeviceOnFirstPingFromMysql,
   type ActivateApprovedDeviceResult,
-} from "../lib/mysql-device-request-repository";
+} from "./device-request-service";
 
 const DEFAULT_LOCAL_DEVICE_KEY = "local-development-key";
 
