@@ -256,6 +256,9 @@ tanpa mengubah perilaku:
   aturan ESLint layanan secara tertulis di `eslint.config.mjs` sampai SQL-nya dipindah;
 - `monitoring/server/deployment-probes.ts` (pemeriksaan kesiapan `/api/ready`) menguji
   koneksi database secara langsung; dikecualikan secara tertulis dari aturan layanan;
+- halaman depan memuat kode STO pilot (TPH, NJA, JTO), dan formulir pengajuan perangkat
+  memakai contoh isian "STO Bangil", "Pasuruan", serta koordinat sekitar Pasuruan. Keduanya teks
+  yang dilihat pengguna; menggantinya dengan contoh fiktif adalah perubahan tampilan (FTM-028);
 - formulir admin "Bersihkan semua data perangkat" dan "Bersihkan pengajuan terpilih"
   dicabut dari halaman pada Juli 2026, tetapi server action `resetMonitoringDeviceDataAction`,
   layanan, dan kueri SQL di belakangnya masih ada tanpa pemakai. Komponen formulirnya sudah

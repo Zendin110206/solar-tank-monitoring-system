@@ -50,6 +50,7 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Data uji nomor telepon memakai nomor yang jelas fiktif (`0811-0000-0001`).
 - Halaman manajemen pengguna admin (±1.200 baris) dipecah: filter, lencana, tombol aksi, daftar
   pengajuan akses, dan pembacaan filter dari URL pindah ke `admin/users/_components/`. Halaman kini
   ±530 baris. Teks komponen tidak berubah; tampilan sama.
