@@ -220,13 +220,14 @@ dan `jsonCaughtError` (pesan aman untuk error yang ditangkap). Hanya `/api/ready
 
 Kit UI bersama ada di `src/components/ui/`:
 
-| Berkas            | Isi                                                                                     |
-| ----------------- | --------------------------------------------------------------------------------------- |
-| `card.tsx`        | `Card`: kartu putih standar (`as` untuk `section`/`article`/`div`)                      |
-| `status-pill.tsx` | `StatusPill`: lencana status berbentuk pil dengan titik warna                           |
-| `message.tsx`     | `FormErrorMessage` (kotak error formulir), `ActionMessage` (hasil aksi di dialog)       |
-| `button-class.ts` | `PRIMARY_BLOCK_BUTTON_CLASS`, `SECONDARY_BUTTON_CLASS` untuk `<button>` maupun `<Link>` |
-| `status-tone.ts`  | peta warna status                                                                       |
+| Berkas               | Isi                                                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `card.tsx`           | `Card`: kartu putih standar (`as` untuk `section`/`article`/`div`)                                                 |
+| `status-pill.tsx`    | `StatusPill`: lencana status berbentuk pil dengan titik warna                                                      |
+| `section-header.tsx` | `SectionHeader`: judul bagian (label merah, judul, penjelasan); `limitDescriptionWidth` membatasi lebar penjelasan |
+| `message.tsx`        | `FormErrorMessage` (kotak error formulir), `ActionMessage` (hasil aksi di dialog)                                  |
+| `button-class.ts`    | `PRIMARY_BLOCK_BUTTON_CLASS`, `SECONDARY_BUTTON_CLASS` untuk `<button>` maupun `<Link>`                            |
+| `status-tone.ts`     | peta warna status                                                                                                  |
 
 Tes `ui-kit.test.tsx` memastikan setiap komponen menghasilkan HTML yang sama persis
 dengan markup lama.

@@ -9,6 +9,7 @@ import { mergeMonitoringReadingsById } from "@/features/monitoring/domain/latest
 import { buildSimpleTankDetail } from "@/features/monitoring/domain/simple-tank-detail-model";
 import { buildTankDetail } from "@/features/monitoring/domain/tank-detail-view-model";
 import { getMonitoringReferenceData } from "@/features/monitoring/server/monitoring-registry";
+import { SectionHeader } from "@/components/ui/section-header";
 import {
   listLatestMonitoringReadingsByTankWithSource,
   listMonitoringReadingsForTank,
@@ -44,11 +45,7 @@ import {
   formatRuntimeHour,
   statusMeta,
 } from "./_components/tank-detail-format";
-import {
-  MetricCard,
-  SectionHeading,
-  StatusBadge,
-} from "./_components/tank-detail-ui";
+import { MetricCard, StatusBadge } from "./_components/tank-detail-ui";
 import {
   ConfigReviewPanel,
   LocationPanel,
@@ -324,7 +321,8 @@ export default async function TankDetailPage({
             {/* History Section */}
             <Card id="riwayat" className="animate-soft-fade min-w-0">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                <SectionHeading
+                <SectionHeader
+                  limitDescriptionWidth
                   label="Riwayat"
                   title="Tren pembacaan"
                   description="Pilih rentang grafik, lalu unduh CSV dengan periode data yang sama."
@@ -343,7 +341,8 @@ export default async function TankDetailPage({
             {/* Device Health Section */}
             <Card className="animate-soft-fade">
               <div className="flex items-start justify-between gap-4">
-                <SectionHeading
+                <SectionHeader
+                  limitDescriptionWidth
                   label="Perangkat"
                   title="Status sensor"
                   description="Informasi ini disiapkan untuk health check perangkat saat data real mulai masuk."
@@ -369,7 +368,8 @@ export default async function TankDetailPage({
         <div className="mt-5 grid min-w-0 gap-5 xl:grid-cols-3">
           {/* Data Flow Section */}
           <Card className="animate-soft-fade">
-            <SectionHeading
+            <SectionHeader
+              limitDescriptionWidth
               label="Alur baca"
               title="Dari sensor ke keputusan"
               description="Urutan ini menjaga dashboard tidak salah memahami data mentah perangkat."
@@ -402,7 +402,8 @@ export default async function TankDetailPage({
 
           {/* Device Data Section */}
           <Card id="data-perangkat" className="animate-soft-fade">
-            <SectionHeading
+            <SectionHeader
+              limitDescriptionWidth
               label="Data perangkat"
               title="Field kompatibel CAT"
               description="Nilai berikut menjadi jembatan dari format perangkat lama ke data internal yang lebih rapi."
@@ -475,7 +476,8 @@ export default async function TankDetailPage({
 
           {/* Validation Notes Section */}
           <Card className="animate-soft-fade">
-            <SectionHeading
+            <SectionHeader
+              limitDescriptionWidth
               label="Validasi lapangan"
               title="Data yang perlu dikonfirmasi"
               description="Gunakan daftar ini untuk memastikan pembacaan perangkat, konfigurasi tangki, dan lokasi STO sudah sesuai kondisi lapangan sebelum dipakai sebagai acuan operasional."

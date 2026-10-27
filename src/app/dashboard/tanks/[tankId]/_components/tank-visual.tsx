@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import { SectionHeader } from "@/components/ui/section-header";
 import {
   TankHorizontalCylinderScene3D,
   TankRectangularScene3D,
@@ -17,7 +18,7 @@ import {
 } from "lucide-react";
 import { type ParameterItem, type TankDetail } from "./tank-detail-data";
 import { formatMeasurement, formatPercent } from "./tank-detail-format";
-import { SectionHeading, StatusBadge } from "./tank-detail-ui";
+import { StatusBadge } from "./tank-detail-ui";
 
 function clampPercent(value: number) {
   return Math.min(Math.max(value, 0), 100);
@@ -110,7 +111,8 @@ export function TankVisual({ tank }: { tank: TankDetail }) {
   return (
     <Card as="div" className="relative overflow-hidden">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <SectionHeading
+        <SectionHeader
+          limitDescriptionWidth
           label="Visual tangki"
           title={tank.shapeLabel}
           description={visualDescription}

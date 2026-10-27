@@ -50,6 +50,9 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Judul bagian halaman (label, judul, penjelasan) yang ditulis ulang di tiga tempat (dashboard detail, peta
+  dashboard, detail tangki) kini memakai satu komponen kit UI `SectionHeader`. HTML yang dihasilkan tidak
+  berubah.
 - Halaman depan `src/app/page.tsx` (±860 baris) dipecah per bagian ke `src/app/_components/`
   (header, hero, fitur, cara kerja, ajakan masuk, footer). Isi setiap bagian dan data contohnya tidak
   berubah; `page.tsx` tinggal memeriksa sesi dan menyusun bagian-bagian itu.

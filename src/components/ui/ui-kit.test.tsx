@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { Card } from "./card";
 import { ActionMessage, FormErrorMessage } from "./message";
+import { SectionHeader } from "./section-header";
 import { StatusPill } from "./status-pill";
 
 // Setiap komponen harus menghasilkan HTML yang sama persis dengan markup yang dulu
@@ -83,5 +84,40 @@ describe("kit UI", () => {
         </p>,
       ),
     );
+  });
+
+  it("SectionHeader sama dengan judul bagian lama", () => {
+    const oldHeader = (descriptionClass: string) =>
+      html(
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-red-600">
+            Lokasi
+          </p>
+          <h2 className="mt-2 text-2xl font-semibold tracking-normal text-zinc-950">
+            Peta tangki
+          </h2>
+          <p className={descriptionClass}>Posisi setiap tangki.</p>
+        </div>,
+      );
+
+    expect(
+      html(
+        <SectionHeader
+          label="Lokasi"
+          title="Peta tangki"
+          description="Posisi setiap tangki."
+        />,
+      ),
+    ).toBe(oldHeader("mt-2 text-sm leading-6 text-zinc-500"));
+    expect(
+      html(
+        <SectionHeader
+          label="Lokasi"
+          title="Peta tangki"
+          description="Posisi setiap tangki."
+          limitDescriptionWidth
+        />,
+      ),
+    ).toBe(oldHeader("mt-2 max-w-3xl text-sm leading-6 text-zinc-500"));
   });
 });
