@@ -5,7 +5,7 @@ import {
   calculateDeviceRequestCapacityLiter,
   calculateOperationalConsumptionLiterPerHour,
   calculateOperationalLoadKw,
-} from "../lib/device-request";
+} from "@/features/devices/domain/device-request";
 import { buildMonitoringRollupWindow } from "../domain/reading-rollup";
 import { calculateRuntimeHours } from "../domain/runtime";
 import {

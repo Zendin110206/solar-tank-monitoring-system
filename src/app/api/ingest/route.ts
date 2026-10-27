@@ -6,7 +6,7 @@ import { checkRateLimit } from "@/features/auth/server/rate-limit";
 import {
   getExpectedProvisioningKey,
   isDeviceAutoProvisioningEnabled,
-} from "@/features/monitoring/lib/device-provisioning";
+} from "@/features/devices/server/device-provisioning";
 import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
 import {
   jsonError,

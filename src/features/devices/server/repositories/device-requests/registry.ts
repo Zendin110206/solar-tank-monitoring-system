@@ -1,6 +1,6 @@
 import "server-only";
 
-import type { MonitoringDeviceRequest } from "../../../types/monitoring";
+import type { MonitoringDeviceRequest } from "@/features/monitoring/types/monitoring";
 import type { SiteIdRow } from "./types";
 import type { PoolConnection } from "mysql2/promise";
 

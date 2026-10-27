@@ -77,14 +77,14 @@ flowchart TB
 
 ### Modul (divisi)
 
-| Modul        | Mengurus                                                                                 |
-| ------------ | ---------------------------------------------------------------------------------------- |
-| `monitoring` | Data tangki, perhitungan, dashboard, penerimaan data perangkat, pengajuan perangkat baru |
-| `auth`       | Akun, login, kode OTP admin, sesi, audit keamanan, Telegram                              |
-| `helpdesk`   | Tombol bantuan di web dan penerusan pesan ke Telegram admin                              |
+| Modul        | Mengurus                                                                         |
+| ------------ | -------------------------------------------------------------------------------- |
+| `monitoring` | Data tangki, perhitungan, dashboard, penerimaan data perangkat                   |
+| `devices`    | Pengajuan perangkat baru, persetujuan, kunci perangkat, paket firmware, aktivasi |
+| `auth`       | Akun, login, kode OTP admin, sesi, audit keamanan, Telegram                      |
+| `helpdesk`   | Tombol bantuan di web dan penerusan pesan ke Telegram admin                      |
 
-Rencana pemisahan berikutnya (pengajuan perangkat dan perawatan data menjadi modul
-sendiri) dicatat di [ADR 0011](decisions/0011-struktur-modul-dan-aturan-lapisan.md).
+Rencana pemisahan berikutnya (perawatan data menjadi modul `admin`) dicatat di [ADR 0011](decisions/0011-struktur-modul-dan-aturan-lapisan.md).
 
 ### Contoh: perangkat baru dipasang
 

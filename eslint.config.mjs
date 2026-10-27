@@ -55,6 +55,8 @@ const eslintConfig = defineConfig([
       // berkas (lihat docs/architecture.md, bagian penyimpangan); hapus baris ini setelahnya.
       "src/features/auth/server/admin-telegram-notifications.ts",
       "src/features/auth/server/rate-limit.ts",
+      // Pembuatan perangkat otomatis dari kiriman pertama juga masih menjalankan SQL sendiri.
+      "src/features/devices/server/device-provisioning.ts",
       // Pemeriksaan kesiapan (/api/ready) memang menguji koneksi database secara langsung.
       "src/features/monitoring/server/deployment-probes.ts",
     ],

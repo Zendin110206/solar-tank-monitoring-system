@@ -15,7 +15,7 @@ import type {
   MonitoringDeviceRequest,
   MonitoringFirmwareTemplate,
   MonitoringHardwareProfile,
-} from "../types/monitoring";
+} from "@/features/monitoring/types/monitoring";
 
 const DEFAULT_PACKAGE_PREFIX = "solartank";
 const DEFAULT_DEVICE_SEGMENT = "device";

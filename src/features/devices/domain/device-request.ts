@@ -12,12 +12,12 @@ import type {
   MonitoringHardwareProfile,
   NormalizedDeviceRequestDraft,
   TankShape,
-} from "../types/monitoring";
+} from "@/features/monitoring/types/monitoring";
 import {
   normalizeRegionalLabel,
   normalizeWilayahLabel,
-} from "../domain/location-taxonomy";
-import { roundTo } from "../domain/number";
+} from "@/features/monitoring/domain/location-taxonomy";
+import { roundTo } from "@/features/monitoring/domain/number";
 
 const DEFAULT_LOW_LEVEL_PERCENT = 30;
 const DEFAULT_CRITICAL_LEVEL_PERCENT = 15;

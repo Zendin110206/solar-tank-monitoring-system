@@ -1,12 +1,12 @@
 import "server-only";
 
-import { buildPendingDeviceRequest } from "../../../lib/device-request";
+import { buildPendingDeviceRequest } from "../../../domain/device-request";
 import { getMysqlPool } from "@/lib/database/mysql-connection";
 import type {
   DeviceRequestDraft,
   DeviceRequestStatus,
   MonitoringDeviceRequest,
-} from "../../../types/monitoring";
+} from "@/features/monitoring/types/monitoring";
 import {
   listFirmwareTemplatesFromMysql,
   listHardwareProfilesFromMysql,

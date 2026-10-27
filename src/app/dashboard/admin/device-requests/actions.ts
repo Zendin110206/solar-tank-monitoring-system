@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getAppBaseUrl } from "@/features/auth/server/auth-config";
 import { verifyAdminActionCsrfToken } from "@/features/auth/server/auth-csrf";
 import { requirePageAdmin } from "@/features/auth/server/auth-guards";
-import { sendDevicePackageReadyEmail } from "@/features/monitoring/lib/device-package-email";
+import { sendDevicePackageReadyEmail } from "@/features/devices/server/device-package-email";
 import {
   approveDeviceRequest as approveDeviceRequestInMysql,
   recordDevicePackageEmailDelivery as recordFirmwarePackageEmailDeliveryInMysql,
@@ -13,7 +13,7 @@ import {
   rejectDeviceRequest as rejectDeviceRequestInMysql,
   reissueDevicePackage as reissueDevicePackageInMysql,
   revokeDeviceProvisioning as revokeDeviceProvisioningInMysql,
-} from "@/features/monitoring/server/device-request-service";
+} from "@/features/devices/server/device-request-service";
 import {
   cleanupMonitoringDeviceRequests as cleanupMonitoringDeviceRequestsInMysql,
   resetMonitoringDeviceData as resetMonitoringDeviceDataInMysql,

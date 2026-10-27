@@ -6,11 +6,11 @@ import { requirePageUser } from "@/features/auth/server/auth-guards";
 import {
   getDeviceRequestStatusLabel,
   getDeviceSensorTypeLabel,
-} from "@/features/monitoring/lib/device-request";
+} from "@/features/devices/domain/device-request";
 import {
   listDeviceRequestsForUser as listDeviceRequestsForUserFromMysql,
   listDeviceHardwareProfiles as listHardwareProfilesFromMysql,
-} from "@/features/monitoring/server/device-request-service";
+} from "@/features/devices/server/device-request-service";
 import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
 import type {
   DeviceRequestStatus,

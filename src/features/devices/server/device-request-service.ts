@@ -15,9 +15,9 @@ export {
   rejectDeviceRequestInMysql as rejectDeviceRequest,
   reissueDevicePackageInMysql as reissueDevicePackage,
   revokeDeviceProvisioningInMysql as revokeDeviceProvisioning,
-} from "../lib/mysql-device-request-repository";
+} from "./repositories/mysql-device-request-repository";
 
 export type {
   ActivateApprovedDeviceResult,
   CreateDeviceRequestFromMysqlResult as SubmitDeviceRequestResult,
-} from "../lib/mysql-device-request-repository";
+} from "./repositories/mysql-device-request-repository";

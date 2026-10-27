@@ -1,6 +1,6 @@
 import "server-only";
 
-import { verifyDeviceKeyHash } from "../../../lib/device-key";
+import { verifyDeviceKeyHash } from "../../device-key";
 import { getMysqlPool } from "@/lib/database/mysql-connection";
 import { insertProvisioningEvent } from "./events";
 import {

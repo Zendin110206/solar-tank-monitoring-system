@@ -6,12 +6,12 @@ import {
   submitDeviceRequest as createDeviceRequestInMysql,
   downloadDevicePackage as downloadDevicePackageByTokenFromMysql,
 } from "../../server/device-request-service";
-import { activateApprovedDeviceOnFirstPingFromMysql } from "../../lib/mysql-device-request-repository";
+import { activateApprovedDeviceOnFirstPingFromMysql } from "../../server/repositories/mysql-device-request-repository";
 import {
   createTestDatabase,
   insertFictionalUser,
   type TestDatabase,
-} from "./mysql-test-database";
+} from "@/features/monitoring/tests/integration/mysql-test-database";
 
 // Tes integrasi alur pemasangan perangkat pada MySQL asli: pengajuan ->
 // persetujuan admin -> unduh paket -> kiriman pertama mengaktifkan perangkat.
@@ -19,9 +19,9 @@ import {
 
 const DEVICE_KEY = "kunci-perangkat-integrasi-tetap";
 
-vi.mock("../../lib/device-key", async (importOriginal) => {
+vi.mock("../../server/device-key", async (importOriginal) => {
   const original =
-    await importOriginal<typeof import("../../lib/device-key")>();
+    await importOriginal<typeof import("../../server/device-key")>();
   return { ...original, createDeviceKey: () => DEVICE_KEY };
 });
 

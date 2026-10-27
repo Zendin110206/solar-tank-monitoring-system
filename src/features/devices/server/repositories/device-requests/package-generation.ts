@@ -1,13 +1,13 @@
 import "server-only";
 
-import { createDeviceKey, hashDeviceKey } from "../../../lib/device-key";
+import { createDeviceKey, hashDeviceKey } from "../../device-key";
 import {
   createDownloadExpiresAt,
   createDownloadToken,
   createFirmwarePackageBundle,
   encryptFirmwarePackage,
-} from "../../../lib/firmware-package";
-import type { MonitoringDeviceRequest } from "../../../types/monitoring";
+} from "../../firmware-package";
+import type { MonitoringDeviceRequest } from "@/features/monitoring/types/monitoring";
 import { findFirmwareTemplateById, findHardwareProfileById } from "./catalog";
 import { insertFirmwarePackage } from "./package-queries";
 import { createInactiveRegistryForApprovedRequest } from "./registry";

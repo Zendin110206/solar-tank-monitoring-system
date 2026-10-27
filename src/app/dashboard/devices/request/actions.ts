@@ -6,8 +6,8 @@ import { requirePageUser } from "@/features/auth/server/auth-guards";
 import {
   submitDeviceRequest as createDeviceRequestInMysql,
   type SubmitDeviceRequestResult as CreateDeviceRequestFromMysqlResult,
-} from "@/features/monitoring/server/device-request-service";
-import { notifyAdminsDeviceRequestCreated } from "@/features/monitoring/lib/device-request-notifications";
+} from "@/features/devices/server/device-request-service";
+import { notifyAdminsDeviceRequestCreated } from "@/features/devices/server/device-request-notifications";
 import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
 import type {

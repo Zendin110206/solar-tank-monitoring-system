@@ -117,8 +117,23 @@ src/features/monitoring/
 Koneksi database bersama ada di `src/lib/database/mysql-connection.ts` karena dipakai
 semua modul; hanya repositori yang boleh memakainya (dicek ESLint).
 
-Berkas pengajuan perangkat dan perawatan data masih berada di `monitoring/lib/` dan
-`monitoring/server/`; keduanya dipindah ke modul `devices` dan `admin` berikutnya.
+```text
+src/features/devices/
+├── domain/device-request.ts   validasi pengajuan, kapasitas tangki, konsumsi, label status
+├── server/                    layanan pengajuan, pembuatan perangkat dari kiriman pertama,
+│                              kunci perangkat, paket firmware, email paket, notifikasi admin
+│   └── repositories/          mysql-device-request-repository.ts (pintu kompatibilitas)
+│                              dan device-requests/ (SQL menurut tanggung jawab)
+└── tests/                     termasuk snapshot paket firmware v1 dan tes MySQL pemasangan
+```
+
+Modul `devices` memakai tipe data dan rumus dari `monitoring` (tangki, lokasi, angka).
+`monitoring/server/ingest-telemetry.ts` mengaktifkan perangkat pada kiriman pertama lewat
+layanan `devices`, bukan langsung ke repositorinya. Impor antar-modul selalu memakai alias
+`@/features/<modul>/...`; impor di dalam modul memakai jalur relatif.
+
+Berkas perawatan data masih berada di `monitoring/lib/` dan `monitoring/server/` dan
+dipindah ke modul `admin` berikutnya.
 
 ## Lapisan dan arah ketergantungan
 
@@ -137,11 +152,11 @@ src/app (halaman, route handler, server action — tipis)
 Logika murni tidak boleh mengakses database dan hanya ada di satu tempat.
 
 Pengajuan perangkat memakai pintu layanan
-`src/features/monitoring/server/device-request-service.ts`. Dua halaman pengajuan,
+`src/features/devices/server/device-request-service.ts`. Dua halaman pengajuan,
 aksi formulir pengguna dan admin, serta route unduhan paket memanggil layanan ini.
 Selama transisi, layanan meneruskan fungsi repositori yang sama melalui pintu
-kompatibilitas `lib/mysql-device-request-repository.ts`. Implementasi SQL berada
-di `server/repositories/device-requests/`, dipisahkan menurut tanggung jawab:
+kompatibilitas `server/repositories/mysql-device-request-repository.ts`. Implementasi SQL
+berada di `server/repositories/device-requests/`, dipisahkan menurut tanggung jawab:
 
 | Berkas                                                                     | Tanggung jawab                                                                                           |
 | -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
@@ -226,8 +241,9 @@ tanpa mengubah perilaku:
   banyak file;
 - beberapa file masih sangat besar, misalnya `mysql-auth-repository.ts`
   (±1.700 baris); repositori pengajuan perangkat sudah dipecah menurut tanggung jawab;
-- `auth/server/rate-limit.ts` dan `auth/server/admin-telegram-notifications.ts` masih
-  menjalankan kueri SQL sendiri, bukan lewat repositori. Keduanya dikecualikan dari
+- `auth/server/rate-limit.ts`, `auth/server/admin-telegram-notifications.ts`, dan
+  `devices/server/device-provisioning.ts` masih menjalankan kueri SQL sendiri, bukan lewat
+  repositori. Ketiganya dikecualikan dari
   aturan ESLint layanan secara tertulis di `eslint.config.mjs` sampai SQL-nya dipindah;
 - `monitoring/server/deployment-probes.ts` (pemeriksaan kesiapan `/api/ready`) menguji
   koneksi database secara langsung; dikecualikan secara tertulis dari aturan layanan;
