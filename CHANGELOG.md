@@ -50,6 +50,10 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Repositori akun (`mysql-auth-repository.ts`, ±1.700 baris) dipecah menurut tanggung jawab
+  ke `auth/server/repositories/accounts/` (pengguna, sesi, administrasi pengguna, pengajuan akses,
+  token, Telegram, audit). Teks deklarasi dan SQL tidak berubah; berkas lama menjadi pintu
+  ekspor dengan daftar ekspor yang sama.
 - Modul baru `admin` (`src/features/admin/`) berisi layanan dan repositori perawatan data
   beserta tesnya. Isi berkas tidak berubah selain alamat impor. Semua modul kini memakai
   bentuk folder ADR 0011.
