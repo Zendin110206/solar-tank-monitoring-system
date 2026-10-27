@@ -514,7 +514,7 @@ Contoh pengajuan akses:
 ```powershell
 curl.exe -X POST http://localhost:3000/api/auth/register-request `
   -H "Content-Type: application/json" `
-  -d "{\"fullName\":\"Operator Monitoring\",\"username\":\"operator_1\",\"email\":\"operator@example.com\",\"phone\":\"081234567890\",\"password\":\"Password12345\",\"confirmPassword\":\"Password12345\",\"requestedRole\":\"user\",\"accessReason\":\"Perlu memantau STO area Pasuruan\",\"captchaToken\":\"token-turnstile\"}"
+  -d "{\"fullName\":\"Operator Monitoring\",\"username\":\"operator_1\",\"email\":\"operator@example.com\",\"phone\":\"081234567890\",\"password\":\"Password12345\",\"confirmPassword\":\"Password12345\",\"requestedRole\":\"user\",\"accessReason\":\"Perlu memantau STO area contoh\",\"captchaToken\":\"token-turnstile\"}"
 ```
 
 ## Catatan Versi

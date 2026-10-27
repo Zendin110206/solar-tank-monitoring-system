@@ -283,7 +283,7 @@ Contoh bagian penting:
   "name": "STO TPH",
   "regionalLabel": "TREG 5",
   "wilayahLabel": "TIF 3",
-  "areaLabel": "Pasuruan",
+  "areaLabel": "Area Contoh",
   "latitude": -7.65,
   "longitude": 112.9,
   "coordinateStatus": "approved",

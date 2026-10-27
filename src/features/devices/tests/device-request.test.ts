@@ -41,7 +41,7 @@ const rectangularProfile: MonitoringHardwareProfile = {
 
 const baseDraft: DeviceRequestDraft = {
   siteName: "STO TPH",
-  areaLabel: "Pasuruan",
+  areaLabel: "Area Contoh",
   regionalLabel: "TREG 5",
   wilayahLabel: "TIF 3",
   deviceSensorType: "fuel",
@@ -80,7 +80,7 @@ describe("device request foundation", () => {
     expect(validation.normalized).toMatchObject({
       siteCode: "TPH",
       siteName: "STO TPH",
-      areaLabel: "Pasuruan",
+      areaLabel: "Area Contoh",
       regionalLabel: "TREG 5",
       wilayahLabel: "TIF 3",
       deviceSensorType: "fuel",

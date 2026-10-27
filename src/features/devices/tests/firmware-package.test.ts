@@ -43,7 +43,7 @@ const HARDWARE_PROFILE: MonitoringHardwareProfile = {
 const DEVICE_REQUEST: MonitoringDeviceRequest = {
   adminReviewedAt: null,
   adminReviewedByUserId: null,
-  areaLabel: "Pasuruan",
+  areaLabel: "Area Contoh",
   regionalLabel: "TREG 5",
   wilayahLabel: "TIF 3",
   capacityLiter: 540,
@@ -159,7 +159,7 @@ describe("firmware package helpers", () => {
     expect(manifest).toMatchObject({
       siteRegional: "TREG 5",
       siteWilayah: "TIF 3",
-      siteLocation: { area: "Pasuruan" },
+      siteLocation: { area: "Area Contoh" },
     });
     expect(
       bundle.files

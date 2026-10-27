@@ -35,7 +35,7 @@ Siapkan tabel sederhana seperti ini sebelum menyentuh kode atau device.
 | Nama lokasi    | `STO TPH`       | Nama yang tampil di dashboard                                    |
 | Regional       | `TREG 5`        | Kelompok lokasi paling besar                                     |
 | Wilayah        | `TIF 3`         | Kelompok di bawah Regional                                       |
-| Area           | `Pasuruan`      | Label area kerja                                                 |
+| Area           | `Area Contoh`   | Label area kerja                                                 |
 | Latitude       | `-7.6500000`    | Harus angka koordinat yang disetujui                             |
 | Longitude      | `112.9000000`   | Harus angka koordinat yang disetujui                             |
 | ID tangki      | `tank-tph-main` | Gunakan format konsisten                                         |

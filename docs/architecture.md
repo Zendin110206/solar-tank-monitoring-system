@@ -269,6 +269,11 @@ karena merapikannya mengubah tampilan atau perilaku:
 - halaman depan memuat kode STO pilot (TPH, NJA, JTO), dan formulir pengajuan perangkat
   memakai contoh isian "STO Bangil", "Pasuruan", serta koordinat sekitar Pasuruan. Keduanya teks
   yang dilihat pengguna; menggantinya dengan contoh fiktif adalah perubahan tampilan (FTM-028);
+- teks layar lain juga memuat lokasi sungguhan: label kantor "Telkom Pasuruan, Jawa Timur" di
+  halaman profil, kartu contoh "STO TPH" di layar masuk/daftar (`auth-shell.tsx`), dan contoh alasan
+  "STO area Pasuruan" di formulir daftar. Alias teknis data contoh (`site-tph`, `tank-tph-main`,
+  `demo-tph-01`) dipakai seed, penyimpanan memori, dan tes; menggantinya ikut mengubah alamat halaman
+  contoh (FTM-028);
 - formulir admin "Bersihkan semua data perangkat" dan "Bersihkan pengajuan terpilih"
   dicabut dari halaman pada Juli 2026, tetapi server action `resetMonitoringDeviceDataAction`,
   layanan, dan kueri SQL di belakangnya masih ada tanpa pemakai. Komponen formulirnya sudah

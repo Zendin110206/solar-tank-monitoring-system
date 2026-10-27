@@ -52,6 +52,9 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Data tes dan contoh dokumentasi tidak lagi memakai nama tempat sungguhan (Pasuruan, Tosari, Sukorejo,
+  Nguling) dan domain email sungguhan; diganti "Area Contoh", "STO Contoh ...", dan `contoh.example`.
+  Alias teknis seperti `tank-tph-main` tetap karena dipakai data contoh aplikasi.
 - SQL yang masih dijalankan empat layanan (rate limit, notifikasi Telegram admin, pembuatan perangkat
   otomatis, pemeriksaan `/api/ready`) dipindah ke repositori. Pengecualian aturan lapisan di
   `eslint.config.mjs` dihapus. Teks SQL dan urutan langkah tidak berubah.
