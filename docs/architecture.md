@@ -98,7 +98,9 @@ src/features/auth/
 ├── domain/              validasi isian akun, aturan alamat tujuan setelah login
 ├── server/              layanan akun, sesi, guard, CSRF, kripto, pengaturan auth,
 │                        email, captcha, Telegram, pembatas permintaan
-│   └── repositories/mysql-auth-repository.ts   kueri SQL akun dan sesi
+│   └── repositories/    mysql-auth-repository.ts (pintu kompatibilitas) dan accounts/:
+│                        pengguna, sesi, administrasi pengguna, pengajuan akses, token
+│                        (OTP, atur ulang sandi, verifikasi email), Telegram, audit
 ├── tests/
 └── types/auth.ts
 
@@ -245,8 +247,9 @@ tanpa mengubah perilaku:
   (`status.ts` dan dua halaman detail tangki);
 - pola tampilan yang sama (kartu, format angka, warna status) ditulis ulang di
   banyak file;
-- beberapa file masih sangat besar, misalnya `mysql-auth-repository.ts`
-  (±1.700 baris); repositori pengajuan perangkat sudah dipecah menurut tanggung jawab;
+- beberapa halaman masih sangat besar, misalnya `/dashboard/tanks/[id]` (±1.500 baris) dan
+  `/dashboard/admin/users` (±1.200 baris); repositori pengajuan perangkat dan repositori
+  akun sudah dipecah menurut tanggung jawab;
 - `auth/server/rate-limit.ts`, `auth/server/admin-telegram-notifications.ts`, dan
   `devices/server/device-provisioning.ts` masih menjalankan kueri SQL sendiri, bukan lewat
   repositori. Ketiganya dikecualikan dari
