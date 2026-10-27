@@ -50,6 +50,9 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Tampilan error dashboard dan detail tangki (`error.tsx`) yang kembar kecuali teksnya kini memakai satu
+  komponen `src/components/dashboard/dashboard-route-error.tsx`, setara `dashboard-route-loading.tsx`. Teks
+  dan HTML tidak berubah.
 - Judul bagian halaman (label, judul, penjelasan) yang ditulis ulang di tiga tempat (dashboard detail, peta
   dashboard, detail tangki) kini memakai satu komponen kit UI `SectionHeader`. HTML yang dihasilkan tidak
   berubah.
