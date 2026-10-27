@@ -201,3 +201,20 @@ Pengecualian tertulis yang tersisa di `eslint.config.mjs` (layanan yang masih
 menjalankan SQL sendiri): `auth/server/rate-limit.ts`,
 `auth/server/admin-telegram-notifications.ts`, `devices/server/device-provisioning.ts`,
 serta `monitoring/server/deployment-probes.ts` yang memang menguji koneksi database.
+
+### 27 Oktober 2026 — pengecualian SQL di layanan dihapus
+
+SQL yang masih dijalankan layanan dipindah ke repositori, sehingga semua layanan kini
+mengikuti aturan 2 tanpa pengecualian:
+
+- rate limit → `auth/server/repositories/mysql-rate-limit-repository.ts`;
+- daftar chat Telegram admin dan pemeriksaan indeks unik Telegram →
+  `auth/server/repositories/accounts/telegram.ts`. Modul `monitoring` memanggil pemeriksaan
+  ini lewat layanan `auth/server/auth-readiness.ts`, karena tabel `auth_users` milik modul `auth`;
+- penyimpanan perangkat yang dibuat otomatis →
+  `devices/server/repositories/mysql-device-provisioning-repository.ts`;
+- pemeriksaan koneksi database untuk `/api/ready` →
+  `monitoring/server/repositories/mysql-health-repository.ts`.
+
+Teks SQL dan urutan langkah tidak berubah. Sebelum pemindahan, rate limit dan pembuatan
+perangkat otomatis diberi tes integrasi MySQL lebih dulu.

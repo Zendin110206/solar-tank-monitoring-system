@@ -249,23 +249,23 @@ Semua pengaturan dibaca dari dua katalog di `src/lib/config/`:
 Nilai dibaca saat dipakai, sama seperti membaca `process.env` langsung. ESLint
 (`no-restricted-properties`) menolak `process.env` di luar katalog ini, kecuali di tes.
 
-Penyimpangan yang **masih ada** per 25 Oktober 2026 dan akan dirapikan bertahap
-tanpa mengubah perilaku:
+Penyimpangan yang **masih ada** per 27 Oktober 2026. Semuanya menunggu keputusan pemilik
+karena merapikannya mengubah tampilan atau perilaku:
 
 - ambang status sisa jam genset ditulis di tiga tempat dengan kelas yang berbeda
   (`status.ts` dan dua halaman detail tangki);
-- pola tampilan yang sama (kartu, format angka, warna status) ditulis ulang di
-  banyak file;
+- kartu metrik di halaman detail tangki, ringkasan tangki, dan formulir pengajuan perangkat
+  mirip tetapi berbeda ukuran dan susunan; markup yang identik (kartu, lencana status, judul
+  bagian, pesan, tampilan error) sudah memakai kit UI;
 - dua halaman detail tangki (`/dashboard/tanks/[id]` dan `/dashboard/ringkas/tanks/[id]`) hanya
   berbagi 3 fungsi yang identik; tabel ambang sisa jam, lencana, dan panelnya sengaja bergaya
   berbeda. Menyatukannya mengubah tampilan dan menunggu keputusan pemilik. Halaman besar
   (`/dashboard/tanks/[id]`, `/dashboard/admin/users`) dan repositori besar sudah dipecah;
-- `auth/server/rate-limit.ts`, `auth/server/admin-telegram-notifications.ts`, dan
-  `devices/server/device-provisioning.ts` masih menjalankan kueri SQL sendiri, bukan lewat
-  repositori. Ketiganya dikecualikan dari
-  aturan ESLint layanan secara tertulis di `eslint.config.mjs` sampai SQL-nya dipindah;
-- `monitoring/server/deployment-probes.ts` (pemeriksaan kesiapan `/api/ready`) menguji
-  koneksi database secara langsung; dikecualikan secara tertulis dari aturan layanan;
+- dua peta interaktif (`operational-map.tsx` dan `simple-dashboard-map.tsx`) memuat rumus
+  proyeksi peta yang sama, kecuali satu hal: hanya peta ringkas yang membatasi lintang ke ±85°.
+  Menyatukannya ke satu modul berarti mengubah perilaku peta operasional untuk lintang di atas 85°;
+- teks halaman error dashboard dan detail tangki memuat petunjuk pengembang
+  (`MYSQL_DATABASE_URL`, `.env.local`, `pnpm dev`) yang ikut terlihat pengguna;
 - halaman depan memuat kode STO pilot (TPH, NJA, JTO), dan formulir pengajuan perangkat
   memakai contoh isian "STO Bangil", "Pasuruan", serta koordinat sekitar Pasuruan. Keduanya teks
   yang dilihat pengguna; menggantinya dengan contoh fiktif adalah perubahan tampilan (FTM-028);
