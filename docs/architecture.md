@@ -247,8 +247,8 @@ tanpa mengubah perilaku:
   (`status.ts` dan dua halaman detail tangki);
 - pola tampilan yang sama (kartu, format angka, warna status) ditulis ulang di
   banyak file;
-- beberapa halaman masih sangat besar, misalnya `/dashboard/tanks/[id]` (±1.500 baris) dan
-  `/dashboard/admin/users` (±1.200 baris); repositori pengajuan perangkat dan repositori
+- halaman `/dashboard/tanks/[id]` masih sangat besar (±1.500 baris); halaman
+  `/dashboard/admin/users` sudah dipecah ke `_components/`; repositori pengajuan perangkat dan repositori
   akun sudah dipecah menurut tanggung jawab;
 - `auth/server/rate-limit.ts`, `auth/server/admin-telegram-notifications.ts`, dan
   `devices/server/device-provisioning.ts` masih menjalankan kueri SQL sendiri, bukan lewat

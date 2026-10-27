@@ -50,6 +50,9 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Halaman manajemen pengguna admin (±1.200 baris) dipecah: filter, lencana, tombol aksi, daftar
+  pengajuan akses, dan pembacaan filter dari URL pindah ke `admin/users/_components/`. Halaman kini
+  ±530 baris. Teks komponen tidak berubah; tampilan sama.
 - Repositori akun (`mysql-auth-repository.ts`, ±1.700 baris) dipecah menurut tanggung jawab
   ke `auth/server/repositories/accounts/` (pengguna, sesi, administrasi pengguna, pengajuan akses,
   token, Telegram, audit). Teks deklarasi dan SQL tidak berubah; berkas lama menjadi pintu
