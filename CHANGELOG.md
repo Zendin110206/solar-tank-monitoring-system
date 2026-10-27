@@ -11,6 +11,8 @@ dirilis ke `main`.
 
 ### Ditambahkan
 
+- Tes integrasi MySQL untuk rate limit (batas, kunci ember di-hash, jendela waktu) dan pembuatan
+  perangkat otomatis (pembuatan, kiriman ulang, pembatalan transaksi bila gagal).
 - Kit UI dasar di `src/components/ui/`: `Card` (24 kartu), `StatusPill` (5 lencana status),
   `FormErrorMessage` dan `ActionMessage` (10 kotak pesan), serta kelas tombol utama dan
   sekunder (8 tombol). HTML yang dihasilkan sama persis; tampilan tidak berubah.
@@ -50,6 +52,9 @@ dirilis ke `main`.
 
 ### Diubah
 
+- SQL yang masih dijalankan empat layanan (rate limit, notifikasi Telegram admin, pembuatan perangkat
+  otomatis, pemeriksaan `/api/ready`) dipindah ke repositori. Pengecualian aturan lapisan di
+  `eslint.config.mjs` dihapus. Teks SQL dan urutan langkah tidak berubah.
 - Tampilan error dashboard dan detail tangki (`error.tsx`) yang kembar kecuali teksnya kini memakai satu
   komponen `src/components/dashboard/dashboard-route-error.tsx`, setara `dashboard-route-loading.tsx`. Teks
   dan HTML tidak berubah.

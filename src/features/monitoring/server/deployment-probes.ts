@@ -2,7 +2,6 @@ import "server-only";
 
 import { publicEnv } from "@/lib/config/public-env";
 import { serverEnv } from "@/lib/config/server-env";
-import type { RowDataPacket } from "mysql2/promise";
 
 import {
   canLogOtpInDevelopment,
@@ -24,10 +23,8 @@ import {
 } from "@/features/devices/server/device-provisioning";
 import { isGlobalDeviceKeyFallbackAllowed } from "@/features/devices/server/device-key";
 import { getDevicePackageEncryptionKey } from "@/features/devices/server/firmware-package";
-import {
-  checkMysqlConnection,
-  getMysqlPool,
-} from "@/lib/database/mysql-connection";
+import { checkAuthTelegramSchemaFromMysql } from "@/features/auth/server/auth-readiness";
+import { checkMysqlConnection } from "./repositories/mysql-health-repository";
 import {
   checkMonitoringLocationTaxonomySchemaFromMysql,
   countMonitoringReferenceRowsFromMysql,
@@ -209,21 +206,7 @@ async function checkAuthTelegramSchemaReadiness(): Promise<DeploymentCheck> {
   const startedAtMs = Date.now();
 
   try {
-    const pool = getMysqlPool();
-    const [rows] = await pool.execute<Array<RowDataPacket & { count: number }>>(
-      `SELECT COUNT(*) AS count
-         FROM information_schema.statistics
-        WHERE table_schema = DATABASE()
-          AND table_name = 'auth_users'
-          AND index_name = 'uniq_auth_users_telegram_chat_id'
-          AND non_unique = 0
-          AND column_name = 'telegram_chat_id'
-          AND seq_in_index = 1`,
-    );
-
-    if (Number(rows[0]?.count ?? 0) !== 1) {
-      throw new Error("Unique index Telegram binding belum tersedia.");
-    }
+    await checkAuthTelegramSchemaFromMysql();
 
     return {
       name: "mysql-auth-telegram",

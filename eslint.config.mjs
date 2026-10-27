@@ -48,18 +48,7 @@ const eslintConfig = defineConfig([
   // repositori modul lain tertangkap pola di bawah. Folder repositories/ dikecualikan.
   {
     files: ["src/features/*/server/**/*.{ts,tsx}"],
-    ignores: [
-      "src/features/*/server/repositories/**",
-      // Pengecualian sementara: dua layanan auth ini masih menjalankan kueri SQL sendiri
-      // lewat koneksi database bersama. SQL-nya dipindah ke repositori di paket perapian
-      // berkas (lihat docs/architecture.md, bagian penyimpangan); hapus baris ini setelahnya.
-      "src/features/auth/server/admin-telegram-notifications.ts",
-      "src/features/auth/server/rate-limit.ts",
-      // Pembuatan perangkat otomatis dari kiriman pertama juga masih menjalankan SQL sendiri.
-      "src/features/devices/server/device-provisioning.ts",
-      // Pemeriksaan kesiapan (/api/ready) memang menguji koneksi database secara langsung.
-      "src/features/monitoring/server/deployment-probes.ts",
-    ],
+    ignores: ["src/features/*/server/repositories/**"],
     rules: {
       "no-restricted-imports": [
         "error",

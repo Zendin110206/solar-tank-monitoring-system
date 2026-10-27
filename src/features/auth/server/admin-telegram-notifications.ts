@@ -1,9 +1,5 @@
 import "server-only";
 
-import type { RowDataPacket } from "mysql2/promise";
-
-import { getMysqlPool } from "@/lib/database/mysql-connection";
-
 import type { RegisterAccessPayload } from "../domain/auth-validation";
 import {
   getAppBaseUrl,
@@ -12,11 +8,8 @@ import {
   type TelegramAdminTopic,
 } from "./auth-config";
 import { sendTelegramMessage } from "./auth-telegram";
+import { listActiveAdminTelegramChatIds } from "./repositories/mysql-auth-repository";
 import { formatDateTimeJakarta } from "@/lib/format";
-
-type AdminTelegramRow = RowDataPacket & {
-  telegram_chat_id: string | null;
-};
 
 export type AdminTelegramNotifyResult = {
   attempted: number;
@@ -60,26 +53,6 @@ export function buildAdminTelegramUrl(
   }
 
   return url.toString();
-}
-
-export async function listActiveAdminTelegramChatIds(): Promise<string[]> {
-  const pool = getMysqlPool();
-  const [rows] = await pool.execute<AdminTelegramRow[]>(
-    `
-      SELECT telegram_chat_id
-      FROM auth_users
-      WHERE role = 'admin'
-        AND status = 'active'
-        AND telegram_chat_id IS NOT NULL
-        AND telegram_verified_at IS NOT NULL
-      ORDER BY updated_at DESC
-      LIMIT 20
-    `,
-  );
-
-  return rows
-    .map((row) => row.telegram_chat_id?.trim())
-    .filter((chatId): chatId is string => Boolean(chatId));
 }
 
 export async function sendAdminTelegramNotification(

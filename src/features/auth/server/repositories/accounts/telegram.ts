@@ -120,3 +120,46 @@ export async function completeTelegramBindingInMysql({
     connection.release();
   }
 }
+
+type AdminTelegramRow = RowDataPacket & {
+  telegram_chat_id: string | null;
+};
+
+export async function listActiveAdminTelegramChatIds(): Promise<string[]> {
+  const pool = getMysqlPool();
+  const [rows] = await pool.execute<AdminTelegramRow[]>(
+    `
+      SELECT telegram_chat_id
+      FROM auth_users
+      WHERE role = 'admin'
+        AND status = 'active'
+        AND telegram_chat_id IS NOT NULL
+        AND telegram_verified_at IS NOT NULL
+      ORDER BY updated_at DESC
+      LIMIT 20
+    `,
+  );
+
+  return rows
+    .map((row) => row.telegram_chat_id?.trim())
+    .filter((chatId): chatId is string => Boolean(chatId));
+}
+
+// Pastikan indeks unik pengikatan Telegram (migrasi 008) sudah ada; melempar error bila belum.
+export async function checkAuthTelegramSchemaFromMysql(): Promise<void> {
+  const pool = getMysqlPool();
+  const [rows] = await pool.execute<Array<RowDataPacket & { count: number }>>(
+    `SELECT COUNT(*) AS count
+         FROM information_schema.statistics
+        WHERE table_schema = DATABASE()
+          AND table_name = 'auth_users'
+          AND index_name = 'uniq_auth_users_telegram_chat_id'
+          AND non_unique = 0
+          AND column_name = 'telegram_chat_id'
+          AND seq_in_index = 1`,
+  );
+
+  if (Number(rows[0]?.count ?? 0) !== 1) {
+    throw new Error("Unique index Telegram binding belum tersedia.");
+  }
+}
