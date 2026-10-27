@@ -9,12 +9,12 @@ import {
   hashDownloadToken,
   renderDeviceConfigHeader,
   sanitizeFirmwareFileSegment,
-} from "../lib/firmware-package";
+} from "../server/firmware-package";
 import type {
   MonitoringDeviceRequest,
   MonitoringFirmwareTemplate,
   MonitoringHardwareProfile,
-} from "../types/monitoring";
+} from "@/features/monitoring/types/monitoring";
 
 const FIRMWARE_TEMPLATE: MonitoringFirmwareTemplate = {
   displayName: "SolarTank ESP8266 Ultrasonic",

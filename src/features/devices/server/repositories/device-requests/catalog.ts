@@ -4,7 +4,7 @@ import { getMysqlPool } from "@/lib/database/mysql-connection";
 import type {
   MonitoringFirmwareTemplate,
   MonitoringHardwareProfile,
-} from "../../../types/monitoring";
+} from "@/features/monitoring/types/monitoring";
 import { rowToFirmwareTemplate, rowToHardwareProfile } from "./row-mappers";
 import type { FirmwareTemplateRow, HardwareProfileRow } from "./types";
 import type { PoolConnection } from "mysql2/promise";

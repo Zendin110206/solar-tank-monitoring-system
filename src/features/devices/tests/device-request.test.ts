@@ -7,12 +7,12 @@ import {
   evaluateDeviceRequestCapacity,
   getDeviceRequestStatusLabel,
   validateDeviceRequestDraft,
-} from "../lib/device-request";
+} from "../domain/device-request";
 import type {
   DeviceRequestDraft,
   MonitoringFirmwareTemplate,
   MonitoringHardwareProfile,
-} from "../types/monitoring";
+} from "@/features/monitoring/types/monitoring";
 
 const firmwareTemplate: MonitoringFirmwareTemplate = {
   id: "firmware-template-esp8266-ultrasonic-v1",

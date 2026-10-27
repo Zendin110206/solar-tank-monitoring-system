@@ -3,8 +3,8 @@ import "server-only";
 import {
   getDevicePackageMaxDownloads,
   hashDownloadToken,
-} from "../../../lib/firmware-package";
-import type { MonitoringFirmwarePackage } from "../../../types/monitoring";
+} from "../../firmware-package";
+import type { MonitoringFirmwarePackage } from "@/features/monitoring/types/monitoring";
 import { rowToFirmwarePackage } from "./row-mappers";
 import { formatMysqlDateTime } from "./shared";
 import type { FirmwarePackageRow } from "./types";

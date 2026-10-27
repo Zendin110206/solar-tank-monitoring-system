@@ -5,7 +5,7 @@ import {
   sendAdminTelegramNotification,
   type AdminTelegramNotifyResult,
 } from "@/features/auth/server/admin-telegram-notifications";
-import type { MonitoringDeviceRequest } from "../types/monitoring";
+import type { MonitoringDeviceRequest } from "@/features/monitoring/types/monitoring";
 
 function formatOptionalCoordinate(value: number | undefined): string {
   return typeof value === "number" ? String(value) : "-";

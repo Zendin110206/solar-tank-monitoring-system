@@ -6,7 +6,7 @@ import {
   decryptFirmwarePackage,
   getDevicePackageMaxDownloads,
   hashDownloadToken,
-} from "../../../lib/firmware-package";
+} from "../../firmware-package";
 import { getMysqlPool } from "@/lib/database/mysql-connection";
 import { insertProvisioningEvent } from "./events";
 import { createPackageForRequest } from "./package-generation";

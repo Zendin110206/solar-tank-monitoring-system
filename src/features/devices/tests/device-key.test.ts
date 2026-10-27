@@ -5,7 +5,7 @@ import {
   isGlobalDeviceKeyFallbackAllowed,
   verifyDeviceKey,
   verifyDeviceKeyHash,
-} from "../lib/device-key";
+} from "../server/device-key";
 
 describe("device key security", () => {
   it("creates strong random device keys for firmware packages", () => {

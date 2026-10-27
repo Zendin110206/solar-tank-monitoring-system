@@ -5,11 +5,11 @@ import { Clock3, Database, Search, ShieldCheck } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { createAdminActionCsrfToken } from "@/features/auth/server/auth-csrf";
 import { requirePageAdmin } from "@/features/auth/server/auth-guards";
-import { getDeviceRequestStatusLabel } from "@/features/monitoring/lib/device-request";
+import { getDeviceRequestStatusLabel } from "@/features/devices/domain/device-request";
 import {
   listDeviceRequestsForAdmin as listDeviceRequestsForAdminFromMysql,
   listDeviceHardwareProfiles as listHardwareProfilesFromMysql,
-} from "@/features/monitoring/server/device-request-service";
+} from "@/features/devices/server/device-request-service";
 import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
 import type {
   DeviceRequestStatus,

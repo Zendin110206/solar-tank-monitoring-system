@@ -17,13 +17,13 @@ import {
   isProductionLikeEnvironment,
   shouldRequireAdminOtp,
   shouldRequireEmailVerificationForApproval,
-} from "../../auth/server/auth-config";
+} from "@/features/auth/server/auth-config";
 import {
   getExpectedProvisioningKey,
   isDeviceAutoProvisioningEnabled,
-} from "../lib/device-provisioning";
-import { isGlobalDeviceKeyFallbackAllowed } from "../lib/device-key";
-import { getDevicePackageEncryptionKey } from "../lib/firmware-package";
+} from "@/features/devices/server/device-provisioning";
+import { isGlobalDeviceKeyFallbackAllowed } from "@/features/devices/server/device-key";
+import { getDevicePackageEncryptionKey } from "@/features/devices/server/firmware-package";
 import {
   checkMysqlConnection,
   getMysqlPool,

@@ -2,7 +2,7 @@ import "server-only";
 
 import { serverEnv } from "@/lib/config/server-env";
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
-import type { Device } from "../types/monitoring";
+import type { Device } from "@/features/monitoring/types/monitoring";
 
 const DEVICE_KEY_HASH_PREFIX = "sha256:";
 const DEVICE_KEY_PREFIX = "stk";

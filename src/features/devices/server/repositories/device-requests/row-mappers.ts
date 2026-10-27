@@ -5,7 +5,7 @@ import {
   DEFAULT_WILAYAH_LABEL,
   normalizeRegionalLabel,
   normalizeWilayahLabel,
-} from "../../../domain/location-taxonomy";
+} from "@/features/monitoring/domain/location-taxonomy";
 import type {
   Device,
   DeviceRequestStatus,
@@ -22,7 +22,7 @@ import type {
   Site,
   Tank,
   TankShape,
-} from "../../../types/monitoring";
+} from "@/features/monitoring/types/monitoring";
 import type {
   DeviceRequestRow,
   FirmwarePackageRow,

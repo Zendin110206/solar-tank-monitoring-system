@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { Device, Reading, Site, Tank } from "../types/monitoring";
-import { hashDeviceKey } from "../lib/device-key";
+import { hashDeviceKey } from "@/features/devices/server/device-key";
 import { ingestTelemetry } from "../server/ingest-telemetry";
 import { getMonitoringReferenceData } from "../server/monitoring-registry";
 import { saveMonitoringReading } from "../server/monitoring-storage";
-import { activateApprovedDeviceOnFirstPingFromMysql } from "../lib/mysql-device-request-repository";
+import { activateApprovedDeviceOnFirstPingFromMysql } from "@/features/devices/server/repositories/mysql-device-request-repository";
 
 // Tes karakterisasi jalur aktivasi kiriman pertama dan perangkat nonaktif pada
 // mode MySQL. Database diganti tiruan; yang dikunci adalah keputusan ingest.
@@ -14,9 +14,12 @@ vi.mock("../server/monitoring-registry", () => ({
   getMonitoringReferenceData: vi.fn(),
 }));
 
-vi.mock("../lib/mysql-device-request-repository", () => ({
-  activateApprovedDeviceOnFirstPingFromMysql: vi.fn(),
-}));
+vi.mock(
+  "@/features/devices/server/repositories/mysql-device-request-repository",
+  () => ({
+    activateApprovedDeviceOnFirstPingFromMysql: vi.fn(),
+  }),
+);
 
 vi.mock("../server/monitoring-storage", async (importOriginal) => {
   const original =

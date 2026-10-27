@@ -50,6 +50,10 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Modul baru `devices` (`src/features/devices/`) berisi pengajuan perangkat, pembuatan perangkat
+  dari kiriman pertama, kunci perangkat, paket firmware, email paket, notifikasi admin, repositori
+  pengajuan, dan tesnya. Isi berkas tidak berubah selain alamat impor. Penerimaan data kini
+  mengaktifkan perangkat lewat layanan `devices`. Impor antar-modul memakai alias `@/features/...`.
 - Modul `monitoring` memakai bentuk folder ADR 0011: rumus dan view model di `domain/`,
   layanan di `server/`, kueri SQL di `server/repositories/`. Koneksi database bersama pindah
   ke `src/lib/database/mysql-connection.ts`. Isi berkas tidak berubah selain alamat impor.

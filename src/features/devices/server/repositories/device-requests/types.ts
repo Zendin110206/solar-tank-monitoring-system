@@ -7,7 +7,7 @@ import type {
   MonitoringFirmwarePackage,
   Site,
   Tank,
-} from "../../../types/monitoring";
+} from "@/features/monitoring/types/monitoring";
 import type { RowDataPacket } from "mysql2/promise";
 
 export type FirmwareTemplateRow = RowDataPacket & {

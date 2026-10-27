@@ -8,12 +8,12 @@ import {
   createDownloadToken,
   createFirmwarePackageBundle,
   encryptFirmwarePackage,
-} from "../lib/firmware-package";
+} from "../server/firmware-package";
 import type {
   MonitoringDeviceRequest,
   MonitoringFirmwareTemplate,
   MonitoringHardwareProfile,
-} from "../types/monitoring";
+} from "@/features/monitoring/types/monitoring";
 
 // Tes karakterisasi kontrak perangkat v1: paket firmware untuk masukan yang
 // sama harus menghasilkan berkas yang sama persis. Nilai acak (kunci enkripsi,

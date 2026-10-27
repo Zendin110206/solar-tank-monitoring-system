@@ -5,7 +5,7 @@ import {
   rowToFirmwarePackage,
   rowToFirmwareTemplate,
   rowToHardwareProfile,
-} from "../lib/mysql-device-request-repository";
+} from "../server/repositories/mysql-device-request-repository";
 
 describe("mysql device request repository mappers", () => {
   it("maps firmware template rows into safe domain objects", () => {
