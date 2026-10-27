@@ -151,13 +151,13 @@ describe("auth validation", () => {
         fullName: "Operator Monitoring",
         username: "operator_1",
         email: "Operator@Example.com",
-        phone: "0822-3163-9644",
+        phone: "0811-0000-0001",
         password: "Password12345",
         confirmPassword: "Password12345",
       }),
     ).toMatchObject({
       email: "operator@example.com",
-      phone: "+6282231639644",
+      phone: "+6281100000001",
       username: "operator_1",
     });
   });

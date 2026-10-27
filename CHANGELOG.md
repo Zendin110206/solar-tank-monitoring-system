@@ -50,6 +50,7 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Data uji nomor telepon memakai nomor yang jelas fiktif (`0811-0000-0001`).
 - Halaman detail tangki admin `/dashboard/tanks/[id]` (±1.500 baris) dipecah ke
   `tanks/[tankId]/_components/` (data detail, tabel ambang sisa jam, visual tangki, panel,
   tabel pembacaan, format). Teks komponen tidak berubah; tampilan sama.
