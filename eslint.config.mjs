@@ -72,8 +72,9 @@ const eslintConfig = defineConfig([
                 "Layanan tidak memakai repositori atau koneksi database modul lain; panggil layanan modul itu (ADR 0011).",
             },
             {
-              // Koneksi database bersama hanya dipakai repositori.
-              group: ["@/lib/database/*"],
+              // Koneksi database bersama hanya dipakai repositori, baik lewat alias
+              // @/lib/database/... maupun jalur relatif ../../lib/database/...
+              regex: "(^@|^(\\.\\./)+)/?lib/database/",
               message:
                 "Koneksi database hanya dipakai repositori di server/repositories/ (ADR 0011).",
             },
@@ -104,10 +105,14 @@ const eslintConfig = defineConfig([
                 "next/headers",
                 "server-only",
                 "@/lib/config/*",
-                "@/lib/database/*",
               ],
               message:
                 "domain/ hanya berisi logika murni tanpa I/O; pindahkan bagian ini ke server/ (ADR 0011).",
+            },
+            {
+              regex: "(^@|^(\\.\\./)+)/?lib/(database|config)/",
+              message:
+                "domain/ tidak memakai database atau pengaturan; pindahkan bagian ini ke server/ (ADR 0011).",
             },
           ],
         },

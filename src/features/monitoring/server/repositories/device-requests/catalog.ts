@@ -1,6 +1,6 @@
 import "server-only";
 
-import { getMysqlPool } from "../../../../../lib/database/mysql-connection";
+import { getMysqlPool } from "@/lib/database/mysql-connection";
 import type {
   MonitoringFirmwareTemplate,
   MonitoringHardwareProfile,

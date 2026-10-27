@@ -16,7 +16,7 @@ import {
   normalizeWilayahLabel,
 } from "../domain/location-taxonomy";
 import { getMonitoringStorageDriver } from "../server/monitoring-storage";
-import { getMysqlPool } from "../../../lib/database/mysql-connection";
+import { getMysqlPool } from "@/lib/database/mysql-connection";
 import { toFiniteNumber } from "../domain/number";
 import { extractPayloadTankConfig } from "../domain/reading-tank-config";
 

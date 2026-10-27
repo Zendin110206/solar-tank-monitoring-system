@@ -7,7 +7,7 @@ import {
   getDevicePackageMaxDownloads,
   hashDownloadToken,
 } from "../../../lib/firmware-package";
-import { getMysqlPool } from "../../../../../lib/database/mysql-connection";
+import { getMysqlPool } from "@/lib/database/mysql-connection";
 import { insertProvisioningEvent } from "./events";
 import { createPackageForRequest } from "./package-generation";
 import {

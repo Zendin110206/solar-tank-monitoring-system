@@ -27,7 +27,7 @@ import { getDevicePackageEncryptionKey } from "../lib/firmware-package";
 import {
   checkMysqlConnection,
   getMysqlPool,
-} from "../../../lib/database/mysql-connection";
+} from "@/lib/database/mysql-connection";
 import {
   checkMonitoringLocationTaxonomySchemaFromMysql,
   countMonitoringReferenceRowsFromMysql,

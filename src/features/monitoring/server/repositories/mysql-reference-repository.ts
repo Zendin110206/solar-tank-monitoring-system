@@ -7,7 +7,7 @@ import {
   normalizeRegionalLabel,
   normalizeWilayahLabel,
 } from "../../domain/location-taxonomy";
-import { getMysqlPool } from "../../../../lib/database/mysql-connection";
+import { getMysqlPool } from "@/lib/database/mysql-connection";
 
 type SiteRow = RowDataPacket & {
   id: string;

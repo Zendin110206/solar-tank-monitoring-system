@@ -1,7 +1,7 @@
 import "server-only";
 
 import { type PoolConnection, type RowDataPacket } from "mysql2/promise";
-import { getMysqlPool } from "../../../../lib/database/mysql-connection";
+import { getMysqlPool } from "@/lib/database/mysql-connection";
 import type {
   Reading,
   ReadingQuality,

@@ -6,7 +6,7 @@ import type {
   RowDataPacket,
 } from "mysql2/promise";
 
-import { getMysqlPool } from "../../../lib/database/mysql-connection";
+import { getMysqlPool } from "@/lib/database/mysql-connection";
 
 const RESET_MONITORING_DEVICE_DATA_TABLES = [
   "monitoring_ingest_events",

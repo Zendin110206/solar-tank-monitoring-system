@@ -4,7 +4,7 @@ const mocks = vi.hoisted(() => ({
   query: vi.fn(),
 }));
 
-vi.mock("../../../lib/database/mysql-connection", () => ({
+vi.mock("@/lib/database/mysql-connection", () => ({
   getMysqlPool: () => ({ query: mocks.query }),
 }));
 
