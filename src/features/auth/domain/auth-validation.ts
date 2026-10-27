@@ -42,11 +42,6 @@ export type ResendVerificationPayload = {
   identity: string;
   captchaToken: string | null;
 };
-
-export type TelegramBindPayload = {
-  token: string;
-};
-
 export function normalizeIdentity(value: unknown): string {
   return String(value ?? "")
     .trim()
@@ -265,17 +260,4 @@ export function parseResendVerificationPayload(
     identity,
     captchaToken: parseOptionalCaptchaToken(record.captchaToken),
   };
-}
-
-export function parseTelegramBindPayload(
-  payload: unknown,
-): TelegramBindPayload {
-  const record = (payload ?? {}) as Record<string, unknown>;
-  const token = String(record.token ?? "").trim();
-
-  if (!token) {
-    throw new Error("Token Telegram tidak valid.");
-  }
-
-  return { token };
 }

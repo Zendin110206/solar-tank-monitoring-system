@@ -190,11 +190,6 @@ export function parseReadingExportRange(
 
   return READING_EXPORT_RANGE_ALIASES[value.trim().toLowerCase()] ?? null;
 }
-
-export function getReadingExportRangeLabel(rangeKey: ReadingExportRangeKey) {
-  return getChartRange(rangeKey).label;
-}
-
 export function buildReadingExportPeriod(
   readings: Reading[],
   rangeKey: ReadingExportRangeKey = "day",

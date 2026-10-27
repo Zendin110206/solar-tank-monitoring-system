@@ -20,5 +20,3 @@ export const STATUS_DOT_CLASS = {
   warning: "bg-amber-500",
   danger: "bg-red-500",
 } as const;
-
-export type StatusTone = keyof typeof STATUS_BADGE_CLASS;

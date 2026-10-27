@@ -5,7 +5,7 @@ import type { NextRequest, NextResponse } from "next/server";
 
 import type { AuthSessionUser } from "../types/auth";
 import { getAuthCookieName, shouldUseSecureCookies } from "./auth-config";
-import { getSessionUserFromToken, logoutSession } from "./auth-service";
+import { getSessionUserFromToken } from "./auth-service";
 
 export async function getCurrentSessionUser(): Promise<AuthSessionUser | null> {
   const cookieStore = await cookies();
@@ -48,15 +48,4 @@ export function clearSessionCookie(response: NextResponse) {
     path: "/",
     maxAge: 0,
   });
-}
-
-export async function revokeCurrentSession() {
-  const currentUser = await getCurrentSessionUser();
-
-  if (currentUser) {
-    await logoutSession(currentUser.sessionId);
-  }
-
-  const cookieStore = await cookies();
-  cookieStore.delete(getAuthCookieName());
 }

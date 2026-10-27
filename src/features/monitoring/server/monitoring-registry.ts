@@ -27,13 +27,6 @@ export type MonitoringReferenceResult = {
   reference: MonitoringReferenceData;
   source: MonitoringRegistrySource;
 };
-
-export type MonitoringDeviceBundle = {
-  site: Site;
-  tank: Tank;
-  device: Device;
-};
-
 function cloneReferenceData(
   reference: MonitoringReferenceData,
 ): MonitoringReferenceData {
@@ -106,33 +99,4 @@ export async function getMonitoringReferenceDataWithSource(): Promise<Monitoring
 export async function getMonitoringReferenceData(): Promise<MonitoringReferenceData> {
   const result = await getMonitoringReferenceDataWithSource();
   return result.reference;
-}
-
-export async function findMonitoringDeviceBundleByIdentifier(
-  identifier: string,
-): Promise<MonitoringDeviceBundle | null> {
-  const reference = await getMonitoringReferenceData();
-  const device =
-    reference.devices.find(
-      (item) => item.id === identifier || item.code === identifier,
-    ) ?? null;
-
-  if (!device) {
-    return null;
-  }
-
-  const tank =
-    reference.tanks.find((item) => item.id === device.tankId) ?? null;
-  const site =
-    reference.sites.find((item) => item.id === device.siteId) ?? null;
-
-  if (!tank || !site) {
-    return null;
-  }
-
-  return {
-    site,
-    tank,
-    device,
-  };
 }

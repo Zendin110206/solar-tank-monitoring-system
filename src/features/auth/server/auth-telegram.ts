@@ -57,19 +57,6 @@ export function verifyTelegramWebhookSecret(headers: Headers): boolean {
 
   return headers.get("x-telegram-bot-api-secret-token") === expected;
 }
-
-export function parseTelegramPrivateMessage(
-  payload: unknown,
-): TelegramMessage | null {
-  const message = parseTelegramMessage(payload);
-
-  if (!message || message.chatType !== "private") {
-    return null;
-  }
-
-  return message;
-}
-
 export function parseTelegramMessage(payload: unknown): TelegramMessage | null {
   const update = payload as TelegramUpdate;
   const message = update.message;

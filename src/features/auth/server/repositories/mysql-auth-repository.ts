@@ -997,22 +997,6 @@ export async function listPendingAccessRequests(): Promise<
 
   return rows.map(rowToAccessRequest);
 }
-
-export async function listAuthUsers(): Promise<AuthSafeUser[]> {
-  const pool = getMysqlPool();
-  const [rows] = await pool.execute<AuthUserRow[]>(
-    `SELECT id, email, username, full_name, phone, role, status, password_hash,
-            password_changed_at, password_reset_required_at, email_verified_at,
-            telegram_chat_id, telegram_verified_at, failed_login_count,
-            locked_until, last_login_at
-       FROM auth_users
-      ORDER BY created_at DESC
-      LIMIT 200`,
-  );
-
-  return rows.map(rowToSafeUser);
-}
-
 function getAuthUserDirectoryPageSize(pageSize: number | undefined): number {
   if (!Number.isInteger(pageSize) || !pageSize) {
     return DEFAULT_AUTH_USER_PAGE_SIZE;
@@ -1684,45 +1668,4 @@ export async function listAuthAuditEvents(): Promise<AuthAuditEvent[]> {
   );
 
   return rows.map(rowToAuditEvent);
-}
-
-export async function createAdminUserIfMissing({
-  email,
-  username,
-  fullName,
-  password,
-}: {
-  email: string;
-  username: string;
-  fullName: string;
-  password: string;
-}): Promise<{ created: boolean; userId: string }> {
-  const pool = getMysqlPool();
-  const [rows] = await pool.execute<AuthUserRow[]>(
-    `SELECT id, email, username, full_name, phone, role, status, password_hash,
-            password_changed_at, password_reset_required_at, email_verified_at,
-            telegram_chat_id, telegram_verified_at, failed_login_count,
-            locked_until, last_login_at
-       FROM auth_users
-      WHERE email = ? OR username = ?
-      LIMIT 1`,
-    [email, username],
-  );
-  const existing = rows[0];
-
-  if (existing) {
-    return { created: false, userId: existing.id };
-  }
-
-  const userId = createAuthId("usr");
-  const passwordHash = await hashPassword(password);
-
-  await pool.execute<ResultSetHeader>(
-    `INSERT INTO auth_users
-      (id, email, username, full_name, role, status, password_hash, password_changed_at, email_verified_at)
-     VALUES (?, ?, ?, ?, 'admin', 'active', ?, UTC_TIMESTAMP(3), UTC_TIMESTAMP(3))`,
-    [userId, email, username, fullName, passwordHash],
-  );
-
-  return { created: true, userId };
 }

@@ -21,7 +21,6 @@ import {
   approveDeviceRequestAction,
   cleanupDeviceRequestsAction,
   rejectDeviceRequestAction,
-  resetMonitoringDeviceDataAction,
   reissueDevicePackageAction,
   resendDevicePackageAction,
   revokeDeviceProvisioningAction,
@@ -32,9 +31,7 @@ const INITIAL_STATE: DeviceRequestAdminActionState = {
   status: "idle",
   message: "",
 };
-const CLEANUP_SELECTED_CONFIRMATION = "BERSIHKAN PILIHAN DEVICE";
 const CLEANUP_SINGLE_CONFIRMATION = "BERSIHKAN ITEM DEVICE";
-const RESET_CONFIRMATION = "BERSIHKAN SEMUA DATA DEVICE";
 
 function ActionMessage({ state }: { state: DeviceRequestAdminActionState }) {
   if (state.status === "idle" || !state.message) {
@@ -396,110 +393,6 @@ export function CleanupDeviceRequestForm({
         variant="dangerOutline"
       >
         Hapus data
-      </ConfirmedSubmitButton>
-      <ActionMessage state={state} />
-    </form>
-  );
-}
-
-export function CleanupSelectedDeviceRequestsForm({
-  csrfToken,
-  formId,
-}: {
-  csrfToken: string;
-  formId: string;
-}) {
-  const [state, formAction] = useActionState(
-    cleanupDeviceRequestsAction,
-    INITIAL_STATE,
-  );
-
-  return (
-    <form
-      action={formAction}
-      className="grid gap-3 lg:grid-cols-[1fr_auto] lg:items-end"
-      id={formId}
-    >
-      <input name="csrfToken" type="hidden" value={csrfToken} />
-      <input name="cleanupMode" type="hidden" value="selected" />
-      <label className="grid gap-2 text-sm font-semibold text-zinc-950">
-        Hapus pengajuan yang dicentang
-        <input
-          autoComplete="off"
-          className="h-11 rounded-lg border border-amber-200 bg-white px-3 text-sm font-semibold text-zinc-950 outline-none transition placeholder:text-zinc-400 focus:border-amber-500 focus:ring-4 focus:ring-amber-600/15"
-          name="confirmation"
-          placeholder={CLEANUP_SELECTED_CONFIRMATION}
-          required
-        />
-      </label>
-      <ConfirmedSubmitButton
-        confirmation={{
-          confirmLabel: "Ya, bersihkan pilihan",
-          description:
-            "Semua pengajuan yang dicentang beserta data perangkat terkait akan dibersihkan sesuai aturan keamanan relasi data.",
-          eyebrow: "Pembersihan data terpilih",
-          title: "Bersihkan semua pengajuan yang dicentang?",
-          tone: "warning",
-        }}
-        icon="trash"
-        variant="warning"
-      >
-        Bersihkan pilihan
-      </ConfirmedSubmitButton>
-      <p className="text-xs leading-5 text-zinc-500 lg:col-span-2">
-        Centang satu atau beberapa pengajuan, ketik tepat{" "}
-        <span className="font-semibold">{CLEANUP_SELECTED_CONFIRMATION}</span>,
-        lalu bersihkan. Sistem hanya menghapus data yang terkait pilihan.
-      </p>
-      <div className="lg:col-span-2">
-        <ActionMessage state={state} />
-      </div>
-    </form>
-  );
-}
-
-export function ResetMonitoringDeviceDataForm({
-  csrfToken,
-}: {
-  csrfToken: string;
-}) {
-  const [state, formAction] = useActionState(
-    resetMonitoringDeviceDataAction,
-    INITIAL_STATE,
-  );
-
-  return (
-    <form action={formAction} className="grid gap-3">
-      <input name="csrfToken" type="hidden" value={csrfToken} />
-      <label className="grid gap-2 text-sm font-semibold text-zinc-950">
-        Frasa konfirmasi
-        <input
-          autoComplete="off"
-          className="h-11 rounded-lg border border-red-200 bg-white px-3 text-sm font-semibold text-zinc-950 outline-none transition placeholder:text-zinc-400 focus:border-red-500 focus:ring-4 focus:ring-red-600/15"
-          name="confirmation"
-          placeholder={RESET_CONFIRMATION}
-          required
-        />
-      </label>
-      <p className="text-xs leading-5 text-zinc-500">
-        Ketik tepat <span className="font-semibold">{RESET_CONFIRMATION}</span>{" "}
-        untuk membersihkan semua data STO, tangki, perangkat, reading,
-        pengajuan, paket firmware, dan event provisioning. Akun pengguna, admin,
-        template firmware, dan profil hardware tidak ikut dihapus.
-      </p>
-      <ConfirmedSubmitButton
-        confirmation={{
-          confirmLabel: "Ya, bersihkan semuanya",
-          description:
-            "Seluruh data operasional STO, tangki, perangkat, reading, pengajuan, paket firmware, dan event provisioning akan dihapus. Akun pengguna dan template tetap dipertahankan.",
-          eyebrow: "Reset data operasional",
-          title: "Bersihkan semua data operasional perangkat?",
-          tone: "danger",
-        }}
-        icon="trash"
-        variant="danger"
-      >
-        Bersihkan semua data
       </ConfirmedSubmitButton>
       <ActionMessage state={state} />
     </form>
