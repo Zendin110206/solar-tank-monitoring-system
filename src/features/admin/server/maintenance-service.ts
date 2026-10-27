@@ -7,4 +7,4 @@ export {
   cleanupMonitoringTanksInMysql as cleanupMonitoringTanks,
   resetMonitoringDeviceDataInMysql as resetMonitoringDeviceData,
   resetMonitoringReadingsInMysql as resetMonitoringReadings,
-} from "../lib/mysql-maintenance-repository";
+} from "./repositories/mysql-maintenance-repository";

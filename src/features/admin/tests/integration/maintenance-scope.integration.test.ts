@@ -2,14 +2,14 @@ import type { RowDataPacket } from "mysql2/promise";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { resetMonitoringReadings as resetMonitoringReadingsInMysql } from "../../server/maintenance-service";
-import { saveMonitoringReadingToMysql } from "../../server/repositories/mysql-reading-repository";
-import type { Reading } from "../../types/monitoring";
+import { saveMonitoringReadingToMysql } from "@/features/monitoring/server/repositories/mysql-reading-repository";
+import type { Reading } from "@/features/monitoring/types/monitoring";
 import {
   createTestDatabase,
   insertFictionalLocation,
   insertFictionalUser,
   type TestDatabase,
-} from "./mysql-test-database";
+} from "@/features/monitoring/tests/integration/mysql-test-database";
 
 // Tes integrasi cakupan aksi reset pembacaan. Mengunci perilaku saat ini:
 // reset per tangki hanya menyentuh tangki itu, reset semua menghapus seluruh

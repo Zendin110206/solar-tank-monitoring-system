@@ -64,13 +64,13 @@ Penjelasan diagram:
 
 ## Modul
 
-| Modul                     | Isi utama                                                                                                                                                                                                                                                                                                 |
-| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/features/monitoring` | Perhitungan domain (volume, status, sisa jam genset, kapasitas, konsumsi), normalisasi kiriman perangkat, registry lokasi/tangki/perangkat, penyimpanan pembacaan, pengajuan perangkat, paket firmware, perawatan data, pemeriksaan kesiapan, ekspor CSV, komponen dashboard, peta, grafik, dan visual 3D |
-| `src/features/auth`       | Akun, sesi, peran, OTP admin, CSRF (pengaman agar aksi tidak bisa dipicu dari situs lain), captcha, email, pembatas jumlah permintaan, audit, dan Telegram (binding, perintah, notifikasi admin)                                                                                                          |
-| `src/features/helpdesk`   | Widget bantuan di web dan relay pesan ke topik Telegram                                                                                                                                                                                                                                                   |
-| `src/components`          | Kerangka halaman bersama (header, footer, menu, halaman akun) dan logo                                                                                                                                                                                                                                    |
-| `src/lib`                 | Utilitas umum (pesan error yang aman ditampilkan), katalog pengaturan `src/lib/config/`, dan koneksi database bersama `src/lib/database/`                                                                                                                                                                 |
+| Modul                     | Isi utama                                                                                                                                                                                                                                                                       |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/features/monitoring` | Perhitungan domain (volume, status, sisa jam genset, kapasitas, konsumsi), normalisasi kiriman perangkat, registry lokasi/tangki/perangkat, penyimpanan pembacaan, penerimaan data perangkat, pemeriksaan kesiapan, ekspor CSV, komponen dashboard, peta, grafik, dan visual 3D |
+| `src/features/auth`       | Akun, sesi, peran, OTP admin, CSRF (pengaman agar aksi tidak bisa dipicu dari situs lain), captcha, email, pembatas jumlah permintaan, audit, dan Telegram (binding, perintah, notifikasi admin)                                                                                |
+| `src/features/helpdesk`   | Widget bantuan di web dan relay pesan ke topik Telegram                                                                                                                                                                                                                         |
+| `src/components`          | Kerangka halaman bersama (header, footer, menu, halaman akun) dan logo                                                                                                                                                                                                          |
+| `src/lib`                 | Utilitas umum (pesan error yang aman ditampilkan), katalog pengaturan `src/lib/config/`, dan koneksi database bersama `src/lib/database/`                                                                                                                                       |
 
 Di dalam modul, setiap jenis berkas punya foldernya sendiri:
 
@@ -132,8 +132,14 @@ Modul `devices` memakai tipe data dan rumus dari `monitoring` (tangki, lokasi, a
 layanan `devices`, bukan langsung ke repositorinya. Impor antar-modul selalu memakai alias
 `@/features/<modul>/...`; impor di dalam modul memakai jalur relatif.
 
-Berkas perawatan data masih berada di `monitoring/lib/` dan `monitoring/server/` dan
-dipindah ke modul `admin` berikutnya.
+```text
+src/features/admin/
+├── server/maintenance-service.ts      reset pembacaan, pembersihan data uji, reset data perangkat
+│   └── repositories/mysql-maintenance-repository.ts   kueri SQL perawatan data
+└── tests/                            termasuk tes MySQL cakupan reset pembacaan
+```
+
+Semua modul kini memakai bentuk folder ADR 0011; folder `lib/` lama tidak ada lagi.
 
 ## Lapisan dan arah ketergantungan
 
@@ -179,7 +185,7 @@ Pintu layanan lain dengan pola yang sama:
 
 - `src/features/auth/server/`: audit keamanan akun, profil, dan manajemen pengguna;
 - `src/features/helpdesk/server/helpdesk-service.ts`: route bantuan web;
-- `src/features/monitoring/server/maintenance-service.ts`: aksi perawatan data
+- `src/features/admin/server/maintenance-service.ts`: aksi perawatan data
   (reset pembacaan, pembersihan data uji).
 
 Sejak Oktober 2026 tidak ada lagi berkas di `src/app` yang mengimpor repositori,

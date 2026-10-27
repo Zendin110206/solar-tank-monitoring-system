@@ -26,7 +26,7 @@ import {
   cleanupMonitoringTanksInMysql,
   resetMonitoringDeviceDataInMysql,
   resetMonitoringReadingsInMysql,
-} from "../lib/mysql-maintenance-repository";
+} from "../server/repositories/mysql-maintenance-repository";
 
 describe("mysql maintenance repository", () => {
   beforeEach(() => {
