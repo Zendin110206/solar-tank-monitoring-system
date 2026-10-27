@@ -17,8 +17,8 @@ import type { DashboardMonitoringSite } from "../domain/dashboard-view-model";
 const sites: SimpleDashboardSite[] = [
   {
     code: "TPH",
-    name: "STO Tosari Pasuruan",
-    areaLabel: "Pasuruan Barat",
+    name: "STO Contoh Dahlia",
+    areaLabel: "Area Contoh Barat",
     regionalLabel: "TREG 5",
     wilayahLabel: "TIF 3",
     tankId: "tank-tph",
@@ -32,8 +32,8 @@ const sites: SimpleDashboardSite[] = [
   },
   {
     code: "NJA",
-    name: "STO Nguling Jaya",
-    areaLabel: "Pasuruan Timur",
+    name: "STO Contoh Bakung",
+    areaLabel: "Area Contoh Timur",
     regionalLabel: "TREG 5",
     wilayahLabel: "TIF 3",
     tankId: "tank-nja",
@@ -47,8 +47,8 @@ const sites: SimpleDashboardSite[] = [
   },
   {
     code: "SKP",
-    name: "STO Sukorejo Pasuruan",
-    areaLabel: "Pasuruan Barat",
+    name: "STO Contoh Cemara",
+    areaLabel: "Area Contoh Barat",
     regionalLabel: "TREG 4",
     wilayahLabel: "TIF 3",
     tankId: "tank-skp",
@@ -123,8 +123,8 @@ describe("simple dashboard model", () => {
 
   it("mengambil daftar area unik untuk filter", () => {
     expect(getSimpleDashboardAreas(sites)).toEqual([
-      "Pasuruan Barat",
-      "Pasuruan Timur",
+      "Area Contoh Barat",
+      "Area Contoh Timur",
     ]);
   });
 
@@ -146,7 +146,7 @@ describe("simple dashboard model", () => {
 
     expect(
       filterSimpleDashboardSites(sites, {
-        query: "sukorejo",
+        query: "cemara",
         status: "all",
         area: SIMPLE_DASHBOARD_ALL_AREAS,
         regional: SIMPLE_DASHBOARD_ALL_REGIONALS,
@@ -192,7 +192,7 @@ describe("simple dashboard model", () => {
       filterSimpleDashboardSites(sites, {
         query: "",
         status: "all",
-        area: "Pasuruan Barat",
+        area: "Area Contoh Barat",
         regional: SIMPLE_DASHBOARD_ALL_REGIONALS,
         wilayah: SIMPLE_DASHBOARD_ALL_WILAYAHS,
       }).map((site) => site.code),

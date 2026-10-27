@@ -60,7 +60,7 @@ describe("mysql device request repository mappers", () => {
       site_name: "STO TPH",
       regional_label: "TREG 5",
       wilayah_label: "TIF 3",
-      area_label: "Pasuruan",
+      area_label: "Area Contoh",
       latitude: "-7.7200",
       longitude: "112.8800",
       device_code: "device-tph-main",

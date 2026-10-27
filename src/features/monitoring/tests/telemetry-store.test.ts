@@ -197,7 +197,7 @@ describe("telemetry store", () => {
         device: "demo-auto-01",
         site_code: "AUTO",
         site_name: "STO Auto",
-        area_label: "Pasuruan",
+        area_label: "Area Contoh",
         lat: -7.651,
         lng: 112.901,
         tank_shape: "rectangular",

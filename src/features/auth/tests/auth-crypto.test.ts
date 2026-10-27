@@ -98,11 +98,11 @@ describe("auth validation", () => {
   it("menormalisasi payload login", () => {
     expect(
       parseLoginPayload({
-        identity: " ADMIN@CONTOH.CO.ID ",
+        identity: " ADMIN@CONTOH.EXAMPLE ",
         password: "secret",
       }),
     ).toEqual({
-      identity: "admin@contoh.co.id",
+      identity: "admin@contoh.example",
       password: "secret",
     });
   });
@@ -174,11 +174,11 @@ describe("auth validation", () => {
   it("memvalidasi payload lupa password secara generik", () => {
     expect(
       parseForgotPasswordPayload({
-        identity: " OPERATOR@CONTOH.CO.ID ",
+        identity: " OPERATOR@CONTOH.EXAMPLE ",
         captchaToken: " token ",
       }),
     ).toEqual({
-      identity: "operator@contoh.co.id",
+      identity: "operator@contoh.example",
       captchaToken: "token",
     });
   });
