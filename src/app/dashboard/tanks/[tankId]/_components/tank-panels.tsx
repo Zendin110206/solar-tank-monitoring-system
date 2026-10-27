@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { TankLocationMap } from "@/features/monitoring/components/tank-location-map";
 import { formatNumber } from "@/lib/format";
+import { SectionHeader } from "@/components/ui/section-header";
 import {
   getRuntimeLevelParameter,
   runtimeLevelParameters,
@@ -12,13 +13,13 @@ import {
   formatPercent,
   formatRuntimeHour,
 } from "./tank-detail-format";
-import { SectionHeading } from "./tank-detail-ui";
 
 export function LocationPanel({ tank }: { tank: TankDetail }) {
   return (
     <article className="animate-soft-fade overflow-hidden rounded-lg border border-zinc-200 bg-white shadow-sm">
       <div className="flex flex-col gap-4 border-b border-zinc-200 p-5 sm:flex-row sm:items-start sm:justify-between">
-        <SectionHeading
+        <SectionHeader
+          limitDescriptionWidth
           label="Lokasi manual"
           title="Titik STO pada peta manual"
           description="Koordinat ditampilkan sebagai input manual agar tidak bergantung pada modul GPS."
@@ -129,7 +130,8 @@ export function ConfigReviewPanel({ tank }: { tank: TankDetail }) {
       className={`mb-5 animate-soft-fade rounded-lg border p-5 shadow-sm ${tone}`}
     >
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <SectionHeading
+        <SectionHeader
+          limitDescriptionWidth
           label="Review config"
           title={review.summaryLabel}
           description="Payload perangkat boleh membawa konfigurasi tangki, tetapi tetap dibandingkan dengan registry agar perubahan besar tidak dipercaya diam-diam."
@@ -206,7 +208,8 @@ export function RuntimeParameterPanel({ tank }: { tank: TankDetail }) {
 
   return (
     <Card className="animate-soft-fade">
-      <SectionHeading
+      <SectionHeader
+        limitDescriptionWidth
         label="Sisa jam"
         title="Level parameter runtime"
         description="Kategori ini membaca sisa runtime genset agar operator tahu posisi tangki terhadap batas operasional."
@@ -292,7 +295,8 @@ export function TankConfigurationPanel({ tank }: { tank: TankDetail }) {
 
   return (
     <Card id="konfigurasi" className="animate-soft-fade">
-      <SectionHeading
+      <SectionHeader
+        limitDescriptionWidth
         label="Konfigurasi"
         title="Spesifikasi tangki dan perangkat"
         description="Ringkasan config yang dipakai UI untuk memilih visual, menghitung volume, dan menentukan ambang operasional."

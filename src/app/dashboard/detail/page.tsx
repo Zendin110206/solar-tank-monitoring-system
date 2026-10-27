@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { SectionHeader } from "@/components/ui/section-header";
 import { DashboardMapOverview } from "@/features/monitoring/components/dashboard-map-overview";
 import { LiveClock } from "@/features/monitoring/components/live-clock";
 import { LiveRefreshControl } from "@/features/monitoring/components/live-refresh-control";
@@ -163,28 +164,6 @@ function StatusBadge({ status }: { status: SiteStatus }) {
     <StatusPill badgeClass={meta.badge} dotClass={meta.dot}>
       {meta.label}
     </StatusPill>
-  );
-}
-
-function SectionHeader({
-  label,
-  title,
-  description,
-}: {
-  label: string;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div>
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-red-600">
-        {label}
-      </p>
-      <h2 className="mt-2 text-2xl font-semibold tracking-normal text-zinc-950">
-        {title}
-      </h2>
-      <p className="mt-2 text-sm leading-6 text-zinc-500">{description}</p>
-    </div>
   );
 }
 

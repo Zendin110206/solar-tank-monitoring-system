@@ -13,30 +13,6 @@ export function StatusBadge({ status }: { status: TankStatus }) {
   );
 }
 
-export function SectionHeading({
-  label,
-  title,
-  description,
-}: {
-  label: string;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div>
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-red-600">
-        {label}
-      </p>
-      <h2 className="mt-2 text-2xl font-semibold tracking-normal text-zinc-950">
-        {title}
-      </h2>
-      <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-500">
-        {description}
-      </p>
-    </div>
-  );
-}
-
 export function MetricCard({
   label,
   value,
