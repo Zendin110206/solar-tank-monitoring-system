@@ -50,6 +50,9 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Visual 3D tangki (`tank-rectangular-scene-3d.tsx`, ±870 baris) dipecah ke `monitoring/components/tank-3d/`
+  (tangki balok, tangki silinder horizontal, tampilan cadangan tanpa WebGL, pembantu three.js). Teks
+  deklarasi tidak berubah; berkas lama menjadi pintu ekspor client dengan ekspor yang sama.
 - `auth/server/auth-service.ts` (±860 baris) dipecah per alur ke `auth/server/auth-flows/` (login,
   pendaftaran, kata sandi, verifikasi email, sesi, Telegram). Teks deklarasi tidak berubah; berkas lama
   menjadi pintu ekspor dengan daftar ekspor yang sama.
