@@ -145,6 +145,12 @@ src/features/admin/
 
 Semua modul kini memakai bentuk folder ADR 0011; folder `lib/` lama tidak ada lagi.
 
+Komponen yang hanya dipakai satu halaman disimpan di folder `_components/` di samping
+`page.tsx` halaman itu, misalnya `src/app/_components/` (bagian-bagian halaman depan) dan
+`src/app/dashboard/tanks/[tankId]/_components/`. Awalan `_` membuat Next.js tidak
+menjadikannya alamat halaman (_private folder_). Komponen yang dipakai beberapa halaman
+tetap di `components/` modulnya atau di `src/components/`.
+
 ## Lapisan dan arah ketergantungan
 
 Arah yang dituju (ADR [0002](decisions/0002-satu-repositori-modular-monolith.md),
