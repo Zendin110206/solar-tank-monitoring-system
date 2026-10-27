@@ -50,6 +50,9 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Halaman depan `src/app/page.tsx` (±860 baris) dipecah per bagian ke `src/app/_components/`
+  (header, hero, fitur, cara kerja, ajakan masuk, footer). Isi setiap bagian dan data contohnya tidak
+  berubah; `page.tsx` tinggal memeriksa sesi dan menyusun bagian-bagian itu.
 - Visual 3D tangki (`tank-rectangular-scene-3d.tsx`, ±870 baris) dipecah ke `monitoring/components/tank-3d/`
   (tangki balok, tangki silinder horizontal, tampilan cadangan tanpa WebGL, pembantu three.js). Teks
   deklarasi tidak berubah; berkas lama menjadi pintu ekspor client dengan ekspor yang sama.
