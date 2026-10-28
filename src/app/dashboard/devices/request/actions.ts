@@ -17,18 +17,11 @@ import type {
   LoadPowerUnit,
   TankShape,
 } from "@/features/monitoring/types/monitoring";
-
-const USER_DEVICE_REQUEST_PATH = "/dashboard/devices/request";
-const ADMIN_DEVICE_REQUEST_PATH = "/dashboard/admin/device-requests";
-const DEVICE_REQUEST_SCHEMA_COLUMNS = [
-  "device_sensor_type",
-  "regional_label",
-  "wilayah_label",
-  "load_value",
-  "load_unit",
-  "diesel_engine_capacity_kva",
-  "cos_phi",
-] as const;
+import { isDeviceRequestSchemaError } from "@/features/devices/server/device-request-schema-error";
+import {
+  ADMIN_DEVICE_REQUEST_PATH,
+  USER_DEVICE_REQUEST_PATH,
+} from "@/features/devices/domain/device-request-constants";
 
 export type DeviceRequestFormState = {
   status: "idle" | "success" | "error";
@@ -140,21 +133,6 @@ function getResultState(
     requestCode: result.request.requestCode,
     issues: result.warnings,
   };
-}
-
-function isDeviceRequestSchemaError(error: unknown): boolean {
-  if (!(error instanceof Error)) {
-    return false;
-  }
-
-  const message = error.message.toLowerCase();
-
-  return (
-    message.includes("unknown column") &&
-    DEVICE_REQUEST_SCHEMA_COLUMNS.some((columnName) =>
-      message.includes(columnName),
-    )
-  );
 }
 
 function getErrorState(error: unknown): DeviceRequestFormState {

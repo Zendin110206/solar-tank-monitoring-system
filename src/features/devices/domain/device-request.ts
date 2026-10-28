@@ -19,8 +19,9 @@ import {
 } from "@/features/monitoring/domain/location-taxonomy";
 import { roundTo } from "@/features/monitoring/domain/number";
 
-const DEFAULT_LOW_LEVEL_PERCENT = 30;
-const DEFAULT_CRITICAL_LEVEL_PERCENT = 15;
+// Ambang awal tangki baru (persen isi), dipakai pengajuan perangkat dan pembuatan perangkat otomatis.
+export const DEFAULT_LOW_LEVEL_PERCENT = 30;
+export const DEFAULT_CRITICAL_LEVEL_PERCENT = 15;
 const DEFAULT_DEVICE_SENSOR_TYPE: DeviceSensorType = "fuel";
 const GENSET_LOAD_LITER_PER_KWH = 0.21;
 const DEFAULT_CAPACITY_TOLERANCE_PERCENT = 5;

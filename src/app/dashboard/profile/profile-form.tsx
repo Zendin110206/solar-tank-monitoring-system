@@ -10,6 +10,7 @@ import {
   updateCurrentUserProfileAction,
   type ProfileActionState,
 } from "./actions";
+import { getRoleLabel } from "@/features/auth/domain/role-label";
 
 type ProfileFormProps = {
   user: AuthSafeUser;
@@ -29,10 +30,6 @@ function splitFullName(fullName: string) {
   const lastName = parts.join(" ");
 
   return { firstName, lastName };
-}
-
-function getRoleLabel(role: AuthSafeUser["role"]) {
-  return role === "admin" ? "Admin" : "User";
 }
 
 function SubmitButton() {

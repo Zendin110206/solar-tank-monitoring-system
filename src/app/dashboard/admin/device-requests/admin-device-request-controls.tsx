@@ -26,12 +26,12 @@ import {
   revokeDeviceProvisioningAction,
   type DeviceRequestAdminActionState,
 } from "./actions";
+import { CLEANUP_SINGLE_CONFIRMATION } from "@/features/devices/domain/device-request-constants";
 
 const INITIAL_STATE: DeviceRequestAdminActionState = {
   status: "idle",
   message: "",
 };
-const CLEANUP_SINGLE_CONFIRMATION = "BERSIHKAN ITEM DEVICE";
 
 function ActionMessage({ state }: { state: DeviceRequestAdminActionState }) {
   if (state.status === "idle" || !state.message) {

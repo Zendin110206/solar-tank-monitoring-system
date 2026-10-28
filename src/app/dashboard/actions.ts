@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { verifyAdminActionCsrfToken } from "@/features/auth/server/auth-csrf";
+import { assertValidAdminActionCsrf } from "@/features/auth/server/auth-csrf";
 import { requirePageAdmin } from "@/features/auth/server/auth-guards";
 import {
   cleanupMonitoringTanks as cleanupMonitoringTanksInMysql,
@@ -11,36 +11,16 @@ import {
 import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
 import { getRequiredFormValue } from "@/lib/http/form-data";
-
-const DELETE_TANK_CONFIRMATION = "HAPUS DATA STO";
-const RESET_TANK_READINGS_CONFIRMATION = "RESET READING STO";
-const RESET_ALL_READINGS_CONFIRMATION = "RESET SEMUA READING";
+import {
+  DELETE_TANK_CONFIRMATION,
+  RESET_ALL_READINGS_CONFIRMATION,
+  RESET_TANK_READINGS_CONFIRMATION,
+} from "@/features/admin/domain/maintenance-confirmations";
 
 export type DashboardAdminActionState = {
   status: "idle" | "success" | "error";
   message: string;
 };
-
-function assertValidAdminActionCsrf({
-  formData,
-  sessionId,
-}: {
-  formData: FormData;
-  sessionId: string;
-}) {
-  const csrfToken = String(formData.get("csrfToken") ?? "");
-
-  if (
-    !verifyAdminActionCsrfToken({
-      sessionId,
-      token: csrfToken,
-    })
-  ) {
-    throw new Error(
-      "Sesi admin tidak valid. Muat ulang halaman lalu coba lagi.",
-    );
-  }
-}
 
 function assertMysqlStorageIsReady() {
   if (getMonitoringStorageDriver() !== "mysql") {
