@@ -52,6 +52,11 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Fungsi yang disalin di modul monitoring kini ada di satu tempat: hitungan ubin peta
+  (`components/map-tiles.ts`), pembantu view model (`domain/view-model-helpers.ts`), hitungan hari
+  tampilan (`domain/display-day.ts`), bentuk tangki (`domain/tank-shape.ts`), serta `toNumber`/
+  `toBoolean` untuk repositori (`src/lib/database/row-values.ts`). Zona waktu tampilan diambil dari
+  `src/lib/format.ts`. Isi fungsinya tidak berubah.
 - Pembantu kecil yang tadinya disalin di beberapa berkas kini ada di satu tempat di `src/lib/`:
   `clamp`/`clampPercent`, `formatRuntimeHour`, `formatDateTimeOrDash`, `escapeHtml`, pengaturan SMTP,
   `getRequestIp`, `getClientKey`, `getStringPayloadValue`, dan `getRequiredFormValue`. Isi fungsinya

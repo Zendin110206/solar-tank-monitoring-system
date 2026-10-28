@@ -9,6 +9,7 @@ import type {
 } from "../../types/monitoring";
 import { buildMonitoringRollupWindow } from "../../domain/reading-rollup";
 import { selectLatestReadingPerTank } from "../../domain/latest-reading";
+import { toNumber } from "@/lib/database/row-values";
 
 const DEFAULT_MYSQL_READINGS_LIMIT = 1000;
 const DEFAULT_MYSQL_TANK_HISTORY_LIMIT = 10_000;
@@ -104,11 +105,6 @@ export function parseMysqlDateTimeAsUtc(value: Date | string): string {
   }
 
   return new Date(parsedTime).toISOString();
-}
-
-function toNumber(value: number | string | null): number {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function toOptionalNumber(value: number | string | null): number | undefined {

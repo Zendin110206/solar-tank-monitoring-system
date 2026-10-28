@@ -13,32 +13,16 @@ import {
   STATUS_DOT_CLASS,
 } from "@/components/ui/status-tone";
 import { clamp } from "@/lib/math";
-
-type LatLng = {
-  latitude: number;
-  longitude: number;
-};
-
-type WorldPixel = {
-  x: number;
-  y: number;
-};
-
-type Tile = {
-  key: string;
-  url: string;
-  left: number;
-  top: number;
-};
-
-type DragState = {
-  pointerId: number;
-  startX: number;
-  startY: number;
-  startCenterPixel: WorldPixel;
-};
-
-const TILE_SIZE = 256;
+import {
+  type DragState,
+  getWorldSize,
+  type LatLng,
+  type Tile,
+  TILE_SIZE,
+  type WorldPixel,
+  worldPixelToLatLng,
+  wrapTileX,
+} from "@/features/monitoring/components/map-tiles";
 const MAP_WIDTH = 1024;
 const MAP_HEIGHT = 560;
 const MIN_ZOOM = 9;
@@ -57,14 +41,6 @@ function isValidCoordinate(
   );
 }
 
-function wrapTileX(tileX: number, tilesPerAxis: number) {
-  return ((tileX % tilesPerAxis) + tilesPerAxis) % tilesPerAxis;
-}
-
-function getWorldSize(zoom: number) {
-  return TILE_SIZE * 2 ** zoom;
-}
-
 function latLngToWorldPixel(point: LatLng, zoom: number): WorldPixel {
   const latitude = clamp(point.latitude, -85, 85);
   const sinLatitude = Math.sin((latitude * Math.PI) / 180);
@@ -76,20 +52,6 @@ function latLngToWorldPixel(point: LatLng, zoom: number): WorldPixel {
   return {
     x: normalizedX * worldSize,
     y: normalizedY * worldSize,
-  };
-}
-
-function worldPixelToLatLng(pixel: WorldPixel, zoom: number): LatLng {
-  const worldSize = getWorldSize(zoom);
-  const normalizedX = pixel.x / worldSize - 0.5;
-  const normalizedY = 0.5 - pixel.y / worldSize;
-  const longitude = normalizedX * 360;
-  const latitude =
-    90 - (360 * Math.atan(Math.exp(-normalizedY * 2 * Math.PI))) / Math.PI;
-
-  return {
-    latitude: clamp(latitude, -85, 85),
-    longitude: ((longitude + 540) % 360) - 180,
   };
 }
 

@@ -246,7 +246,12 @@ Pembantu kecil yang dulu disalin di beberapa berkas kini ada di satu tempat:
 - `src/lib/html.ts`: `escapeHtml` untuk isi email;
 - `src/lib/email/smtp-config.ts`: `hasSmtpConfig`, `getSmtpPort`;
 - `src/lib/http/request.ts`: `getRequestIp`, `getClientKey`, `getStringPayloadValue`;
-- `src/lib/http/form-data.ts`: `getRequiredFormValue` untuk server action.
+- `src/lib/http/form-data.ts`: `getRequiredFormValue` untuk server action;
+- `src/lib/database/row-values.ts`: `toNumber`, `toBoolean` untuk repositori.
+
+Di modul monitoring, hitungan yang sama untuk dua peta ada di `components/map-tiles.ts`,
+pembantu view model di `domain/view-model-helpers.ts`, hitungan hari tampilan (zona Jakarta)
+di `domain/display-day.ts`, dan bentuk tangki dari kolom database di `domain/tank-shape.ts`.
 
 Semua pengaturan dibaca dari dua katalog di `src/lib/config/`:
 

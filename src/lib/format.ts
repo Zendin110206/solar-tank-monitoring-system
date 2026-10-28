@@ -3,7 +3,7 @@
 // tanggal sama di semua tempat. Modul ini murni (tanpa I/O), aman dipakai di browser.
 
 const LOCALE = "id-ID";
-const DISPLAY_TIME_ZONE = "Asia/Jakarta";
+export const DISPLAY_TIME_ZONE = "Asia/Jakarta";
 
 // Angka gaya Indonesia (titik ribuan, koma desimal). Tanpa maximumFractionDigits,
 // bawaan Intl dipakai: paling banyak 3 angka desimal.

@@ -4,6 +4,12 @@ import {
   type SimpleTankChartRange,
   type SimpleTankChartRangeKey,
 } from "./simple-tank-detail-model";
+import {
+  addDays,
+  parseTime,
+  startOfDisplayDay,
+} from "@/features/monitoring/domain/display-day";
+import { DISPLAY_TIME_ZONE } from "@/lib/format";
 
 const TANK_READING_CSV_HEADERS = [
   "id_reading",
@@ -35,10 +41,6 @@ const TANK_READING_CSV_HEADERS = [
   "persentase_max",
   "periode_unduhan",
 ] as const;
-
-const DISPLAY_TIME_ZONE = "Asia/Jakarta";
-const DISPLAY_TIME_ZONE_OFFSET_MS = 7 * 60 * 60 * 1000;
-const DAY_MS = 24 * 60 * 60 * 1000;
 
 export type ReadingExportRangeKey = SimpleTankChartRangeKey;
 
@@ -98,22 +100,6 @@ function sortReadingsByReceivedAt(readings: Reading[]): Reading[] {
       new Date(first.receivedAt).getTime() -
       new Date(second.receivedAt).getTime(),
   );
-}
-
-function parseTime(value: string) {
-  const time = Date.parse(value);
-  return Number.isFinite(time) ? time : null;
-}
-
-function startOfDisplayDay(time: number) {
-  const date = new Date(time + DISPLAY_TIME_ZONE_OFFSET_MS);
-  date.setUTCHours(0, 0, 0, 0);
-
-  return new Date(date.getTime() - DISPLAY_TIME_ZONE_OFFSET_MS);
-}
-
-function addDays(date: Date, days: number) {
-  return new Date(date.getTime() + days * DAY_MS);
 }
 
 function getChartRange(rangeKey: ReadingExportRangeKey) {
