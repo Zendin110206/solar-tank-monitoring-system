@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { TankLocationMap } from "@/features/monitoring/components/tank-location-map";
-import { formatNumber } from "@/lib/format";
+import { formatNumber, formatRuntimeHour } from "@/lib/format";
 import { SectionHeader } from "@/components/ui/section-header";
 import {
   getRuntimeLevelParameter,
@@ -11,7 +11,6 @@ import {
   formatConfigStatusLabel,
   formatMeasurement,
   formatPercent,
-  formatRuntimeHour,
 } from "./tank-detail-format";
 
 export function LocationPanel({ tank }: { tank: TankDetail }) {

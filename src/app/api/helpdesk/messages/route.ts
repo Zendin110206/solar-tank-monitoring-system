@@ -14,25 +14,10 @@ import {
   jsonOk,
   jsonTooManyRequests,
 } from "@/lib/http/json-response";
+import { getClientKey, getStringPayloadValue } from "@/lib/http/request";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-
-function getClientKey(request: NextRequest) {
-  return (
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    "unknown-ip"
-  );
-}
-
-function getStringPayloadValue(payload: unknown, key: string): string | null {
-  const value = String(
-    ((payload ?? {}) as Record<string, unknown>)[key] ?? "",
-  ).trim();
-
-  return value || null;
-}
 
 export async function GET(request: NextRequest) {
   try {

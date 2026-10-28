@@ -8,33 +8,12 @@ import {
   isProductionLikeEnvironment,
 } from "@/features/auth/server/auth-config";
 import { formatDateTimeJakarta } from "@/lib/format";
+import { escapeHtml } from "@/lib/html";
+import { getSmtpPort, hasSmtpConfig } from "@/lib/email/smtp-config";
 
 export type DevicePackageEmailDeliveryResult =
   | { delivered: true; delivery: "email" | "log" }
   | { delivered: false; delivery: "none"; reason: string };
-
-function getSmtpPort(): number {
-  const parsed = Number(serverEnv.SMTP_PORT);
-  return Number.isInteger(parsed) && parsed > 0 ? parsed : 587;
-}
-
-function hasSmtpConfig(): boolean {
-  return Boolean(
-    serverEnv.SMTP_HOST?.trim() &&
-    serverEnv.SMTP_USER?.trim() &&
-    serverEnv.SMTP_PASS?.trim() &&
-    serverEnv.SMTP_FROM?.trim(),
-  );
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
 
 function buildPackageEmailHtml({
   deviceCode,

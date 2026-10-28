@@ -5,14 +5,6 @@ import { type NextRequest } from "next/server";
 
 export type AuthRequestContext = Pick<NextRequest, "headers">;
 
-export function getRequestIp(request: AuthRequestContext): string | null {
-  return (
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    null
-  );
-}
-
 export function getRequestUserAgent(
   request: AuthRequestContext,
 ): string | null {

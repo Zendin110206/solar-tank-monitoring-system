@@ -7,6 +7,8 @@ import {
   canLogOtpInDevelopment,
   isProductionLikeEnvironment,
 } from "./auth-config";
+import { escapeHtml } from "@/lib/html";
+import { getSmtpPort, hasSmtpConfig } from "@/lib/email/smtp-config";
 
 type OtpDeliveryResult =
   | { delivered: true; delivery: "email" }
@@ -15,29 +17,6 @@ type OtpDeliveryResult =
 
 type EmailDeliveryResult = OtpDeliveryResult;
 type EmailTemplateKind = "otp" | "action";
-
-function getSmtpPort(): number {
-  const parsed = Number(serverEnv.SMTP_PORT);
-  return Number.isInteger(parsed) && parsed > 0 ? parsed : 587;
-}
-
-function hasSmtpConfig(): boolean {
-  return Boolean(
-    serverEnv.SMTP_HOST?.trim() &&
-    serverEnv.SMTP_USER?.trim() &&
-    serverEnv.SMTP_PASS?.trim() &&
-    serverEnv.SMTP_FROM?.trim(),
-  );
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
 
 function buildHtmlEmail({
   actionLabel,

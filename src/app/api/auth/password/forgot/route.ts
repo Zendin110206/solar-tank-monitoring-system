@@ -10,22 +10,15 @@ import {
   jsonOk,
   jsonTooManyRequests,
 } from "@/lib/http/json-response";
+import { getRequestIp } from "@/lib/http/request";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
-function getClientIp(request: NextRequest): string | null {
-  return (
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    null
-  );
-}
-
 export async function POST(request: NextRequest) {
   try {
     const payload = parseForgotPasswordPayload(await request.json());
-    const ip = getClientIp(request) ?? "unknown-ip";
+    const ip = getRequestIp(request) ?? "unknown-ip";
     const rateLimit = await checkRateLimit({
       key: `forgot-password:${ip}:${payload.identity}`,
       limit: 5,
@@ -41,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     const captcha = await verifyCaptchaToken({
       token: payload.captchaToken,
-      remoteIp: getClientIp(request),
+      remoteIp: getRequestIp(request),
     });
 
     if (!captcha.ok) {

@@ -64,13 +64,13 @@ Penjelasan diagram:
 
 ## Modul
 
-| Modul                     | Isi utama                                                                                                                                                                                                                                                                       |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/features/monitoring` | Perhitungan domain (volume, status, sisa jam genset, kapasitas, konsumsi), normalisasi kiriman perangkat, registry lokasi/tangki/perangkat, penyimpanan pembacaan, penerimaan data perangkat, pemeriksaan kesiapan, ekspor CSV, komponen dashboard, peta, grafik, dan visual 3D |
-| `src/features/auth`       | Akun, sesi, peran, OTP admin, CSRF (pengaman agar aksi tidak bisa dipicu dari situs lain), captcha, email, pembatas jumlah permintaan, audit, dan Telegram (binding, perintah, notifikasi admin)                                                                                |
-| `src/features/helpdesk`   | Widget bantuan di web dan relay pesan ke topik Telegram                                                                                                                                                                                                                         |
-| `src/components`          | Kerangka halaman bersama (header, footer, menu, halaman akun) dan logo                                                                                                                                                                                                          |
-| `src/lib`                 | Utilitas umum (pesan error yang aman ditampilkan), katalog pengaturan `src/lib/config/`, dan koneksi database bersama `src/lib/database/`                                                                                                                                       |
+| Modul                     | Isi utama                                                                                                                                                                                                                                                                               |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/features/monitoring` | Perhitungan domain (volume, status, sisa jam genset, kapasitas, konsumsi), normalisasi kiriman perangkat, registry lokasi/tangki/perangkat, penyimpanan pembacaan, penerimaan data perangkat, pemeriksaan kesiapan, ekspor CSV, komponen dashboard, peta, grafik, dan visual 3D         |
+| `src/features/auth`       | Akun, sesi, peran, OTP admin, CSRF (pengaman agar aksi tidak bisa dipicu dari situs lain), captcha, email, pembatas jumlah permintaan, audit, dan Telegram (binding, perintah, notifikasi admin)                                                                                        |
+| `src/features/helpdesk`   | Widget bantuan di web dan relay pesan ke topik Telegram                                                                                                                                                                                                                                 |
+| `src/components`          | Kerangka halaman bersama (header, footer, menu, halaman akun) dan logo                                                                                                                                                                                                                  |
+| `src/lib`                 | Utilitas umum: format angka/tanggal (`format.ts`), angka (`math.ts`), HTML aman (`html.ts`), pesan error yang aman ditampilkan, pembantu HTTP `src/lib/http/`, pengaturan SMTP `src/lib/email/`, katalog pengaturan `src/lib/config/`, dan koneksi database bersama `src/lib/database/` |
 
 Di dalam modul, setiap jenis berkas punya foldernya sendiri:
 
@@ -237,8 +237,16 @@ Warna status (lencana dan titik penanda) diambil dari satu peta,
 `neutral` abu-abu, `info` biru. Warna isi grafik dan hiasan tidak termasuk peta ini.
 
 Angka dan tanggal untuk teks yang dilihat pengguna ditulis lewat `src/lib/format.ts`
-(`formatNumber`, `formatDateTimeJakarta`), dipakai halaman, komponen, email, dan pesan
-Telegram.
+(`formatNumber`, `formatDateTimeJakarta`, `formatDateTimeOrDash`, `formatRuntimeHour`), dipakai
+halaman, komponen, email, dan pesan Telegram.
+
+Pembantu kecil yang dulu disalin di beberapa berkas kini ada di satu tempat:
+
+- `src/lib/math.ts`: `clamp`, `clampPercent`;
+- `src/lib/html.ts`: `escapeHtml` untuk isi email;
+- `src/lib/email/smtp-config.ts`: `hasSmtpConfig`, `getSmtpPort`;
+- `src/lib/http/request.ts`: `getRequestIp`, `getClientKey`, `getStringPayloadValue`;
+- `src/lib/http/form-data.ts`: `getRequiredFormValue` untuk server action.
 
 Semua pengaturan dibaca dari dua katalog di `src/lib/config/`:
 

@@ -10,9 +10,9 @@ import { getSafeErrorMessage } from "@/lib/safe-error-message";
 import { sendEmailVerificationForUserId } from "./email-verification";
 import {
   type AuthRequestContext,
-  getRequestIp,
   getRequestUserAgent,
 } from "./request-context";
+import { getRequestIp } from "@/lib/http/request";
 
 export async function submitAccessRequest(
   payload: RegisterAccessPayload,

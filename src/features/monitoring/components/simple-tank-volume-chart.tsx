@@ -9,6 +9,7 @@ import {
   type SimpleTankTrendByRange,
 } from "@/features/monitoring/domain/simple-tank-detail-model";
 import { formatNumber } from "@/lib/format";
+import { clamp } from "@/lib/math";
 
 type SimpleTankVolumeChartProps = {
   trends: SimpleTankTrendByRange;
@@ -20,10 +21,6 @@ const FALLBACK_CHART_SIZE = {
   width: 960,
   height: 288,
 };
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(Math.max(value, min), max);
-}
 
 function isDefined<T>(value: T | undefined): value is T {
   return value !== undefined;

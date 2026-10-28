@@ -20,6 +20,7 @@ import {
 } from "@/features/admin/server/maintenance-service";
 import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
+import { getRequiredFormValue } from "@/lib/http/form-data";
 
 const ADMIN_DEVICE_REQUEST_PATH = "/dashboard/admin/device-requests";
 const USER_DEVICE_REQUEST_PATH = "/dashboard/devices/request";
@@ -41,16 +42,6 @@ export type DeviceRequestAdminActionState = {
   message: string;
   downloadUrl?: string;
 };
-
-function getRequiredFormValue(formData: FormData, key: string): string {
-  const value = String(formData.get(key) ?? "").trim();
-
-  if (!value) {
-    throw new Error("Data aksi admin belum lengkap.");
-  }
-
-  return value;
-}
 
 function assertValidAdminActionCsrf({
   formData,

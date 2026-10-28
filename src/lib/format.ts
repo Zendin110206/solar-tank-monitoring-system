@@ -25,3 +25,19 @@ export function formatDateTimeJakarta(value: Date | string): string {
     timeZone: DISPLAY_TIME_ZONE,
   }).format(typeof value === "string" ? new Date(value) : value);
 }
+
+export function formatRuntimeHour(value: number | null) {
+  if (value === null || !Number.isFinite(value)) {
+    return "-";
+  }
+
+  return `${formatNumber(value, 2)} jam`;
+}
+
+export function formatDateTimeOrDash(value: string | null | undefined) {
+  if (!value) {
+    return "-";
+  }
+
+  return formatDateTimeJakarta(value);
+}

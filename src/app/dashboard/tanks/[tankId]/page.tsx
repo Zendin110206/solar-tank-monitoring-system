@@ -15,7 +15,7 @@ import {
   listMonitoringReadingsForTank,
 } from "@/features/monitoring/server/monitoring-storage";
 import { type ReadingValueSource } from "@/features/monitoring/types/monitoring";
-import { formatNumber } from "@/lib/format";
+import { formatNumber, formatRuntimeHour } from "@/lib/format";
 import {
   Activity,
   AlertTriangle,
@@ -42,7 +42,6 @@ import {
 import {
   formatConfigStatusLabel,
   formatMeasurement,
-  formatRuntimeHour,
   statusMeta,
 } from "./_components/tank-detail-format";
 import { MetricCard, StatusBadge } from "./_components/tank-detail-ui";

@@ -7,7 +7,7 @@ import { AdminActionForm } from "../admin-action-controls";
 import { listPendingAccessRequests } from "@/features/auth/server/user-admin-service";
 import { type AuthRole } from "@/features/auth/types/auth";
 import { Clock3, UserRound } from "lucide-react";
-import { formatDate } from "./users-page-state";
+import { formatDateTimeOrDash } from "@/lib/format";
 
 function getRoleLabel(role: AuthRole) {
   return role === "admin" ? "Admin" : "User";
@@ -70,7 +70,7 @@ export function PendingAccessRequests({
                         {getRoleLabel(request.requestedRole)}
                       </span>
                     </p>
-                    <p>Diajukan: {formatDate(request.createdAt)}</p>
+                    <p>Diajukan: {formatDateTimeOrDash(request.createdAt)}</p>
                     <p>
                       Email:{" "}
                       {request.user.emailVerifiedAt

@@ -1,9 +1,5 @@
 import * as THREE from "three";
 
-export function clamp(value: number, min: number, max: number) {
-  return Math.min(Math.max(value, min), max);
-}
-
 type WebGlContext = WebGLRenderingContext | WebGL2RenderingContext;
 
 export function createSafeWebGlRenderer(canvas: HTMLCanvasElement) {

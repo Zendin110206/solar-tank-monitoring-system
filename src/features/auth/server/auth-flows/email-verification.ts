@@ -21,10 +21,10 @@ import {
   type AuthRequestContext,
   buildAppUrl,
   buildTokenExpiry,
-  getRequestIp,
   getRequestUserAgent,
   isTokenUsable,
 } from "./request-context";
+import { getRequestIp } from "@/lib/http/request";
 
 export async function sendEmailVerificationForUserId({
   userId,

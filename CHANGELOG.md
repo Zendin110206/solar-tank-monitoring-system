@@ -52,6 +52,10 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Pembantu kecil yang tadinya disalin di beberapa berkas kini ada di satu tempat di `src/lib/`:
+  `clamp`/`clampPercent`, `formatRuntimeHour`, `formatDateTimeOrDash`, `escapeHtml`, pengaturan SMTP,
+  `getRequestIp`, `getClientKey`, `getStringPayloadValue`, dan `getRequiredFormValue`. Isi fungsinya
+  tidak berubah.
 - Data tes dan contoh dokumentasi tidak lagi memakai nama tempat sungguhan (Pasuruan, Tosari, Sukorejo,
   Nguling) dan domain email sungguhan; diganti "Area Contoh", "STO Contoh ...", dan `contoh.example`.
   Alias teknis seperti `tank-tph-main` tetap karena dipakai data contoh aplikasi.

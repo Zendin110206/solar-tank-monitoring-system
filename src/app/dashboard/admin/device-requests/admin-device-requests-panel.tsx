@@ -19,7 +19,7 @@ import {
   ResendDevicePackageForm,
   RevokeDeviceProvisioningForm,
 } from "./admin-device-request-controls";
-import { formatDateTimeJakarta, formatNumber } from "@/lib/format";
+import { formatDateTimeOrDash, formatNumber } from "@/lib/format";
 import { STATUS_BADGE_CLASS } from "@/components/ui/status-tone";
 
 type AdminDeviceRequestsPanelProps = {
@@ -42,14 +42,6 @@ const STATUS_LABELS: Record<DeviceRequestStatus, string> = {
   waiting_firmware_download: "Menunggu download firmware",
   waiting_first_valid_ping: "Menunggu perangkat online",
 };
-
-function formatDate(value: string | null | undefined) {
-  if (!value) {
-    return "-";
-  }
-
-  return formatDateTimeJakarta(value);
-}
 
 function formatOptionalNumber(value: number | null | undefined, suffix = "") {
   if (typeof value !== "number" || Number.isNaN(value)) {
@@ -219,7 +211,7 @@ function RequestDetailModal({
               {request.siteName}
             </h3>
             <p className="mt-1 text-sm text-zinc-500">
-              Diajukan {formatDate(request.createdAt)} oleh{" "}
+              Diajukan {formatDateTimeOrDash(request.createdAt)} oleh{" "}
               {request.requesterEmail}
             </p>
           </div>
@@ -319,7 +311,7 @@ function RequestDetailModal({
                     )}
                   </DetailItem>
                   <DetailItem label="Ditinjau">
-                    {formatDate(request.adminReviewedAt)}
+                    {formatDateTimeOrDash(request.adminReviewedAt)}
                   </DetailItem>
                 </dl>
               </section>
@@ -554,7 +546,7 @@ export function AdminDeviceRequestsPanel({
                       <RequestStatusBadge status={request.status} />
                     </td>
                     <td className="border-y border-zinc-200 px-3 py-3 text-zinc-600">
-                      {formatDate(request.createdAt)}
+                      {formatDateTimeOrDash(request.createdAt)}
                     </td>
                     <td className="rounded-r-lg border-y border-r border-zinc-200 px-3 py-3 text-right">
                       <button

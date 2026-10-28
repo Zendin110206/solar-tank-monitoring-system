@@ -19,10 +19,7 @@ import {
 import { type ParameterItem, type TankDetail } from "./tank-detail-data";
 import { formatMeasurement, formatPercent } from "./tank-detail-format";
 import { StatusBadge } from "./tank-detail-ui";
-
-function clampPercent(value: number) {
-  return Math.min(Math.max(value, 0), 100);
-}
+import { clampPercent } from "@/lib/math";
 
 export function TankVisual({ tank }: { tank: TankDetail }) {
   const isRectangular = tank.shape === "rectangular";

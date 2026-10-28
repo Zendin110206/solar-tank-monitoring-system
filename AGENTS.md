@@ -61,6 +61,8 @@ src/app → layanan modul → repositori (SQL) → koneksi database
   `src/components/ui/status-tone.ts`, bukan kelas warna yang ditulis ulang.
 - Angka dan tanggal yang dilihat pengguna ditulis lewat `src/lib/format.ts`; jangan membuat
   `Intl.NumberFormat` atau format tanggal baru di halaman.
+- Sebelum menulis pembantu kecil (batas angka, escape HTML, IP klien, isian formulir), cek
+  `src/lib/` dulu; jangan menyalin fungsi yang sudah ada.
 - Route handler membalas JSON lewat `src/lib/http/json-response.ts` (`jsonOk`, `jsonError`,
   `jsonTooManyRequests`, `jsonCaughtError`) agar bentuk `{ ok, data | error }` seragam.
 - Modul yang mengakses database, email, berkas, jaringan luar, rahasia, atau data permintaan

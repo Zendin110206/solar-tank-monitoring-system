@@ -16,9 +16,9 @@ import {
 import {
   type AuthRequestContext,
   buildTokenExpiry,
-  getRequestIp,
   getRequestUserAgent,
 } from "./request-context";
+import { getRequestIp } from "@/lib/http/request";
 
 export async function startTelegramBinding({
   user,

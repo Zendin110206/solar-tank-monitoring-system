@@ -34,6 +34,7 @@ import {
   getMonitoringStorageDriver,
   type MonitoringStorageDriver,
 } from "./monitoring-storage";
+import { hasSmtpConfig } from "@/lib/email/smtp-config";
 
 const SERVICE_NAME = "solar-tank-monitoring-system";
 
@@ -225,15 +226,6 @@ async function checkAuthTelegramSchemaReadiness(): Promise<DeploymentCheck> {
       latencyMs: getElapsedMs(startedAtMs),
     };
   }
-}
-
-function hasSmtpConfig(): boolean {
-  return Boolean(
-    serverEnv.SMTP_HOST?.trim() &&
-    serverEnv.SMTP_USER?.trim() &&
-    serverEnv.SMTP_PASS?.trim() &&
-    serverEnv.SMTP_FROM?.trim(),
-  );
 }
 
 function checkAuthSecretReadiness(): DeploymentCheck {

@@ -29,7 +29,6 @@ import {
   UserFilterControls,
 } from "./_components/user-filter-controls";
 import {
-  formatDate,
   getPageNumbers,
   getPageSize,
   getParam,
@@ -42,6 +41,7 @@ import {
   PAGE_SIZE_OPTIONS,
   type UsersUrlState,
 } from "./_components/users-page-state";
+import { formatDateTimeOrDash } from "@/lib/format";
 
 export const metadata: Metadata = {
   title: "Manajemen Pengguna | FTM",
@@ -362,10 +362,10 @@ export default async function AdminUsersPage({
                             <StatusBadge status={user.status} />
                           </td>
                           <td className="whitespace-nowrap px-4 py-2.5 text-xs text-zinc-600">
-                            {formatDate(user.lastLoginAt)}
+                            {formatDateTimeOrDash(user.lastLoginAt)}
                           </td>
                           <td className="whitespace-nowrap px-4 py-2.5 text-xs text-zinc-600">
-                            {formatDate(user.createdAt)}
+                            {formatDateTimeOrDash(user.createdAt)}
                           </td>
                           <td className="min-w-[14rem] whitespace-nowrap px-4 py-2.5">
                             <UserActionStack
@@ -417,7 +417,7 @@ export default async function AdminUsersPage({
                             Login
                           </p>
                           <p className="mt-1 leading-5">
-                            {formatDate(user.lastLoginAt)}
+                            {formatDateTimeOrDash(user.lastLoginAt)}
                           </p>
                         </div>
                         <div>
@@ -425,7 +425,7 @@ export default async function AdminUsersPage({
                             Dibuat
                           </p>
                           <p className="mt-1 leading-5">
-                            {formatDate(user.createdAt)}
+                            {formatDateTimeOrDash(user.createdAt)}
                           </p>
                         </div>
                       </div>

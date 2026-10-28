@@ -11,6 +11,7 @@ import {
   STATUS_DOT_CLASS,
 } from "@/components/ui/status-tone";
 import { StatusPill } from "@/components/ui/status-pill";
+import { clamp } from "@/lib/math";
 
 export type OperationalMapSite = {
   code: string;
@@ -122,10 +123,6 @@ function isValidCoordinate(
     typeof site.longitude === "number" &&
     Number.isFinite(site.longitude)
   );
-}
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value));
 }
 
 function wrapTileX(tileX: number, tilesPerAxis: number) {
