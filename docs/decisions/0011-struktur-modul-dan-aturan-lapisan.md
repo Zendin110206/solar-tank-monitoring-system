@@ -218,3 +218,9 @@ mengikuti aturan 2 tanpa pengecualian:
 
 Teks SQL dan urutan langkah tidak berubah. Sebelum pemindahan, rate limit dan pembuatan
 perangkat otomatis diberi tes integrasi MySQL lebih dulu.
+
+### 28 Oktober 2026 — impor di dalam modul dicek ESLint
+
+Impor di dalam satu modul memakai jalur relatif, sedangkan alias `@/features/<modul>/...` hanya
+untuk modul lain. Aturan ini kini dicek ESLint (`no-restricted-syntax`, satu blok per modul),
+sehingga tidak menimpa opsi `no-restricted-imports` untuk aturan lapisan.

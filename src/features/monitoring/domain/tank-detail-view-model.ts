@@ -32,7 +32,7 @@ import {
   DEFAULT_NOW,
   formatAgeLabel,
   getLatestReading,
-} from "@/features/monitoring/domain/view-model-helpers";
+} from "./view-model-helpers";
 
 export type TankDetailStatus = "online" | "warning" | "critical" | "offline";
 

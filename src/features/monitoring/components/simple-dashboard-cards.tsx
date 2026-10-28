@@ -11,7 +11,7 @@ import {
   resetDashboardTankReadingsAction,
   type DashboardAdminActionState,
 } from "@/app/dashboard/actions";
-import type { SimpleDashboardSite } from "@/features/monitoring/domain/simple-dashboard-model";
+import type { SimpleDashboardSite } from "../domain/simple-dashboard-model";
 import { formatNumber } from "@/lib/format";
 import {
   STATUS_BADGE_CLASS,

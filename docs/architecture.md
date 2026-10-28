@@ -138,7 +138,8 @@ src/features/devices/
 Modul `devices` memakai tipe data dan rumus dari `monitoring` (tangki, lokasi, angka).
 `monitoring/server/ingest-telemetry.ts` mengaktifkan perangkat pada kiriman pertama lewat
 layanan `devices`, bukan langsung ke repositorinya. Impor antar-modul selalu memakai alias
-`@/features/<modul>/...`; impor di dalam modul memakai jalur relatif.
+`@/features/<modul>/...`; impor di dalam modul memakai jalur relatif. ESLint menolak alias
+yang menunjuk ke modul sendiri.
 
 ```text
 src/features/admin/

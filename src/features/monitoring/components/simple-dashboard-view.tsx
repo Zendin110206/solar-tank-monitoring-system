@@ -14,7 +14,7 @@ import {
   sortSimpleDashboardSites,
   type SimpleDashboardSite,
   type SimpleDashboardStatusFilter,
-} from "@/features/monitoring/domain/simple-dashboard-model";
+} from "../domain/simple-dashboard-model";
 import { SimpleDashboardCards } from "./simple-dashboard-cards";
 import { SimpleDashboardMap } from "./simple-dashboard-map";
 import { STATUS_DOT_CLASS } from "@/components/ui/status-tone";

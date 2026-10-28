@@ -1,4 +1,4 @@
-import type { TankShape } from "@/features/monitoring/types/monitoring";
+import type { TankShape } from "../types/monitoring";
 
 // Bentuk tangki dari teks kolom database.
 

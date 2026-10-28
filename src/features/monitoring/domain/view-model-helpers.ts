@@ -1,4 +1,4 @@
-import type { Reading } from "@/features/monitoring/types/monitoring";
+import type { Reading } from "../types/monitoring";
 
 // Pembantu bersama view model dashboard dan detail tangki.
 

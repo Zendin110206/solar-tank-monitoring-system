@@ -4,14 +4,11 @@ import Link from "next/link";
 import { Fuel } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import {
-  OperationalMap,
-  type OperationalMapSite,
-} from "@/features/monitoring/components/operational-map";
+import { OperationalMap, type OperationalMapSite } from "./operational-map";
 import type {
   DashboardMonitoringSite,
   DashboardSiteStatus,
-} from "@/features/monitoring/domain/dashboard-view-model";
+} from "../domain/dashboard-view-model";
 import { formatNumber } from "@/lib/format";
 import {
   STATUS_BADGE_CLASS,

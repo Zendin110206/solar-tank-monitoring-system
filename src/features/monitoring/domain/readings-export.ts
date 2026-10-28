@@ -4,11 +4,7 @@ import {
   type SimpleTankChartRange,
   type SimpleTankChartRangeKey,
 } from "./simple-tank-detail-model";
-import {
-  addDays,
-  parseTime,
-  startOfDisplayDay,
-} from "@/features/monitoring/domain/display-day";
+import { addDays, parseTime, startOfDisplayDay } from "./display-day";
 import { DISPLAY_TIME_ZONE } from "@/lib/format";
 
 const TANK_READING_CSV_HEADERS = [

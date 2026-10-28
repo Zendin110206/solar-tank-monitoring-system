@@ -21,7 +21,7 @@ import {
   type WorldPixel,
   worldPixelToLatLng,
   wrapTileX,
-} from "@/features/monitoring/components/map-tiles";
+} from "./map-tiles";
 
 export type OperationalMapSite = {
   code: string;

@@ -1,18 +1,10 @@
-import type {
-  DeviceStatus,
-  Reading,
-  TankShape,
-} from "@/features/monitoring/types/monitoring";
+import type { DeviceStatus, Reading, TankShape } from "../types/monitoring";
 import type {
   TankDetailStatus,
   TankDetailView,
   TankReadingPoint,
 } from "./tank-detail-view-model";
-import {
-  addDays,
-  parseTime,
-  startOfDisplayDay,
-} from "@/features/monitoring/domain/display-day";
+import { addDays, parseTime, startOfDisplayDay } from "./display-day";
 import { DISPLAY_TIME_ZONE } from "@/lib/format";
 
 export const SIMPLE_TANK_DETAIL_CHART_INTERVAL_MINUTES = 5;

@@ -52,6 +52,8 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Impor di dalam satu modul kini selalu memakai jalur relatif (18 impor di modul monitoring
+  diubah), dan ESLint menolak alias `@/features/<modul>/...` yang menunjuk ke modul sendiri.
 - Fungsi dan konstanta yang disalin antara halaman, server action, dan komponen kini ada di modulnya:
   warna status pengajuan, pengenal error skema, alamat halaman, dan frasa konfirmasi (`devices`);
   pemeriksaan CSRF aksi admin, label peran, dan pengaturan captcha formulir (`auth`); frasa konfirmasi
