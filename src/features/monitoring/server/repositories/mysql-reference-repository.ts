@@ -9,7 +9,7 @@ import {
 } from "../../domain/location-taxonomy";
 import { getMysqlPool } from "@/lib/database/mysql-connection";
 import { toBoolean, toNumber } from "@/lib/database/row-values";
-import { toTankShape } from "@/features/monitoring/domain/tank-shape";
+import { toTankShape } from "../../domain/tank-shape";
 
 type SiteRow = RowDataPacket & {
   id: string;

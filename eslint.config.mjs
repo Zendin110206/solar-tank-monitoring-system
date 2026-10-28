@@ -127,6 +127,23 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  // Impor di dalam satu modul memakai jalur relatif; alias @/features/<modul>/... hanya untuk
+  // impor dari modul lain (ADR 0011). Dipasang lewat no-restricted-syntax agar tidak menimpa
+  // opsi no-restricted-imports aturan lapisan di atas.
+  ...["monitoring", "devices", "auth", "helpdesk", "admin"].map(
+    (moduleName) => ({
+      files: [`src/features/${moduleName}/**/*.{ts,tsx}`],
+      rules: {
+        "no-restricted-syntax": [
+          "error",
+          {
+            selector: `:matches(ImportDeclaration, ExportNamedDeclaration, ExportAllDeclaration)[source.value=/^@\\/features\\/${moduleName}\\//]`,
+            message: `Impor di dalam modul ${moduleName} memakai jalur relatif; alias @/features/... hanya untuk modul lain.`,
+          },
+        ],
+      },
+    }),
+  ),
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

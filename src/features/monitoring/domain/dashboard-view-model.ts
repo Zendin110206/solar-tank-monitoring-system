@@ -29,7 +29,7 @@ import {
   DEFAULT_NOW,
   formatAgeLabel,
   getLatestReading,
-} from "@/features/monitoring/domain/view-model-helpers";
+} from "./view-model-helpers";
 
 export type DashboardSiteStatus = "online" | "warning" | "critical" | "offline";
 

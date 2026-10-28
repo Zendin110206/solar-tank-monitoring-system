@@ -1,5 +1,5 @@
 import type { DashboardMonitoringSite } from "./dashboard-view-model";
-import type { TankShape } from "@/features/monitoring/types/monitoring";
+import type { TankShape } from "../types/monitoring";
 import {
   DEFAULT_REGIONAL_LABEL,
   DEFAULT_WILAYAH_LABEL,

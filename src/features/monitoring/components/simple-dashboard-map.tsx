@@ -5,8 +5,8 @@
 import Link from "next/link";
 import { Crosshair, MapPin, Minus, Plus } from "lucide-react";
 import { useMemo, useRef, useState, type PointerEvent } from "react";
-import { formatCoordinatePair } from "@/features/monitoring/domain/number";
-import type { SimpleDashboardSite } from "@/features/monitoring/domain/simple-dashboard-model";
+import { formatCoordinatePair } from "../domain/number";
+import type { SimpleDashboardSite } from "../domain/simple-dashboard-model";
 import { formatNumber } from "@/lib/format";
 import {
   STATUS_BADGE_CLASS,
@@ -22,7 +22,7 @@ import {
   type WorldPixel,
   worldPixelToLatLng,
   wrapTileX,
-} from "@/features/monitoring/components/map-tiles";
+} from "./map-tiles";
 const MAP_WIDTH = 1024;
 const MAP_HEIGHT = 560;
 const MIN_ZOOM = 9;
