@@ -52,6 +52,11 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Delapan dokumen acuan teknis (kontrak API, penerimaan data perangkat, model data, model domain,
+  backup, deployment, batasan, batas sistem) dicocokkan dengan kode dan kini berstatus terkini.
+  Koreksi utama: tiga endpoint yang belum tercantum, aturan akses endpoint, bentuk balasan ingest dan
+  nilai `configStatus`, rumus tinggi bahan bakar, ambang status, dan kemampuan pembersihan data yang
+  benar-benar tersedia. Struktur repositori di README kini memuat modul `devices` dan `admin`.
 - Impor di dalam satu modul kini selalu memakai jalur relatif (18 impor di modul monitoring
   diubah), dan ESLint menolak alias `@/features/<modul>/...` yang menunjuk ke modul sendiri.
 - Fungsi dan konstanta yang disalin antara halaman, server action, dan komponen kini ada di modulnya:

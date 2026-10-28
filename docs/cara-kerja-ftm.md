@@ -1,6 +1,6 @@
 # Cara Kerja FTM dalam Bahasa Sehari-hari
 
-Status: **terkini**, dicocokkan dengan kode pada 25 Oktober 2026.
+Status: **terkini**, dicocokkan dengan kode pada 28 Oktober 2026.
 
 Dokumen ini untuk pembaca yang tidak menulis kode: pengelola, peninjau, atau anggota
 tim baru. Isinya menjelaskan apa yang dikerjakan FTM, bagian-bagiannya, dan pagar
@@ -31,12 +31,13 @@ flowchart TB
    Makin jauh jaraknya, makin sedikit solarnya.
 2. **Mengirim.** Perangkat mengirim jarak itu ke FTM, disertai kunci perangkat (seperti
    kata sandi khusus perangkat itu).
-3. **Memeriksa.** FTM menolak kiriman yang kuncinya salah. Angka yang janggal, misalnya
-   meloncat terlalu jauh, ditandai atau dirapikan.
+3. **Memeriksa.** FTM menolak kiriman yang kuncinya salah. Angka di luar batas wajar
+   dirapikan, dan perbedaan besar antara angka dari perangkat dan hitungan FTM ditandai.
 4. **Menyimpan.** Database menyimpan dua hal: angka terbaru, dan ringkasan setiap
    5 menit (rata-rata, terendah, tertinggi) untuk grafik riwayat.
-5. **Menghitung.** Dari ukuran tangki, FTM menghitung liter dan persen isi. Dari
-   konsumsi genset (liter per jam), FTM menghitung perkiraan sisa jam menyala.
+5. **Menghitung.** Bila perangkat tidak mengirim liter dan persen isi sendiri, FTM
+   menghitungnya dari ukuran tangki. Dari konsumsi genset (liter per jam), FTM menghitung
+   perkiraan sisa jam menyala.
 6. **Menampilkan.** Dashboard memuat ulang data secara berkala (bawaan: setiap 20
    detik) dan memberi warna status.
 
@@ -101,16 +102,17 @@ Pembagian modul ini ditetapkan di [ADR 0011](decisions/0011-struktur-modul-dan-a
 Aturan di atas tidak hanya ditulis, tetapi juga **dicek mesin** setiap kali kode
 diubah. Kalau ada yang melanggar, perubahan ditolak sebelum sampai ke pengguna.
 
-| Pagar                                    | Apa yang dicegah                                                           |
-| ---------------------------------------- | -------------------------------------------------------------------------- |
-| Aturan lapisan (ESLint)                  | Halaman atau API membuka database langsung tanpa lewat petugas layanan     |
-| Penanda `server-only`                    | Kode database atau rahasia ikut terkirim ke browser pengunjung             |
-| Aturan pengaturan (ESLint)               | Pengaturan dibaca sembarangan di luar papan pengaturan                     |
-| Prettier                                 | Gaya penulisan kode yang tidak seragam                                     |
-| TypeScript                               | Data yang salah bentuk, misalnya teks dikirim ke tempat yang meminta angka |
-| Tes otomatis (229 unit, 16 dengan MySQL) | Rumus, kontrak perangkat, dan alur penting berubah tanpa disadari          |
-| Audit dependensi                         | Pustaka dengan celah keamanan yang sudah diketahui                         |
-| Format pesan commit                      | Riwayat perubahan yang sulit dibaca                                        |
+| Pagar                                    | Apa yang dicegah                                                             |
+| ---------------------------------------- | ---------------------------------------------------------------------------- |
+| Aturan lapisan (ESLint)                  | Halaman atau API membuka database langsung tanpa lewat petugas layanan       |
+| Penanda `server-only`                    | Kode database atau rahasia ikut terkirim ke browser pengunjung               |
+| Aturan pengaturan (ESLint)               | Pengaturan dibaca sembarangan di luar papan pengaturan                       |
+| Aturan impor modul (ESLint)              | Batas antar-modul kabur karena impor di dalam modul memakai jalur modul lain |
+| Prettier                                 | Gaya penulisan kode yang tidak seragam                                       |
+| TypeScript                               | Data yang salah bentuk, misalnya teks dikirim ke tempat yang meminta angka   |
+| Tes otomatis (250 unit, 24 dengan MySQL) | Rumus, kontrak perangkat, dan alur penting berubah tanpa disadari            |
+| Audit dependensi                         | Pustaka dengan celah keamanan yang sudah diketahui                           |
+| Format pesan commit                      | Riwayat perubahan yang sulit dibaca                                          |
 
 ## Dari perubahan kode sampai ke pengguna
 

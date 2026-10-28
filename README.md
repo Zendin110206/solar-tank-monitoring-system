@@ -64,7 +64,7 @@ flowchart LR
   subgraph App[Aplikasi FTM - Next.js]
     ING[/POST /api/ingest/]
     MON[Modul monitoring<br/>volume, status, riwayat]
-    DEVMOD[Pengajuan perangkat<br/>dan paket firmware]
+    DEVMOD[Modul devices<br/>pengajuan dan paket firmware]
     AUTH[Modul akun<br/>login, peran, OTP]
     HD[Modul helpdesk]
     UI[Halaman dashboard]
@@ -230,12 +230,14 @@ penerimaan data yang bisa dicoba. Login dan seluruh dashboard membutuhkan MySQL.
 ├── scripts/              # migrasi, simulator, alat operasional
 └── src/
     ├── app/              # halaman, API (route handler), dan server action Next.js
-    ├── components/       # komponen tampilan bersama (kerangka halaman, akun)
-    ├── features/
-    │   ├── monitoring/   # tangki, perangkat, pembacaan, pengajuan, paket firmware
+    ├── components/       # kerangka halaman bersama, akun, dan kit UI (components/ui/)
+    ├── features/         # modul; tiap modul: components/, domain/, server/, tests/, types/
+    │   ├── monitoring/   # tangki, pembacaan, status, dashboard, peta, penerimaan data perangkat
+    │   ├── devices/      # pengajuan perangkat, kunci perangkat, paket firmware
     │   ├── auth/         # akun, sesi, OTP, email, Telegram
-    │   └── helpdesk/     # bantuan web yang terhubung ke Telegram
-    └── lib/              # utilitas umum
+    │   ├── helpdesk/     # bantuan web yang terhubung ke Telegram
+    │   └── admin/        # perawatan data (reset pembacaan, pembersihan data uji)
+    └── lib/              # utilitas umum: format, pengaturan, koneksi database, pembantu HTTP
 ```
 
 ## Pemeriksaan kualitas

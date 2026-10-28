@@ -1,7 +1,7 @@
 # Model Data
 
-> **Status dokumen:** terakhir diperiksa 14 Juli 2026. Isinya belum diverifikasi ulang
-> terhadap kode per Oktober 2026; struktur tabel tetap mengikuti migrasi 001–009.
+> **Status dokumen:** dicocokkan dengan tipe data (`src/features/monitoring/types/monitoring.ts`),
+> migrasi 001–009, dan repositori pada 28 Oktober 2026.
 
 Dokumen ini menjelaskan data utama yang dipakai dalam sistem monitoring.
 
@@ -45,23 +45,23 @@ Site adalah lokasi operasional.
 Contoh:
 
 ```text
-STO TPH
-STO NJA
-STO JTO
+STO Contoh A
+STO Contoh B
+STO Contoh C
 ```
 
 Field penting:
 
-| Field                      | Arti                                          |
-| -------------------------- | --------------------------------------------- |
-| `id`                       | ID internal lokasi                            |
-| `code`                     | kode pendek lokasi                            |
-| `name`                     | nama lokasi                                   |
-| `regionalLabel`            | kelompok lokasi paling besar, contoh `TREG 5` |
-| `wilayahLabel`             | kelompok di bawah Regional, contoh `TIF 3`    |
-| `areaLabel`                | label area                                    |
-| `coordinate`               | koordinat manual contoh                       |
-| `markerLeft` / `markerTop` | posisi marker pada peta ilustratif            |
+| Field                    | Arti                                          |
+| ------------------------ | --------------------------------------------- |
+| `id`                     | ID internal lokasi                            |
+| `code`                   | kode pendek lokasi                            |
+| `name`                   | nama lokasi                                   |
+| `regionalLabel`          | kelompok lokasi paling besar, contoh `TREG 5` |
+| `wilayahLabel`           | kelompok di bawah Regional, contoh `TIF 3`    |
+| `areaLabel`              | label area                                    |
+| `latitude` / `longitude` | koordinat manual (boleh kosong)               |
+| `isActive`               | lokasi aktif atau tidak                       |
 
 ## Tank
 
@@ -77,11 +77,13 @@ Field penting:
 | `shape`                   | bentuk tangki                   |
 | `capacityLiter`           | kapasitas maksimum              |
 | `diameterCm`              | diameter jika tabung horizontal |
-| `lengthCm`                | panjang jika tabung horizontal  |
+| `lengthCm`                | panjang tangki                  |
+| `widthCm` / `heightCm`    | lebar dan tinggi jika balok     |
 | `sensorMountHeightCm`     | tinggi referensi sensor         |
 | `consumptionLiterPerHour` | asumsi konsumsi per jam         |
 | `lowLevelPercent`         | batas level rendah              |
 | `criticalLevelPercent`    | batas level kritis              |
+| `isActive`                | tangki aktif atau tidak         |
 
 ## Device
 
@@ -100,17 +102,20 @@ Field penting:
 | `apiKeyHash`                | hash key device untuk validasi ingest |
 | `isActive`                  | device aktif atau tidak               |
 
-Contoh device aktif:
+Contoh device demo di seed:
 
 ```text
 code: demo-tph-01
 tankId: tank-tph-main
-expectedReportIntervalSec: 20
+expectedReportIntervalSec: 300
 ```
 
-Artinya device operasional diharapkan mengirim data setiap 20 detik. Interval
-ini tidak menentukan jumlah row history karena history tetap di-rollup per 5
-menit.
+Perangkat pilot mengirim data kira-kira setiap 20 detik. Interval ini dipakai untuk
+menentukan status online/terlambat/offline, tetapi tidak menentukan jumlah row history
+karena history tetap di-rollup per 5 menit.
+
+Posisi titik di peta dihitung aplikasi dari `latitude`/`longitude`; tidak ada kolom posisi
+peta tersendiri.
 
 ## Pengajuan Perangkat
 
@@ -178,9 +183,12 @@ jumlah download supaya device key tidak tersebar terlalu bebas.
 ## Maintenance Data Device/Uji
 
 Data device/uji boleh dibersihkan dari halaman admin ketika tim memang ingin
-mulai ulang pengujian perangkat. Admin bisa membersihkan satu card pengajuan,
-beberapa card yang dipilih, atau seluruh data monitoring perangkat. Reset ini
-hanya untuk data operasional monitoring, bukan untuk data akun.
+mulai ulang pengujian perangkat. Per Oktober 2026, halaman admin hanya menyediakan
+pembersihan **satu** pengajuan (dengan mengetik `BERSIHKAN ITEM DEVICE`). Formulir
+"bersihkan pengajuan terpilih" dan "bersihkan semua data perangkat" sudah dicabut dari
+halaman pada Juli 2026; kode server di belakangnya masih ada tanpa pemakai (lihat
+penyimpangan di [arsitektur](architecture.md)). Pembersihan hanya menyentuh data
+operasional monitoring, bukan data akun.
 
 Tabel yang termasuk data operasional monitoring:
 
@@ -189,6 +197,7 @@ Tabel yang termasuk data operasional monitoring:
 | `monitoring_sites`                      | lokasi STO                                              |
 | `monitoring_tanks`                      | konfigurasi tangki                                      |
 | `monitoring_devices`                    | device yang aktif atau disiapkan                        |
+| `monitoring_latest_readings`            | snapshot pembacaan terbaru per device                   |
 | `monitoring_readings`                   | histori pembacaan sensor                                |
 | `monitoring_device_requests`            | pengajuan perangkat dari user                           |
 | `monitoring_device_packages`            | paket firmware yang dibuat dari approval                |
