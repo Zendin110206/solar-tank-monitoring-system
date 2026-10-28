@@ -1,7 +1,7 @@
 # Batas Sistem
 
-> **Status dokumen:** terakhir diperiksa 14 Juli 2026. Isinya belum diverifikasi ulang
-> terhadap kode per Oktober 2026; arah pengembangan terkini ada di catatan keputusan.
+> **Status dokumen:** dicocokkan dengan kode pada 28 Oktober 2026. Arah pengembangan ada di
+> [catatan keputusan](decisions/README.md).
 
 Dokumen ini menjelaskan hal yang masuk dan tidak masuk ke repositori.
 
@@ -27,9 +27,9 @@ Yang masuk:
 - review pengajuan perangkat dari admin lewat web;
 - pembuatan device key dan paket firmware ZIP setelah approval;
 - first valid ping activation;
-- cleanup data monitoring/device/uji oleh admin tanpa menghapus akun;
+- pembersihan satu pengajuan perangkat/uji oleh admin tanpa menghapus akun;
 - export CSV, reset reading, backup MySQL, Telegram, dan helpdesk;
-- unit test;
+- tes unit, tes karakterisasi, dan tes integrasi MySQL;
 - dokumentasi Bahasa Indonesia.
 
 ## Belum Masuk Scope Saat Ini
@@ -123,7 +123,8 @@ Yang sudah masuk:
 - registry site, tangki, device, dan hash key;
 - script apply registry pilot dari file lokal yang tidak di-commit.
 - tabel auth, session, OTP, audit, dan rate limit;
-- tabel pengajuan perangkat, firmware package, hardware profile, firmware template, event provisioning, dan event ingest.
+- tabel pengajuan perangkat, firmware package, hardware profile, firmware template, event provisioning, dan event ingest;
+- tabel helpdesk (sesi dan pesan).
 
 Yang belum final:
 

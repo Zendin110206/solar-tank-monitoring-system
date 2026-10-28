@@ -1,6 +1,6 @@
 # Panduan Pemeriksaan Lokal FTM
 
-> **Diperiksa 25 Oktober 2026** terhadap kode pada branch `dev`. Panduan ini untuk
+> **Diperiksa 28 Oktober 2026** terhadap kode pada branch `dev`. Panduan ini untuk
 > memeriksa aplikasi di laptop dengan data fiktif. Perubahan pada `dev` belum
 > berarti sudah dirilis ke `main` (versi yang dipakai pilot).
 

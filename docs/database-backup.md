@@ -1,7 +1,8 @@
 # Database Backup
 
-> **Status dokumen:** terakhir diperiksa 8 Juli 2026. Isinya belum diverifikasi ulang
-> terhadap kode per Oktober 2026; backup otomatis dan uji pulih belum berjalan per Oktober 2026.
+> **Status dokumen:** dicocokkan dengan `scripts/backup-mysql.mjs` dan
+> `scripts/run-mysql-backup-task.ps1` pada 28 Oktober 2026. Per Oktober 2026, backup otomatis
+> terjadwal dan latihan pemulihan **belum** berjalan; skrip di bawah sudah tersedia.
 
 Backup database wajib disiapkan sebelum aplikasi dipakai sebagai sistem operasional.
 
@@ -26,6 +27,9 @@ MYSQL_SSL_MODE="required"
 MYSQL_BACKUP_OUTPUT_DIR="backups/mysql"
 MYSQL_BACKUP_RETENTION_DAYS="90"
 ```
+
+Bila tidak diisi, `MYSQL_BACKUP_OUTPUT_DIR` bernilai `backups/mysql` (folder `backups/` diabaikan Git)
+dan `MYSQL_BACKUP_RETENTION_DAYS` bernilai 90. Nilai `0` berarti backup lama tidak dihapus.
 
 Untuk dua backup per bulan, retention 90 hari menyimpan kira-kira 6 file backup terakhir. Jika storage Drive kecil, gunakan 45 atau 60 hari.
 

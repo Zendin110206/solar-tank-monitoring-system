@@ -1,7 +1,8 @@
 # Ingest Data Device
 
-> **Status dokumen:** terakhir diperiksa 14 Juli 2026. Isinya belum diverifikasi ulang
-> terhadap kode per Oktober 2026; pemeriksaan ulang dilakukan bersama tes kontrak perangkat.
+> **Status dokumen:** dicocokkan dengan kode pada 28 Oktober 2026. Kontrak perangkat v1
+> (alamat, header, bentuk kiriman, dan balasan) dibekukan dan dikunci tes
+> `ingest-route-contract.test.ts`.
 
 Dokumen ini menjelaskan cara data dari device atau simulator masuk ke aplikasi.
 
@@ -95,6 +96,8 @@ Catatan timestamp:
 - Kirim `measuredAt`/`ts_iso` dalam format ISO UTC jika firmware sudah punya waktu yang benar.
 - Jika hanya punya Unix timestamp, kirim `ts` dalam detik atau milidetik.
 - Jika waktu device belum dipercaya, kirim `ts: 0`; server akan memakai waktu terima.
+- Bila waktu dari perangkat tidak valid atau berselisih lebih dari 24 jam dari waktu server,
+  server memakai waktu terima dan menambahkan peringatan di `warnings`.
 - Dashboard menampilkan jam operasional dalam WIB, tetapi data API tetap disimpan sebagai UTC agar konsisten antara lokal, Vercel, dan server kantor.
 
 Payload real-format untuk pilot:
@@ -142,15 +145,26 @@ diisi manual berdasarkan data yang sudah disetujui.
 
 API mengecek:
 
-- header `X-Device-Id` ada;
-- key ada;
+- batas jumlah kiriman: lebih dari 120 kiriman per menit per perangkat dan alamat ditolak
+  dengan HTTP `429` (hanya saat storage MySQL);
+- body berupa JSON valid;
+- header `X-Device-Id` ada dan kunci perangkat (`X-Api-Key` atau `X-Device-Key`) ada;
 - payload berupa JSON object;
-- device terdaftar;
-- device aktif;
-- key cocok dengan hash key device atau fallback development yang masih diizinkan;
-- device di payload tidak bertentangan dengan header;
-- tangki untuk device ditemukan.
-- config payload tidak dipakai diam-diam tanpa review jika berbeda jauh dari registry.
+- perangkat terdaftar. Perangkat yang belum terdaftar hanya dibuat otomatis bila pembuatan
+  perangkat otomatis diaktifkan dan kunci provisioning cocok;
+- perangkat aktif, atau perangkat hasil pengajuan yang sedang menunggu kiriman valid pertama
+  (kiriman itu mengaktifkannya);
+- kunci cocok dengan hash kunci perangkat, atau dengan kunci cadangan development yang masih
+  diizinkan;
+- identitas perangkat di payload tidak bertentangan dengan header;
+- tangki untuk perangkat ditemukan;
+- config payload tidak dipakai diam-diam bila berbeda jauh dari registry.
+
+Kode status tiap kegagalan ada di [kontrak API](api-contract.md#post-apiingest).
+
+Perilaku yang dicatat apa adanya: kiriman tanpa jarak (`distance`/`distance_cm`) tetap
+diterima dan jaraknya dibaca **0 cm**, sehingga tangki terbaca penuh. Peringatan dicatat di
+`warnings`, tetapi kiriman tidak ditolak.
 
 Jika semua lolos, payload dinormalisasi dan disimpan ke storage aktif. Default
 development memakai memory store. Pada mode MySQL, satu transaksi meng-upsert
@@ -207,7 +221,8 @@ Jika smoke test gagal:
 | ------------------ | ---------------------------------------------------------- |
 | `401`              | key salah atau hash di registry tidak cocok                |
 | `404`              | device belum ada di registry aktif                         |
-| `503`              | storage MySQL belum siap                                   |
+| `429`              | terlalu banyak kiriman dalam satu menit                    |
+| `500`              | gagal menyimpan ke storage aktif (misalnya MySQL mati)     |
 | `needsReview=true` | payload masuk, tetapi config payload berbeda dari registry |
 
 ## Device Contoh yang Tersedia
@@ -219,29 +234,29 @@ Jika smoke test gagal:
 | `demo-jto-01` | `tank-jto-main` |
 | `demo-skp-01` | `tank-skp-main` |
 
-## Hal yang Belum Final
+## Yang Sudah Dikunci dan yang Belum
 
-Sebelum perangkat nyata dipakai, perlu dikunci:
+Sudah dikunci (per Oktober 2026):
 
-- interval kirim device;
-- format payload firmware;
-- key per device;
-- dimensi tangki;
-- posisi sensor;
-- metode kalibrasi;
-- apakah hitung volume dilakukan di device atau server;
-- jaringan dan target deployment.
-- cara rotasi key jika device diganti atau key bocor.
+- format kiriman dan alamat `/api/ingest` (kontrak perangkat v1, firmware v1);
+- kunci per perangkat, disimpan sebagai hash di database;
+- tinggi, volume, dan persen isi memakai nilai dari perangkat bila dikirim; bila tidak, server
+  menghitungnya dari jarak sensor dan config tangki (lihat [model domain](domain-model.md)).
+
+Belum final:
+
+- interval kirim yang baku (perangkat pilot sekitar 20 detik);
+- metode kalibrasi dan posisi sensor per lokasi;
+- cara rotasi kunci bila perangkat diganti atau kunci bocor.
 
 ## Catatan Keamanan
 
 Jangan menaruh key production di kode.
 
-Untuk production nanti:
+Yang sudah berjalan: hash kunci per perangkat di database, HTTPS, dan batas jumlah kiriman.
 
-- jangan gunakan fallback global;
-- simpan hash key per device di database;
-- gunakan HTTPS;
-- beri rate limit;
-- catat audit log;
-- rotasi key jika device hilang atau bocor.
+Yang tetap perlu dijaga di production:
+
+- matikan kunci cadangan global (`SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK="false"`);
+- rotasi kunci bila perangkat hilang atau kunci bocor;
+- catatan audit untuk kiriman perangkat belum ada.

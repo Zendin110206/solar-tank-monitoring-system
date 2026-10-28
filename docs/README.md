@@ -14,31 +14,34 @@ Arti status:
 
 | Dokumen                                                      | Isi                                            | Status                        | Diperiksa   |
 | ------------------------------------------------------------ | ---------------------------------------------- | ----------------------------- | ----------- |
-| [../README.md](../README.md)                                 | Gambaran FTM, cara menjalankan lokal, perintah | Terkini                       | 25 Okt 2026 |
+| [../README.md](../README.md)                                 | Gambaran FTM, cara menjalankan lokal, perintah | Terkini                       | 28 Okt 2026 |
 | [current-operational-truth.md](current-operational-truth.md) | Status operasional bertanggal                  | Terkini (bagian Oktober 2026) | 25 Okt 2026 |
-| [cara-kerja-ftm.md](cara-kerja-ftm.md)                       | Cara kerja FTM dalam bahasa sehari-hari        | Terkini                       | 25 Okt 2026 |
-| [architecture.md](architecture.md)                           | Arsitektur, modul, lapisan, alur data          | Terkini                       | 25 Okt 2026 |
-| [decisions/](decisions/README.md)                            | Catatan keputusan arsitektur (ADR)             | Terkini                       | 25 Okt 2026 |
+| [cara-kerja-ftm.md](cara-kerja-ftm.md)                       | Cara kerja FTM dalam bahasa sehari-hari        | Terkini                       | 28 Okt 2026 |
+| [architecture.md](architecture.md)                           | Arsitektur, modul, lapisan, alur data          | Terkini                       | 28 Okt 2026 |
+| [decisions/](decisions/README.md)                            | Catatan keputusan arsitektur (ADR)             | Terkini                       | 28 Okt 2026 |
 
 ## Acuan teknis
 
 | Dokumen                                                | Isi                                                            | Status                 | Diperiksa   |
 | ------------------------------------------------------ | -------------------------------------------------------------- | ---------------------- | ----------- |
-| [api-contract.md](api-contract.md)                     | Endpoint API dan bentuk datanya, termasuk kontrak perangkat v1 | Perlu diperiksa ulang  | 14 Jul 2026 |
-| [device-ingestion.md](device-ingestion.md)             | Cara data perangkat masuk, autentikasi, normalisasi            | Perlu diperiksa ulang  | 14 Jul 2026 |
-| [data-model.md](data-model.md)                         | Tabel dan hubungan data                                        | Perlu diperiksa ulang  | 14 Jul 2026 |
-| [domain-model.md](domain-model.md)                     | Rumus volume, status, dan sisa jam genset                      | Perlu diperiksa ulang  | 14 Jul 2026 |
-| [database-backup.md](database-backup.md)               | Skrip backup dan batas pemulihan                               | Perlu diperiksa ulang  | 8 Jul 2026  |
-| [deployment.md](deployment.md)                         | Variabel lingkungan, migrasi, kesiapan                         | Perlu diperiksa ulang  | 14 Jul 2026 |
-| [safety-and-limitations.md](safety-and-limitations.md) | Batas perangkat lunak, data, dan perangkat fisik               | Perlu diperiksa ulang  | 14 Jul 2026 |
-| [system-boundaries.md](system-boundaries.md)           | Yang masuk dan tidak masuk repositori                          | Perlu diperiksa ulang  | 14 Jul 2026 |
-| [reviewer-quickstart.md](reviewer-quickstart.md)       | Pemeriksaan lokal, aturan akses, simulator, dan tes MySQL      | Terkini (branch `dev`) | 25 Okt 2026 |
+| [api-contract.md](api-contract.md)                     | Endpoint API dan bentuk datanya, termasuk kontrak perangkat v1 | Terkini                | 28 Okt 2026 |
+| [device-ingestion.md](device-ingestion.md)             | Cara data perangkat masuk, autentikasi, normalisasi            | Terkini                | 28 Okt 2026 |
+| [data-model.md](data-model.md)                         | Tabel dan hubungan data                                        | Terkini                | 28 Okt 2026 |
+| [domain-model.md](domain-model.md)                     | Rumus volume, status, dan sisa jam genset                      | Terkini                | 28 Okt 2026 |
+| [database-backup.md](database-backup.md)               | Skrip backup dan batas pemulihan                               | Terkini                | 28 Okt 2026 |
+| [deployment.md](deployment.md)                         | Variabel lingkungan, migrasi, kesiapan                         | Terkini                | 28 Okt 2026 |
+| [safety-and-limitations.md](safety-and-limitations.md) | Batas perangkat lunak, data, dan perangkat fisik               | Terkini                | 28 Okt 2026 |
+| [system-boundaries.md](system-boundaries.md)           | Yang masuk dan tidak masuk repositori                          | Terkini                | 28 Okt 2026 |
+| [reviewer-quickstart.md](reviewer-quickstart.md)       | Pemeriksaan lokal, aturan akses, simulator, dan tes MySQL      | Terkini (branch `dev`) | 28 Okt 2026 |
 
 ## Panduan pengguna
 
-| Dokumen                                                                                            | Isi                             | Status                | Diperiksa |
-| -------------------------------------------------------------------------------------------------- | ------------------------------- | --------------------- | --------- |
-| [panduan-user-manual-ftm.pdf](panduan-user-manual-ftm.pdf) / [.html](panduan-user-manual-ftm.html) | Panduan bagi pengguna dashboard | Perlu diperiksa ulang | Juli 2026 |
+| Dokumen                                                                                            | Isi                             | Status                                | Diperiksa |
+| -------------------------------------------------------------------------------------------------- | ------------------------------- | ------------------------------------- | --------- |
+| [panduan-user-manual-ftm.pdf](panduan-user-manual-ftm.pdf) / [.html](panduan-user-manual-ftm.html) | Panduan bagi pengguna dashboard | Perlu diperiksa ulang (lihat catatan) | Juli 2026 |
+
+Catatan panduan pengguna: tampilan aplikasi tidak berubah sejak panduan dibuat (14 Juli 2026),
+kecuali perbaikan gulir layar pada 15 Juli 2026. Isinya belum diperiksa ulang langkah demi langkah.
 
 ## Riwayat
 
