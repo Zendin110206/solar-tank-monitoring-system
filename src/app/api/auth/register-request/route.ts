@@ -14,17 +14,10 @@ import {
   jsonOk,
   jsonTooManyRequests,
 } from "@/lib/http/json-response";
+import { getClientKey } from "@/lib/http/request";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-
-function getClientKey(request: NextRequest) {
-  return (
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    "unknown-ip"
-  );
-}
 
 function getCaptchaToken(payload: unknown): string | null {
   const token = String(

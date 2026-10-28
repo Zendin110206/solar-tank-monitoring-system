@@ -10,6 +10,7 @@ import {
 } from "@/features/admin/server/maintenance-service";
 import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
+import { getRequiredFormValue } from "@/lib/http/form-data";
 
 const DELETE_TANK_CONFIRMATION = "HAPUS DATA STO";
 const RESET_TANK_READINGS_CONFIRMATION = "RESET READING STO";
@@ -19,16 +20,6 @@ export type DashboardAdminActionState = {
   status: "idle" | "success" | "error";
   message: string;
 };
-
-function getRequiredFormValue(formData: FormData, key: string): string {
-  const value = String(formData.get(key) ?? "").trim();
-
-  if (!value) {
-    throw new Error("Data aksi admin belum lengkap.");
-  }
-
-  return value;
-}
 
 function assertValidAdminActionCsrf({
   formData,

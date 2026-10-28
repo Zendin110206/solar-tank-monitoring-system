@@ -38,9 +38,9 @@ import {
 } from "../repositories/mysql-auth-repository";
 import {
   type AuthRequestContext,
-  getRequestIp,
   getRequestUserAgent,
 } from "./request-context";
+import { getRequestIp } from "@/lib/http/request";
 
 export type LoginResult =
   | {

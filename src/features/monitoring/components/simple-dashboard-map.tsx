@@ -12,6 +12,7 @@ import {
   STATUS_BADGE_CLASS,
   STATUS_DOT_CLASS,
 } from "@/components/ui/status-tone";
+import { clamp } from "@/lib/math";
 
 type LatLng = {
   latitude: number;
@@ -54,10 +55,6 @@ function isValidCoordinate(
     typeof site.longitude === "number" &&
     Number.isFinite(site.longitude)
   );
-}
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value));
 }
 
 function wrapTileX(tileX: number, tilesPerAxis: number) {

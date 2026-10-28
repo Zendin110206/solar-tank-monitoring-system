@@ -3,7 +3,6 @@ import {
   STATUS_DOT_CLASS,
 } from "@/components/ui/status-tone";
 import { type TankConfigStatus } from "@/features/monitoring/types/monitoring";
-import { formatNumber } from "@/lib/format";
 import { type TankStatus } from "./tank-detail-data";
 
 export const statusMeta: Record<
@@ -69,12 +68,4 @@ export function formatConfigStatusLabel(status: TankConfigStatus) {
   };
 
   return labels[status];
-}
-
-export function formatRuntimeHour(value: number | null) {
-  if (value === null || !Number.isFinite(value)) {
-    return "-";
-  }
-
-  return `${formatNumber(value, 2)} jam`;
 }

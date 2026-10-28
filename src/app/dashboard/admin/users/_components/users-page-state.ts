@@ -1,5 +1,4 @@
 import { type AuthRole, type AuthUserStatus } from "@/features/auth/types/auth";
-import { formatDateTimeJakarta } from "@/lib/format";
 
 export const VERIFICATION_OPTIONS = [
   { label: "Semua email", value: "all" },
@@ -70,14 +69,6 @@ export function getPageSize(value: string): number {
   )
     ? parsed
     : PAGE_SIZE_OPTIONS[0];
-}
-
-export function formatDate(value: string | null) {
-  if (!value) {
-    return "-";
-  }
-
-  return formatDateTimeJakarta(value);
 }
 
 export function getUsersHref(

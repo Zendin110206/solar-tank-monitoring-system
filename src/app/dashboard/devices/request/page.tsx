@@ -17,7 +17,7 @@ import type {
   MonitoringDeviceRequest,
 } from "@/features/monitoring/types/monitoring";
 import { DeviceRequestForm } from "./device-request-form";
-import { formatDateTimeJakarta } from "@/lib/format";
+import { formatDateTimeOrDash } from "@/lib/format";
 import { STATUS_BADGE_CLASS } from "@/components/ui/status-tone";
 
 export const metadata: Metadata = {
@@ -28,14 +28,6 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-
-function formatDate(value: string | null | undefined) {
-  if (!value) {
-    return "-";
-  }
-
-  return formatDateTimeJakarta(value);
-}
 
 function getStatusClass(status: DeviceRequestStatus) {
   switch (status) {
@@ -133,8 +125,8 @@ function RequestHistory({ requests }: { requests: MonitoringDeviceRequest[] }) {
                 ) : null}
               </div>
               <div className="grid min-w-0 gap-1 text-sm text-zinc-500 lg:text-right">
-                <p>Diajukan: {formatDate(request.createdAt)}</p>
-                <p>Ditinjau: {formatDate(request.adminReviewedAt)}</p>
+                <p>Diajukan: {formatDateTimeOrDash(request.createdAt)}</p>
+                <p>Ditinjau: {formatDateTimeOrDash(request.adminReviewedAt)}</p>
               </div>
             </article>
           ))

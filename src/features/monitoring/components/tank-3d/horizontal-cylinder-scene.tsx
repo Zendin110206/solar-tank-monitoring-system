@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import { TankFallbackVisual } from "./tank-fallback-visual";
-import { clamp, createSafeWebGlRenderer, disposeObject } from "./three-helpers";
+import { createSafeWebGlRenderer, disposeObject } from "./three-helpers";
+import { clamp } from "@/lib/math";
 
 type TankHorizontalCylinderScene3DProps = {
   fillPercent: number;

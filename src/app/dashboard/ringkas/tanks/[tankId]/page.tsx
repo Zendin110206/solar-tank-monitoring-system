@@ -35,9 +35,10 @@ import {
 import { buildTankDetail } from "@/features/monitoring/domain/tank-detail-view-model";
 import { mergeMonitoringReadingsById } from "@/features/monitoring/domain/latest-reading";
 import type { DeviceStatus } from "@/features/monitoring/types/monitoring";
-import { formatNumber } from "@/lib/format";
+import { formatNumber, formatRuntimeHour } from "@/lib/format";
 import { STATUS_BADGE_CLASS } from "@/components/ui/status-tone";
 import { Card } from "@/components/ui/card";
+import { clampPercent } from "@/lib/math";
 
 export const metadata: Metadata = {
   title: "Detail Operasional Tangki | FTM",
@@ -143,14 +144,6 @@ const unknownRuntimeLevel: RuntimeLevelParameter = {
   card: "border-zinc-200 bg-zinc-50",
 };
 
-function formatRuntimeHour(value: number | null) {
-  if (value === null || !Number.isFinite(value)) {
-    return "-";
-  }
-
-  return `${formatNumber(value, 2)} jam`;
-}
-
 function formatMeasurement(value: number | null, unit: string) {
   return value === null || !Number.isFinite(value) ? "-" : `${value} ${unit}`;
 }
@@ -183,10 +176,6 @@ function getRuntimeLevelParameter(
   }
 
   return runtimeLevelParameters[5];
-}
-
-function clampPercent(value: number) {
-  return Math.min(Math.max(value, 0), 100);
 }
 
 function StatusBadge({ tank }: { tank: SimpleTankDetail }) {

@@ -1,4 +1,4 @@
-import { clamp } from "./three-helpers";
+import { clamp } from "@/lib/math";
 
 export function TankFallbackVisual({
   fillPercent,
