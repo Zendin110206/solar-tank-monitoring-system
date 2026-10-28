@@ -33,3 +33,24 @@ export function verifyAdminActionCsrfToken({
 
   return safeEqual(token, createAdminActionCsrfToken(sessionId));
 }
+
+export function assertValidAdminActionCsrf({
+  formData,
+  sessionId,
+}: {
+  formData: FormData;
+  sessionId: string;
+}) {
+  const csrfToken = String(formData.get("csrfToken") ?? "");
+
+  if (
+    !verifyAdminActionCsrfToken({
+      sessionId,
+      token: csrfToken,
+    })
+  ) {
+    throw new Error(
+      "Sesi admin tidak valid. Muat ulang halaman lalu coba lagi.",
+    );
+  }
+}

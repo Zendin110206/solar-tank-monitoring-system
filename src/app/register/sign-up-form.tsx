@@ -1,6 +1,5 @@
 "use client";
 
-import { publicEnv } from "@/lib/config/public-env";
 import type { FormEvent } from "react";
 import { useState } from "react";
 import {
@@ -16,16 +15,15 @@ import {
 import { TurnstileWidget } from "@/features/auth/components/turnstile-widget";
 import { PRIMARY_BLOCK_BUTTON_CLASS } from "@/components/ui/button-class";
 import { FormErrorMessage } from "@/components/ui/message";
+import {
+  captchaRequiredMessage,
+  isCaptchaEnabled,
+} from "@/features/auth/components/captcha-settings";
 
 const inputClassName =
   "h-11 w-full rounded-lg border border-zinc-300 bg-white px-3.5 text-sm text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10";
 const labelClassName =
   "mb-1.5 block text-[0.82rem] font-semibold text-zinc-800";
-const captchaRequiredMessage =
-  "Selesaikan verifikasi keamanan terlebih dahulu.";
-const isCaptchaEnabled = Boolean(
-  publicEnv.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY?.trim(),
-);
 
 function PasswordField({
   id,

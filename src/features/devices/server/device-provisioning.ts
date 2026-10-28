@@ -8,6 +8,10 @@ import type {
   Tank,
   TankShape,
 } from "@/features/monitoring/types/monitoring";
+import {
+  DEFAULT_CRITICAL_LEVEL_PERCENT,
+  DEFAULT_LOW_LEVEL_PERCENT,
+} from "../domain/device-request";
 import { hashDeviceKey } from "./device-key";
 import { saveProvisionedBundleToMysql } from "./repositories/mysql-device-provisioning-repository";
 import {
@@ -21,8 +25,6 @@ import { toFiniteNumber } from "@/features/monitoring/domain/number";
 import { extractPayloadTankConfig } from "@/features/monitoring/domain/reading-tank-config";
 
 const DEFAULT_EXPECTED_REPORT_INTERVAL_SEC = 300;
-const DEFAULT_LOW_LEVEL_PERCENT = 30;
-const DEFAULT_CRITICAL_LEVEL_PERCENT = 15;
 const DEFAULT_CONSUMPTION_LITER_PER_HOUR = 25;
 
 type ProvisioningFailure = {

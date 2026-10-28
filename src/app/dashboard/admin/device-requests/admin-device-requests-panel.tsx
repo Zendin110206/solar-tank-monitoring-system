@@ -20,7 +20,7 @@ import {
   RevokeDeviceProvisioningForm,
 } from "./admin-device-request-controls";
 import { formatDateTimeOrDash, formatNumber } from "@/lib/format";
-import { STATUS_BADGE_CLASS } from "@/components/ui/status-tone";
+import { getDeviceRequestStatusClass } from "@/features/devices/components/device-request-status";
 
 type AdminDeviceRequestsPanelProps = {
   csrfToken: string;
@@ -49,26 +49,6 @@ function formatOptionalNumber(value: number | null | undefined, suffix = "") {
   }
 
   return `${formatNumber(value, 2)}${suffix}`;
-}
-
-function getStatusClass(status: DeviceRequestStatus) {
-  switch (status) {
-    case "pending_admin_review":
-      return STATUS_BADGE_CLASS.warning;
-    case "rejected":
-      return STATUS_BADGE_CLASS.danger;
-    case "approved_waiting_package":
-    case "approved_package_ready":
-    case "waiting_firmware_download":
-    case "waiting_first_valid_ping":
-      return STATUS_BADGE_CLASS.info;
-    case "active":
-      return STATUS_BADGE_CLASS.success;
-    case "expired":
-    case "revoked":
-    case "package_generation_failed":
-      return STATUS_BADGE_CLASS.neutral;
-  }
 }
 
 function getTankShapeLabel(shape: TankShape) {
@@ -143,7 +123,7 @@ function DetailItem({
 function RequestStatusBadge({ status }: { status: DeviceRequestStatus }) {
   return (
     <span
-      className={`inline-flex w-fit items-center rounded-full px-3 py-1 text-xs font-semibold ring-1 ${getStatusClass(
+      className={`inline-flex w-fit items-center rounded-full px-3 py-1 text-xs font-semibold ring-1 ${getDeviceRequestStatusClass(
         status,
       )}`}
     >

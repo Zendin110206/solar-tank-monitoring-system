@@ -52,6 +52,11 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Fungsi dan konstanta yang disalin antara halaman, server action, dan komponen kini ada di modulnya:
+  warna status pengajuan, pengenal error skema, alamat halaman, dan frasa konfirmasi (`devices`);
+  pemeriksaan CSRF aksi admin, label peran, dan pengaturan captcha formulir (`auth`); frasa konfirmasi
+  perawatan data (`admin`); ambang awal tangki baru dipakai bersama pengajuan dan pembuatan perangkat
+  otomatis. Isi dan nilainya tidak berubah.
 - Fungsi yang disalin di modul monitoring kini ada di satu tempat: hitungan ubin peta
   (`components/map-tiles.ts`), pembantu view model (`domain/view-model-helpers.ts`), hitungan hari
   tampilan (`domain/display-day.ts`), bentuk tangki (`domain/tank-shape.ts`), serta `toNumber`/

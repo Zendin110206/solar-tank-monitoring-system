@@ -5,6 +5,7 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { requirePageUser } from "@/features/auth/server/auth-guards";
 import type { AuthSafeUser } from "@/features/auth/types/auth";
 import { ProfileForm } from "./profile-form";
+import { getRoleLabel } from "@/features/auth/domain/role-label";
 
 export const metadata: Metadata = {
   title: "Profile | FTM",
@@ -34,10 +35,6 @@ function getAvatarLabel(user: Pick<AuthSafeUser, "fullName" | "username">) {
   return (nameParts[0]?.slice(0, 2) || user.username.slice(0, 2) || "ST")
     .toUpperCase()
     .slice(0, 2);
-}
-
-function getRoleLabel(role: AuthSafeUser["role"]) {
-  return role === "admin" ? "Admin" : "User";
 }
 
 function EditAnchor({ href = "#personal-information" }: { href?: string }) {

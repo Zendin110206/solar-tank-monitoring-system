@@ -1,6 +1,5 @@
 "use client";
 
-import { publicEnv } from "@/lib/config/public-env";
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { ArrowRight, Mail } from "lucide-react";
@@ -8,12 +7,10 @@ import { ArrowRight, Mail } from "lucide-react";
 import { TurnstileWidget } from "@/features/auth/components/turnstile-widget";
 import { PRIMARY_BLOCK_BUTTON_CLASS } from "@/components/ui/button-class";
 import { FormErrorMessage } from "@/components/ui/message";
-
-const captchaRequiredMessage =
-  "Selesaikan verifikasi keamanan terlebih dahulu.";
-const isCaptchaEnabled = Boolean(
-  publicEnv.NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY?.trim(),
-);
+import {
+  captchaRequiredMessage,
+  isCaptchaEnabled,
+} from "@/features/auth/components/captcha-settings";
 
 export default function ForgotPasswordForm() {
   const [pending, setPending] = useState(false);

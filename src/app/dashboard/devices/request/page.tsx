@@ -12,13 +12,10 @@ import {
   listDeviceHardwareProfiles as listHardwareProfilesFromMysql,
 } from "@/features/devices/server/device-request-service";
 import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
-import type {
-  DeviceRequestStatus,
-  MonitoringDeviceRequest,
-} from "@/features/monitoring/types/monitoring";
+import type { MonitoringDeviceRequest } from "@/features/monitoring/types/monitoring";
 import { DeviceRequestForm } from "./device-request-form";
 import { formatDateTimeOrDash } from "@/lib/format";
-import { STATUS_BADGE_CLASS } from "@/components/ui/status-tone";
+import { getDeviceRequestStatusClass } from "@/features/devices/components/device-request-status";
 
 export const metadata: Metadata = {
   title: "Ajukan Perangkat | FTM",
@@ -28,26 +25,6 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-
-function getStatusClass(status: DeviceRequestStatus) {
-  switch (status) {
-    case "pending_admin_review":
-      return STATUS_BADGE_CLASS.warning;
-    case "rejected":
-      return STATUS_BADGE_CLASS.danger;
-    case "approved_waiting_package":
-    case "approved_package_ready":
-    case "waiting_firmware_download":
-    case "waiting_first_valid_ping":
-      return STATUS_BADGE_CLASS.info;
-    case "active":
-      return STATUS_BADGE_CLASS.success;
-    case "expired":
-    case "revoked":
-    case "package_generation_failed":
-      return STATUS_BADGE_CLASS.neutral;
-  }
-}
 
 function getTankShapeLabel(request: MonitoringDeviceRequest) {
   return request.tankShape === "rectangular"
@@ -90,7 +67,7 @@ function RequestHistory({ requests }: { requests: MonitoringDeviceRequest[] }) {
                     {request.requestCode}
                   </span>
                   <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${getStatusClass(
+                    className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${getDeviceRequestStatusClass(
                       request.status,
                     )}`}
                   >

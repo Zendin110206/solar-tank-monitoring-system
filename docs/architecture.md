@@ -94,10 +94,10 @@ src/features/helpdesk/
 └── types/helpdesk.ts
 
 src/features/auth/
-├── components/          tombol keluar, widget captcha
-├── domain/              validasi isian akun, aturan alamat tujuan setelah login
+├── components/          tombol keluar, widget captcha, pengaturan captcha formulir
+├── domain/              validasi isian akun, aturan alamat tujuan setelah login, label peran
 ├── server/              layanan akun, sesi, guard, CSRF, kripto, pengaturan auth,
-│                        email, captcha, Telegram, pembatas permintaan;
+│                        email, captcha, Telegram, pembatas permintaan, kesiapan skema;
 │                        auth-service.ts (pintu kompatibilitas) dan auth-flows/: login,
 │                        pendaftaran, kata sandi, verifikasi email, sesi, Telegram
 │   └── repositories/    mysql-auth-repository.ts (pintu kompatibilitas) dan accounts/:
@@ -123,9 +123,13 @@ semua modul; hanya repositori yang boleh memakainya (dicek ESLint).
 
 ```text
 src/features/devices/
-├── domain/device-request.ts   validasi pengajuan, kapasitas tangki, konsumsi, label status
+├── components/                warna lencana status pengajuan
+├── domain/                    device-request.ts: validasi pengajuan, kapasitas tangki, konsumsi,
+│                              label status, ambang awal; device-request-constants.ts: alamat
+│                              halaman dan frasa konfirmasi
 ├── server/                    layanan pengajuan, pembuatan perangkat dari kiriman pertama,
-│                              kunci perangkat, paket firmware, email paket, notifikasi admin
+│                              kunci perangkat, paket firmware, email paket, notifikasi admin,
+│                              pengenal error skema pengajuan
 │   └── repositories/          mysql-device-request-repository.ts (pintu kompatibilitas)
 │                              dan device-requests/ (SQL menurut tanggung jawab)
 └── tests/                     termasuk snapshot paket firmware v1 dan tes MySQL pemasangan
@@ -138,6 +142,7 @@ layanan `devices`, bukan langsung ke repositorinya. Impor antar-modul selalu mem
 
 ```text
 src/features/admin/
+├── domain/maintenance-confirmations.ts   frasa konfirmasi aksi perawatan data
 ├── server/maintenance-service.ts      reset pembacaan, pembersihan data uji, reset data perangkat
 │   └── repositories/mysql-maintenance-repository.ts   kueri SQL perawatan data
 └── tests/                            termasuk tes MySQL cakupan reset pembacaan

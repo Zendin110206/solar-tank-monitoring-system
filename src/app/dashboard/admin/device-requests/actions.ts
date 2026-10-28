@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { getAppBaseUrl } from "@/features/auth/server/auth-config";
-import { verifyAdminActionCsrfToken } from "@/features/auth/server/auth-csrf";
+import { assertValidAdminActionCsrf } from "@/features/auth/server/auth-csrf";
 import { requirePageAdmin } from "@/features/auth/server/auth-guards";
 import { sendDevicePackageReadyEmail } from "@/features/devices/server/device-package-email";
 import {
@@ -21,63 +21,20 @@ import {
 import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
 import { getRequiredFormValue } from "@/lib/http/form-data";
-
-const ADMIN_DEVICE_REQUEST_PATH = "/dashboard/admin/device-requests";
-const USER_DEVICE_REQUEST_PATH = "/dashboard/devices/request";
+import { isDeviceRequestSchemaError } from "@/features/devices/server/device-request-schema-error";
+import {
+  ADMIN_DEVICE_REQUEST_PATH,
+  CLEANUP_SINGLE_CONFIRMATION,
+  USER_DEVICE_REQUEST_PATH,
+} from "@/features/devices/domain/device-request-constants";
 const CLEANUP_SELECTED_CONFIRMATION = "BERSIHKAN PILIHAN DEVICE";
-const CLEANUP_SINGLE_CONFIRMATION = "BERSIHKAN ITEM DEVICE";
 const RESET_DEVICE_DATA_CONFIRMATION = "BERSIHKAN SEMUA DATA DEVICE";
-const DEVICE_REQUEST_SCHEMA_COLUMNS = [
-  "device_sensor_type",
-  "regional_label",
-  "wilayah_label",
-  "load_value",
-  "load_unit",
-  "diesel_engine_capacity_kva",
-  "cos_phi",
-] as const;
 
 export type DeviceRequestAdminActionState = {
   status: "idle" | "success" | "error";
   message: string;
   downloadUrl?: string;
 };
-
-function assertValidAdminActionCsrf({
-  formData,
-  sessionId,
-}: {
-  formData: FormData;
-  sessionId: string;
-}) {
-  const csrfToken = String(formData.get("csrfToken") ?? "");
-
-  if (
-    !verifyAdminActionCsrfToken({
-      sessionId,
-      token: csrfToken,
-    })
-  ) {
-    throw new Error(
-      "Sesi admin tidak valid. Muat ulang halaman lalu coba lagi.",
-    );
-  }
-}
-
-function isDeviceRequestSchemaError(error: unknown): boolean {
-  if (!(error instanceof Error)) {
-    return false;
-  }
-
-  const message = error.message.toLowerCase();
-
-  return (
-    message.includes("unknown column") &&
-    DEVICE_REQUEST_SCHEMA_COLUMNS.some((columnName) =>
-      message.includes(columnName),
-    )
-  );
-}
 
 function getActionError(error: unknown): DeviceRequestAdminActionState {
   if (isDeviceRequestSchemaError(error)) {

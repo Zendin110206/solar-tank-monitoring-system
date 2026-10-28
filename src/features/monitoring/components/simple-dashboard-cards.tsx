@@ -19,6 +19,11 @@ import {
 } from "@/components/ui/status-tone";
 import { SECONDARY_BUTTON_CLASS } from "@/components/ui/button-class";
 import { ActionMessage } from "@/components/ui/message";
+import {
+  DELETE_TANK_CONFIRMATION,
+  RESET_ALL_READINGS_CONFIRMATION,
+  RESET_TANK_READINGS_CONFIRMATION,
+} from "@/features/admin/domain/maintenance-confirmations";
 
 type SimpleDashboardCardsProps = {
   adminCleanupToken?: string;
@@ -29,9 +34,6 @@ const INITIAL_ACTION_STATE: DashboardAdminActionState = {
   status: "idle",
   message: "",
 };
-const DELETE_TANK_CONFIRMATION = "HAPUS DATA STO";
-const RESET_TANK_READINGS_CONFIRMATION = "RESET READING STO";
-const RESET_ALL_READINGS_CONFIRMATION = "RESET SEMUA READING";
 const TELKOM_WATERMARK_SRC = "/brand/Logo_Telkom1.png";
 
 function getTankIcon(site: SimpleDashboardSite) {
