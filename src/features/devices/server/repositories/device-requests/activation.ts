@@ -7,7 +7,6 @@ import {
   rowToActivationDevice,
   rowToActivationSite,
   rowToActivationTank,
-  toBoolean,
 } from "./row-mappers";
 import { formatMysqlDateTime } from "./shared";
 import type {
@@ -15,6 +14,7 @@ import type {
   PendingDeviceActivationRow,
 } from "./types";
 import type { PoolConnection } from "mysql2/promise";
+import { toBoolean } from "@/lib/database/row-values";
 
 async function findPendingDeviceActivationForUpdate({
   connection,

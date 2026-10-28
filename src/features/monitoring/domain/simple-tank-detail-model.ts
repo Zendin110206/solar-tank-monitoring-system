@@ -8,13 +8,16 @@ import type {
   TankDetailView,
   TankReadingPoint,
 } from "./tank-detail-view-model";
+import {
+  addDays,
+  parseTime,
+  startOfDisplayDay,
+} from "@/features/monitoring/domain/display-day";
+import { DISPLAY_TIME_ZONE } from "@/lib/format";
 
 export const SIMPLE_TANK_DETAIL_CHART_INTERVAL_MINUTES = 5;
 export const SIMPLE_TANK_DETAIL_CHART_MAX_POINTS = 48;
 export const SIMPLE_TANK_OFFLINE_GAP_THRESHOLD_MINUTES = 15;
-const DISPLAY_TIME_ZONE = "Asia/Jakarta";
-const DISPLAY_TIME_ZONE_OFFSET_MS = 7 * 60 * 60 * 1000;
-const DAY_MS = 24 * 60 * 60 * 1000;
 
 export type SimpleTankChartRangeKey = "day" | "week" | "month";
 
@@ -151,11 +154,6 @@ const deviceStatusLabels: Record<DeviceStatus, string> = {
   unknown: "Belum terbaca",
 };
 
-function parseTime(value: string) {
-  const time = Date.parse(value);
-  return Number.isFinite(time) ? time : null;
-}
-
 function formatClockLabel(date: Date) {
   return new Intl.DateTimeFormat("id-ID", {
     hour: "2-digit",
@@ -202,17 +200,6 @@ function formatDurationLabel(durationMs: number) {
   }
 
   return `${minutes} menit`;
-}
-
-function startOfDisplayDay(time: number) {
-  const date = new Date(time + DISPLAY_TIME_ZONE_OFFSET_MS);
-  date.setUTCHours(0, 0, 0, 0);
-
-  return new Date(date.getTime() - DISPLAY_TIME_ZONE_OFFSET_MS);
-}
-
-function addDays(date: Date, days: number) {
-  return new Date(date.getTime() + days * DAY_MS);
 }
 
 function addMinutes(date: Date, minutes: number) {

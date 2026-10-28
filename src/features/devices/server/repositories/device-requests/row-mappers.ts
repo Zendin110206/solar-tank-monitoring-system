@@ -21,7 +21,6 @@ import type {
   MonitoringHardwareProfile,
   Site,
   Tank,
-  TankShape,
 } from "@/features/monitoring/types/monitoring";
 import type {
   DeviceRequestRow,
@@ -30,6 +29,8 @@ import type {
   HardwareProfileRow,
   PendingDeviceActivationRow,
 } from "./types";
+import { toBoolean } from "@/lib/database/row-values";
+import { toTankShape } from "@/features/monitoring/domain/tank-shape";
 
 const DEVICE_REQUEST_STATUSES: DeviceRequestStatus[] = [
   "pending_admin_review",
@@ -52,10 +53,6 @@ const FIRMWARE_PACKAGE_STATUSES: FirmwarePackageStatus[] = [
   "activated",
   "failed",
 ];
-
-export function toBoolean(value: number | boolean): boolean {
-  return value === true || value === 1;
-}
 
 function toNumber(value: number | string | null | undefined): number {
   const parsed = Number(value);
@@ -85,10 +82,6 @@ function isFirmwarePackageStatus(
 
 function toDeviceRequestStatus(value: string): DeviceRequestStatus {
   return isDeviceRequestStatus(value) ? value : "pending_admin_review";
-}
-
-function toTankShape(value: string): TankShape {
-  return value === "rectangular" ? "rectangular" : "horizontal-cylinder";
 }
 
 function toDeviceSensorType(value: string | undefined): DeviceSensorType {

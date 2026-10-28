@@ -2,12 +2,14 @@ import "server-only";
 
 import { type RowDataPacket } from "mysql2/promise";
 
-import type { Device, Site, Tank, TankShape } from "../../types/monitoring";
+import type { Device, Site, Tank } from "../../types/monitoring";
 import {
   normalizeRegionalLabel,
   normalizeWilayahLabel,
 } from "../../domain/location-taxonomy";
 import { getMysqlPool } from "@/lib/database/mysql-connection";
+import { toBoolean, toNumber } from "@/lib/database/row-values";
+import { toTankShape } from "@/features/monitoring/domain/tank-shape";
 
 type SiteRow = RowDataPacket & {
   id: string;
@@ -67,15 +69,6 @@ export type MysqlMonitoringReferenceData = {
   devices: Device[];
 };
 
-function toBoolean(value: number | boolean): boolean {
-  return value === true || value === 1;
-}
-
-function toNumber(value: number | string | null): number {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : 0;
-}
-
 function toOptionalNumber(value: number | string | null): number | undefined {
   if (value === null) {
     return undefined;
@@ -83,10 +76,6 @@ function toOptionalNumber(value: number | string | null): number | undefined {
 
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : undefined;
-}
-
-function toTankShape(value: string): TankShape {
-  return value === "rectangular" ? "rectangular" : "horizontal-cylinder";
 }
 
 export function rowToSite(row: SiteRow): Site {
