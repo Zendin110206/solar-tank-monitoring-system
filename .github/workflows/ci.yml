@@ -115,6 +115,27 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }}
         run: printf '%s\n' "$PR_TITLE" | pnpm exec commitlint --verbose
 
+  release-source:
+    name: Release source branch
+    if: github.event_name == 'pull_request' && github.base_ref == 'main'
+    runs-on: ubuntu-latest
+
+    steps:
+      # main adalah produksi: yang boleh masuk hanya pull request rilis dari branch dev di
+      # repositori ini. Pull request lain ke main, misalnya pembaruan keamanan Dependabot yang
+      # selalu dibuka ke branch default, dibuat gagal supaya tidak tergabung tanpa sengaja.
+      - name: Check pull request source branch
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          HEAD_REPO: ${{ github.event.pull_request.head.repo.full_name }}
+          BASE_REPO: ${{ github.repository }}
+        run: |
+          if [ "$HEAD_REF" != "dev" ] || [ "$HEAD_REPO" != "$BASE_REPO" ]; then
+            echo "::error title=Sumber pull request ke main::Pull request ke main hanya boleh berasal dari branch dev di repositori ini (sekarang: $HEAD_REPO:$HEAD_REF). Buat ulang perubahannya lewat pull request ke dev."
+            exit 1
+          fi
+          echo "Sumber pull request ke main: $HEAD_REPO:$HEAD_REF"
+
   audit:
     name: Dependency audit
     runs-on: ubuntu-latest

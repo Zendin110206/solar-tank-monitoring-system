@@ -192,6 +192,19 @@ Indonesia yang wajar, yang bisa dipahami orang non-programmer:
 
 Jelaskan istilah teknis singkat di tempat istilah itu muncul.
 
+### Pull request ke `main`
+
+`main` hanya menerima pull request rilis dari branch `dev` di repositori ini. Job CI
+`Release source branch` menggagalkan pull request ke `main` yang berasal dari branch
+lain atau dari fork.
+
+Dependabot membuka pembaruan **keamanan** ke branch bawaan repositori (`main`), bukan ke
+`dev`; pengaturan `target-branch: dev` di `.github/dependabot.yml` hanya berlaku untuk
+pembaruan versi biasa. Pull request keamanan seperti itu jangan digabung. Buat ulang
+perubahannya di branch baru dari `dev` (naikkan versi paket yang sama, perbarui
+`pnpm-lock.yaml`, jalankan pemeriksaan), buka pull request ke `dev`, lalu tutup pull
+request Dependabot tadi dengan tautan ke pull request pengganti.
+
 ## Dependensi baru
 
 Sebelum menambah paket:
