@@ -11,6 +11,9 @@ dirilis ke `main`.
 
 ### Ditambahkan
 
+- Job CI `Release source branch`: pull request ke `main` yang tidak berasal dari branch `dev` di
+  repositori ini dibuat gagal, termasuk pembaruan keamanan Dependabot yang selalu dibuka ke branch
+  bawaan. CONTRIBUTING menjelaskan cara membuat ulang pembaruan seperti itu lewat `dev`.
 - Tes integrasi MySQL untuk rate limit (batas, kunci ember di-hash, jendela waktu) dan pembuatan
   perangkat otomatis (pembuatan, kiriman ulang, pembatalan transaksi bila gagal).
 - Kit UI dasar di `src/components/ui/`: `Card` (24 kartu), `StatusPill` (5 lencana status),

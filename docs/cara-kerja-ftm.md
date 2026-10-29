@@ -113,6 +113,7 @@ diubah. Kalau ada yang melanggar, perubahan ditolak sebelum sampai ke pengguna.
 | Tes otomatis (250 unit, 24 dengan MySQL) | Rumus, kontrak perangkat, dan alur penting berubah tanpa disadari            |
 | Audit dependensi                         | Pustaka dengan celah keamanan yang sudah diketahui                           |
 | Format pesan commit                      | Riwayat perubahan yang sulit dibaca                                          |
+| Sumber pull request ke `main`            | Perubahan selain rilis dari `dev` tergabung langsung ke produksi             |
 
 ## Dari perubahan kode sampai ke pengguna
 
