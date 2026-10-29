@@ -52,6 +52,10 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Pemeriksaan indeks unik Telegram untuk `/api/ready` kini ada di repositori sendiri
+  (`auth/server/repositories/mysql-auth-schema-repository.ts`) dan tidak lagi memuat repositori akun.
+  Akibatnya paket serverless `/api/health` kembali tanpa pustaka `argon2`, sama seperti di produksi.
+  Teks SQL dan balasan `/api/ready` tidak berubah.
 - Delapan dokumen acuan teknis (kontrak API, penerimaan data perangkat, model data, model domain,
   backup, deployment, batasan, batas sistem) dicocokkan dengan kode dan kini berstatus terkini.
   Koreksi utama: tiga endpoint yang belum tercantum, aturan akses endpoint, bentuk balasan ingest dan

@@ -20,11 +20,11 @@ export {
   touchAuthSessionIfStale,
 } from "./accounts/sessions";
 export {
-  checkAuthTelegramSchemaFromMysql,
   completeTelegramBindingInMysql,
   createTelegramBindTokenRecord,
   listActiveAdminTelegramChatIds,
 } from "./accounts/telegram";
+export { checkAuthTelegramSchemaFromMysql } from "./mysql-auth-schema-repository";
 export {
   createEmailVerificationTokenRecord,
   createOtpCodeRecord,
