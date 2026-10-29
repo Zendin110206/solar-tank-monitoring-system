@@ -279,13 +279,13 @@ Contoh bagian penting:
 ```json
 {
   "id": "site-tph",
-  "code": "TPH",
-  "name": "STO TPH",
+  "code": "CONTOH-A",
+  "name": "STO Contoh A",
   "regionalLabel": "TREG 5",
   "wilayahLabel": "TIF 3",
   "areaLabel": "Area Contoh",
-  "latitude": -7.65,
-  "longitude": 112.9,
+  "latitude": -0.123456,
+  "longitude": 100.123456,
   "coordinateStatus": "approved",
   "tank": {
     "shape": "rectangular",
@@ -299,7 +299,7 @@ Contoh bagian penting:
     "consumptionLiterPerHour": 25
   },
   "device": {
-    "code": "pilot-tph-01",
+    "code": "pilot-contoh-a-01",
     "expectedReportIntervalSec": 20,
     "apiKeyHash": "sha256:hasil_hash_di_sini"
   }
@@ -382,8 +382,8 @@ Lokal:
 
 ```powershell
 $env:PILOT_API_BASE_URL="http://localhost:3000"
-$env:PILOT_DEVICE_ID="pilot-tph-01"
-$env:PILOT_DEVICE_KEY="key-asli-device-tph"
+$env:PILOT_DEVICE_ID="pilot-contoh-a-01"
+$env:PILOT_DEVICE_KEY="key-asli-device-contoh-a"
 pnpm pilot:smoke
 ```
 
@@ -391,8 +391,8 @@ Vercel:
 
 ```powershell
 $env:PILOT_API_BASE_URL="https://solar-tank-monitoring-system.vercel.app"
-$env:PILOT_DEVICE_ID="pilot-tph-01"
-$env:PILOT_DEVICE_KEY="key-asli-device-tph"
+$env:PILOT_DEVICE_ID="pilot-contoh-a-01"
+$env:PILOT_DEVICE_KEY="key-asli-device-contoh-a"
 pnpm pilot:smoke
 ```
 
@@ -481,7 +481,7 @@ Header:
 
 ```http
 Content-Type: application/json
-X-Device-Id: pilot-tph-01
+X-Device-Id: pilot-contoh-a-01
 X-Device-Key: key-asli-device
 ```
 
@@ -489,7 +489,7 @@ Payload minimal yang disarankan:
 
 ```json
 {
-  "device": "pilot-tph-01",
+  "device": "pilot-contoh-a-01",
   "ts": 1780000000,
   "tank_shape": "rectangular",
   "capacity_liter": 540,

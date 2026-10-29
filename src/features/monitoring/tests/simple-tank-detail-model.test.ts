@@ -82,7 +82,7 @@ describe("simple tank detail model", () => {
     });
 
     if (!detail) {
-      throw new Error("Expected TPH tank detail.");
+      throw new Error("Expected tank-tph-main detail.");
     }
 
     expect(buildSimpleTankDetail(detail)).toMatchObject({
@@ -105,7 +105,7 @@ describe("simple tank detail model", () => {
     });
 
     if (!detail) {
-      throw new Error("Expected TPH tank detail.");
+      throw new Error("Expected tank-tph-main detail.");
     }
 
     const history = Array.from({ length: 36 }, (_, index) =>

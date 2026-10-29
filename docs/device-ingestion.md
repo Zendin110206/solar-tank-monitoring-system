@@ -104,7 +104,7 @@ Payload real-format untuk pilot:
 
 ```json
 {
-  "device": "pilot-tph-01",
+  "device": "pilot-contoh-a-01",
   "ts": 1780000000,
   "tank_shape": "rectangular",
   "capacity_liter": 540,
@@ -204,7 +204,7 @@ Untuk menguji payload real-format tanpa menunggu device fisik:
 
 ```powershell
 $env:PILOT_API_BASE_URL="https://solar-tank-monitoring-system.vercel.app"
-$env:PILOT_DEVICE_ID="pilot-tph-01"
+$env:PILOT_DEVICE_ID="pilot-contoh-a-01"
 $env:PILOT_DEVICE_KEY="key-asli-device"
 pnpm pilot:smoke
 ```

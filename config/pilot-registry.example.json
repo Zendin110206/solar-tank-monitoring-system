@@ -5,13 +5,13 @@
   "sites": [
     {
       "id": "site-tph",
-      "code": "TPH",
-      "name": "STO TPH",
+      "code": "CONTOH-A",
+      "name": "STO Contoh A",
       "regionalLabel": "TREG 5",
       "wilayahLabel": "TIF 3",
-      "areaLabel": "Pilot Pasuruan",
-      "latitude": -7.65,
-      "longitude": 112.9,
+      "areaLabel": "Area Contoh",
+      "latitude": 0,
+      "longitude": 0,
       "coordinateStatus": "review-required",
       "tank": {
         "id": "tank-tph-main",
@@ -28,21 +28,21 @@
       },
       "device": {
         "id": "device-tph-main",
-        "code": "pilot-tph-01",
-        "label": "NodeMCU Ultrasonic Pilot TPH",
+        "code": "pilot-contoh-a-01",
+        "label": "NodeMCU Ultrasonic Pilot Contoh A",
         "expectedReportIntervalSec": 20,
         "apiKeyHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
       }
     },
     {
       "id": "site-nja",
-      "code": "NJA",
-      "name": "STO NJA",
+      "code": "CONTOH-B",
+      "name": "STO Contoh B",
       "regionalLabel": "TREG 5",
       "wilayahLabel": "TIF 3",
-      "areaLabel": "Pilot Pasuruan",
-      "latitude": -7.68,
-      "longitude": 112.86,
+      "areaLabel": "Area Contoh",
+      "latitude": 0,
+      "longitude": 0,
       "coordinateStatus": "review-required",
       "tank": {
         "id": "tank-nja-main",
@@ -59,21 +59,21 @@
       },
       "device": {
         "id": "device-nja-main",
-        "code": "pilot-nja-01",
-        "label": "NodeMCU Ultrasonic Pilot NJA",
+        "code": "pilot-contoh-b-01",
+        "label": "NodeMCU Ultrasonic Pilot Contoh B",
         "expectedReportIntervalSec": 20,
         "apiKeyHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
       }
     },
     {
       "id": "site-jto",
-      "code": "JTO",
-      "name": "STO JTO",
+      "code": "CONTOH-C",
+      "name": "STO Contoh C",
       "regionalLabel": "TREG 5",
       "wilayahLabel": "TIF 3",
-      "areaLabel": "Pilot Pasuruan",
-      "latitude": -7.72,
-      "longitude": 112.88,
+      "areaLabel": "Area Contoh",
+      "latitude": 0,
+      "longitude": 0,
       "coordinateStatus": "review-required",
       "tank": {
         "id": "tank-jto-main",
@@ -90,21 +90,21 @@
       },
       "device": {
         "id": "device-jto-main",
-        "code": "pilot-jto-01",
-        "label": "NodeMCU Ultrasonic Pilot JTO",
+        "code": "pilot-contoh-c-01",
+        "label": "NodeMCU Ultrasonic Pilot Contoh C",
         "expectedReportIntervalSec": 20,
         "apiKeyHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
       }
     },
     {
       "id": "site-skp",
-      "code": "SKP",
-      "name": "STO SKP",
+      "code": "CONTOH-D",
+      "name": "STO Contoh D",
       "regionalLabel": "TREG 5",
       "wilayahLabel": "TIF 3",
-      "areaLabel": "Pilot Pasuruan",
-      "latitude": -7.7,
-      "longitude": 112.94,
+      "areaLabel": "Area Contoh",
+      "latitude": 0,
+      "longitude": 0,
       "coordinateStatus": "review-required",
       "tank": {
         "id": "tank-skp-main",
@@ -121,21 +121,21 @@
       },
       "device": {
         "id": "device-skp-main",
-        "code": "pilot-skp-01",
-        "label": "NodeMCU Ultrasonic Pilot SKP",
+        "code": "pilot-contoh-d-01",
+        "label": "NodeMCU Ultrasonic Pilot Contoh D",
         "expectedReportIntervalSec": 20,
         "apiKeyHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
       }
     },
     {
       "id": "site-psn",
-      "code": "PSN",
-      "name": "STO PSN",
+      "code": "CONTOH-E",
+      "name": "STO Contoh E",
       "regionalLabel": "TREG 5",
       "wilayahLabel": "TIF 3",
-      "areaLabel": "Pilot Pasuruan",
-      "latitude": -7.64,
-      "longitude": 112.91,
+      "areaLabel": "Area Contoh",
+      "latitude": 0,
+      "longitude": 0,
       "coordinateStatus": "review-required",
       "tank": {
         "id": "tank-psn-main",
@@ -152,8 +152,8 @@
       },
       "device": {
         "id": "device-psn-main",
-        "code": "pilot-psn-01",
-        "label": "NodeMCU Ultrasonic Pilot PSN",
+        "code": "pilot-contoh-e-01",
+        "label": "NodeMCU Ultrasonic Pilot Contoh E",
         "expectedReportIntervalSec": 20,
         "apiKeyHash": "sha256:0000000000000000000000000000000000000000000000000000000000000000"
       }

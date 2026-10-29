@@ -50,17 +50,17 @@ const DEVICE_REQUEST: MonitoringDeviceRequest = {
   consumptionLiterPerHour: 5.25,
   createdAt: "2026-07-05T00:00:00.000Z",
   criticalLevelPercent: 15,
-  deviceCode: "device-tph-main",
-  deviceLabel: "NodeMCU utama STO TPH",
+  deviceCode: "device-contoh-t-main",
+  deviceLabel: "NodeMCU utama STO Contoh T",
   deviceSensorType: "fuel",
   dieselEngineCapacityKva: 40,
   firmwareTemplateId: FIRMWARE_TEMPLATE.id,
   hardwareProfileId: HARDWARE_PROFILE.id,
   heightCm: 60,
   id: "device-request-1",
-  latitude: -7.72,
+  latitude: -0.72,
   lengthCm: 150,
-  longitude: 112.88,
+  longitude: 100.88,
   loadUnit: "kw",
   loadValue: 20,
   lowLevelPercent: 30,
@@ -68,10 +68,10 @@ const DEVICE_REQUEST: MonitoringDeviceRequest = {
   rejectionReason: null,
   requesterEmail: "operator@example.com",
   requesterUserId: "user-1",
-  requestCode: "REQ-TPH-20260705-ABC123",
+  requestCode: "REQ-CONTOH-T-20260705-ABC123",
   sensorMountHeightCm: 60,
-  siteCode: "TPH",
-  siteName: "STO TPH",
+  siteCode: "CONTOH-T",
+  siteName: "STO Contoh T",
   status: "pending_admin_review",
   tankShape: "rectangular",
   updatedAt: "2026-07-05T00:00:00.000Z",
@@ -83,10 +83,10 @@ describe("firmware package helpers", () => {
   it("creates safe zip filenames from device code", () => {
     expect(
       createFirmwarePackageFilename({
-        deviceCode: "Device TPH/Main",
+        deviceCode: "Device Contoh T/Main",
         generatedAt: new Date("2026-07-05T00:00:00.000Z"),
       }),
-    ).toBe("solartank-device-tph-main-20260705.zip");
+    ).toBe("solartank-device-contoh-t-main-20260705.zip");
   });
 
   it("falls back when a filename segment is empty after sanitizing", () => {
@@ -110,14 +110,16 @@ describe("firmware package helpers", () => {
       request: DEVICE_REQUEST,
     });
 
-    expect(header).toContain('#define SOLARTANK_DEVICE_CODE "device-tph-main"');
+    expect(header).toContain(
+      '#define SOLARTANK_DEVICE_CODE "device-contoh-t-main"',
+    );
     expect(header).toContain('#define SOLARTANK_DEVICE_SENSOR_TYPE "fuel"');
     expect(header).toContain(
       '#define SOLARTANK_DEVICE_KEY "stk_test_device_key"',
     );
     expect(header).toContain("#define SOLARTANK_TANK_CAPACITY_LITER 540");
-    expect(header).toContain("#define SOLARTANK_SITE_LATITUDE -7.7200000");
-    expect(header).toContain("#define SOLARTANK_SITE_LONGITUDE 112.8800000");
+    expect(header).toContain("#define SOLARTANK_SITE_LATITUDE -0.7200000");
+    expect(header).toContain("#define SOLARTANK_SITE_LONGITUDE 100.8800000");
     expect(header).toContain('#define SOLARTANK_REGIONAL_LABEL "TREG 5"');
     expect(header).toContain('#define SOLARTANK_WILAYAH_LABEL "TIF 3"');
     expect(header).toContain(
@@ -136,7 +138,9 @@ describe("firmware package helpers", () => {
       request: DEVICE_REQUEST,
     });
 
-    expect(bundle.filename).toMatch(/^solartank-device-tph-main-\d{8}\.zip$/);
+    expect(bundle.filename).toMatch(
+      /^solartank-device-contoh-t-main-\d{8}\.zip$/,
+    );
     expect(bundle.zipBuffer.subarray(0, 4).toString("hex")).toBe("504b0304");
     expect(bundle.files.map((file) => file.path)).toEqual([
       "solar_tank_firmware.ino",

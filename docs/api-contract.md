@@ -318,7 +318,7 @@ curl.exe -L "http://localhost:3000/api/tanks/tank-tph-main/readings/export?range
 Contoh nama file:
 
 ```text
-solartank_tph_tangki-utama_reading_7-hari_2026-07-01_sampai_2026-07-07.csv
+solartank_contoh-a_tangki-utama_reading_7-hari_2026-07-01_sampai_2026-07-07.csv
 ```
 
 Jika `range` tidak dikenal:
@@ -379,7 +379,7 @@ Payload pilot real-format juga didukung. Payload ini dapat membawa config tangki
 
 ```json
 {
-  "device": "pilot-tph-01",
+  "device": "pilot-contoh-a-01",
   "tank_shape": "rectangular",
   "capacity_liter": 540,
   "length_cm": 150,

@@ -176,7 +176,7 @@ Copy-Item config/pilot-registry.example.json config/pilot-registry.local.json
 pnpm pilot:registry -- --dry-run
 pnpm pilot:registry
 $env:PILOT_API_BASE_URL="https://solar-tank-monitoring-system.vercel.app"
-$env:PILOT_DEVICE_ID="pilot-tph-01"
+$env:PILOT_DEVICE_ID="pilot-contoh-a-01"
 $env:PILOT_DEVICE_KEY="key-asli-device"
 pnpm pilot:smoke
 ```

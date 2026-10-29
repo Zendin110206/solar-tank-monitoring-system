@@ -29,28 +29,28 @@ Dashboard memakai peta berbasis koordinat. Titik peta tidak berasal dari GPS dev
 
 Siapkan tabel sederhana seperti ini sebelum menyentuh kode atau device.
 
-| Data           | Contoh          | Catatan                                                          |
-| -------------- | --------------- | ---------------------------------------------------------------- |
-| Kode STO       | `TPH`           | Kode pendek yang mudah dibaca                                    |
-| Nama lokasi    | `STO TPH`       | Nama yang tampil di dashboard                                    |
-| Regional       | `TREG 5`        | Kelompok lokasi paling besar                                     |
-| Wilayah        | `TIF 3`         | Kelompok di bawah Regional                                       |
-| Area           | `Area Contoh`   | Label area kerja                                                 |
-| Latitude       | `-7.6500000`    | Harus angka koordinat yang disetujui                             |
-| Longitude      | `112.9000000`   | Harus angka koordinat yang disetujui                             |
-| ID tangki      | `tank-tph-main` | Gunakan format konsisten                                         |
-| Bentuk tangki  | `rectangular`   | Contoh awal memakai tangki balok                                 |
-| Kapasitas      | `540`           | Liter                                                            |
-| Panjang        | `150`           | cm                                                               |
-| Lebar          | `60`            | cm                                                               |
-| Tinggi         | `60`            | cm                                                               |
-| Tinggi sensor  | `60`            | cm dari dasar referensi                                          |
-| Batas rendah   | `30`            | persen                                                           |
-| Batas kritis   | `15`            | persen                                                           |
-| Konsumsi       | `25`            | liter per jam                                                    |
-| Kode device    | `pilot-tph-01`  | Harus sama dengan firmware                                       |
-| Interval kirim | `20`            | detik untuk monitoring live; history tetap diringkas per 5 menit |
-| Hash key       | `sha256:...`    | Bukan key asli                                                   |
+| Data           | Contoh              | Catatan                                                          |
+| -------------- | ------------------- | ---------------------------------------------------------------- |
+| Kode STO       | `CONTOH-A`          | Kode pendek yang mudah dibaca                                    |
+| Nama lokasi    | `STO Contoh A`      | Nama yang tampil di dashboard                                    |
+| Regional       | `TREG 5`            | Kelompok lokasi paling besar                                     |
+| Wilayah        | `TIF 3`             | Kelompok di bawah Regional                                       |
+| Area           | `Area Contoh`       | Label area kerja                                                 |
+| Latitude       | `0.0000000`         | Ganti dengan angka koordinat yang disetujui                      |
+| Longitude      | `0.0000000`         | Ganti dengan angka koordinat yang disetujui                      |
+| ID tangki      | `tank-tph-main`     | Gunakan format konsisten                                         |
+| Bentuk tangki  | `rectangular`       | Contoh awal memakai tangki balok                                 |
+| Kapasitas      | `540`               | Liter                                                            |
+| Panjang        | `150`               | cm                                                               |
+| Lebar          | `60`                | cm                                                               |
+| Tinggi         | `60`                | cm                                                               |
+| Tinggi sensor  | `60`                | cm dari dasar referensi                                          |
+| Batas rendah   | `30`                | persen                                                           |
+| Batas kritis   | `15`                | persen                                                           |
+| Konsumsi       | `25`                | liter per jam                                                    |
+| Kode device    | `pilot-contoh-a-01` | Harus sama dengan firmware                                       |
+| Interval kirim | `20`                | detik untuk monitoring live; history tetap diringkas per 5 menit |
+| Hash key       | `sha256:...`        | Bukan key asli                                                   |
 
 ## Cara Mengambil Koordinat
 
@@ -65,7 +65,7 @@ Cara umum di browser:
 5. Pastikan formatnya seperti:
 
 ```text
--7.650000, 112.900000
+-0.123456, 100.123456
 ```
 
 Angka pertama adalah latitude. Angka kedua adalah longitude.
@@ -74,8 +74,8 @@ Masukkan ke registry:
 
 ```json
 {
-  "latitude": -7.65,
-  "longitude": 112.9,
+  "latitude": -0.123456,
+  "longitude": 100.123456,
   "coordinateStatus": "approved"
 }
 ```
@@ -227,7 +227,7 @@ Header:
 
 ```http
 Content-Type: application/json
-X-Device-Id: pilot-tph-01
+X-Device-Id: pilot-contoh-a-01
 X-Device-Key: key-asli-device
 ```
 
@@ -241,7 +241,7 @@ Payload minimal:
 
 ```json
 {
-  "device": "pilot-tph-01",
+  "device": "pilot-contoh-a-01",
   "ts": 1780000000,
   "tank_shape": "rectangular",
   "capacity_liter": 540,
@@ -322,7 +322,7 @@ Smoke test lokal:
 
 ```powershell
 $env:PILOT_API_BASE_URL="https://solar-tank-monitoring-system.vercel.app"
-$env:PILOT_DEVICE_ID="pilot-tph-01"
+$env:PILOT_DEVICE_ID="pilot-contoh-a-01"
 $env:PILOT_DEVICE_KEY="key-asli-device"
 pnpm pilot:smoke
 ```
