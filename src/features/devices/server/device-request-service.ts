@@ -1,7 +1,9 @@
 import "server-only";
 
-// Pintu layanan pengajuan perangkat selama transisi lapisan pada ADR 0011.
-// Delegasi mempertahankan fungsi, tipe hasil, dan transaksi repositori yang sama.
+// Pintu layanan pengajuan perangkat untuk src/app dan modul lain (ADR 0011).
+// Pembungkus tipis repositori (aturan 5): fungsi, tipe hasil, dan transaksinya sama dengan
+// repositori; hanya namanya mengikuti kegiatan pengguna. Alur beberapa langkah (menyetujui,
+// mengirim email, mencatat pengiriman) masih dijalankan server action.
 export {
   activateApprovedDeviceOnFirstPingFromMysql as activateApprovedDeviceOnFirstPing,
   approveDeviceRequestInMysql as approveDeviceRequest,

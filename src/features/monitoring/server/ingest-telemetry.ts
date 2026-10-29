@@ -25,7 +25,7 @@ import {
   type MonitoringStorageDriver,
 } from "./monitoring-storage";
 import {
-  activateApprovedDeviceOnFirstPing as activateApprovedDeviceOnFirstPingFromMysql,
+  activateApprovedDeviceOnFirstPing,
   type ActivateApprovedDeviceResult,
 } from "@/features/devices/server/device-request-service";
 
@@ -205,13 +205,11 @@ export async function ingestTelemetry({
     referenceData = await getMonitoringReferenceData();
   } catch {
     if (getMonitoringStorageDriver() === "mysql") {
-      const activationResult = await activateApprovedDeviceOnFirstPingFromMysql(
-        {
-          deviceIdentifier: cleanDeviceIdentifier,
-          deviceKey: cleanDeviceKey,
-          receivedAt,
-        },
-      );
+      const activationResult = await activateApprovedDeviceOnFirstPing({
+        deviceIdentifier: cleanDeviceIdentifier,
+        deviceKey: cleanDeviceKey,
+        receivedAt,
+      });
 
       if (activationResult.ok) {
         device = activationResult.device;
@@ -255,7 +253,7 @@ export async function ingestTelemetry({
   }
 
   if (!device && getMonitoringStorageDriver() === "mysql") {
-    const activationResult = await activateApprovedDeviceOnFirstPingFromMysql({
+    const activationResult = await activateApprovedDeviceOnFirstPing({
       deviceIdentifier: cleanDeviceIdentifier,
       deviceKey: cleanDeviceKey,
       receivedAt,

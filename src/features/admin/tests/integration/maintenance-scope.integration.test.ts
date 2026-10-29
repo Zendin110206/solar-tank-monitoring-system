@@ -1,7 +1,7 @@
 import type { RowDataPacket } from "mysql2/promise";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-import { resetMonitoringReadings as resetMonitoringReadingsInMysql } from "../../server/maintenance-service";
+import { resetMonitoringReadings } from "../../server/maintenance-service";
 import { saveMonitoringReadingToMysql } from "@/features/monitoring/server/repositories/mysql-reading-repository";
 import type { Reading } from "@/features/monitoring/types/monitoring";
 import {
@@ -74,7 +74,7 @@ describe("cakupan reset pembacaan di MySQL (integrasi)", () => {
   });
 
   it("reset satu tangki hanya menghapus pembacaan tangki itu", async () => {
-    const result = await resetMonitoringReadingsInMysql({
+    const result = await resetMonitoringReadings({
       tankIds: [locationA.tankId],
     });
 
@@ -105,11 +105,13 @@ describe("cakupan reset pembacaan di MySQL (integrasi)", () => {
 
   it("mengabaikan tangki yang tidak ada tanpa menghapus apa pun", async () => {
     expect(
-      await resetMonitoringReadingsInMysql({ tankIds: ["tank-tidak-ada"] }),
+      await resetMonitoringReadings({ tankIds: ["tank-tidak-ada"] }),
     ).toEqual({ matchedTankCount: 0, readingRows: 0, totalRows: 0 });
-    expect(
-      await resetMonitoringReadingsInMysql({ tankIds: [" ", ""] }),
-    ).toEqual({ matchedTankCount: 0, readingRows: 0, totalRows: 0 });
+    expect(await resetMonitoringReadings({ tankIds: [" ", ""] })).toEqual({
+      matchedTankCount: 0,
+      readingRows: 0,
+      totalRows: 0,
+    });
     expect(
       await count("SELECT COUNT(*) AS total FROM monitoring_readings"),
     ).toBe(2);
@@ -118,7 +120,7 @@ describe("cakupan reset pembacaan di MySQL (integrasi)", () => {
   it("mempertahankan perilaku saat ini: reset semua menghapus seluruh riwayat permanen (FTM-002) tetapi menyisakan registry dan akun", async () => {
     await seedReadings();
 
-    const result = await resetMonitoringReadingsInMysql();
+    const result = await resetMonitoringReadings();
 
     expect(result).toEqual({
       matchedTankCount: 2,

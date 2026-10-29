@@ -1,7 +1,8 @@
 import "server-only";
 
 // Pintu layanan aksi perawatan data (reset pembacaan, pembersihan data uji)
-// untuk src/app (ADR 0011). Untuk sementara meneruskan fungsi repositori apa adanya.
+// untuk src/app (ADR 0011).
+// Pembungkus tipis repositori (aturan 5 ADR 0011) karena alurnya sederhana.
 export {
   cleanupMonitoringDeviceRequestsInMysql as cleanupMonitoringDeviceRequests,
   cleanupMonitoringTanksInMysql as cleanupMonitoringTanks,

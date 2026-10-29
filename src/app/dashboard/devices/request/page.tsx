@@ -8,8 +8,8 @@ import {
   getDeviceSensorTypeLabel,
 } from "@/features/devices/domain/device-request";
 import {
-  listDeviceRequestsForUser as listDeviceRequestsForUserFromMysql,
-  listDeviceHardwareProfiles as listHardwareProfilesFromMysql,
+  listDeviceRequestsForUser,
+  listDeviceHardwareProfiles,
 } from "@/features/devices/server/device-request-service";
 import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
 import type { MonitoringDeviceRequest } from "@/features/monitoring/types/monitoring";
@@ -118,8 +118,8 @@ export default async function DeviceRequestPage() {
   const isMysqlEnabled = getMonitoringStorageDriver() === "mysql";
   const [hardwareProfiles, requests] = isMysqlEnabled
     ? await Promise.all([
-        listHardwareProfilesFromMysql({ activeOnly: true }),
-        listDeviceRequestsForUserFromMysql(user.id),
+        listDeviceHardwareProfiles({ activeOnly: true }),
+        listDeviceRequestsForUser(user.id),
       ])
     : [[], []];
 
