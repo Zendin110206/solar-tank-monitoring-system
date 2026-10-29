@@ -224,3 +224,13 @@ perangkat otomatis diberi tes integrasi MySQL lebih dulu.
 Impor di dalam satu modul memakai jalur relatif, sedangkan alias `@/features/<modul>/...` hanya
 untuk modul lain. Aturan ini kini dicek ESLint (`no-restricted-syntax`, satu blok per modul),
 sehingga tidak menimpa opsi `no-restricted-imports` untuk aturan lapisan.
+
+### 29 Oktober 2026 — pemeriksaan skema Telegram punya repositori sendiri
+
+Pemeriksaan indeks unik Telegram untuk `/api/ready` dipindah dari
+`auth/server/repositories/accounts/telegram.ts` ke
+`auth/server/repositories/mysql-auth-schema-repository.ts`, dan `auth-readiness.ts` mengimpornya
+langsung dari berkas itu. Alasannya: lewat pintu `mysql-auth-repository.ts`, pemeriksaan ini ikut
+memuat seluruh repositori akun beserta modul kripto akun (`argon2`), sehingga rute `/api/health`
+(yang memuat modul pemeriksaan yang sama) membawa `argon2` ke paket serverless-nya, padahal sebelum
+pemindahan 27 Oktober tidak. Teks SQL dan balasan `/api/ready` tidak berubah.
