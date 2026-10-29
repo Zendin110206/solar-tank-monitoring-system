@@ -79,7 +79,7 @@ describe("normalizeCatPayload", () => {
     const tank = mockTanks.find((item) => item.id === "tank-psn-main");
 
     if (!tank) {
-      throw new Error("Expected PSN tank mock data.");
+      throw new Error("Expected tank-psn-main mock data.");
     }
 
     const reading = normalizeCatPayload({
@@ -103,8 +103,8 @@ describe("normalizeCatPayload", () => {
         rssi: -54,
         wifi_rssi: -54,
         ip: "192.168.1.173",
-        lat: -7.65,
-        lng: 112.9,
+        lat: -0.65,
+        lng: 100.9,
         tank: {
           shape: "rectangular",
           capacity_liter: 540,

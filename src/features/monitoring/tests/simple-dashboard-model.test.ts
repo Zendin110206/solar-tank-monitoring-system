@@ -16,7 +16,7 @@ import type { DashboardMonitoringSite } from "../domain/dashboard-view-model";
 
 const sites: SimpleDashboardSite[] = [
   {
-    code: "TPH",
+    code: "CONTOH-T",
     name: "STO Contoh Dahlia",
     areaLabel: "Area Contoh Barat",
     regionalLabel: "TREG 5",
@@ -31,7 +31,7 @@ const sites: SimpleDashboardSite[] = [
     isOnline: true,
   },
   {
-    code: "NJA",
+    code: "CONTOH-N",
     name: "STO Contoh Bakung",
     areaLabel: "Area Contoh Timur",
     regionalLabel: "TREG 5",
@@ -46,7 +46,7 @@ const sites: SimpleDashboardSite[] = [
     isOnline: true,
   },
   {
-    code: "SKP",
+    code: "CONTOH-S",
     name: "STO Contoh Cemara",
     areaLabel: "Area Contoh Barat",
     regionalLabel: "TREG 4",
@@ -67,13 +67,13 @@ describe("simple dashboard model", () => {
     const rows: DashboardMonitoringSite[] = [
       {
         id: "site-tph-tank-tph",
-        code: "TPH",
-        name: "STO TPH",
+        code: "CONTOH-T",
+        name: "STO Contoh T",
         areaLabel: "Area demo",
         regionalLabel: "TREG 5",
         wilayahLabel: "TIF 3",
         tankId: "tank-tph",
-        tank: "Tangki TPH",
+        tank: "Tangki Contoh T",
         status: "online",
         deviceStatus: "online",
         runtimeStatus: "safe",
@@ -87,8 +87,8 @@ describe("simple dashboard model", () => {
         signal: "-",
         left: "50%",
         top: "50%",
-        latitude: -7.65,
-        longitude: 112.9,
+        latitude: -0.65,
+        longitude: 100.9,
         note: "Data stabil.",
         consumptionLiterPerHour: 24,
         configStatus: "normal",
@@ -106,8 +106,8 @@ describe("simple dashboard model", () => {
     ).toMatchObject({
       capacityLiter: 540,
       tankShape: "rectangular",
-      latitude: -7.65,
-      longitude: 112.9,
+      latitude: -0.65,
+      longitude: 100.9,
       regionalLabel: "TREG 5",
       wilayahLabel: "TIF 3",
     });
@@ -142,7 +142,7 @@ describe("simple dashboard model", () => {
         regional: SIMPLE_DASHBOARD_ALL_REGIONALS,
         wilayah: SIMPLE_DASHBOARD_ALL_WILAYAHS,
       }).map((site) => site.code),
-    ).toEqual(["NJA"]);
+    ).toEqual(["CONTOH-N"]);
 
     expect(
       filterSimpleDashboardSites(sites, {
@@ -152,7 +152,7 @@ describe("simple dashboard model", () => {
         regional: SIMPLE_DASHBOARD_ALL_REGIONALS,
         wilayah: SIMPLE_DASHBOARD_ALL_WILAYAHS,
       }).map((site) => site.code),
-    ).toEqual(["SKP"]);
+    ).toEqual(["CONTOH-S"]);
 
     expect(
       filterSimpleDashboardSites(sites, {
@@ -162,7 +162,7 @@ describe("simple dashboard model", () => {
         regional: SIMPLE_DASHBOARD_ALL_REGIONALS,
         wilayah: SIMPLE_DASHBOARD_ALL_WILAYAHS,
       }).map((site) => site.code),
-    ).toEqual(["SKP"]);
+    ).toEqual(["CONTOH-S"]);
   });
 
   it("memfilter status online dan offline saja", () => {
@@ -174,7 +174,7 @@ describe("simple dashboard model", () => {
         regional: SIMPLE_DASHBOARD_ALL_REGIONALS,
         wilayah: SIMPLE_DASHBOARD_ALL_WILAYAHS,
       }).map((site) => site.code),
-    ).toEqual(["TPH", "NJA"]);
+    ).toEqual(["CONTOH-T", "CONTOH-N"]);
 
     expect(
       filterSimpleDashboardSites(sites, {
@@ -184,7 +184,7 @@ describe("simple dashboard model", () => {
         regional: SIMPLE_DASHBOARD_ALL_REGIONALS,
         wilayah: SIMPLE_DASHBOARD_ALL_WILAYAHS,
       }).map((site) => site.code),
-    ).toEqual(["SKP"]);
+    ).toEqual(["CONTOH-S"]);
   });
 
   it("memfilter area dari data registry, bukan hardcode", () => {
@@ -196,7 +196,7 @@ describe("simple dashboard model", () => {
         regional: SIMPLE_DASHBOARD_ALL_REGIONALS,
         wilayah: SIMPLE_DASHBOARD_ALL_WILAYAHS,
       }).map((site) => site.code),
-    ).toEqual(["TPH", "SKP"]);
+    ).toEqual(["CONTOH-T", "CONTOH-S"]);
   });
 
   it("memfilter regional dan wilayah dari data registry", () => {
@@ -208,7 +208,7 @@ describe("simple dashboard model", () => {
         regional: "TREG 5",
         wilayah: SIMPLE_DASHBOARD_ALL_WILAYAHS,
       }).map((site) => site.code),
-    ).toEqual(["TPH", "NJA"]);
+    ).toEqual(["CONTOH-T", "CONTOH-N"]);
 
     expect(
       filterSimpleDashboardSites(sites, {
@@ -218,14 +218,14 @@ describe("simple dashboard model", () => {
         regional: SIMPLE_DASHBOARD_ALL_REGIONALS,
         wilayah: "TIF 3",
       }).map((site) => site.code),
-    ).toEqual(["TPH", "NJA", "SKP"]);
+    ).toEqual(["CONTOH-T", "CONTOH-N", "CONTOH-S"]);
   });
 
   it("mengurutkan offline lebih dulu, lalu reading terbaru", () => {
     expect(sortSimpleDashboardSites(sites).map((site) => site.code)).toEqual([
-      "SKP",
-      "TPH",
-      "NJA",
+      "CONTOH-S",
+      "CONTOH-T",
+      "CONTOH-N",
     ]);
   });
 });

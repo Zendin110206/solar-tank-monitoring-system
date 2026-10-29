@@ -52,19 +52,19 @@ describe("mysql device request repository mappers", () => {
   it("maps device request rows with JSON validation warnings and UTC timestamps", () => {
     const request = rowToDeviceRequest({
       id: "device-request-1",
-      request_code: "REQ-TPH-20260705-ABC123",
+      request_code: "REQ-CONTOH-T-20260705-ABC123",
       requester_user_id: "user-1",
       requester_email: "user@example.com",
       status: "approved_waiting_package",
-      site_code: "TPH",
-      site_name: "STO TPH",
+      site_code: "CONTOH-T",
+      site_name: "STO Contoh T",
       regional_label: "TREG 5",
       wilayah_label: "TIF 3",
       area_label: "Area Contoh",
-      latitude: "-7.7200",
-      longitude: "112.8800",
-      device_code: "device-tph-main",
-      device_label: "NodeMCU TPH",
+      latitude: "-0.7200",
+      longitude: "100.8800",
+      device_code: "device-contoh-t-main",
+      device_label: "NodeMCU Contoh T",
       device_sensor_type: "fuel",
       tank_shape: "rectangular",
       capacity_liter: "540.00",
@@ -97,12 +97,12 @@ describe("mysql device request repository mappers", () => {
     } as Parameters<typeof rowToDeviceRequest>[0]);
 
     expect(request).toMatchObject({
-      requestCode: "REQ-TPH-20260705-ABC123",
+      requestCode: "REQ-CONTOH-T-20260705-ABC123",
       status: "approved_waiting_package",
       regionalLabel: "TREG 5",
       wilayahLabel: "TIF 3",
-      latitude: -7.72,
-      longitude: 112.88,
+      latitude: -0.72,
+      longitude: 100.88,
       capacityLiter: 540,
       deviceSensorType: "fuel",
       loadValue: 20,
@@ -124,7 +124,7 @@ describe("mysql device request repository mappers", () => {
     const firmwarePackage = rowToFirmwarePackage({
       activated_at: null,
       content_type: "application/zip",
-      device_id: "device-device-tph-main",
+      device_id: "device-device-contoh-t-main",
       device_key_hash: "sha256:device-key-hash",
       download_count: "1",
       download_expires_at: "2026-07-12 03:20:00.000",
@@ -138,7 +138,7 @@ describe("mysql device request repository mappers", () => {
       package_auth_tag: Buffer.from("tag"),
       package_checksum_sha256: "checksum",
       package_ciphertext: Buffer.from("ciphertext"),
-      package_filename: "solartank-device-tph-main-20260705.zip",
+      package_filename: "solartank-device-contoh-t-main-20260705.zip",
       package_iv: Buffer.from("iv"),
       package_size_bytes: "2048",
       package_status: "downloaded",
@@ -147,11 +147,11 @@ describe("mysql device request repository mappers", () => {
     } as Parameters<typeof rowToFirmwarePackage>[0]);
 
     expect(firmwarePackage).toMatchObject({
-      deviceId: "device-device-tph-main",
+      deviceId: "device-device-contoh-t-main",
       downloadCount: 1,
       downloadExpiresAt: "2026-07-12T03:20:00.000Z",
       firstDownloadedAt: "2026-07-05T04:20:00.000Z",
-      packageFilename: "solartank-device-tph-main-20260705.zip",
+      packageFilename: "solartank-device-contoh-t-main-20260705.zip",
       packageSizeBytes: 2048,
       packageStatus: "downloaded",
     });

@@ -285,14 +285,18 @@ karena merapikannya mengubah tampilan atau perilaku:
   Menyatukannya ke satu modul berarti mengubah perilaku peta operasional untuk lintang di atas 85°;
 - teks halaman error dashboard dan detail tangki memuat petunjuk pengembang
   (`MYSQL_DATABASE_URL`, `.env.local`, `pnpm dev`) yang ikut terlihat pengguna;
-- halaman depan memuat kode STO pilot (TPH, NJA, JTO), dan formulir pengajuan perangkat
-  memakai contoh isian "STO Bangil", "Pasuruan", serta koordinat sekitar Pasuruan. Keduanya teks
-  yang dilihat pengguna; menggantinya dengan contoh fiktif adalah perubahan tampilan (FTM-028);
-- teks layar lain juga memuat lokasi sungguhan: label kantor "Telkom Pasuruan, Jawa Timur" di
-  halaman profil, kartu contoh "STO TPH" di layar masuk/daftar (`auth-shell.tsx`), dan contoh alasan
-  "STO area Pasuruan" di formulir daftar. Alias teknis data contoh (`site-tph`, `tank-tph-main`,
-  `demo-tph-01`) dipakai seed, penyimpanan memori, dan tes; menggantinya ikut mengubah alamat halaman
-  contoh (FTM-028);
+- halaman depan memuat tiga kode STO pilot, dan formulir pengajuan perangkat memakai contoh
+  isian nama STO, nama kota, serta koordinat di sekitar lokasi pilot. Keduanya teks yang
+  dilihat pengguna; menggantinya dengan contoh fiktif adalah perubahan tampilan (FTM-028);
+- teks layar lain juga memuat lokasi sungguhan: label kantor di halaman profil, kartu contoh
+  berkode STO pilot di layar masuk/daftar (`auth-shell.tsx`), serta contoh nama pengguna dan
+  contoh alasan di formulir daftar. Titik tengah bawaan kedua peta (dipakai bila belum ada lokasi
+  berkoordinat) juga berada di sekitar lokasi pilot. Alias teknis data contoh (`site-tph`,
+  `tank-tph-main`, `demo-tph-01`) dipakai seed, penyimpanan memori, dan tes; menggantinya ikut
+  mengubah alamat halaman contoh (FTM-028);
+- `pnpm pilot:smoke` memakai kode perangkat bawaan yang berkode STO pilot bila `--device` dan
+  `PILOT_DEVICE_ID` kosong, dan teks bantuannya memakai kode yang sama. Menggantinya mengubah
+  perilaku skrip;
 - formulir admin "Bersihkan semua data perangkat" dan "Bersihkan pengajuan terpilih"
   dicabut dari halaman pada Juli 2026, tetapi server action `resetMonitoringDeviceDataAction`,
   layanan, dan kueri SQL di belakangnya masih ada tanpa pemakai. Komponen formulirnya sudah

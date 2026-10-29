@@ -149,8 +149,8 @@ describe("telemetry store", () => {
         width_cm: 60,
         height_cm: 60,
         sensor_mount_height_cm: 60,
-        lat: -7.65,
-        lng: 112.9,
+        lat: -0.65,
+        lng: 100.9,
       },
     });
 
@@ -173,8 +173,8 @@ describe("telemetry store", () => {
         width_cm: 60,
         height_cm: 60,
         sensor_mount_height_cm: 60,
-        lat: -7.65,
-        lng: 112.9,
+        lat: -0.65,
+        lng: 100.9,
       },
     });
 
@@ -198,8 +198,8 @@ describe("telemetry store", () => {
         site_code: "AUTO",
         site_name: "STO Auto",
         area_label: "Area Contoh",
-        lat: -7.651,
-        lng: 112.901,
+        lat: -0.651,
+        lng: 100.901,
         tank_shape: "rectangular",
         capacity_liter: 540,
         length_cm: 150,

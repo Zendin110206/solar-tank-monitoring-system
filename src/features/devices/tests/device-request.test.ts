@@ -40,7 +40,7 @@ const rectangularProfile: MonitoringHardwareProfile = {
 };
 
 const baseDraft: DeviceRequestDraft = {
-  siteName: "STO TPH",
+  siteName: "STO Contoh T",
   areaLabel: "Area Contoh",
   regionalLabel: "TREG 5",
   wilayahLabel: "TIF 3",
@@ -78,8 +78,8 @@ describe("device request foundation", () => {
     expect(validation.ok).toBe(true);
     expect(validation.errors).toEqual([]);
     expect(validation.normalized).toMatchObject({
-      siteCode: "TPH",
-      siteName: "STO TPH",
+      siteCode: "CONTOH-T",
+      siteName: "STO Contoh T",
       areaLabel: "Area Contoh",
       regionalLabel: "TREG 5",
       wilayahLabel: "TIF 3",
@@ -95,7 +95,7 @@ describe("device request foundation", () => {
       consumptionLiterPerHour: 5.25,
     });
     expect(validation.normalized?.deviceCode).toMatch(
-      /^device-tph-[a-f0-9]{6}$/,
+      /^device-contoh-t-[a-f0-9]{6}$/,
     );
     expect(validation.capacityCheck).toMatchObject({
       calculatedCapacityLiter: 540,
@@ -150,8 +150,8 @@ describe("device request foundation", () => {
     const validation = validateDeviceRequestDraft(
       {
         ...baseDraft,
-        latitude: -7.7201234,
-        longitude: 112.8809876,
+        latitude: -0.7201234,
+        longitude: 100.8809876,
       },
       {
         firmwareTemplates: [firmwareTemplate],
@@ -161,8 +161,8 @@ describe("device request foundation", () => {
 
     expect(validation.ok).toBe(true);
     expect(validation.normalized).toMatchObject({
-      latitude: -7.7201234,
-      longitude: 112.8809876,
+      latitude: -0.7201234,
+      longitude: 100.8809876,
     });
   });
 
@@ -246,9 +246,9 @@ describe("device request foundation", () => {
 
     expect(result.request.id).toMatch(/^device_request_/);
     expect(result.request.requestCode).toMatch(
-      /^REQ-TPH-20260705-[A-F0-9]{6}$/,
+      /^REQ-CONTOH-T-20260705-[A-F0-9]{6}$/,
     );
-    expect(result.request.deviceCode).toMatch(/^device-tph-[a-f0-9]{6}$/);
+    expect(result.request.deviceCode).toMatch(/^device-contoh-t-[a-f0-9]{6}$/);
     expect(result.request.requesterEmail).toBe("user@example.com");
     expect(result.request.status).toBe("pending_admin_review");
     expect(result.request.firmwareTemplateId).toBe(firmwareTemplate.id);

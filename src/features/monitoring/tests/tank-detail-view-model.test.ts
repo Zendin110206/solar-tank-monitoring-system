@@ -65,15 +65,15 @@ describe("tank detail view model", () => {
       site.id === "site-tph"
         ? {
             ...site,
-            latitude: -7.7201234,
-            longitude: 112.8809876,
+            latitude: -0.7201234,
+            longitude: 100.8809876,
           }
         : site,
     );
     const detail = buildTankDetail("tank-tph-main", { now, sites });
 
     expect(detail?.coordinate.label).toBe(
-      "-7.7201234, 112.8809876 (koordinat manual)",
+      "-0.7201234, 100.8809876 (koordinat manual)",
     );
   });
 
@@ -81,7 +81,7 @@ describe("tank detail view model", () => {
     const tank = mockTanks.find((item) => item.id === "tank-tph-main");
 
     if (!tank) {
-      throw new Error("Expected TPH tank mock data.");
+      throw new Error("Expected tank-tph-main mock data.");
     }
 
     const reading = normalizeCatPayload({

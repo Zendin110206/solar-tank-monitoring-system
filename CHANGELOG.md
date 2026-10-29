@@ -55,6 +55,12 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Kode, nama, dan koordinat STO yang mirip lokasi sungguhan di tes, contoh registry
+  (`config/pilot-registry.example.json`), `.env.example`, dan dokumen acuan diganti contoh fiktif
+  (`CONTOH-A`, `STO Contoh A`, `pilot-contoh-a-01`, dan seterusnya). Koordinat contoh registry kini
+  `0` sebagai penanda. Tes tetap memeriksa hal yang sama. Teks layar aplikasi dan kode perangkat
+  bawaan `pnpm pilot:smoke` belum diubah karena mengubah tampilan atau perilaku; panduan pengguna
+  (HTML/PDF) belum diubah karena PDF-nya perlu dibuat ulang bersamaan.
 - Pemeriksaan indeks unik Telegram untuk `/api/ready` kini ada di repositori sendiri
   (`auth/server/repositories/mysql-auth-schema-repository.ts`) dan tidak lagi memuat repositori akun.
   Akibatnya paket serverless `/api/health` kembali tanpa pustaka `argon2`, sama seperti di produksi.
@@ -80,9 +86,9 @@ dirilis ke `main`.
   `clamp`/`clampPercent`, `formatRuntimeHour`, `formatDateTimeOrDash`, `escapeHtml`, pengaturan SMTP,
   `getRequestIp`, `getClientKey`, `getStringPayloadValue`, dan `getRequiredFormValue`. Isi fungsinya
   tidak berubah.
-- Data tes dan contoh dokumentasi tidak lagi memakai nama tempat sungguhan (Pasuruan, Tosari, Sukorejo,
-  Nguling) dan domain email sungguhan; diganti "Area Contoh", "STO Contoh ...", dan `contoh.example`.
-  Alias teknis seperti `tank-tph-main` tetap karena dipakai data contoh aplikasi.
+- Data tes dan contoh di dokumen acuan tidak lagi memakai nama tempat dan domain email sungguhan;
+  diganti "Area Contoh", "STO Contoh ...", dan `contoh.example`. Alias teknis seperti
+  `tank-tph-main` tetap karena dipakai data contoh aplikasi.
 - SQL yang masih dijalankan empat layanan (rate limit, notifikasi Telegram admin, pembuatan perangkat
   otomatis, pemeriksaan `/api/ready`) dipindah ke repositori. Pengecualian aturan lapisan di
   `eslint.config.mjs` dihapus. Teks SQL dan urutan langkah tidak berubah.
