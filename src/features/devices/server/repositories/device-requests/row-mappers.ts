@@ -357,7 +357,3 @@ export function rowToFirmwarePackage(
     revokedAt: parseMysqlDateTimeAsUtc(row.revoked_at),
   };
 }
-
-export function isPackageStatus(value: string): value is FirmwarePackageStatus {
-  return isFirmwarePackageStatus(value);
-}

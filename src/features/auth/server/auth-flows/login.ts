@@ -42,7 +42,7 @@ import {
 } from "./request-context";
 import { getRequestIp } from "@/lib/http/request";
 
-export type LoginResult =
+type LoginResult =
   | {
       ok: true;
       status: "authenticated";
@@ -57,7 +57,7 @@ export type LoginResult =
       delivery: "email" | "log";
     };
 
-export type VerifyOtpResult = {
+type VerifyOtpResult = {
   user: AuthSessionUser;
   sessionToken: string;
   expiresAt: Date;

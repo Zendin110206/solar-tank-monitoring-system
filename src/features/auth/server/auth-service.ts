@@ -13,7 +13,6 @@ export {
   logoutSession,
   verifyAdminOtpLogin,
 } from "./auth-flows/login";
-export type { LoginResult, VerifyOtpResult } from "./auth-flows/login";
 export {
   changePasswordForSession,
   requestPasswordReset,

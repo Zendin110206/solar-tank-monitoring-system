@@ -40,10 +40,9 @@ type ProvisioningSuccess = {
   device: Device;
 };
 
-export type DeviceProvisioningResult =
-  ProvisioningSuccess | ProvisioningFailure;
+type DeviceProvisioningResult = ProvisioningSuccess | ProvisioningFailure;
 
-export type ProvisionMonitoringDeviceInput = {
+type ProvisionMonitoringDeviceInput = {
   deviceIdentifier: string;
   deviceKey: string;
   expectedDeviceKey?: string;

@@ -7,9 +7,9 @@ import type {
 import { addDays, parseTime, startOfDisplayDay } from "./display-day";
 import { DISPLAY_TIME_ZONE } from "@/lib/format";
 
-export const SIMPLE_TANK_DETAIL_CHART_INTERVAL_MINUTES = 5;
-export const SIMPLE_TANK_DETAIL_CHART_MAX_POINTS = 48;
-export const SIMPLE_TANK_OFFLINE_GAP_THRESHOLD_MINUTES = 15;
+const SIMPLE_TANK_DETAIL_CHART_INTERVAL_MINUTES = 5;
+const SIMPLE_TANK_DETAIL_CHART_MAX_POINTS = 48;
+const SIMPLE_TANK_OFFLINE_GAP_THRESHOLD_MINUTES = 15;
 
 export type SimpleTankChartRangeKey = "day" | "week" | "month";
 
@@ -21,7 +21,7 @@ export type SimpleTankChartRange = {
   days: number;
 };
 
-export type SimpleTankTrendTick = {
+type SimpleTankTrendTick = {
   label: string;
   xRatio: number;
 };
@@ -34,19 +34,19 @@ export type SimpleTankDetailChartPoint = {
   sampleCount?: number;
 };
 
-export type SimpleTankTrendPoint = SimpleTankDetailChartPoint & {
+type SimpleTankTrendPoint = SimpleTankDetailChartPoint & {
   bucketStart: string;
   bucketEnd: string;
   sampleCount: number;
   xRatio: number;
 };
 
-export type SimpleTankTrendSegment = {
+type SimpleTankTrendSegment = {
   id: string;
   points: SimpleTankTrendPoint[];
 };
 
-export type SimpleTankTrendGap = {
+type SimpleTankTrendGap = {
   id: string;
   fromBucketStart: string;
   toBucketStart: string;
@@ -509,7 +509,7 @@ export function buildSimpleTankTrend(
   };
 }
 
-export function buildSimpleTankTrends(
+function buildSimpleTankTrends(
   points: SimpleTankDetailChartPoint[],
 ): SimpleTankTrendByRange {
   return SIMPLE_TANK_CHART_RANGES.reduce((trendByRange, range) => {

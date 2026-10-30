@@ -55,6 +55,9 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Ekspor yang hanya dipakai di berkasnya sendiri ditutup (88 deklarasi). Sebanyak 17 ekspor ulang tanpa
+  pemakai dan fungsi `isPackageStatus` yang tidak pernah dipanggil dihapus. Penanda `prettier-ignore`
+  di `accounts/users.ts` dibuang karena hasil Prettier 3.9.10 sudah stabil. Perilaku tidak berubah.
 - Tes karakterisasi ambang sisa jam genset kini mengimpor modul sungguhan, bukan membaca teks sumber
   halaman. Ambang di halaman `/dashboard/ringkas/tanks/[id]` dipindah apa adanya ke
   `_components/runtime-levels.ts` milik halaman itu, lalu pembantu tes

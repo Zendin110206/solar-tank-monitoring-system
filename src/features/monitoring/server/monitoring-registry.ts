@@ -16,14 +16,14 @@ export type MonitoringReferenceData = {
   devices: Device[];
 };
 
-export type MonitoringRegistrySource = {
+type MonitoringRegistrySource = {
   configuredDriver: MonitoringStorageDriver;
   activeDriver: MonitoringStorageDriver;
   isFallback: boolean;
   label: string;
 };
 
-export type MonitoringReferenceResult = {
+type MonitoringReferenceResult = {
   reference: MonitoringReferenceData;
   source: MonitoringRegistrySource;
 };

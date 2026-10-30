@@ -24,7 +24,6 @@ export {
   createTelegramBindTokenRecord,
   listActiveAdminTelegramChatIds,
 } from "./accounts/telegram";
-export { checkAuthTelegramSchemaFromMysql } from "./mysql-auth-schema-repository";
 export {
   createEmailVerificationTokenRecord,
   createOtpCodeRecord,
@@ -43,12 +42,7 @@ export {
   setAuthUserStatus,
   updateAuthUserRole,
 } from "./accounts/user-admin";
-export type {
-  AuthUserDirectoryFilters,
-  AuthUserDirectoryItem,
-  AuthUserDirectoryResult,
-  DeletedAuthUserSummary,
-} from "./accounts/user-admin";
+export type { AuthUserDirectoryItem } from "./accounts/user-admin";
 export {
   findAuthUserById,
   findAuthUserByIdentity,
@@ -59,4 +53,3 @@ export {
   updateAuthUserPasswordHash,
   updateAuthUserProfile,
 } from "./accounts/users";
-export type { VerifiedTelegramUserSummary } from "./accounts/users";

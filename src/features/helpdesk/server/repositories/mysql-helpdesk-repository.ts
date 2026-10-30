@@ -195,7 +195,7 @@ export async function findHelpdeskSessionByCode(
   return row ? rowToSession(row) : null;
 }
 
-export async function listHelpdeskMessages(
+async function listHelpdeskMessages(
   sessionId: string,
 ): Promise<HelpdeskMessage[]> {
   const pool = getMysqlPool();

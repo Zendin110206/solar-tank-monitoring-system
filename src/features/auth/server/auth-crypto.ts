@@ -57,7 +57,7 @@ export function createOtpCode(): string {
   return value.toString().padStart(6, "0");
 }
 
-export function sha256Hex(value: string): string {
+function sha256Hex(value: string): string {
   return createHash("sha256").update(value).digest("hex");
 }
 

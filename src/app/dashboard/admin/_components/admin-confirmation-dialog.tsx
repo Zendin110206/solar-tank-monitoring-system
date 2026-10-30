@@ -35,7 +35,7 @@ type AdminConfirmationDialogCallbackProps = AdminConfirmationDialogBaseProps & {
   onConfirm: () => void;
 };
 
-export type AdminConfirmationDialogProps =
+type AdminConfirmationDialogProps =
   AdminConfirmationDialogFormProps | AdminConfirmationDialogCallbackProps;
 
 const toneClasses: Record<

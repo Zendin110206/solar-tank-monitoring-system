@@ -5,7 +5,7 @@ import type { RowDataPacket } from "mysql2/promise";
 import { getMysqlPool } from "@/lib/database/mysql-connection";
 import { hmacSha256Hex } from "../auth-crypto";
 
-export type RateLimitRow = RowDataPacket & {
+type RateLimitRow = RowDataPacket & {
   request_count: number;
   window_expires_at: Date;
 };

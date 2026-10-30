@@ -51,7 +51,7 @@ export type AuthUserDirectoryItem = AuthSafeUser & {
   createdAt: string;
 };
 
-export type AuthUserDirectoryFilters = {
+type AuthUserDirectoryFilters = {
   page?: number;
   pageSize?: number;
   query?: string;
@@ -61,7 +61,7 @@ export type AuthUserDirectoryFilters = {
   verification?: "all" | "unverified" | "verified";
 };
 
-export type AuthUserDirectoryResult = {
+type AuthUserDirectoryResult = {
   counts: {
     active: number;
     admin: number;
@@ -78,7 +78,7 @@ export type AuthUserDirectoryResult = {
   users: AuthUserDirectoryItem[];
 };
 
-export type DeletedAuthUserSummary = {
+type DeletedAuthUserSummary = {
   email: string;
   fullName: string;
   id: string;

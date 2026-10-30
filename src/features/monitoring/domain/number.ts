@@ -1,4 +1,4 @@
-export function isFiniteNumber(value: unknown): value is number {
+function isFiniteNumber(value: unknown): value is number {
   return typeof value === "number" && Number.isFinite(value);
 }
 
@@ -24,7 +24,7 @@ export function roundTo(value: number, digits = 2): number {
   return Math.round((value + Number.EPSILON) * factor) / factor;
 }
 
-export function formatCoordinate(value: number, maxFractionDigits = 7): string {
+function formatCoordinate(value: number, maxFractionDigits = 7): string {
   if (!Number.isFinite(value)) {
     return "-";
   }

@@ -2,8 +2,7 @@ import type { HTMLAttributes } from "react";
 
 // Kartu putih standar: tepi abu-abu tipis, sudut membulat, bayangan lembut.
 // Kelas tambahan (misalnya animate-soft-fade atau mt-5) ditaruh di depan kelas dasar.
-export const CARD_CLASS =
-  "rounded-lg border border-zinc-200 bg-white p-5 shadow-sm";
+const CARD_CLASS = "rounded-lg border border-zinc-200 bg-white p-5 shadow-sm";
 
 type CardProps = HTMLAttributes<HTMLElement> & {
   as?: "article" | "div" | "section";

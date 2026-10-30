@@ -48,24 +48,24 @@ type TankLinkRow = RowDataPacket & {
   site_id: string;
 };
 
-export type ResetMonitoringDeviceDataResult = {
+type ResetMonitoringDeviceDataResult = {
   counts: Record<ResetMonitoringDeviceDataTable, number>;
   totalRows: number;
 };
 
-export type CleanupMonitoringDeviceRequestsResult = {
+type CleanupMonitoringDeviceRequestsResult = {
   counts: Partial<Record<ResetMonitoringDeviceDataTable, number>>;
   matchedRequestCount: number;
   totalRows: number;
 };
 
-export type CleanupMonitoringTanksResult = {
+type CleanupMonitoringTanksResult = {
   counts: Partial<Record<ResetMonitoringDeviceDataTable, number>>;
   matchedTankCount: number;
   totalRows: number;
 };
 
-export type ResetMonitoringReadingsResult = {
+type ResetMonitoringReadingsResult = {
   matchedTankCount: number;
   readingRows: number;
   totalRows: number;

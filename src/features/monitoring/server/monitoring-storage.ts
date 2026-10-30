@@ -17,19 +17,19 @@ import { selectLatestReadingPerTank } from "../domain/latest-reading";
 
 export type MonitoringStorageDriver = "memory" | "mysql";
 
-export type MonitoringStorageSource = {
+type MonitoringStorageSource = {
   configuredDriver: MonitoringStorageDriver;
   activeDriver: MonitoringStorageDriver;
   isFallback: boolean;
   label: string;
 };
 
-export type SaveMonitoringReadingResult = {
+type SaveMonitoringReadingResult = {
   reading: Reading;
   storage: MonitoringStorageDriver;
 };
 
-export type ListMonitoringReadingsResult = {
+type ListMonitoringReadingsResult = {
   readings: Reading[];
   source: MonitoringStorageSource;
 };

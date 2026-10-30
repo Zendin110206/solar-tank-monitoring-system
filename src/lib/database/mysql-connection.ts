@@ -17,7 +17,7 @@ const mysqlGlobal = globalThis as MysqlPoolGlobal;
 const DEFAULT_MYSQL_CONNECTION_LIMIT = 3;
 const MAX_MYSQL_CONNECTION_LIMIT = 10;
 
-export function getMysqlDatabaseUrl(): string {
+function getMysqlDatabaseUrl(): string {
   const value = serverEnv.MYSQL_DATABASE_URL?.trim();
 
   if (!value) {

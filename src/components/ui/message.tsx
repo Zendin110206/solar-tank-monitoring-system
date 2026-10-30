@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 // Pesan kesalahan formulir (kotak merah lembut) di atas tombol kirim.
-export const FORM_ERROR_CLASS =
+const FORM_ERROR_CLASS =
   "rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm leading-6 text-red-800";
 
 export function FormErrorMessage({

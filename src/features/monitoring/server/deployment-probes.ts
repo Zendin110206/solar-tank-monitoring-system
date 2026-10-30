@@ -38,16 +38,16 @@ import { hasSmtpConfig } from "@/lib/email/smtp-config";
 
 const SERVICE_NAME = "solar-tank-monitoring-system";
 
-export type DeploymentCheckStatus = "ok" | "degraded" | "error";
-export type DeploymentReadinessStatus = "ready" | "degraded" | "not_ready";
+type DeploymentCheckStatus = "ok" | "degraded" | "error";
+type DeploymentReadinessStatus = "ready" | "degraded" | "not_ready";
 
-export type DeploymentHealth = {
+type DeploymentHealth = {
   status: "ok";
   service: string;
   timestamp: string;
 };
 
-export type DeploymentCheck = {
+type DeploymentCheck = {
   name: string;
   ok: boolean;
   status: DeploymentCheckStatus;
@@ -55,7 +55,7 @@ export type DeploymentCheck = {
   latencyMs?: number;
 };
 
-export type DeploymentReadiness = {
+type DeploymentReadiness = {
   ok: boolean;
   status: DeploymentReadinessStatus;
   service: string;
