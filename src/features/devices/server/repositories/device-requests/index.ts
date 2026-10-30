@@ -5,12 +5,8 @@ export {
   rowToHardwareProfile,
   rowToDeviceRequest,
   rowToFirmwarePackage,
-  isPackageStatus,
 } from "./row-mappers";
-export {
-  listFirmwareTemplatesFromMysql,
-  listHardwareProfilesFromMysql,
-} from "./catalog";
+export { listHardwareProfilesFromMysql } from "./catalog";
 export {
   listDeviceRequestsForUserFromMysql,
   listDeviceRequestsForAdminFromMysql,
@@ -30,8 +26,5 @@ export {
 export { activateApprovedDeviceOnFirstPingFromMysql } from "./activation";
 export type {
   CreateDeviceRequestFromMysqlResult,
-  ApprovedDeviceRequestPackageResult,
-  DownloadDevicePackageResult,
-  DevicePackageAdminMutationResult,
   ActivateApprovedDeviceResult,
 } from "./types";

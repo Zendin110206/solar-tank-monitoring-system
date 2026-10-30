@@ -64,7 +64,7 @@ export function calculateHorizontalCylinderVolumeLiter({
   return roundTo((segmentAreaCm2 * lengthCm) / 1000, 2);
 }
 
-export function calculateRectangularVolumeLiter({
+function calculateRectangularVolumeLiter({
   lengthCm,
   widthCm,
   fuelHeightCm,

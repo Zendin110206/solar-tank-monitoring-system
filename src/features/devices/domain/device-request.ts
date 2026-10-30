@@ -227,7 +227,7 @@ export function evaluateDeviceRequestCapacity({
   };
 }
 
-export function isTankShapeSupportedByHardwareProfile({
+function isTankShapeSupportedByHardwareProfile({
   profile,
   tankShape,
 }: {
@@ -249,7 +249,7 @@ export function getDeviceSensorTypeLabel(sensorType: DeviceSensorType): string {
   }
 }
 
-export function createSiteCodeFromName({
+function createSiteCodeFromName({
   areaLabel,
   siteName,
 }: {
@@ -265,11 +265,7 @@ export function createSiteCodeFromName({
   return code || "STO";
 }
 
-export function createGeneratedDeviceCode({
-  siteCode,
-}: {
-  siteCode: string;
-}): string {
+function createGeneratedDeviceCode({ siteCode }: { siteCode: string }): string {
   const safeSiteCode =
     normalizeDeviceCode(siteCode).replace(/^sto-?/, "") || "sto";
   const randomPart = randomBytes(GENERATED_DEVICE_CODE_RANDOM_BYTES)
@@ -320,7 +316,7 @@ export function calculateOperationalConsumptionLiterPerHour({
   return roundTo(Math.max(0, loadConsumption), 2);
 }
 
-export function createDeviceRequestCode({
+function createDeviceRequestCode({
   now = new Date(),
   siteCode,
 }: {
@@ -336,7 +332,7 @@ export function createDeviceRequestCode({
   return `REQ-${safeSiteCode}-${datePart}-${randomPart}`;
 }
 
-export function createDeviceRequestId(): string {
+function createDeviceRequestId(): string {
   return createMonitoringId("device_request");
 }
 export function validateDeviceRequestDraft(

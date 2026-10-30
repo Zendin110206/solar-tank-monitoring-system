@@ -18,16 +18,12 @@ type VerifiedTelegramUserSummaryRow = RowDataPacket & {
   username: string;
 };
 
-export type VerifiedTelegramUserSummary = Pick<
+type VerifiedTelegramUserSummary = Pick<
   AuthSafeUser,
   "fullName" | "role" | "status" | "telegramVerifiedAt" | "username"
 >;
 
-// Prettier 3.9 tidak stabil memformat tipe kembalian ini (berganti bentuk setiap dijalankan).
-// prettier-ignore
-export async function findAuthUserByIdentity(
-  identity: string,
-): Promise<
+export async function findAuthUserByIdentity(identity: string): Promise<
   | (AuthSafeUser & {
       passwordHash: string;
       lockedUntil: string | null;

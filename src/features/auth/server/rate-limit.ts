@@ -2,7 +2,7 @@ import "server-only";
 
 import { recordRateLimitRequest } from "./repositories/mysql-rate-limit-repository";
 
-export type RateLimitResult =
+type RateLimitResult =
   { allowed: true } | { allowed: false; retryAfterSeconds: number };
 
 export async function checkRateLimit({

@@ -2,7 +2,7 @@ import "server-only";
 
 // Mengenali error "kolom belum ada" saat migrasi pengajuan perangkat belum dijalankan.
 
-export const DEVICE_REQUEST_SCHEMA_COLUMNS = [
+const DEVICE_REQUEST_SCHEMA_COLUMNS = [
   "device_sensor_type",
   "regional_label",
   "wilayah_label",

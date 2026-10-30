@@ -52,11 +52,11 @@ const configLabels: Record<keyof TankConfigSnapshot, string> = {
   consumptionLiterPerHour: "Konsumsi per jam",
 };
 
-export function isPayloadRecord(value: unknown): value is PayloadRecord {
+function isPayloadRecord(value: unknown): value is PayloadRecord {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
-export function readPayloadPath(source: unknown, path: string): unknown {
+function readPayloadPath(source: unknown, path: string): unknown {
   if (!isPayloadRecord(source)) {
     return undefined;
   }
@@ -375,7 +375,7 @@ function collectInvalidConfigIssues(payload: unknown): TankConfigIssue[] {
   return issues;
 }
 
-export function tankToConfigSnapshot(tank: Tank): TankConfigSnapshot {
+function tankToConfigSnapshot(tank: Tank): TankConfigSnapshot {
   return {
     shape: tank.shape,
     capacityLiter: tank.capacityLiter,
@@ -599,10 +599,7 @@ function canApplyPayloadConfig(status: TankConfigReview["status"]): boolean {
   return status === "normal" || status === "minor_config_difference";
 }
 
-export function resolveTankFromPayloadConfig(
-  payload: unknown,
-  baseTank: Tank,
-): Tank {
+function resolveTankFromPayloadConfig(payload: unknown, baseTank: Tank): Tank {
   const payloadConfig = extractPayloadTankConfig(payload);
 
   if (!payloadConfig) {

@@ -1,8 +1,8 @@
 export const MONITORING_ROLLUP_INTERVAL_MINUTES = 5;
-export const MONITORING_ROLLUP_INTERVAL_MS =
+const MONITORING_ROLLUP_INTERVAL_MS =
   MONITORING_ROLLUP_INTERVAL_MINUTES * 60 * 1000;
 
-export type MonitoringRollupWindow = {
+type MonitoringRollupWindow = {
   end: string;
   id: string;
   start: string;

@@ -29,12 +29,12 @@ const ZIP_UTF8_FLAG = 0x0800;
 const AES_GCM_IV_BYTES = 12;
 const AES_256_KEY_BYTES = 32;
 
-export type FirmwarePackageFile = {
+type FirmwarePackageFile = {
   path: string;
   content: Buffer;
 };
 
-export type FirmwarePackageBundle = {
+type FirmwarePackageBundle = {
   checksumSha256: string;
   files: FirmwarePackageFile[];
   filename: string;
@@ -42,7 +42,7 @@ export type FirmwarePackageBundle = {
   zipBuffer: Buffer;
 };
 
-export type EncryptedFirmwarePackage = {
+type EncryptedFirmwarePackage = {
   authTag: Buffer;
   ciphertext: Buffer;
   iv: Buffer;
@@ -347,7 +347,7 @@ export function findUnresolvedTemplatePlaceholders(content: string): string[] {
   return [...placeholders].sort();
 }
 
-export function getDevicePackageDownloadTtlDays(): number {
+function getDevicePackageDownloadTtlDays(): number {
   return parsePositiveIntegerEnv({
     envValue: serverEnv.DEVICE_PACKAGE_DOWNLOAD_TTL_DAYS,
     fallback: DEFAULT_DOWNLOAD_TTL_DAYS,
@@ -381,7 +381,7 @@ export function hashDownloadToken(token: string): string {
   return `sha256:${createHash("sha256").update(token.trim()).digest("hex")}`;
 }
 
-export function sha256Buffer(buffer: Buffer): string {
+function sha256Buffer(buffer: Buffer): string {
   return createHash("sha256").update(buffer).digest("hex");
 }
 
@@ -496,7 +496,7 @@ export function renderDeviceConfigHeader({
 `;
 }
 
-export function renderHardwareProfileHeader({
+function renderHardwareProfileHeader({
   hardwareProfile,
 }: Pick<FirmwarePackageContext, "hardwareProfile">): string {
   return `#pragma once
@@ -513,7 +513,7 @@ export function renderHardwareProfileHeader({
 `;
 }
 
-export function renderFirmwareReadme({
+function renderFirmwareReadme({
   hardwareProfile,
   request,
 }: Pick<FirmwarePackageContext, "hardwareProfile" | "request">): string {
@@ -561,7 +561,7 @@ Device key hanya boleh dipakai untuk device ini. Jika file ini salah kirim atau 
 `;
 }
 
-export function renderFirmwareManifest({
+function renderFirmwareManifest({
   firmwareTemplate,
   generatedAt,
   hardwareProfile,

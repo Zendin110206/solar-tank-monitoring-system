@@ -38,9 +38,9 @@ const TANK_READING_CSV_HEADERS = [
   "periode_unduhan",
 ] as const;
 
-export type ReadingExportRangeKey = SimpleTankChartRangeKey;
+type ReadingExportRangeKey = SimpleTankChartRangeKey;
 
-export type ReadingExportPeriod = {
+type ReadingExportPeriod = {
   range: SimpleTankChartRange;
   start: Date;
   end: Date;
@@ -48,12 +48,12 @@ export type ReadingExportPeriod = {
   filenameSegment: string;
 };
 
-export type ReadingExportOptions = {
+type ReadingExportOptions = {
   period?: ReadingExportPeriod;
   rangeKey?: ReadingExportRangeKey;
 };
 
-export type TankReadingsCsvFilenameOptions = {
+type TankReadingsCsvFilenameOptions = {
   siteCode?: string | null;
   tankId: string;
   tankName: string;

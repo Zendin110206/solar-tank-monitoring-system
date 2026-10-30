@@ -10,10 +10,9 @@ import {
 } from "@/components/ui/status-tone";
 import { StatusPill } from "@/components/ui/status-pill";
 
-export type TankLocationMapStatus =
-  "online" | "warning" | "critical" | "offline";
+type TankLocationMapStatus = "online" | "warning" | "critical" | "offline";
 
-export type TankLocationMapSite = {
+type TankLocationMapSite = {
   tankId: string;
   code: string;
   name: string;

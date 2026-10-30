@@ -5,7 +5,7 @@ const USERNAME_PATTERN = /^[a-zA-Z0-9._-]{3,40}$/;
 const INDONESIAN_MOBILE_PHONE_PATTERN = /^\+628\d{7,11}$/;
 const MAX_PASSWORD_LENGTH = 256;
 
-export type LoginPayload = {
+type LoginPayload = {
   identity: string;
   password: string;
 };
@@ -21,7 +21,7 @@ export type RegisterAccessPayload = {
   accessReason: string | null;
 };
 
-export type ForgotPasswordPayload = {
+type ForgotPasswordPayload = {
   identity: string;
   captchaToken: string | null;
 };
@@ -38,17 +38,17 @@ export type ChangePasswordPayload = {
   confirmPassword: string;
 };
 
-export type ResendVerificationPayload = {
+type ResendVerificationPayload = {
   identity: string;
   captchaToken: string | null;
 };
-export function normalizeIdentity(value: unknown): string {
+function normalizeIdentity(value: unknown): string {
   return String(value ?? "")
     .trim()
     .toLowerCase();
 }
 
-export function normalizeUsername(value: unknown): string {
+function normalizeUsername(value: unknown): string {
   return String(value ?? "")
     .trim()
     .toLowerCase();
@@ -61,7 +61,7 @@ export function normalizeText(value: unknown, maxLength: number): string {
     .slice(0, maxLength);
 }
 
-export function normalizeOptionalText(
+function normalizeOptionalText(
   value: unknown,
   maxLength: number,
 ): string | null {

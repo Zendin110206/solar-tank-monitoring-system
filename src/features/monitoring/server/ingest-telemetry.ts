@@ -76,8 +76,7 @@ type IngestTelemetryFailure = {
   error: string;
 };
 
-export type IngestTelemetryResult =
-  IngestTelemetrySuccess | IngestTelemetryFailure;
+type IngestTelemetryResult = IngestTelemetrySuccess | IngestTelemetryFailure;
 
 function isRecord(value: unknown): value is CatTelemetryPayload {
   return typeof value === "object" && value !== null && !Array.isArray(value);

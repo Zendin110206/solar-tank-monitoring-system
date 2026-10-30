@@ -16,8 +16,8 @@ export const FTM_WILAYAH_OPTIONS = [
   "TIF 5",
 ] as const;
 
-export type FtmRegionalLabel = (typeof FTM_REGIONAL_OPTIONS)[number];
-export type FtmWilayahLabel = (typeof FTM_WILAYAH_OPTIONS)[number];
+type FtmRegionalLabel = (typeof FTM_REGIONAL_OPTIONS)[number];
+type FtmWilayahLabel = (typeof FTM_WILAYAH_OPTIONS)[number];
 
 export const DEFAULT_REGIONAL_LABEL: FtmRegionalLabel = "TREG 5";
 export const DEFAULT_WILAYAH_LABEL: FtmWilayahLabel = "TIF 3";

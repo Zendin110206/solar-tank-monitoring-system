@@ -11,7 +11,7 @@ import { formatDateTimeJakarta } from "@/lib/format";
 import { escapeHtml } from "@/lib/html";
 import { getSmtpPort, hasSmtpConfig } from "@/lib/email/smtp-config";
 
-export type DevicePackageEmailDeliveryResult =
+type DevicePackageEmailDeliveryResult =
   | { delivered: true; delivery: "email" | "log" }
   | { delivered: false; delivery: "none"; reason: string };
 

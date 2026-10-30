@@ -29,7 +29,7 @@ export type SimpleDashboardSite = {
   isOnline: boolean;
 };
 
-export type SimpleDashboardFilters = {
+type SimpleDashboardFilters = {
   query: string;
   status: SimpleDashboardStatusFilter;
   area: string;
@@ -37,7 +37,7 @@ export type SimpleDashboardFilters = {
   wilayah: string;
 };
 
-export type SimpleDashboardSummary = {
+type SimpleDashboardSummary = {
   total: number;
   online: number;
   offline: number;

@@ -57,13 +57,13 @@ type ReferenceCountRow = RowDataPacket & {
   device_count: number | string;
 };
 
-export type MysqlReferenceCounts = {
+type MysqlReferenceCounts = {
   sites: number;
   tanks: number;
   devices: number;
 };
 
-export type MysqlMonitoringReferenceData = {
+type MysqlMonitoringReferenceData = {
   sites: Site[];
   tanks: Tank[];
   devices: Device[];
@@ -155,7 +155,7 @@ export async function checkMonitoringLocationTaxonomySchemaFromMysql(): Promise<
   );
 }
 
-export async function listMonitoringSitesFromMysql(): Promise<Site[]> {
+async function listMonitoringSitesFromMysql(): Promise<Site[]> {
   const pool = getMysqlPool();
   const [rows] = await pool.query<SiteRow[]>(
     `
@@ -178,7 +178,7 @@ export async function listMonitoringSitesFromMysql(): Promise<Site[]> {
   return rows.map(rowToSite);
 }
 
-export async function listMonitoringTanksFromMysql(): Promise<Tank[]> {
+async function listMonitoringTanksFromMysql(): Promise<Tank[]> {
   const pool = getMysqlPool();
   const [rows] = await pool.query<TankRow[]>(
     `
@@ -206,7 +206,7 @@ export async function listMonitoringTanksFromMysql(): Promise<Tank[]> {
   return rows.map(rowToTank);
 }
 
-export async function listMonitoringDevicesFromMysql(): Promise<Device[]> {
+async function listMonitoringDevicesFromMysql(): Promise<Device[]> {
   const pool = getMysqlPool();
   const [rows] = await pool.query<DeviceRow[]>(
     `

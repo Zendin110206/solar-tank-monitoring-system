@@ -7,7 +7,6 @@ export {
   rowToHardwareProfile,
   rowToDeviceRequest,
   rowToFirmwarePackage,
-  listFirmwareTemplatesFromMysql,
   listHardwareProfilesFromMysql,
   listDeviceRequestsForUserFromMysql,
   listDeviceRequestsForAdminFromMysql,
@@ -20,12 +19,8 @@ export {
   activateApprovedDeviceOnFirstPingFromMysql,
   downloadDevicePackageByTokenFromMysql,
   rejectDeviceRequestInMysql,
-  isPackageStatus,
 } from "./device-requests/index";
 export type {
   CreateDeviceRequestFromMysqlResult,
-  ApprovedDeviceRequestPackageResult,
-  DownloadDevicePackageResult,
-  DevicePackageAdminMutationResult,
   ActivateApprovedDeviceResult,
 } from "./device-requests/index";

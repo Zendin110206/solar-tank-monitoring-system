@@ -182,7 +182,7 @@ export function getAppBaseUrl(): string {
   return "http://localhost:3000";
 }
 
-export type CaptchaProvider = "disabled" | "turnstile" | "invalid";
+type CaptchaProvider = "disabled" | "turnstile" | "invalid";
 
 export function getCaptchaProvider(): CaptchaProvider {
   const provider = serverEnv.AUTH_CAPTCHA_PROVIDER?.trim().toLowerCase();
