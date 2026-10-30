@@ -1,6 +1,6 @@
 # Deployment
 
-> **Status dokumen:** perintah dan pengaturan dicocokkan dengan kode pada 28 Oktober 2026.
+> **Status dokumen:** perintah dan pengaturan dicocokkan dengan kode pada 31 Oktober 2026.
 > Angka operasional di bagian "Status Saat Ini" adalah pemeriksaan bertanggal 14 Juli 2026;
 > snapshot terbaru ada di README dan `docs/current-operational-truth.md`. Cara menjalankan lokal
 > yang lengkap ada di README.
@@ -191,6 +191,7 @@ pnpm db:migrate:auth
 pnpm db:migrate:auth-recovery
 pnpm db:migrate:device-provisioning
 pnpm db:migrate:device-request-fields
+pnpm db:migrate:helpdesk
 pnpm db:migrate:reading-rollup
 pnpm db:migrate:auth-telegram
 pnpm db:migrate:site-taxonomy
@@ -263,7 +264,6 @@ Kelompok utama:
 | Pemeriksaan kesiapan | `READINESS_CHECK_TOKEN`                                                                                                  |
 | Backup               | `MYSQL_BACKUP_OUTPUT_DIR`, `MYSQL_BACKUP_RETENTION_DAYS`                                                                 |
 
-Catatan: `NEXT_PUBLIC_APP_NAME` masih tercantum di `.env.example`, tetapi tidak dibaca kode.
 Variabel `PILOT_*` hanya dipakai skrip operasional pilot.
 
 ## Checklist Sebelum Production

@@ -1,6 +1,6 @@
 # Status Operasional Saat Ini
 
-Tanggal status: 2026-10-25 (bagian "Status per Oktober 2026"). Bagian lain di
+Tanggal status: 2026-10-31 (bagian "Status per Oktober 2026"). Bagian lain di
 bawahnya berasal dari pemeriksaan 14 Juli 2026 dan disimpan sebagai riwayat.
 
 Dokumen ini menjadi acuan status operasional FTM. Informasi bertanggal
@@ -9,16 +9,16 @@ deployment, atau tingkat kesiapan sistem berubah.
 
 ## Status per Oktober 2026
 
-| Butir                          | Keadaan                                                                                                       | Sumber dan tanggal                           |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| Tahap                          | Pilot operasional aktif; belum dikeraskan untuk produksi penuh, tanpa SLA dan tanpa dukungan 24 jam           | Kondisi kode dan operasi per 25 Oktober 2026 |
-| Cakupan                        | 9 lokasi terdaftar, 8 perangkat aktif, masing-masing mengirim data ±20 detik sekali                           | Snapshot database baca-saja 11 Oktober 2026  |
-| Kode yang berjalan di produksi | Commit `4bda023` (2 Agustus 2026) di branch `main`                                                            | Riwayat deployment GitHub, 25 Oktober 2026   |
-| Alur kerja repositori          | Perubahan masuk lewat pull request ke `dev`; `main` hanya menerima rilis yang disetujui                       | Sejak 25 Oktober 2026                        |
-| Backup                         | Belum otomatis; pemulihan belum diuji berkala                                                                 | Kondisi per 25 Oktober 2026                  |
-| Alarm otomatis                 | Belum ada                                                                                                     | Kondisi kode per 25 Oktober 2026             |
-| Akses per lokasi               | Belum ada; semua akun aktif melihat semua lokasi                                                              | Kondisi kode per 25 Oktober 2026             |
-| Dependensi                     | Ada kerentanan yang diketahui pada beberapa pustaka; pembaruannya direncanakan sebagai paket kerja tersendiri | `pnpm audit --prod`, 25 Oktober 2026         |
+| Butir                          | Keadaan                                                                                                                                    | Sumber dan tanggal                                         |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| Tahap                          | Pilot operasional aktif; belum dikeraskan untuk produksi penuh, tanpa SLA dan tanpa dukungan 24 jam                                        | Kondisi kode dan operasi per 25 Oktober 2026               |
+| Cakupan                        | 9 lokasi terdaftar, 8 perangkat aktif, masing-masing mengirim data ±20 detik sekali                                                        | Snapshot database baca-saja 11 Oktober 2026                |
+| Kode yang berjalan di produksi | Commit `4bda023` (2 Agustus 2026) di branch `main`                                                                                         | Riwayat deployment GitHub, 25 Oktober 2026                 |
+| Alur kerja repositori          | Perubahan masuk lewat pull request ke `dev`; `main` hanya menerima rilis yang disetujui                                                    | Sejak 25 Oktober 2026                                      |
+| Backup                         | Belum otomatis; pemulihan belum diuji berkala                                                                                              | Kondisi per 25 Oktober 2026                                |
+| Alarm otomatis                 | Belum ada                                                                                                                                  | Kondisi kode per 25 Oktober 2026                           |
+| Akses per lokasi               | Belum ada; semua akun aktif melihat semua lokasi                                                                                           | Kondisi kode per 25 Oktober 2026                           |
+| Dependensi                     | Versi yang berjalan di produksi masih memakai pustaka dengan kerentanan yang diketahui. Pembaruannya sudah ada di `dev` dan menunggu rilis | `pnpm audit --prod` pada `main` dan `dev`, 31 Oktober 2026 |
 
 Arah perbaikan dicatat di [catatan keputusan arsitektur](decisions/README.md).
 

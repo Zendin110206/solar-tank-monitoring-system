@@ -55,6 +55,13 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Dokumen dicocokkan lagi dengan kode: alasan berkas di atas 400 baris dicatat di
+  `docs/architecture.md`, diagram README memuat modul admin, `NEXT_PUBLIC_APP_NAME` yang tidak dibaca
+  kode dibuang dari `.env.example`, dan daftar migrasi di `docs/deployment.md` memuat migrasi helpdesk.
+- Seluruh repositori diformat dengan Prettier supaya gaya penulisannya seragam; isi kode tidak
+  berubah (#23).
+- Job audit dependensi di CI tidak lagi memakai cache pnpm, karena job itu tidak memasang dependensi
+  dan langkah penyimpanan cache-nya gagal (#29).
 - Aturan lapisan ESLint diperketat: `import()` dinamis dan `require()` ke repositori atau koneksi
   database dari `src/app`, komponen yang mengimpor repositori, layanan yang mengimpor subfolder
   repositori modul lain, `globalThis.process`, dan akses jaringan di `domain/` kini ditolak. Tidak
@@ -181,7 +188,7 @@ dirilis ke `main`.
 - Route bantuan web `/api/helpdesk/session` dan `/api/helpdesk/messages` memakai
   layanan `src/features/helpdesk/server/`; isi balasan, batas permintaan, dan notifikasi tetap.
 - Aksi perawatan data di dashboard dan halaman pengajuan perangkat (reset pembacaan,
-  pembersihan data uji) memakai layanan `src/features/monitoring/server/maintenance-service.ts`;
+  pembersihan data uji) memakai layanan `src/features/admin/server/maintenance-service.ts`;
   konfirmasi, cakupan penghapusan, dan pesan tetap. Tidak ada lagi impor repositori di `src/app`.
 - Panduan pemeriksaan lokal disesuaikan dengan Node.js 22, pnpm 9.15.3, aturan
   login, kesiapan layanan, simulator, dan tes MySQL; status audit keamanan dibatasi
