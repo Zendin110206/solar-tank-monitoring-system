@@ -1,7 +1,7 @@
 import "server-only";
 
 // Pintu layanan audit keamanan akun untuk src/app (ADR 0011).
-// Untuk sementara meneruskan fungsi repositori apa adanya.
+// Pembungkus tipis repositori (aturan 5 ADR 0011) karena alurnya sederhana.
 export {
   listAuthAuditEvents,
   recordAuthAuditEvent,

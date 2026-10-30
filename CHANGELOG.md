@@ -55,6 +55,11 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Pemanggil layanan di `src/app`, `monitoring/server/ingest-telemetry.ts`, dan dua tes integrasi
+  kini memakai nama fungsi dan tipe layanan apa adanya. Alias lama seperti
+  `approveDeviceRequest as approveDeviceRequestInMysql` dihapus karena namanya terkesan memanggil
+  MySQL langsung. Komentar enam layanan tipis kini merujuk aturan 5 ADR 0011, bukan "untuk
+  sementara". Hasil kompilasi tiap berkas tetap sama setelah nama lokal diseragamkan.
 - Kode, nama, dan koordinat STO yang mirip lokasi sungguhan di tes, contoh registry
   (`config/pilot-registry.example.json`), `.env.example`, dan dokumen acuan diganti contoh fiktif
   (`CONTOH-A`, `STO Contoh A`, `pilot-contoh-a-01`, dan seterusnya). Koordinat contoh registry kini

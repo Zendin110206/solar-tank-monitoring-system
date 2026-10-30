@@ -2,9 +2,9 @@ import type { RowDataPacket } from "mysql2/promise";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
 import {
-  approveDeviceRequest as approveDeviceRequestInMysql,
-  submitDeviceRequest as createDeviceRequestInMysql,
-  downloadDevicePackage as downloadDevicePackageByTokenFromMysql,
+  approveDeviceRequest,
+  submitDeviceRequest,
+  downloadDevicePackage,
 } from "../../server/device-request-service";
 import { activateApprovedDeviceOnFirstPingFromMysql } from "../../server/repositories/mysql-device-request-repository";
 import {
@@ -90,7 +90,7 @@ describe("alur pemasangan perangkat di MySQL (integrasi)", () => {
   });
 
   it("menyimpan pengajuan baru dengan kapasitas dan konsumsi hasil hitungan", async () => {
-    const result = await createDeviceRequestInMysql({
+    const result = await submitDeviceRequest({
       draft: {
         siteName: "STO Contoh Integrasi",
         areaLabel: "Area Contoh",
@@ -136,7 +136,7 @@ describe("alur pemasangan perangkat di MySQL (integrasi)", () => {
   });
 
   it("membuat lokasi, tangki, dan perangkat nonaktif beserta paket saat disetujui", async () => {
-    const approved = await approveDeviceRequestInMysql({
+    const approved = await approveDeviceRequest({
       adminUserId: "usr_admin",
       appBaseUrl: "https://ftm.example.test",
       requestId,
@@ -156,7 +156,7 @@ describe("alur pemasangan perangkat di MySQL (integrasi)", () => {
 
   it("tidak bisa menyetujui pengajuan yang sama dua kali", async () => {
     await expect(
-      approveDeviceRequestInMysql({
+      approveDeviceRequest({
         adminUserId: "usr_admin",
         appBaseUrl: "https://ftm.example.test",
         requestId,
@@ -174,7 +174,7 @@ describe("alur pemasangan perangkat di MySQL (integrasi)", () => {
   });
 
   it("menandai paket terunduh dan menunggu kiriman pertama", async () => {
-    const download = await downloadDevicePackageByTokenFromMysql(downloadToken);
+    const download = await downloadDevicePackage(downloadToken);
 
     expect(download.ok).toBe(true);
     if (!download.ok) return;

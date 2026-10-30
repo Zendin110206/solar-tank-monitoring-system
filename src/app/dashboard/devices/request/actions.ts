@@ -4,8 +4,8 @@ import { revalidatePath } from "next/cache";
 
 import { requirePageUser } from "@/features/auth/server/auth-guards";
 import {
-  submitDeviceRequest as createDeviceRequestInMysql,
-  type SubmitDeviceRequestResult as CreateDeviceRequestFromMysqlResult,
+  submitDeviceRequest,
+  type SubmitDeviceRequestResult,
 } from "@/features/devices/server/device-request-service";
 import { notifyAdminsDeviceRequestCreated } from "@/features/devices/server/device-request-notifications";
 import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
@@ -116,7 +116,7 @@ function buildDeviceRequestDraft(formData: FormData): DeviceRequestDraft {
 }
 
 function getResultState(
-  result: CreateDeviceRequestFromMysqlResult,
+  result: SubmitDeviceRequestResult,
 ): DeviceRequestFormState {
   if (!result.ok) {
     return {
@@ -167,7 +167,7 @@ export async function createDeviceRequestAction(
       );
     }
 
-    const result = await createDeviceRequestInMysql({
+    const result = await submitDeviceRequest({
       draft: buildDeviceRequestDraft(formData),
       requesterEmail: user.email,
       requesterUserId: user.id,

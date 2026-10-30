@@ -7,8 +7,8 @@ import { createAdminActionCsrfToken } from "@/features/auth/server/auth-csrf";
 import { requirePageAdmin } from "@/features/auth/server/auth-guards";
 import { getDeviceRequestStatusLabel } from "@/features/devices/domain/device-request";
 import {
-  listDeviceRequestsForAdmin as listDeviceRequestsForAdminFromMysql,
-  listDeviceHardwareProfiles as listHardwareProfilesFromMysql,
+  listDeviceRequestsForAdmin,
+  listDeviceHardwareProfiles,
 } from "@/features/devices/server/device-request-service";
 import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
 import type {
@@ -111,8 +111,8 @@ export default async function AdminDeviceRequestsPage({
   const isMysqlEnabled = getMonitoringStorageDriver() === "mysql";
   const [requests, hardwareProfiles] = isMysqlEnabled
     ? await Promise.all([
-        listDeviceRequestsForAdminFromMysql(),
-        listHardwareProfilesFromMysql(),
+        listDeviceRequestsForAdmin(),
+        listDeviceHardwareProfiles(),
       ])
     : [[], []];
   const pendingCount = requests.filter(

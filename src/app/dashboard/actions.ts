@@ -5,8 +5,8 @@ import { revalidatePath } from "next/cache";
 import { assertValidAdminActionCsrf } from "@/features/auth/server/auth-csrf";
 import { requirePageAdmin } from "@/features/auth/server/auth-guards";
 import {
-  cleanupMonitoringTanks as cleanupMonitoringTanksInMysql,
-  resetMonitoringReadings as resetMonitoringReadingsInMysql,
+  cleanupMonitoringTanks,
+  resetMonitoringReadings,
 } from "@/features/admin/server/maintenance-service";
 import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
@@ -58,7 +58,7 @@ export async function cleanupDashboardTankAction(
       throw new Error("Konfirmasi hapus data STO tidak valid.");
     }
 
-    const result = await cleanupMonitoringTanksInMysql({ tankIds: [tankId] });
+    const result = await cleanupMonitoringTanks({ tankIds: [tankId] });
 
     revalidateDashboardMonitoringPages(tankId);
 
@@ -103,7 +103,7 @@ export async function resetDashboardTankReadingsAction(
       throw new Error("Konfirmasi reset reading STO tidak valid.");
     }
 
-    const result = await resetMonitoringReadingsInMysql({ tankIds: [tankId] });
+    const result = await resetMonitoringReadings({ tankIds: [tankId] });
 
     revalidateDashboardMonitoringPages(tankId);
 
@@ -149,7 +149,7 @@ export async function resetAllDashboardReadingsAction(
       throw new Error("Konfirmasi reset semua reading tidak valid.");
     }
 
-    const result = await resetMonitoringReadingsInMysql();
+    const result = await resetMonitoringReadings();
 
     revalidateDashboardMonitoringPages();
 
