@@ -19,24 +19,12 @@ import {
   calculateTankVolumeLiter,
   getMaxFuelHeightCm,
 } from "../domain/tank-volume";
-import {
-  STATUS_BADGE_CLASS,
-  STATUS_DOT_CLASS,
-} from "@/components/ui/status-tone";
-
-import { loadSourceDeclarations } from "./helpers/load-source-declarations";
+import { getRuntimeLevelParameter as getDetailRuntimeLevel } from "@/app/dashboard/tanks/[tankId]/_components/runtime-levels";
+import { getRuntimeLevelParameter as getSimpleRuntimeLevel } from "@/app/dashboard/ringkas/tanks/[tankId]/_components/runtime-levels";
 
 // Tes karakterisasi perhitungan domain. Mengunci perilaku saat ini, termasuk
 // perbedaan yang tercatat (FTM-011, FTM-018) dan akan dibahas di paket kerja
 // domain. Jangan "memperbaiki" angka di sini.
-
-// Nilai yang diimpor halaman detail tangki, dibutuhkan saat potongan kodenya dijalankan.
-const PAGE_SCOPE = { STATUS_BADGE_CLASS, STATUS_DOT_CLASS };
-
-type RuntimeLevel = { label: string; range: string };
-type PageThresholds = {
-  getRuntimeLevelParameter: (runtimeHour: number | null) => RuntimeLevel;
-};
 
 const RUNTIME_SAMPLES = [
   null,
@@ -109,22 +97,11 @@ describe("ambang sisa jam genset di tiga tempat (FTM-018)", () => {
   });
 
   it.each([
-    "src/app/dashboard/tanks/[tankId]/_components/runtime-levels.ts",
-    "src/app/dashboard/ringkas/tanks/[tankId]/page.tsx",
+    ["halaman detail tangki", getDetailRuntimeLevel],
+    ["halaman ringkas tangki", getSimpleRuntimeLevel],
   ])(
     "%s memakai 6 kelas dengan batas 13, 14, 16, 19, dan < 24 jam",
-    (pagePath) => {
-      const { getRuntimeLevelParameter } =
-        loadSourceDeclarations<PageThresholds>(
-          pagePath,
-          [
-            "runtimeLevelParameters",
-            "unknownRuntimeLevel",
-            "getRuntimeLevelParameter",
-          ] as never,
-          PAGE_SCOPE,
-        );
-
+    (_pageName, getRuntimeLevelParameter) => {
       expect(
         RUNTIME_SAMPLES.map((hour) => {
           const level = getRuntimeLevelParameter(hour);
@@ -151,18 +128,8 @@ describe("ambang sisa jam genset di tiga tempat (FTM-018)", () => {
   );
 
   it("mempertahankan perbedaan saat ini: tepat 24 jam = 'limited' di status.ts tetapi 'Overstock' di halaman detail", () => {
-    const { getRuntimeLevelParameter } = loadSourceDeclarations<PageThresholds>(
-      "src/app/dashboard/tanks/[tankId]/_components/runtime-levels.ts",
-      [
-        "runtimeLevelParameters",
-        "unknownRuntimeLevel",
-        "getRuntimeLevelParameter",
-      ] as never,
-      PAGE_SCOPE,
-    );
-
     expect(getRuntimeStatus(24)).toBe("limited");
-    expect(getRuntimeLevelParameter(24).label).toBe("Overstock");
+    expect(getDetailRuntimeLevel(24).label).toBe("Overstock");
   });
 });
 
