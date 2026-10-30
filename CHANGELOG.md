@@ -55,6 +55,10 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Tes karakterisasi ambang sisa jam genset kini mengimpor modul sungguhan, bukan membaca teks sumber
+  halaman. Ambang di halaman `/dashboard/ringkas/tanks/[id]` dipindah apa adanya ke
+  `_components/runtime-levels.ts` milik halaman itu, lalu pembantu tes
+  `load-source-declarations.ts` dihapus. Isi ambang dan tampilan tidak berubah.
 - Pemanggil layanan di `src/app`, `monitoring/server/ingest-telemetry.ts`, dan dua tes integrasi
   kini memakai nama fungsi dan tipe layanan apa adanya. Alias lama seperti
   `approveDeviceRequest as approveDeviceRequestInMysql` dihapus karena namanya terkesan memanggil
