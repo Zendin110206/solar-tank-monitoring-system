@@ -14,10 +14,10 @@ Arti status:
 
 | Dokumen                                                      | Isi                                            | Status                        | Diperiksa   |
 | ------------------------------------------------------------ | ---------------------------------------------- | ----------------------------- | ----------- |
-| [../README.md](../README.md)                                 | Gambaran FTM, cara menjalankan lokal, perintah | Terkini                       | 28 Okt 2026 |
-| [current-operational-truth.md](current-operational-truth.md) | Status operasional bertanggal                  | Terkini (bagian Oktober 2026) | 25 Okt 2026 |
+| [../README.md](../README.md)                                 | Gambaran FTM, cara menjalankan lokal, perintah | Terkini                       | 31 Okt 2026 |
+| [current-operational-truth.md](current-operational-truth.md) | Status operasional bertanggal                  | Terkini (bagian Oktober 2026) | 31 Okt 2026 |
 | [cara-kerja-ftm.md](cara-kerja-ftm.md)                       | Cara kerja FTM dalam bahasa sehari-hari        | Terkini                       | 28 Okt 2026 |
-| [architecture.md](architecture.md)                           | Arsitektur, modul, lapisan, alur data          | Terkini                       | 28 Okt 2026 |
+| [architecture.md](architecture.md)                           | Arsitektur, modul, lapisan, alur data          | Terkini                       | 31 Okt 2026 |
 | [decisions/](decisions/README.md)                            | Catatan keputusan arsitektur (ADR)             | Terkini                       | 28 Okt 2026 |
 
 ## Acuan teknis
@@ -29,7 +29,7 @@ Arti status:
 | [data-model.md](data-model.md)                         | Tabel dan hubungan data                                        | Terkini                | 28 Okt 2026 |
 | [domain-model.md](domain-model.md)                     | Rumus volume, status, dan sisa jam genset                      | Terkini                | 28 Okt 2026 |
 | [database-backup.md](database-backup.md)               | Skrip backup dan batas pemulihan                               | Terkini                | 28 Okt 2026 |
-| [deployment.md](deployment.md)                         | Variabel lingkungan, migrasi, kesiapan                         | Terkini                | 28 Okt 2026 |
+| [deployment.md](deployment.md)                         | Variabel lingkungan, migrasi, kesiapan                         | Terkini                | 31 Okt 2026 |
 | [safety-and-limitations.md](safety-and-limitations.md) | Batas perangkat lunak, data, dan perangkat fisik               | Terkini                | 28 Okt 2026 |
 | [system-boundaries.md](system-boundaries.md)           | Yang masuk dan tidak masuk repositori                          | Terkini                | 28 Okt 2026 |
 | [reviewer-quickstart.md](reviewer-quickstart.md)       | Pemeriksaan lokal, aturan akses, simulator, dan tes MySQL      | Terkini (branch `dev`) | 28 Okt 2026 |

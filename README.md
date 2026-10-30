@@ -67,6 +67,7 @@ flowchart LR
     DEVMOD[Modul devices<br/>pengajuan dan paket firmware]
     AUTH[Modul akun<br/>login, peran, OTP]
     HD[Modul helpdesk]
+    ADM[Modul admin<br/>perawatan data]
     UI[Halaman dashboard]
   end
   DB[(MySQL)]
@@ -80,6 +81,8 @@ flowchart LR
   UI --> MON
   UI --> DEVMOD
   UI --> AUTH
+  UI --> ADM
+  ADM --> DB
   DEVMOD --> DB
   DEVMOD --> MAIL
   AUTH --> DB

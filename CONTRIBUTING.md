@@ -218,6 +218,11 @@ Sebelum menambah paket:
 Pembaruan dependensi dikerjakan per kelompok, satu pull request per kelompok,
 dan setiap pembaruan versi besar membaca catatan perubahan paketnya terlebih dulu.
 
+`pnpm.overrides` di `package.json` memaksa versi aman paket turunan Next.js (`browserslist`,
+`baseline-browser-mapping`, `source-map-js`). Per 31 Oktober 2026 rentang versi dari Next.js sudah
+memilih versi aman tanpa paksaan, jadi paksaan ini bisa dilepas saat Next.js diperbarui lagi, setelah
+`pnpm audit --prod` dicek.
+
 ## Menjaga riwayat
 
 - Jangan _force push_ ke branch yang sudah dibagikan.
