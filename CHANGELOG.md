@@ -55,6 +55,8 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Pesan Telegram `/status` memakai `formatDateTimeOrDash` bersama, menggantikan salinan lokalnya.
+  Teks pesan tidak berubah.
 - Ekspor yang hanya dipakai di berkasnya sendiri ditutup (88 deklarasi). Sebanyak 17 ekspor ulang tanpa
   pemakai dan fungsi `isPackageStatus` yang tidak pernah dipanggil dihapus. Penanda `prettier-ignore`
   di `accounts/users.ts` dibuang karena hasil Prettier 3.9.10 sudah stabil. Perilaku tidak berubah.

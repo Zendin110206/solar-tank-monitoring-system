@@ -4,7 +4,7 @@ import { getAppBaseUrl } from "./auth-config";
 import { sendTelegramMessage, type TelegramMessage } from "./auth-telegram";
 import { findAuthUserByVerifiedTelegramChatId } from "./repositories/mysql-auth-repository";
 import type { AuthSafeUser } from "../types/auth";
-import { formatDateTimeJakarta } from "@/lib/format";
+import { formatDateTimeOrDash } from "@/lib/format";
 
 type PrivateTelegramCommand = "dashboard" | "help" | "status";
 
@@ -38,14 +38,6 @@ function formatStatus(status: AuthSafeUser["status"]): string {
     case "suspended":
       return "Ditangguhkan";
   }
-}
-
-function formatTelegramDate(value: string | null): string {
-  if (!value) {
-    return "-";
-  }
-
-  return formatDateTimeJakarta(value);
 }
 
 function buildDashboardUrl(): string | null {
@@ -90,7 +82,7 @@ async function buildStatusMessage(chatId: string): Promise<string> {
     `Username: ${user.username}`,
     `Role: ${formatRole(user.role)}`,
     `Status akun: ${formatStatus(user.status)}`,
-    `Terhubung: ${formatTelegramDate(user.telegramVerifiedAt)}`,
+    `Terhubung: ${formatDateTimeOrDash(user.telegramVerifiedAt)}`,
     "",
     "Data sensitif seperti password, OTP, session, email, nomor telepon, API key, dan token device tidak ditampilkan di Telegram.",
   ].join("\n");
