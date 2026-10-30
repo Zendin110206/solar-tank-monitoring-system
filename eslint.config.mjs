@@ -3,6 +3,12 @@ import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 import prettier from "eslint-config-prettier/flat";
 
+// Modul yang tidak boleh dimuat src/app dan komponen tampilan (ADR 0011).
+const DATABASE_MODULE_PATTERN =
+  "^mysql2(/.*)?$|-repository$|mysql-connection$|/server/repositories/|/lib/database/";
+// Regex di dalam selector ESLint harus menulis garis miring dengan escape.
+const DATABASE_MODULE_SELECTOR = DATABASE_MODULE_PATTERN.replaceAll("/", "\\/");
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
@@ -41,6 +47,36 @@ const eslintConfig = defineConfig([
           ],
         },
       ],
+      // no-restricted-imports tidak melihat import() dinamis dan require().
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: `:matches(ImportExpression[source.value=/${DATABASE_MODULE_SELECTOR}/], CallExpression[callee.name="require"][arguments.0.value=/${DATABASE_MODULE_SELECTOR}/])`,
+          message:
+            "src/app tidak memuat repositori atau koneksi database, juga lewat import() atau require(); panggil layanan di server/ modul (ADR 0011).",
+        },
+      ],
+    },
+  },
+  // Komponen tampilan mengikuti batas yang sama dengan src/app.
+  {
+    files: [
+      "src/features/*/components/**/*.{ts,tsx}",
+      "src/components/**/*.{ts,tsx}",
+    ],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              regex: DATABASE_MODULE_PATTERN,
+              message:
+                "Komponen tidak mengimpor repositori atau koneksi database; data datang dari layanan lewat halaman (ADR 0011).",
+            },
+          ],
+        },
+      ],
     },
   },
   // Aturan 2 ADR 0011: layanan di server/ hanya memakai repositori modulnya sendiri.
@@ -58,7 +94,7 @@ const eslintConfig = defineConfig([
               // Alias @/features/<modul>/... atau jalur relatif ../../<modul>/... (kedalaman berapa pun)
               // yang berakhir di repositori atau koneksi database.
               regex:
-                "^(@/features/[^/]+|(\\.\\./)+[^/.][^/]*)/(server/repositories/[^/]+|lib/[^/]*-repository|lib/mysql-connection)$",
+                "^(@/features/[^/]+|(\\.\\./)+[^/.][^/]*)/(server/repositories/.+|lib/[^/]*-repository|lib/mysql-connection)$",
               message:
                 "Layanan tidak memakai repositori atau koneksi database modul lain; panggil layanan modul itu (ADR 0011).",
             },
@@ -93,6 +129,9 @@ const eslintConfig = defineConfig([
                 "nodemailer",
                 "node:fs",
                 "node:fs/*",
+                "node:http",
+                "node:https",
+                "node:net",
                 "next/headers",
                 "server-only",
                 "@/lib/config/*",
@@ -108,6 +147,14 @@ const eslintConfig = defineConfig([
           ],
         },
       ],
+      "no-restricted-globals": [
+        "error",
+        ...["fetch", "XMLHttpRequest", "WebSocket"].map((name) => ({
+          name,
+          message:
+            "domain/ hanya berisi logika murni tanpa I/O; pindahkan bagian ini ke server/ (ADR 0011).",
+        })),
+      ],
     },
   },
   // Variabel lingkungan hanya dibaca di katalog src/lib/config/ (server-env.ts dan
@@ -121,6 +168,12 @@ const eslintConfig = defineConfig([
         {
           object: "process",
           property: "env",
+          message:
+            "Baca pengaturan lewat serverEnv atau publicEnv di src/lib/config/, bukan process.env langsung.",
+        },
+        {
+          object: "globalThis",
+          property: "process",
           message:
             "Baca pengaturan lewat serverEnv atau publicEnv di src/lib/config/, bukan process.env langsung.",
         },

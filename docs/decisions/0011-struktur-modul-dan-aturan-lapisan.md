@@ -234,3 +234,12 @@ langsung dari berkas itu. Alasannya: lewat pintu `mysql-auth-repository.ts`, pem
 memuat seluruh repositori akun beserta modul kripto akun (`argon2`), sehingga rute `/api/health`
 (yang memuat modul pemeriksaan yang sama) membawa `argon2` ke paket serverless-nya, padahal sebelum
 pemindahan 27 Oktober tidak. Teks SQL dan balasan `/api/ready` tidak berubah.
+
+### 31 Oktober 2026 — celah aturan lapisan ditutup
+
+Uji negatif menunjukkan beberapa jalur lolos dari ESLint walaupun belum ada kode yang memakainya.
+Kini ditolak juga: `import()` dinamis dan `require()` ke repositori atau koneksi database dari
+`src/app`; komponen (`src/features/*/components`, `src/components`) yang mengimpor repositori atau
+koneksi database; layanan yang mengimpor subfolder repositori modul lain; `globalThis.process` di luar
+katalog pengaturan; serta `fetch`, `XMLHttpRequest`, `WebSocket`, `node:http`, `node:https`, dan
+`node:net` di `domain/`. `node:crypto` tetap boleh di `domain/` karena membuat angka acak bukan I/O.

@@ -55,6 +55,10 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Aturan lapisan ESLint diperketat: `import()` dinamis dan `require()` ke repositori atau koneksi
+  database dari `src/app`, komponen yang mengimpor repositori, layanan yang mengimpor subfolder
+  repositori modul lain, `globalThis.process`, dan akses jaringan di `domain/` kini ditolak. Tidak
+  ada kode aplikasi yang berubah karena belum ada pelanggaran.
 - Pesan Telegram `/status` memakai `formatDateTimeOrDash` bersama, menggantikan salinan lokalnya.
   Teks pesan tidak berubah.
 - Ekspor yang hanya dipakai di berkasnya sendiri ditutup (88 deklarasi). Sebanyak 17 ekspor ulang tanpa
