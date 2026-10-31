@@ -36,12 +36,13 @@ Arti status:
 
 ## Panduan pengguna
 
-| Dokumen                                                                                            | Isi                             | Status                                | Diperiksa |
-| -------------------------------------------------------------------------------------------------- | ------------------------------- | ------------------------------------- | --------- |
-| [panduan-user-manual-ftm.pdf](panduan-user-manual-ftm.pdf) / [.html](panduan-user-manual-ftm.html) | Panduan bagi pengguna dashboard | Perlu diperiksa ulang (lihat catatan) | Juli 2026 |
+| Dokumen                                                                                            | Isi                             | Status                  | Diperiksa   |
+| -------------------------------------------------------------------------------------------------- | ------------------------------- | ----------------------- | ----------- |
+| [panduan-user-manual-ftm.pdf](panduan-user-manual-ftm.pdf) / [.html](panduan-user-manual-ftm.html) | Panduan bagi pengguna dashboard | Terkini (lihat catatan) | 31 Okt 2026 |
 
-Catatan panduan pengguna: tampilan aplikasi tidak berubah sejak panduan dibuat (14 Juli 2026),
-kecuali perbaikan gulir layar pada 15 Juli 2026. Isinya belum diperiksa ulang langkah demi langkah.
+Catatan panduan pengguna: label, rumus, dan alur di versi 1.3 dicocokkan dengan teks tampilan dan
+kode pada 31 Oktober 2026. Contoh lokasinya fiktif. PDF dicetak dari berkas HTML, jadi perubahan isi
+ditulis di HTML lalu PDF-nya dicetak ulang. Panduan belum memuat tangkapan layar.
 
 ## Riwayat
 
