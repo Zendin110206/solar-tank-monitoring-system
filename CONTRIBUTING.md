@@ -31,6 +31,9 @@ pnpm install --frozen-lockfile
 pnpm check
 ```
 
+Di Windows, `corepack enable` butuh terminal Administrator. Tanpa hak itu, pasang pnpm dengan
+`npm install -g pnpm@9.15.3` dan lewati `corepack enable`.
+
 Untuk menjalankan aplikasi dengan database lokal, ikuti bagian
 [Menjalankan secara lokal](README.md#menjalankan-secara-lokal) di README. Laptop
 pengembang **tidak pernah** diarahkan ke database atau alamat produksi.
@@ -167,8 +170,10 @@ pemeriksaan otomatis saat commit dan push):
 - saat menulis pesan commit: commitlint memeriksa format `type(scope): deskripsi`;
 - sebelum push: `pnpm typecheck` dan `pnpm test`.
 
-Bila hook belum terpasang, jalankan `pnpm exec lefthook install`. Jangan melewati
-hook dengan `--no-verify`; perbaiki penyebab kegagalannya.
+Pada klon kedua di laptop yang sama, pnpm memakai hasil pemasangan yang tersimpan sehingga hook
+tidak terpasang otomatis. Bila hook belum terpasang (tidak ada `pre-commit` di `.git/hooks`),
+jalankan `pnpm exec lefthook install`. Jangan melewati hook dengan `--no-verify`; perbaiki
+penyebab kegagalannya.
 
 Pastikan tidak ada yang ikut ter-commit:
 

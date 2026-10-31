@@ -57,6 +57,8 @@ dirilis ke `main`.
 
 ### Diubah
 
+- README, CONTRIBUTING, dan panduan pemeriksaan lokal menjelaskan pemasangan pnpm bila `corepack enable`
+  ditolak di Windows, dan CONTRIBUTING menjelaskan kenapa hook git bisa belum terpasang pada klon kedua.
 - Panduan pengguna (HTML dan PDF) menjadi versi 1.3: label `Unduh CSV`, `Kartu`, `Peta`,
   `Manajemen Tangki`, dan `Operator operasional` disamakan dengan tampilan, dan contoh lokasi
   diganti fiktif.

@@ -18,6 +18,9 @@ pnpm --version
 pnpm install --frozen-lockfile
 ```
 
+Di Windows, `corepack enable` butuh terminal Administrator. Tanpa hak itu, pasang pnpm dengan
+`npm install -g pnpm@9.15.3` dan lewati perintah tersebut.
+
 `--frozen-lockfile` mempertahankan versi dependensi (pustaka pendukung) yang sudah
 dicatat. Untuk mengubah kode, buat branch kerja dari `origin/dev` sesuai
 [panduan kontribusi](../CONTRIBUTING.md#alur-kerja-harian).
