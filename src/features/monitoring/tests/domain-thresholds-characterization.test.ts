@@ -213,6 +213,13 @@ describe("volume tangki", () => {
     expect(calculateTankVolumeLiter(rectangularTank, 150)).toBe(1200);
   });
 
+  it("mengunci tinggi balok ke tinggi maksimum walaupun kapasitas tercatat lebih besar dari dimensinya", () => {
+    const largerCapacityTank = { ...rectangularTank, capacityLiter: 1500 };
+
+    expect(calculateTankVolumeLiter(largerCapacityTank, 100)).toBe(1200);
+    expect(calculateTankVolumeLiter(largerCapacityTank, 130)).toBe(1200);
+  });
+
   it("menghitung silinder horizontal dan mengunci di kedua ujung serta kapasitas", () => {
     expect(getMaxFuelHeightCm(cylinderTank)).toBe(150);
     expect(calculateTankVolumeLiter(cylinderTank, 0)).toBe(0);
