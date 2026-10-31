@@ -55,6 +55,9 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Panduan pengguna (HTML dan PDF) menjadi versi 1.3: label `Unduh CSV`, `Kartu`, `Peta`,
+  `Manajemen Tangki`, dan `Operator operasional` disamakan dengan tampilan, dan contoh lokasi
+  diganti fiktif.
 - Perintah `pnpm <skrip> -- --opsi` di dokumen diganti `pnpm <skrip> --opsi` karena bentuk lama
   ditolak skrip di pnpm 9. Contoh smoke test di `device-ingestion.md` dan panduan lapangan kini
   mengarah ke alamat lokal, bukan alamat pilot. Kode balasan saat penyimpanan gagal ditulis `500`,
