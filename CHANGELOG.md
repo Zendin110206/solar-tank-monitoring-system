@@ -9,6 +9,12 @@ dirilis ke `main`.
 
 ## [Belum dirilis]
 
+## [0.2.0] - 2026-11-01
+
+Rilis pertama dari branch `dev`. Isinya fondasi kerja (struktur modul, tes, dokumen, dan pemeriksaan
+otomatis) dan pembaruan keamanan dependensi. Tidak ada fitur baru, migrasi database, perubahan firmware,
+atau perubahan kontrak perangkat.
+
 ### Ditambahkan
 
 - Tes rata-rata berjalan ringkasan 5 menit dengan tiga sampel, dan tes batas tinggi tangki balok saat
@@ -261,5 +267,6 @@ Regional/Wilayah/Area/STO, detail tangki dengan grafik dan ekspor CSV, pengajuan
 perangkat sampai paket firmware dan aktivasi kiriman pertama, akun dengan
 verifikasi email, persetujuan admin, OTP admin, integrasi Telegram, dan helpdesk.
 
-[Belum dirilis]: https://github.com/Zendin110206/solar-tank-monitoring-system/compare/4bda023...dev
+[Belum dirilis]: https://github.com/Zendin110206/solar-tank-monitoring-system/compare/v0.2.0...dev
+[0.2.0]: https://github.com/Zendin110206/solar-tank-monitoring-system/compare/4bda023...v0.2.0
 [0.1.0]: https://github.com/Zendin110206/solar-tank-monitoring-system/tree/4bda023
