@@ -81,7 +81,7 @@ Menghapus rahasia dari commit terbaru tidak menghapusnya dari riwayat.
 Ringkasan berikut sengaja tidak memuat rincian teknis yang bisa disalahgunakan.
 
 - Pilot belum dikeraskan untuk produksi penuh dan belum diuji penetrasi.
-- Pada branch `dev`, audit `pnpm audit --prod` tanggal 25 Oktober 2026 tidak
+- Pada branch `dev`, audit `pnpm audit --prod` tanggal 31 Oktober 2026 tidak
   menemukan kerentanan yang diketahui pada dependensi produksi yang terkunci.
   Pembaruannya tercatat di [CHANGELOG.md](CHANGELOG.md). Hasil ini berlaku untuk
   kode di `dev`; penerapannya pada pilot menunggu rilis yang disetujui ke `main`.

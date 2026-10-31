@@ -1,6 +1,6 @@
 # Batasan dan Keselamatan
 
-> **Status dokumen:** daftar kemampuan dicocokkan dengan kode pada 28 Oktober 2026. Ringkasan
+> **Status dokumen:** daftar kemampuan dicocokkan dengan kode pada 31 Oktober 2026. Ringkasan
 > kondisi operasional terkini ada di `docs/current-operational-truth.md`.
 
 Dokumen ini menjelaskan batas sistem dan hal keselamatan yang harus diperhatikan.

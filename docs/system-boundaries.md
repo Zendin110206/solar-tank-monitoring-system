@@ -1,6 +1,6 @@
 # Batas Sistem
 
-> **Status dokumen:** dicocokkan dengan kode pada 28 Oktober 2026. Arah pengembangan ada di
+> **Status dokumen:** dicocokkan dengan kode pada 31 Oktober 2026. Arah pengembangan ada di
 > [catatan keputusan](decisions/README.md).
 
 Dokumen ini menjelaskan hal yang masuk dan tidak masuk ke repositori.

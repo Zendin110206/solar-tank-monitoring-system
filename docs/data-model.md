@@ -1,7 +1,7 @@
 # Model Data
 
 > **Status dokumen:** dicocokkan dengan tipe data (`src/features/monitoring/types/monitoring.ts`),
-> migrasi 001–009, dan repositori pada 28 Oktober 2026.
+> migrasi 001–009, dan repositori pada 31 Oktober 2026.
 
 Dokumen ini menjelaskan data utama yang dipakai dalam sistem monitoring.
 

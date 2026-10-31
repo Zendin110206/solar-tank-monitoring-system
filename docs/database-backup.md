@@ -1,7 +1,7 @@
 # Database Backup
 
 > **Status dokumen:** dicocokkan dengan `scripts/backup-mysql.mjs` dan
-> `scripts/run-mysql-backup-task.ps1` pada 28 Oktober 2026. Per Oktober 2026, backup otomatis
+> `scripts/run-mysql-backup-task.ps1` pada 31 Oktober 2026. Per Oktober 2026, backup otomatis
 > terjadwal dan latihan pemulihan **belum** berjalan; skrip di bawah sudah tersedia.
 
 Backup database wajib disiapkan sebelum aplikasi dipakai sebagai sistem operasional.
