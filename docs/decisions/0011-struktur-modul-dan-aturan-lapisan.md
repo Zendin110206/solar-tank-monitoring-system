@@ -1,7 +1,7 @@
 # ADR 0011 — Struktur modul dan aturan lapisan
 
 - **Status:** Diterima
-- **Tanggal:** 2026-10-25 (diterima; pembaruan 2026-10-25)
+- **Tanggal:** 2026-10-25 (diterima; pembaruan terakhir 2026-10-31)
 - **Pemilik keputusan:** pemelihara repositori
 - **Terkait:** [ADR 0002](0002-satu-repositori-modular-monolith.md),
   [arsitektur](../architecture.md), [indeks keputusan](README.md)

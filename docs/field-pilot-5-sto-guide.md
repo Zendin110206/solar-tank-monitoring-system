@@ -148,7 +148,7 @@ Jangan membalik dua nilai ini.
 Validasi tanpa menulis database:
 
 ```powershell
-pnpm pilot:registry -- --dry-run
+pnpm pilot:registry --dry-run
 ```
 
 Jika masih error, berhenti dulu dan perbaiki file registry lokal.
@@ -307,7 +307,7 @@ Arti response umum:
 | `400`    | payload rusak atau field kurang |
 | `401`    | key salah                       |
 | `404`    | device tidak ada di registry    |
-| `503`    | database/storage belum siap     |
+| `500`    | gagal menyimpan ke database     |
 
 Catatan HTTPS:
 
@@ -321,7 +321,7 @@ Catatan HTTPS:
 Smoke test lokal:
 
 ```powershell
-$env:PILOT_API_BASE_URL="https://solar-tank-monitoring-system.vercel.app"
+$env:PILOT_API_BASE_URL="http://localhost:3000"
 $env:PILOT_DEVICE_ID="pilot-contoh-a-01"
 $env:PILOT_DEVICE_KEY="key-asli-device"
 pnpm pilot:smoke

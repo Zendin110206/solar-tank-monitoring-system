@@ -1,6 +1,6 @@
 # Ingest Data Device
 
-> **Status dokumen:** dicocokkan dengan kode pada 28 Oktober 2026. Kontrak perangkat v1
+> **Status dokumen:** dicocokkan dengan kode pada 31 Oktober 2026. Kontrak perangkat v1
 > (alamat, header, bentuk kiriman, dan balasan) dibekukan dan dikunci tes
 > `ingest-route-contract.test.ts`.
 
@@ -200,19 +200,25 @@ pnpm simulate:device --device demo-nja-01 --once
 
 ## Smoke Test Pilot
 
-Untuk menguji payload real-format tanpa menunggu device fisik:
+Untuk menguji payload real-format tanpa menunggu device fisik, jalankan aplikasi secara lokal
+lalu kirim ke alamat lokal memakai device contoh:
 
 ```powershell
-$env:PILOT_API_BASE_URL="https://solar-tank-monitoring-system.vercel.app"
-$env:PILOT_DEVICE_ID="pilot-contoh-a-01"
-$env:PILOT_DEVICE_KEY="key-asli-device"
-pnpm pilot:smoke
+$env:PILOT_API_BASE_URL="http://localhost:3000"
+$env:PILOT_DEVICE_ID="demo-tph-01"
+$env:PILOT_DEVICE_KEY="demo-tph-key"
+pnpm pilot:smoke --allow-config-review
 ```
+
+Payload ini membawa config tangki yang berbeda dari device contoh, jadi balasannya wajar
+memuat `needsReview=true`; opsi `--allow-config-review` membuat skrip tetap menganggapnya
+berhasil. Smoke test ke alamat pilot hanya dijalankan pemelihara yang berwenang, memakai
+device yang memang disepakati untuk tes.
 
 Jika ingin melihat payload tanpa mengirim:
 
 ```powershell
-pnpm pilot:smoke -- --dry-run
+pnpm pilot:smoke --dry-run
 ```
 
 Jika smoke test gagal:

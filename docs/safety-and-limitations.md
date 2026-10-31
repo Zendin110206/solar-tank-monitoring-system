@@ -49,8 +49,9 @@ Yang belum ada:
 - kalibrasi serta persetujuan keselamatan hardware untuk setiap lokasi;
 - halaman admin untuk mengelola registry device, hardware profile, dan firmware template secara penuh;
 - keputusan deployment production final dan proteksi perimeter environment final;
-- approval/reject device lewat Telegram (bot Telegram saat ini hanya menerima perintah
-  `dashboard`, `help`, dan `status`, serta mengirim notifikasi ke admin).
+- approval/reject device lewat Telegram (bot Telegram saat ini hanya menerima perintah akun
+  `/start`, `/help`, `/status`, dan `/dashboard`, perintah helpdesk `/reply` dan `/close`, serta
+  mengirim notifikasi ke admin).
 
 ## Batas Data
 

@@ -21,7 +21,7 @@ FTM dikembangkan dengan merapikan sistem yang ada sedikit demi sedikit. Setiap p
 ### Membangun ulang dari nol dengan stack baru
 
 - Kelebihan: Bisa memulai dengan struktur bersih.
-- Kekurangan: Harus mengejar semua fitur (27 rute, alur pengajuan perangkat, akun, ekspor, helpdesk, Telegram) sambil tetap merawat sistem lama; risiko terbesar tetap ada.
+- Kekurangan: Harus mengejar semua fitur (44 rute, alur pengajuan perangkat, akun, ekspor, helpdesk, Telegram) sambil tetap merawat sistem lama; risiko terbesar tetap ada.
 - Hasil: Tidak dipilih.
 
 ### Memecah menjadi banyak layanan kecil (microservices)

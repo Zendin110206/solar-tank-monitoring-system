@@ -163,6 +163,12 @@ Jika gagal, cek:
 Gunakan langkah ini ketika tim ingin menghapus data device sementara, misalnya
 setelah uji template firmware dan sebelum memasukkan data perangkat real.
 
+> **Catatan 31 Oktober 2026:** langkah 3, 6, dan 7 di bawah sudah tidak sesuai tampilan.
+> Centang massal dan opsi reset semua dicabut dari halaman **Tinjau Pengajuan** pada Juli 2026.
+> Yang tersedia sekarang: **Hapus data** per pengajuan, lalu di kartu dashboard admin ikon
+> **Reset reading** dan **Hapus data monitoring** per STO, serta **Reset semua reading**. Lihat
+> [model data](data-model.md#maintenance-data-deviceuji).
+
 Langkah aman:
 
 1. Login sebagai admin.
@@ -311,7 +317,7 @@ Contoh bagian penting:
 Jalankan:
 
 ```powershell
-pnpm pilot:registry -- --dry-run
+pnpm pilot:registry --dry-run
 ```
 
 Jika sukses, script menampilkan ringkasan 5 STO.
@@ -412,13 +418,13 @@ runtime 17,93 jam
 Untuk melihat payload tanpa mengirim:
 
 ```powershell
-pnpm pilot:smoke -- --dry-run
+pnpm pilot:smoke --dry-run
 ```
 
 Untuk mengubah distance:
 
 ```powershell
-pnpm pilot:smoke -- --distance-cm 18.5
+pnpm pilot:smoke --distance-cm 18.5
 ```
 
 Jika response `401`:
@@ -433,10 +439,10 @@ Jika response `404`:
 Device belum ada di registry MySQL.
 ```
 
-Jika response `503`:
+Jika response `500`:
 
 ```text
-Database/storage belum siap. Cek /api/ready.
+Gagal menyimpan ke database. Cek /api/ready.
 ```
 
 Jika response sukses tetapi `needsReview=true`:

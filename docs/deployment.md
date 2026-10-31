@@ -173,7 +173,7 @@ pnpm db:setup:mysql
 pnpm pilot:hash-key
 Copy-Item config/pilot-registry.example.json config/pilot-registry.local.json
 # edit config/pilot-registry.local.json sampai koordinat dan hash device sudah real/approved
-pnpm pilot:registry -- --dry-run
+pnpm pilot:registry --dry-run
 pnpm pilot:registry
 $env:PILOT_API_BASE_URL="https://solar-tank-monitoring-system.vercel.app"
 $env:PILOT_DEVICE_ID="pilot-contoh-a-01"
