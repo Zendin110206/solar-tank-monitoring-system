@@ -1,5 +1,8 @@
 # Model Data
 
+> **Status dokumen:** dicocokkan dengan tipe data (`src/features/monitoring/types/monitoring.ts`),
+> migrasi 001–009, dan repositori pada 31 Oktober 2026.
+
 Dokumen ini menjelaskan data utama yang dipakai dalam sistem monitoring.
 
 ## Gambaran Awam
@@ -42,23 +45,23 @@ Site adalah lokasi operasional.
 Contoh:
 
 ```text
-STO TPH
-STO NJA
-STO JTO
+STO Contoh A
+STO Contoh B
+STO Contoh C
 ```
 
 Field penting:
 
-| Field | Arti |
-|---|---|
-| `id` | ID internal lokasi |
-| `code` | kode pendek lokasi |
-| `name` | nama lokasi |
-| `regionalLabel` | kelompok lokasi paling besar, contoh `TREG 5` |
-| `wilayahLabel` | kelompok di bawah Regional, contoh `TIF 3` |
-| `areaLabel` | label area |
-| `coordinate` | koordinat manual contoh |
-| `markerLeft` / `markerTop` | posisi marker pada peta ilustratif |
+| Field                    | Arti                                          |
+| ------------------------ | --------------------------------------------- |
+| `id`                     | ID internal lokasi                            |
+| `code`                   | kode pendek lokasi                            |
+| `name`                   | nama lokasi                                   |
+| `regionalLabel`          | kelompok lokasi paling besar, contoh `TREG 5` |
+| `wilayahLabel`           | kelompok di bawah Regional, contoh `TIF 3`    |
+| `areaLabel`              | label area                                    |
+| `latitude` / `longitude` | koordinat manual (boleh kosong)               |
+| `isActive`               | lokasi aktif atau tidak                       |
 
 ## Tank
 
@@ -66,19 +69,21 @@ Tank adalah tangki bahan bakar.
 
 Field penting:
 
-| Field | Arti |
-|---|---|
-| `id` | ID tangki |
-| `siteId` | lokasi tangki |
-| `name` | nama tangki |
-| `shape` | bentuk tangki |
-| `capacityLiter` | kapasitas maksimum |
-| `diameterCm` | diameter jika tabung horizontal |
-| `lengthCm` | panjang jika tabung horizontal |
-| `sensorMountHeightCm` | tinggi referensi sensor |
-| `consumptionLiterPerHour` | asumsi konsumsi per jam |
-| `lowLevelPercent` | batas level rendah |
-| `criticalLevelPercent` | batas level kritis |
+| Field                     | Arti                            |
+| ------------------------- | ------------------------------- |
+| `id`                      | ID tangki                       |
+| `siteId`                  | lokasi tangki                   |
+| `name`                    | nama tangki                     |
+| `shape`                   | bentuk tangki                   |
+| `capacityLiter`           | kapasitas maksimum              |
+| `diameterCm`              | diameter jika tabung horizontal |
+| `lengthCm`                | panjang tangki                  |
+| `widthCm` / `heightCm`    | lebar dan tinggi jika balok     |
+| `sensorMountHeightCm`     | tinggi referensi sensor         |
+| `consumptionLiterPerHour` | asumsi konsumsi per jam         |
+| `lowLevelPercent`         | batas level rendah              |
+| `criticalLevelPercent`    | batas level kritis              |
+| `isActive`                | tangki aktif atau tidak         |
 
 ## Device
 
@@ -86,28 +91,31 @@ Device adalah perangkat yang mengirim data.
 
 Field penting:
 
-| Field | Arti |
-|---|---|
-| `id` | ID internal device |
-| `code` | kode device yang dipakai di header |
-| `siteId` | lokasi device |
-| `tankId` | tangki yang dipantau |
-| `label` | nama device |
-| `expectedReportIntervalSec` | interval kirim yang diharapkan |
-| `apiKeyHash` | hash key device untuk validasi ingest |
-| `isActive` | device aktif atau tidak |
+| Field                       | Arti                                  |
+| --------------------------- | ------------------------------------- |
+| `id`                        | ID internal device                    |
+| `code`                      | kode device yang dipakai di header    |
+| `siteId`                    | lokasi device                         |
+| `tankId`                    | tangki yang dipantau                  |
+| `label`                     | nama device                           |
+| `expectedReportIntervalSec` | interval kirim yang diharapkan        |
+| `apiKeyHash`                | hash key device untuk validasi ingest |
+| `isActive`                  | device aktif atau tidak               |
 
-Contoh device aktif:
+Contoh device demo di seed:
 
 ```text
 code: demo-tph-01
 tankId: tank-tph-main
-expectedReportIntervalSec: 20
+expectedReportIntervalSec: 300
 ```
 
-Artinya device operasional diharapkan mengirim data setiap 20 detik. Interval
-ini tidak menentukan jumlah row history karena history tetap di-rollup per 5
-menit.
+Perangkat pilot mengirim data kira-kira setiap 20 detik. Interval ini dipakai untuk
+menentukan status online/terlambat/offline, tetapi tidak menentukan jumlah row history
+karena history tetap di-rollup per 5 menit.
+
+Posisi titik di peta dihitung aplikasi dari `latitude`/`longitude`; tidak ada kolom posisi
+peta tersendiri.
 
 ## Pengajuan Perangkat
 
@@ -116,23 +124,23 @@ Tujuannya agar user lapangan tidak perlu membuat kode device dan key manual.
 
 Field penting:
 
-| Field | Arti |
-|---|---|
-| `requestCode` | kode pengajuan yang mudah dilacak admin |
-| `requesterEmail` | email user yang mengajukan |
-| `status` | status review dan provisioning |
-| `siteName` | nama STO yang tampil di dashboard |
-| `regionalLabel` / `wilayahLabel` / `areaLabel` | urutan kelompok lokasi dari paling besar ke paling dekat dengan STO |
-| `latitude` / `longitude` | koordinat manual untuk peta |
-| `deviceCode` | kode device yang dibuat sistem |
-| `deviceSensorType` | tipe sensor, saat ini fokus ke sensor fuel |
-| `tankShape` | bentuk tangki, balok atau silinder horizontal |
-| `capacityLiter` | kapasitas tangki hasil hitung sistem dari dimensi, bukan input manual user |
-| `lengthCm`, `widthCm`, `heightCm`, `diameterCm` | dimensi fisik tangki sesuai bentuk |
-| `sensorMountHeightCm` | acuan tinggi sensor yang harus diisi konsisten dengan panduan firmware/lapangan |
-| `loadValue`, `loadUnit`, `dieselEngineCapacityKva`, `cosPhi` | parameter beban genset untuk menghitung konsumsi solar per jam |
-| `hardwareProfileId` | profile board, sensor, dan pin yang dipakai firmware |
-| `firmwareTemplateId` | template firmware yang dipakai untuk membuat ZIP |
+| Field                                                        | Arti                                                                            |
+| ------------------------------------------------------------ | ------------------------------------------------------------------------------- |
+| `requestCode`                                                | kode pengajuan yang mudah dilacak admin                                         |
+| `requesterEmail`                                             | email user yang mengajukan                                                      |
+| `status`                                                     | status review dan provisioning                                                  |
+| `siteName`                                                   | nama STO yang tampil di dashboard                                               |
+| `regionalLabel` / `wilayahLabel` / `areaLabel`               | urutan kelompok lokasi dari paling besar ke paling dekat dengan STO             |
+| `latitude` / `longitude`                                     | koordinat manual untuk peta                                                     |
+| `deviceCode`                                                 | kode device yang dibuat sistem                                                  |
+| `deviceSensorType`                                           | tipe sensor, saat ini fokus ke sensor fuel                                      |
+| `tankShape`                                                  | bentuk tangki, balok atau silinder horizontal                                   |
+| `capacityLiter`                                              | kapasitas tangki hasil hitung sistem dari dimensi, bukan input manual user      |
+| `lengthCm`, `widthCm`, `heightCm`, `diameterCm`              | dimensi fisik tangki sesuai bentuk                                              |
+| `sensorMountHeightCm`                                        | acuan tinggi sensor yang harus diisi konsisten dengan panduan firmware/lapangan |
+| `loadValue`, `loadUnit`, `dieselEngineCapacityKva`, `cosPhi` | parameter beban genset untuk menghitung konsumsi solar per jam                  |
+| `hardwareProfileId`                                          | profile board, sensor, dan pin yang dipakai firmware                            |
+| `firmwareTemplateId`                                         | template firmware yang dipakai untuk membuat ZIP                                |
 
 Catatan penting:
 
@@ -144,14 +152,14 @@ Catatan penting:
 
 Status penting:
 
-| Status | Arti |
-|---|---|
-| `pending_admin_review` | menunggu admin approve/reject |
-| `approved_package_ready` | paket firmware sudah dibuat |
-| `waiting_firmware_download` | link firmware sudah dikirim dan menunggu download |
-| `waiting_first_valid_ping` | firmware sudah didownload, menunggu device mengirim data valid |
-| `active` | device sudah aktif dan tampil di dashboard |
-| `rejected` / `revoked` / `expired` | pengajuan tidak bisa dipakai lagi |
+| Status                             | Arti                                                           |
+| ---------------------------------- | -------------------------------------------------------------- |
+| `pending_admin_review`             | menunggu admin approve/reject                                  |
+| `approved_package_ready`           | paket firmware sudah dibuat                                    |
+| `waiting_firmware_download`        | link firmware sudah dikirim dan menunggu download              |
+| `waiting_first_valid_ping`         | firmware sudah didownload, menunggu device mengirim data valid |
+| `active`                           | device sudah aktif dan tampil di dashboard                     |
+| `rejected` / `revoked` / `expired` | pengajuan tidak bisa dipakai lagi                              |
 
 ## Paket Firmware
 
@@ -175,22 +183,26 @@ jumlah download supaya device key tidak tersebar terlalu bebas.
 ## Maintenance Data Device/Uji
 
 Data device/uji boleh dibersihkan dari halaman admin ketika tim memang ingin
-mulai ulang pengujian perangkat. Admin bisa membersihkan satu card pengajuan,
-beberapa card yang dipilih, atau seluruh data monitoring perangkat. Reset ini
-hanya untuk data operasional monitoring, bukan untuk data akun.
+mulai ulang pengujian perangkat. Per Oktober 2026, halaman admin hanya menyediakan
+pembersihan **satu** pengajuan (dengan mengetik `BERSIHKAN ITEM DEVICE`). Formulir
+"bersihkan pengajuan terpilih" dan "bersihkan semua data perangkat" sudah dicabut dari
+halaman pada Juli 2026; kode server di belakangnya masih ada tanpa pemakai (lihat
+penyimpangan di [arsitektur](architecture.md)). Pembersihan hanya menyentuh data
+operasional monitoring, bukan data akun.
 
 Tabel yang termasuk data operasional monitoring:
 
-| Tabel | Isi |
-|---|---|
-| `monitoring_sites` | lokasi STO |
-| `monitoring_tanks` | konfigurasi tangki |
-| `monitoring_devices` | device yang aktif atau disiapkan |
-| `monitoring_readings` | histori pembacaan sensor |
-| `monitoring_device_requests` | pengajuan perangkat dari user |
-| `monitoring_device_packages` | paket firmware yang dibuat dari approval |
+| Tabel                                   | Isi                                                     |
+| --------------------------------------- | ------------------------------------------------------- |
+| `monitoring_sites`                      | lokasi STO                                              |
+| `monitoring_tanks`                      | konfigurasi tangki                                      |
+| `monitoring_devices`                    | device yang aktif atau disiapkan                        |
+| `monitoring_latest_readings`            | snapshot pembacaan terbaru per device                   |
+| `monitoring_readings`                   | histori pembacaan sensor                                |
+| `monitoring_device_requests`            | pengajuan perangkat dari user                           |
+| `monitoring_device_packages`            | paket firmware yang dibuat dari approval                |
 | `monitoring_device_provisioning_events` | event approve, reject, reissue, revoke, dan email paket |
-| `monitoring_ingest_events` | event ingest device |
+| `monitoring_ingest_events`              | event ingest device                                     |
 
 Untuk pembersihan satu atau beberapa pengajuan, sistem hanya menghapus site,
 tangki, dan device yang terkait dengan pilihan tersebut. Jika site atau tangki
@@ -198,11 +210,11 @@ masih dipakai data lain, data itu tidak ikut dihapus.
 
 Tabel yang sengaja tidak ikut dihapus:
 
-| Tabel | Alasan |
-|---|---|
-| `auth_*` | akun admin/user, session, OTP, audit auth, dan reset password harus tetap aman |
-| `monitoring_firmware_templates` | template firmware masih dibutuhkan untuk membuat paket baru |
-| `monitoring_hardware_profiles` | profil board, sensor, dan pin masih dibutuhkan oleh pengajuan berikutnya |
+| Tabel                           | Alasan                                                                         |
+| ------------------------------- | ------------------------------------------------------------------------------ |
+| `auth_*`                        | akun admin/user, session, OTP, audit auth, dan reset password harus tetap aman |
+| `monitoring_firmware_templates` | template firmware masih dibutuhkan untuk membuat paket baru                    |
+| `monitoring_hardware_profiles`  | profil board, sensor, dan pin masih dibutuhkan oleh pengajuan berikutnya       |
 
 Setelah data operasional dibersihkan, dashboard akan kosong sampai ada pengajuan
 perangkat baru yang disetujui atau registry monitoring disiapkan ulang.
@@ -213,27 +225,27 @@ Reading adalah satu catatan pembacaan.
 
 Field penting:
 
-| Field | Arti |
-|---|---|
-| `id` | ID reading |
-| `deviceId` | device pengirim |
-| `tankId` | tangki yang dibaca |
-| `measuredAt` | waktu pengukuran dari device atau fallback server |
-| `receivedAt` | waktu server menerima data |
-| `sensorDistanceCm` | tinggi ruang kosong: jarak dari sensor di bagian atas tangki ke permukaan bahan bakar |
-| `fuelHeightCm` | tinggi bahan bakar |
-| `volumeLiter` | estimasi volume |
-| `fillPercent` | persentase isi |
-| `runtimeHour` | estimasi durasi operasional |
-| `batteryVolt` | tegangan device jika ada |
-| `rssiDbm` | sinyal WiFi jika ada |
-| `rawPayload` | payload mentah untuk audit development |
-| `quality` | catatan sumber angka dan status review config jika payload membawa config tangki |
-| `resolution` | `raw`, `5m`, atau `latest` pada model baca aplikasi |
-| `bucketStart`, `bucketEnd` | batas waktu bucket agregat |
-| `sampleCount` | jumlah sampel yang diwakili satu row agregat |
-| `volumeLiterMin`, `volumeLiterMax` | volume minimum dan maksimum dalam bucket |
-| `fillPercentMin`, `fillPercentMax` | persentase minimum dan maksimum dalam bucket |
+| Field                              | Arti                                                                                  |
+| ---------------------------------- | ------------------------------------------------------------------------------------- |
+| `id`                               | ID reading                                                                            |
+| `deviceId`                         | device pengirim                                                                       |
+| `tankId`                           | tangki yang dibaca                                                                    |
+| `measuredAt`                       | waktu pengukuran dari device atau fallback server                                     |
+| `receivedAt`                       | waktu server menerima data                                                            |
+| `sensorDistanceCm`                 | tinggi ruang kosong: jarak dari sensor di bagian atas tangki ke permukaan bahan bakar |
+| `fuelHeightCm`                     | tinggi bahan bakar                                                                    |
+| `volumeLiter`                      | estimasi volume                                                                       |
+| `fillPercent`                      | persentase isi                                                                        |
+| `runtimeHour`                      | estimasi durasi operasional                                                           |
+| `batteryVolt`                      | tegangan device jika ada                                                              |
+| `rssiDbm`                          | sinyal WiFi jika ada                                                                  |
+| `rawPayload`                       | payload mentah untuk audit development                                                |
+| `quality`                          | catatan sumber angka dan status review config jika payload membawa config tangki      |
+| `resolution`                       | `raw`, `5m`, atau `latest` pada model baca aplikasi                                   |
+| `bucketStart`, `bucketEnd`         | batas waktu bucket agregat                                                            |
+| `sampleCount`                      | jumlah sampel yang diwakili satu row agregat                                          |
+| `volumeLiterMin`, `volumeLiterMax` | volume minimum dan maksimum dalam bucket                                              |
+| `fillPercentMin`, `fillPercentMax` | persentase minimum dan maksimum dalam bucket                                          |
 
 `quality` membantu menjawab:
 
@@ -263,21 +275,21 @@ Status dibuat dari data reading dan konfigurasi.
 
 Jenis status:
 
-| Status | Berdasarkan |
-|---|---|
-| `runtimeStatus` | estimasi runtime |
-| `levelStatus` | persentase isi |
-| `deviceStatus` | umur data terakhir |
+| Status              | Berdasarkan           |
+| ------------------- | --------------------- |
+| `runtimeStatus`     | estimasi runtime      |
+| `levelStatus`       | persentase isi        |
+| `deviceStatus`      | umur data terakhir    |
 | `operationalStatus` | gabungan status utama |
 
 ## Catatan Penyimpanan Saat Ini
 
 Saat ini aplikasi memiliki dua mode penyimpanan reading:
 
-| Mode | Fungsi |
-|---|---|
+| Mode     | Fungsi                                               |
+| -------- | ---------------------------------------------------- |
 | `memory` | Default development, data hilang saat server restart |
-| `mysql` | Reading disimpan ke MySQL lewat repository opsional |
+| `mysql`  | Reading disimpan ke MySQL lewat repository opsional  |
 
 Karakteristik memory store:
 

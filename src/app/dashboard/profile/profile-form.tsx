@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation";
 import { useActionState, useEffect, useMemo, useState } from "react";
 import { useFormStatus } from "react-dom";
 
-import type { AuthSafeUser } from "@/features/auth/types";
+import type { AuthSafeUser } from "@/features/auth/types/auth";
 import {
   updateCurrentUserProfileAction,
   type ProfileActionState,
 } from "./actions";
+import { getRoleLabel } from "@/features/auth/domain/role-label";
 
 type ProfileFormProps = {
   user: AuthSafeUser;
@@ -29,10 +30,6 @@ function splitFullName(fullName: string) {
   const lastName = parts.join(" ");
 
   return { firstName, lastName };
-}
-
-function getRoleLabel(role: AuthSafeUser["role"]) {
-  return role === "admin" ? "Admin" : "User";
 }
 
 function SubmitButton() {
@@ -98,7 +95,10 @@ const inputClassName =
 
 export function ProfileForm({ user }: ProfileFormProps) {
   const router = useRouter();
-  const initialName = useMemo(() => splitFullName(user.fullName), [user.fullName]);
+  const initialName = useMemo(
+    () => splitFullName(user.fullName),
+    [user.fullName],
+  );
   const [isEditing, setIsEditing] = useState(false);
   const [state, formAction] = useActionState(
     updateCurrentUserProfileAction,

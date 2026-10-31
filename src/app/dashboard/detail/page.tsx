@@ -1,5 +1,5 @@
-import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
-import { getMonitoringReferenceDataWithSource } from "@/features/monitoring/lib/monitoring-registry";
+import { requirePageAdmin } from "@/features/auth/server/auth-guards";
+import { getMonitoringReferenceDataWithSource } from "@/features/monitoring/server/monitoring-registry";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connection } from "next/server";
@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { SectionHeader } from "@/components/ui/section-header";
 import { DashboardMapOverview } from "@/features/monitoring/components/dashboard-map-overview";
 import { LiveClock } from "@/features/monitoring/components/live-clock";
 import { LiveRefreshControl } from "@/features/monitoring/components/live-refresh-control";
@@ -22,10 +23,17 @@ import {
   buildDashboardOverview,
   type DashboardOverview,
   type DashboardSiteStatus as SiteStatus,
-} from "@/features/monitoring/lib/dashboard-view-model";
+} from "@/features/monitoring/domain/dashboard-view-model";
 
-import { listLatestMonitoringReadingsByTankWithSource } from "@/features/monitoring/lib/monitoring-storage";
-import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/lib/refresh-interval";
+import { listLatestMonitoringReadingsByTankWithSource } from "@/features/monitoring/server/monitoring-storage";
+import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/components/refresh-interval";
+import { formatNumber } from "@/lib/format";
+import {
+  STATUS_BADGE_CLASS,
+  STATUS_DOT_CLASS,
+} from "@/components/ui/status-tone";
+import { Card } from "@/components/ui/card";
+import { StatusPill } from "@/components/ui/status-pill";
 
 export const metadata: Metadata = {
   title: "Analisis Teknis Tangki Bahan Bakar | FTM",
@@ -47,29 +55,29 @@ const statusMeta: Record<
 > = {
   online: {
     label: "Online",
-    dot: "bg-emerald-500",
-    badge: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+    dot: STATUS_DOT_CLASS.success,
+    badge: STATUS_BADGE_CLASS.success,
     ring: "ring-emerald-200",
     text: "text-emerald-700",
   },
   warning: {
     label: "Waspada",
-    dot: "bg-amber-500",
-    badge: "bg-amber-50 text-amber-700 ring-amber-100",
+    dot: STATUS_DOT_CLASS.warning,
+    badge: STATUS_BADGE_CLASS.warning,
     ring: "ring-amber-200",
     text: "text-amber-700",
   },
   critical: {
     label: "Kritis",
     dot: "bg-red-600",
-    badge: "bg-red-50 text-red-700 ring-red-100",
+    badge: STATUS_BADGE_CLASS.danger,
     ring: "ring-red-200",
     text: "text-red-700",
   },
   offline: {
     label: "Offline",
     dot: "bg-zinc-950",
-    badge: "bg-zinc-100 text-zinc-700 ring-zinc-200",
+    badge: STATUS_BADGE_CLASS.neutral,
     ring: "ring-zinc-300",
     text: "text-zinc-700",
   },
@@ -89,32 +97,37 @@ function buildSummaryCards(dashboardOverview: DashboardOverview) {
       value: String(dashboardOverview.summary.criticalTanks),
       note: "berdasarkan runtime, level, dan perangkat",
       icon: AlertTriangle,
-      tone: "bg-red-50 text-red-700 ring-red-100",
+      tone: STATUS_BADGE_CLASS.danger,
     },
     {
       label: "Perangkat online",
       value: String(dashboardOverview.summary.onlineDevices),
       note: `${dashboardOverview.summary.delayedDevices} terlambat, ${dashboardOverview.summary.offlineDevices} offline`,
       icon: Wifi,
-      tone: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+      tone: STATUS_BADGE_CLASS.success,
     },
     {
       label: "Rata-rata update",
       value: dashboardOverview.summary.averageIntervalLabel,
       note: "target dapat diatur per perangkat",
       icon: Clock,
-      tone: "bg-zinc-100 text-zinc-700 ring-zinc-200",
+      tone: STATUS_BADGE_CLASS.neutral,
     },
   ];
 }
 
 const runtimeBands = [
-  { label: "Kritis", range: "< 13 jam", width: "24%", tone: "bg-red-500" },
+  {
+    label: "Kritis",
+    range: "< 13 jam",
+    width: "24%",
+    tone: STATUS_DOT_CLASS.danger,
+  },
   {
     label: "Waspada",
     range: "13 - 16 jam",
     width: "24%",
-    tone: "bg-amber-500",
+    tone: STATUS_DOT_CLASS.warning,
   },
   {
     label: "Aman terbatas",
@@ -126,13 +139,9 @@ const runtimeBands = [
     label: "Aman panjang",
     range: "> 24 jam",
     width: "28%",
-    tone: "bg-emerald-500",
+    tone: STATUS_DOT_CLASS.success,
   },
 ];
-
-function formatLiter(value: number) {
-  return new Intl.NumberFormat("id-ID").format(value);
-}
 
 function formatJakartaTime(value: Date) {
   const time = new Intl.DateTimeFormat("id-ID", {
@@ -152,34 +161,9 @@ function StatusBadge({ status }: { status: SiteStatus }) {
   const meta = statusMeta[status];
 
   return (
-    <span
-      className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ring-1 ${meta.badge}`}
-    >
-      <span className={`size-2 rounded-full ${meta.dot}`} />
+    <StatusPill badgeClass={meta.badge} dotClass={meta.dot}>
       {meta.label}
-    </span>
-  );
-}
-
-function SectionHeader({
-  label,
-  title,
-  description,
-}: {
-  label: string;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div>
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-red-600">
-        {label}
-      </p>
-      <h2 className="mt-2 text-2xl font-semibold tracking-normal text-zinc-950">
-        {title}
-      </h2>
-      <p className="mt-2 text-sm leading-6 text-zinc-500">{description}</p>
-    </div>
+    </StatusPill>
   );
 }
 
@@ -204,9 +188,7 @@ export default async function DashboardPage() {
   const storageSource = monitoringReadingsResult.source;
   const registrySource = monitoringReferenceResult.source;
   const storageBadgeLabel =
-    storageSource.activeDriver === "mysql"
-      ? "database MySQL"
-      : "memory lokal";
+    storageSource.activeDriver === "mysql" ? "database MySQL" : "memory lokal";
 
   const monitoredSites = dashboardOverview.rows;
   const latestSite = dashboardOverview.latestRow;
@@ -322,10 +304,7 @@ export default async function DashboardPage() {
           <div className="space-y-5">
             {/* Lower Insights Section */}
             <section className="grid gap-5 lg:grid-cols-[0.72fr_1.28fr]">
-              <article
-                id="prioritas"
-                className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
-              >
+              <Card id="prioritas" as="article" className="animate-soft-fade">
                 <SectionHeader
                   label="Prioritas"
                   title="Tindak lanjut hari ini"
@@ -364,9 +343,9 @@ export default async function DashboardPage() {
                 >
                   Lihat semua prioritas
                 </button>
-              </article>
+              </Card>
 
-              <article className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+              <Card as="article" className="animate-soft-fade">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <SectionHeader
                     label="Tren volume"
@@ -421,13 +400,13 @@ export default async function DashboardPage() {
                     </div>
                   ))}
                 </div>
-              </article>
+              </Card>
             </section>
           </div>
 
           {/* Supporting Status Panels */}
           <aside className="space-y-5">
-            <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+            <Card className="animate-soft-fade">
               <SectionHeader
                 label="Kesehatan data"
                 title="Status perangkat"
@@ -454,9 +433,9 @@ export default async function DashboardPage() {
                   ))}
                 </div>
               </div>
-            </section>
+            </Card>
 
-            <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+            <Card className="animate-soft-fade">
               <SectionHeader
                 label="Alur data"
                 title="Siap disambung bertahap"
@@ -488,15 +467,12 @@ export default async function DashboardPage() {
                   </div>
                 ))}
               </div>
-            </section>
+            </Card>
           </aside>
         </div>
 
         {/* Monitoring Table Section */}
-        <section
-          id="log"
-          className="mt-5 animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm"
-        >
+        <Card id="log" className="mt-5 animate-soft-fade">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <SectionHeader
               label="Log perangkat"
@@ -520,13 +496,13 @@ export default async function DashboardPage() {
                   <th className="px-4 py-2 font-semibold">Volume</th>
                   <th className="px-4 py-2 font-semibold">Isi</th>
                   <th className="px-4 py-2 font-semibold">Runtime</th>
-                <th className="px-4 py-2 font-semibold">Perangkat</th>
-                <th className="px-4 py-2 font-semibold">Update</th>
-                <th className="px-4 py-2 font-semibold">Status</th>
-                <th className="px-4 py-2 font-semibold">Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
+                  <th className="px-4 py-2 font-semibold">Perangkat</th>
+                  <th className="px-4 py-2 font-semibold">Update</th>
+                  <th className="px-4 py-2 font-semibold">Status</th>
+                  <th className="px-4 py-2 font-semibold">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
                 {monitoredSites.map((site) => (
                   <tr key={site.code} className="bg-zinc-50">
                     <td className="rounded-l-lg px-4 py-4">
@@ -555,7 +531,7 @@ export default async function DashboardPage() {
                     </td>
                     <td className="px-4 py-4 text-zinc-600">{site.tank}</td>
                     <td className="px-4 py-4 font-semibold">
-                      {formatLiter(site.volumeLiter)} L
+                      {formatNumber(site.volumeLiter)} L
                     </td>
                     <td className="px-4 py-4">
                       <div className="flex items-center gap-3">
@@ -597,7 +573,7 @@ export default async function DashboardPage() {
               </tbody>
             </table>
           </div>
-        </section>
+        </Card>
       </div>
     </main>
   );

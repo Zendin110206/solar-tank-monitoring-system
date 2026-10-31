@@ -1,13 +1,18 @@
 import {
   getLocalDeviceKey,
   ingestTelemetry,
-} from "@/features/monitoring/lib/ingest-telemetry";
-import { checkRateLimit } from "@/features/auth/lib/rate-limit";
+} from "@/features/monitoring/server/ingest-telemetry";
+import { checkRateLimit } from "@/features/auth/server/rate-limit";
 import {
   getExpectedProvisioningKey,
   isDeviceAutoProvisioningEnabled,
-} from "@/features/monitoring/lib/device-provisioning";
-import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
+} from "@/features/devices/server/device-provisioning";
+import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
+import {
+  jsonError,
+  jsonOk,
+  jsonTooManyRequests,
+} from "@/lib/http/json-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -22,7 +27,9 @@ function getClientAddress(headers: Headers): string {
   );
 }
 
-async function checkIngestRateLimit(request: Request): Promise<Response | null> {
+async function checkIngestRateLimit(
+  request: Request,
+): Promise<Response | null> {
   if (getMonitoringStorageDriver() !== "mysql") {
     return null;
   }
@@ -40,15 +47,9 @@ async function checkIngestRateLimit(request: Request): Promise<Response | null> 
     return null;
   }
 
-  return Response.json(
-    {
-      ok: false,
-      error: "Terlalu banyak request device. Coba lagi sebentar.",
-    },
-    {
-      headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
-      status: 429,
-    },
+  return jsonTooManyRequests(
+    "Terlalu banyak request device. Coba lagi sebentar.",
+    rateLimit.retryAfterSeconds,
   );
 }
 
@@ -64,13 +65,7 @@ export async function POST(request: Request) {
   try {
     payload = await request.json();
   } catch {
-    return Response.json(
-      {
-        ok: false,
-        error: "Body request harus JSON valid.",
-      },
-      { status: 400 },
-    );
+    return jsonError("Body request harus JSON valid.", 400);
   }
 
   const result = await ingestTelemetry({
@@ -85,20 +80,8 @@ export async function POST(request: Request) {
   });
 
   if (!result.ok) {
-    return Response.json(
-      {
-        ok: false,
-        error: result.error,
-      },
-      { status: result.status },
-    );
+    return jsonError(result.error, result.status);
   }
 
-  return Response.json(
-    {
-      ok: true,
-      data: result.data,
-    },
-    { status: result.status },
-  );
+  return jsonOk(result.data, { status: result.status });
 }

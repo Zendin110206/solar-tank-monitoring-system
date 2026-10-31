@@ -21,11 +21,12 @@ import type {
 import {
   FTM_REGIONAL_OPTIONS,
   FTM_WILAYAH_OPTIONS,
-} from "@/features/monitoring/lib/location-taxonomy";
+} from "@/features/monitoring/domain/location-taxonomy";
 import {
   createDeviceRequestAction,
   type DeviceRequestFormState,
 } from "./actions";
+import { formatNumber } from "@/lib/format";
 
 const INITIAL_STATE: DeviceRequestFormState = {
   status: "idle",
@@ -93,12 +94,6 @@ function parsePositiveFormNumber(value: string): number | null {
 
 function roundMetric(value: number): number {
   return Math.round(value * 100) / 100;
-}
-
-function formatMetric(value: number): string {
-  return new Intl.NumberFormat("id-ID", {
-    maximumFractionDigits: 2,
-  }).format(value);
 }
 
 function calculateCapacityPreview({
@@ -188,7 +183,7 @@ function ComputedMetric({
     <div className="flex h-full w-full min-w-0 flex-col gap-2 text-sm font-semibold text-zinc-900">
       <span className="break-words">{label}</span>
       <output className="flex min-h-11 w-full min-w-0 max-w-full items-center rounded-lg border border-blue-100 bg-blue-50 px-3 text-sm font-semibold text-blue-950 shadow-sm">
-        {value === null ? emptyLabel : `${formatMetric(value)} ${unit}`}
+        {value === null ? emptyLabel : `${formatNumber(value, 2)} ${unit}`}
       </output>
       {help ? (
         <span className="min-h-5 break-words text-xs font-normal leading-5 text-zinc-500">
@@ -235,11 +230,7 @@ function NumberInput({
   );
 }
 
-function SubmitButton({
-  disabled,
-}: {
-  disabled?: boolean;
-}) {
+function SubmitButton({ disabled }: { disabled?: boolean }) {
   const { pending } = useFormStatus();
 
   return (
@@ -492,7 +483,11 @@ export function DeviceRequestForm({
             label="Mode sensor"
             help="Paket firmware aktif saat ini untuk sensor fuel."
           >
-            <select className={inputClassName()} name="deviceSensorType" required>
+            <select
+              className={inputClassName()}
+              name="deviceSensorType"
+              required
+            >
               <option value="fuel">Sensor fuel</option>
               <option value="energy" disabled>
                 Sensor energy (belum aktif)
@@ -585,8 +580,8 @@ export function DeviceRequestForm({
           icon={<Gauge className="size-5" aria-hidden="true" />}
           title="Beban Genset"
         >
-          Sistem menghitung konsumsi bahan bakar per jam dari beban lokasi, kapasitas
-          diesel engine, dan cos phi.
+          Sistem menghitung konsumsi bahan bakar per jam dari beban lokasi,
+          kapasitas diesel engine, dan cos phi.
         </SectionHeader>
 
         <div className="grid w-full min-w-0 max-w-6xl gap-4 sm:grid-cols-2 xl:grid-cols-5">
@@ -603,7 +598,9 @@ export function DeviceRequestForm({
             <select
               className={inputClassName()}
               name="loadUnit"
-              onChange={(event) => setLoadUnit(event.target.value as LoadPowerUnit)}
+              onChange={(event) =>
+                setLoadUnit(event.target.value as LoadPowerUnit)
+              }
               required
               value={loadUnit}
             >
@@ -611,10 +608,7 @@ export function DeviceRequestForm({
               <option value="kva">kVA</option>
             </select>
           </FormField>
-          <FormField
-            label="Kapasitas diesel engine"
-            help="Isi dalam kVA."
-          >
+          <FormField label="Kapasitas diesel engine" help="Isi dalam kVA.">
             <NumberInput
               name="dieselEngineCapacityKva"
               onValueChange={setDieselEngineCapacityKva}

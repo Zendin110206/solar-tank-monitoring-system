@@ -6,7 +6,7 @@ import {
   formatMonitoringRefreshInterval,
   getMonitoringRefreshIntervalMs,
   normalizeMonitoringRefreshInterval,
-} from "../lib/refresh-interval";
+} from "../components/refresh-interval";
 
 describe("monitoring refresh interval", () => {
   it("keeps the default interval when env is empty", () => {

@@ -4,14 +4,19 @@ import Link from "next/link";
 import { Fuel } from "lucide-react";
 import { useMemo, useState } from "react";
 
-import {
-  OperationalMap,
-  type OperationalMapSite,
-} from "@/features/monitoring/components/operational-map";
+import { OperationalMap, type OperationalMapSite } from "./operational-map";
 import type {
   DashboardMonitoringSite,
   DashboardSiteStatus,
-} from "@/features/monitoring/lib/dashboard-view-model";
+} from "../domain/dashboard-view-model";
+import { formatNumber } from "@/lib/format";
+import {
+  STATUS_BADGE_CLASS,
+  STATUS_DOT_CLASS,
+} from "@/components/ui/status-tone";
+import { Card } from "@/components/ui/card";
+import { StatusPill } from "@/components/ui/status-pill";
+import { SectionHeader } from "@/components/ui/section-header";
 
 type DashboardMapOverviewProps = {
   sites: DashboardMonitoringSite[];
@@ -29,62 +34,33 @@ const statusMeta: Record<
 > = {
   online: {
     label: "Online",
-    dot: "bg-emerald-500",
-    badge: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+    dot: STATUS_DOT_CLASS.success,
+    badge: STATUS_BADGE_CLASS.success,
   },
   warning: {
     label: "Waspada",
-    dot: "bg-amber-500",
-    badge: "bg-amber-50 text-amber-700 ring-amber-100",
+    dot: STATUS_DOT_CLASS.warning,
+    badge: STATUS_BADGE_CLASS.warning,
   },
   critical: {
     label: "Kritis",
     dot: "bg-red-600",
-    badge: "bg-red-50 text-red-700 ring-red-100",
+    badge: STATUS_BADGE_CLASS.danger,
   },
   offline: {
     label: "Offline",
     dot: "bg-zinc-950",
-    badge: "bg-zinc-100 text-zinc-700 ring-zinc-200",
+    badge: STATUS_BADGE_CLASS.neutral,
   },
 };
-
-function formatLiter(value: number) {
-  return new Intl.NumberFormat("id-ID").format(value);
-}
 
 function StatusBadge({ status }: { status: DashboardSiteStatus }) {
   const meta = statusMeta[status];
 
   return (
-    <span
-      className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ring-1 ${meta.badge}`}
-    >
-      <span className={`size-2 rounded-full ${meta.dot}`} />
+    <StatusPill badgeClass={meta.badge} dotClass={meta.dot}>
       {meta.label}
-    </span>
-  );
-}
-
-function SectionHeader({
-  label,
-  title,
-  description,
-}: {
-  label: string;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div>
-      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-red-600">
-        {label}
-      </p>
-      <h2 className="mt-2 text-2xl font-semibold tracking-normal text-zinc-950">
-        {title}
-      </h2>
-      <p className="mt-2 text-sm leading-6 text-zinc-500">{description}</p>
-    </div>
+    </StatusPill>
   );
 }
 
@@ -149,7 +125,7 @@ export function DashboardMapOverview({
       </section>
 
       {/* Right Detail Overview */}
-      <section className="animate-soft-fade rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+      <Card className="animate-soft-fade">
         {selectedSite ? (
           <>
             <div className="flex items-start justify-between gap-4">
@@ -186,7 +162,7 @@ export function DashboardMapOverview({
                   </span>
                 </div>
                 <p className="mt-2 text-sm leading-6 text-zinc-500">
-                  {formatLiter(selectedSite.volumeLiter)} liter tersedia.
+                  {formatNumber(selectedSite.volumeLiter)} liter tersedia.
                   Runtime estimasi {selectedSite.runtimeHour} jam dengan asumsi
                   konsumsi konfigurasi {selectedSite.consumptionLiterPerHour}{" "}
                   L/jam.
@@ -203,7 +179,7 @@ export function DashboardMapOverview({
 
             <div className="mt-6 grid grid-cols-3 gap-3">
               {[
-                ["Volume", `${formatLiter(selectedSite.volumeLiter)} L`],
+                ["Volume", `${formatNumber(selectedSite.volumeLiter)} L`],
                 ["Runtime", `${selectedSite.runtimeHour} jam`],
                 ["RSSI", selectedSite.signal],
               ].map(([label, value]) => (
@@ -228,7 +204,7 @@ export function DashboardMapOverview({
             Belum ada STO yang bisa ditampilkan.
           </p>
         )}
-      </section>
+      </Card>
     </>
   );
 }

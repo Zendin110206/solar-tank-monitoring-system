@@ -4,7 +4,7 @@ const mocks = vi.hoisted(() => ({
   query: vi.fn(),
 }));
 
-vi.mock("../lib/mysql-connection", () => ({
+vi.mock("@/lib/database/mysql-connection", () => ({
   getMysqlPool: () => ({ query: mocks.query }),
 }));
 
@@ -13,7 +13,7 @@ import {
   rowToDevice,
   rowToSite,
   rowToTank,
-} from "../lib/mysql-reference-repository";
+} from "../server/repositories/mysql-reference-repository";
 
 describe("mysql reference repository mappers", () => {
   beforeEach(() => {
@@ -29,8 +29,8 @@ describe("mysql reference repository mappers", () => {
       regional_label: "TREG 5",
       wilayah_label: "TIF 3",
       area_label: "Area demo",
-      latitude: "-7.6500000",
-      longitude: "112.9000000",
+      latitude: "-0.6500000",
+      longitude: "100.9000000",
       is_active: 1,
     } as Parameters<typeof rowToSite>[0]);
 
@@ -41,8 +41,8 @@ describe("mysql reference repository mappers", () => {
       regionalLabel: "TREG 5",
       wilayahLabel: "TIF 3",
       areaLabel: "Area demo",
-      latitude: -7.65,
-      longitude: 112.9,
+      latitude: -0.65,
+      longitude: 100.9,
       isActive: true,
     });
   });

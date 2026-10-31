@@ -3,10 +3,11 @@ import type { NextRequest } from "next/server";
 import {
   getReadinessCheckToken,
   isProductionLikeEnvironment,
-} from "@/features/auth/lib/auth-config";
-import { requireApiUser } from "@/features/auth/lib/auth-guards";
-import { getDeploymentReadiness } from "@/features/monitoring/lib/deployment-probes";
-import { hasValidReadinessToken } from "@/features/monitoring/lib/readiness-access";
+} from "@/features/auth/server/auth-config";
+import { requireApiUser } from "@/features/auth/server/auth-guards";
+import { getDeploymentReadiness } from "@/features/monitoring/server/deployment-probes";
+import { hasValidReadinessToken } from "@/features/monitoring/server/readiness-access";
+import { jsonError } from "@/lib/http/json-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -33,15 +34,7 @@ async function authorizeReadiness(request: NextRequest) {
     return null;
   }
 
-  return Response.json(
-    {
-      ok: false,
-      error: "Readiness operasional hanya tersedia untuk admin.",
-    },
-    {
-      status: 401,
-    },
-  );
+  return jsonError("Readiness operasional hanya tersedia untuk admin.", 401);
 }
 
 export async function GET(request: NextRequest) {

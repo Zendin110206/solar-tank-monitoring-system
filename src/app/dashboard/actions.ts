@@ -2,52 +2,25 @@
 
 import { revalidatePath } from "next/cache";
 
-import { verifyAdminActionCsrfToken } from "@/features/auth/lib/auth-csrf";
-import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
+import { assertValidAdminActionCsrf } from "@/features/auth/server/auth-csrf";
+import { requirePageAdmin } from "@/features/auth/server/auth-guards";
 import {
-  cleanupMonitoringTanksInMysql,
-  resetMonitoringReadingsInMysql,
-} from "@/features/monitoring/lib/mysql-maintenance-repository";
-import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
+  cleanupMonitoringTanks,
+  resetMonitoringReadings,
+} from "@/features/admin/server/maintenance-service";
+import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
-
-const DELETE_TANK_CONFIRMATION = "HAPUS DATA STO";
-const RESET_TANK_READINGS_CONFIRMATION = "RESET READING STO";
-const RESET_ALL_READINGS_CONFIRMATION = "RESET SEMUA READING";
+import { getRequiredFormValue } from "@/lib/http/form-data";
+import {
+  DELETE_TANK_CONFIRMATION,
+  RESET_ALL_READINGS_CONFIRMATION,
+  RESET_TANK_READINGS_CONFIRMATION,
+} from "@/features/admin/domain/maintenance-confirmations";
 
 export type DashboardAdminActionState = {
   status: "idle" | "success" | "error";
   message: string;
 };
-
-function getRequiredFormValue(formData: FormData, key: string): string {
-  const value = String(formData.get(key) ?? "").trim();
-
-  if (!value) {
-    throw new Error("Data aksi admin belum lengkap.");
-  }
-
-  return value;
-}
-
-function assertValidAdminActionCsrf({
-  formData,
-  sessionId,
-}: {
-  formData: FormData;
-  sessionId: string;
-}) {
-  const csrfToken = String(formData.get("csrfToken") ?? "");
-
-  if (
-    !verifyAdminActionCsrfToken({
-      sessionId,
-      token: csrfToken,
-    })
-  ) {
-    throw new Error("Sesi admin tidak valid. Muat ulang halaman lalu coba lagi.");
-  }
-}
 
 function assertMysqlStorageIsReady() {
   if (getMonitoringStorageDriver() !== "mysql") {
@@ -85,7 +58,7 @@ export async function cleanupDashboardTankAction(
       throw new Error("Konfirmasi hapus data STO tidak valid.");
     }
 
-    const result = await cleanupMonitoringTanksInMysql({ tankIds: [tankId] });
+    const result = await cleanupMonitoringTanks({ tankIds: [tankId] });
 
     revalidateDashboardMonitoringPages(tankId);
 
@@ -130,7 +103,7 @@ export async function resetDashboardTankReadingsAction(
       throw new Error("Konfirmasi reset reading STO tidak valid.");
     }
 
-    const result = await resetMonitoringReadingsInMysql({ tankIds: [tankId] });
+    const result = await resetMonitoringReadings({ tankIds: [tankId] });
 
     revalidateDashboardMonitoringPages(tankId);
 
@@ -176,7 +149,7 @@ export async function resetAllDashboardReadingsAction(
       throw new Error("Konfirmasi reset semua reading tidak valid.");
     }
 
-    const result = await resetMonitoringReadingsInMysql();
+    const result = await resetMonitoringReadings();
 
     revalidateDashboardMonitoringPages();
 

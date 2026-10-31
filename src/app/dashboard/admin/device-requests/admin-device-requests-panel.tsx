@@ -10,7 +10,7 @@ import type {
   MonitoringHardwareProfile,
   TankShape,
 } from "@/features/monitoring/types/monitoring";
-import { formatCoordinatePair } from "@/features/monitoring/lib/number";
+import { formatCoordinatePair } from "@/features/monitoring/domain/number";
 import {
   ApproveDeviceRequestForm,
   CleanupDeviceRequestForm,
@@ -19,6 +19,8 @@ import {
   ResendDevicePackageForm,
   RevokeDeviceProvisioningForm,
 } from "./admin-device-request-controls";
+import { formatDateTimeOrDash, formatNumber } from "@/lib/format";
+import { getDeviceRequestStatusClass } from "@/features/devices/components/device-request-status";
 
 type AdminDeviceRequestsPanelProps = {
   csrfToken: string;
@@ -41,56 +43,23 @@ const STATUS_LABELS: Record<DeviceRequestStatus, string> = {
   waiting_first_valid_ping: "Menunggu perangkat online",
 };
 
-function formatDate(value: string | null | undefined) {
-  if (!value) {
-    return "-";
-  }
-
-  return new Intl.DateTimeFormat("id-ID", {
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    month: "short",
-    timeZone: "Asia/Jakarta",
-    year: "numeric",
-  }).format(new Date(value));
-}
-
-function formatNumber(value: number | null | undefined, suffix = "") {
+function formatOptionalNumber(value: number | null | undefined, suffix = "") {
   if (typeof value !== "number" || Number.isNaN(value)) {
     return "-";
   }
 
-  return `${new Intl.NumberFormat("id-ID", {
-    maximumFractionDigits: 2,
-  }).format(value)}${suffix}`;
-}
-
-function getStatusClass(status: DeviceRequestStatus) {
-  switch (status) {
-    case "pending_admin_review":
-      return "bg-amber-50 text-amber-700 ring-amber-100";
-    case "rejected":
-      return "bg-red-50 text-red-700 ring-red-100";
-    case "approved_waiting_package":
-    case "approved_package_ready":
-    case "waiting_firmware_download":
-    case "waiting_first_valid_ping":
-      return "bg-blue-50 text-blue-700 ring-blue-100";
-    case "active":
-      return "bg-emerald-50 text-emerald-700 ring-emerald-100";
-    case "expired":
-    case "revoked":
-    case "package_generation_failed":
-      return "bg-zinc-100 text-zinc-700 ring-zinc-200";
-  }
+  return `${formatNumber(value, 2)}${suffix}`;
 }
 
 function getTankShapeLabel(shape: TankShape) {
-  return shape === "rectangular" ? "Tangki balok" : "Tangki silinder horizontal";
+  return shape === "rectangular"
+    ? "Tangki balok"
+    : "Tangki silinder horizontal";
 }
 
-function getSupportedTankShapeLabel(shape: MonitoringHardwareProfile["supportedTankShape"]) {
+function getSupportedTankShapeLabel(
+  shape: MonitoringHardwareProfile["supportedTankShape"],
+) {
   if (shape === "any") {
     return "Semua tipe tangki";
   }
@@ -98,26 +67,31 @@ function getSupportedTankShapeLabel(shape: MonitoringHardwareProfile["supportedT
   return getTankShapeLabel(shape);
 }
 
-function getSensorTypeLabel(sensorType: MonitoringDeviceRequest["deviceSensorType"]) {
+function getSensorTypeLabel(
+  sensorType: MonitoringDeviceRequest["deviceSensorType"],
+) {
   return sensorType === "energy" ? "Sensor energy" : "Sensor fuel";
 }
 
 function getDimensionSummary(request: MonitoringDeviceRequest) {
   if (request.tankShape === "rectangular") {
-    return `${formatNumber(request.lengthCm, " cm")} × ${formatNumber(
+    return `${formatOptionalNumber(request.lengthCm, " cm")} × ${formatOptionalNumber(
       request.widthCm,
       " cm",
-    )} × ${formatNumber(request.heightCm, " cm")}`;
+    )} × ${formatOptionalNumber(request.heightCm, " cm")}`;
   }
 
-  return `Panjang ${formatNumber(request.lengthCm, " cm")} · diameter ${formatNumber(
+  return `Panjang ${formatOptionalNumber(request.lengthCm, " cm")} · diameter ${formatOptionalNumber(
     request.diameterCm,
     " cm",
   )}`;
 }
 
 function getCoordinateSummary(request: MonitoringDeviceRequest) {
-  if (typeof request.latitude !== "number" || typeof request.longitude !== "number") {
+  if (
+    typeof request.latitude !== "number" ||
+    typeof request.longitude !== "number"
+  ) {
     return "-";
   }
 
@@ -139,7 +113,9 @@ function DetailItem({
         {label}
       </dt>
       <dd className="mt-1 text-sm font-semibold text-zinc-950">{children}</dd>
-      {note ? <p className="mt-1 text-xs leading-5 text-zinc-500">{note}</p> : null}
+      {note ? (
+        <p className="mt-1 text-xs leading-5 text-zinc-500">{note}</p>
+      ) : null}
     </div>
   );
 }
@@ -147,7 +123,7 @@ function DetailItem({
 function RequestStatusBadge({ status }: { status: DeviceRequestStatus }) {
   return (
     <span
-      className={`inline-flex w-fit items-center rounded-full px-3 py-1 text-xs font-semibold ring-1 ${getStatusClass(
+      className={`inline-flex w-fit items-center rounded-full px-3 py-1 text-xs font-semibold ring-1 ${getDeviceRequestStatusClass(
         status,
       )}`}
     >
@@ -198,7 +174,8 @@ function RequestDetailModal({
         className="flex max-h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-zinc-950/10"
         role="dialog"
         style={{
-          animation: "login-shell-enter 180ms cubic-bezier(0.22, 1, 0.36, 1) both",
+          animation:
+            "login-shell-enter 180ms cubic-bezier(0.22, 1, 0.36, 1) both",
         }}
       >
         {/* Modal header */}
@@ -214,7 +191,8 @@ function RequestDetailModal({
               {request.siteName}
             </h3>
             <p className="mt-1 text-sm text-zinc-500">
-              Diajukan {formatDate(request.createdAt)} oleh {request.requesterEmail}
+              Diajukan {formatDateTimeOrDash(request.createdAt)} oleh{" "}
+              {request.requesterEmail}
             </p>
           </div>
           <button
@@ -238,12 +216,22 @@ function RequestDetailModal({
                 <dl className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
                   <DetailItem label="Nama STO">{request.siteName}</DetailItem>
                   <DetailItem label="Kode STO">{request.siteCode}</DetailItem>
-                  <DetailItem label="Regional">{request.regionalLabel}</DetailItem>
-                  <DetailItem label="Wilayah">{request.wilayahLabel}</DetailItem>
+                  <DetailItem label="Regional">
+                    {request.regionalLabel}
+                  </DetailItem>
+                  <DetailItem label="Wilayah">
+                    {request.wilayahLabel}
+                  </DetailItem>
                   <DetailItem label="Area">{request.areaLabel}</DetailItem>
-                  <DetailItem label="Kode device">{request.deviceCode}</DetailItem>
-                  <DetailItem label="Label device">{request.deviceLabel}</DetailItem>
-                  <DetailItem label="Koordinat">{getCoordinateSummary(request)}</DetailItem>
+                  <DetailItem label="Kode device">
+                    {request.deviceCode}
+                  </DetailItem>
+                  <DetailItem label="Label device">
+                    {request.deviceLabel}
+                  </DetailItem>
+                  <DetailItem label="Koordinat">
+                    {getCoordinateSummary(request)}
+                  </DetailItem>
                 </dl>
               </section>
 
@@ -256,17 +244,19 @@ function RequestDetailModal({
                     {getTankShapeLabel(request.tankShape)}
                   </DetailItem>
                   <DetailItem label="Kapasitas">
-                    {formatNumber(request.capacityLiter, " L")}
+                    {formatOptionalNumber(request.capacityLiter, " L")}
                   </DetailItem>
-                  <DetailItem label="Dimensi">{getDimensionSummary(request)}</DetailItem>
+                  <DetailItem label="Dimensi">
+                    {getDimensionSummary(request)}
+                  </DetailItem>
                   <DetailItem label="Tinggi sensor">
-                    {formatNumber(request.sensorMountHeightCm, " cm")}
+                    {formatOptionalNumber(request.sensorMountHeightCm, " cm")}
                   </DetailItem>
                   <DetailItem label="Low level">
-                    {formatNumber(request.lowLevelPercent, "%")}
+                    {formatOptionalNumber(request.lowLevelPercent, "%")}
                   </DetailItem>
                   <DetailItem label="Critical level">
-                    {formatNumber(request.criticalLevelPercent, "%")}
+                    {formatOptionalNumber(request.criticalLevelPercent, "%")}
                   </DetailItem>
                 </dl>
               </section>
@@ -280,17 +270,28 @@ function RequestDetailModal({
                     {getSensorTypeLabel(request.deviceSensorType)}
                   </DetailItem>
                   <DetailItem label="Beban lokasi">
-                    {formatNumber(request.loadValue, ` ${request.loadUnit.toUpperCase()}`)}
+                    {formatOptionalNumber(
+                      request.loadValue,
+                      ` ${request.loadUnit.toUpperCase()}`,
+                    )}
                   </DetailItem>
                   <DetailItem label="Diesel engine">
-                    {formatNumber(request.dieselEngineCapacityKva, " kVA")}
+                    {formatOptionalNumber(
+                      request.dieselEngineCapacityKva,
+                      " kVA",
+                    )}
                   </DetailItem>
-                  <DetailItem label="Cos phi">{formatNumber(request.cosPhi)}</DetailItem>
+                  <DetailItem label="Cos phi">
+                    {formatOptionalNumber(request.cosPhi)}
+                  </DetailItem>
                   <DetailItem label="Konsumsi hitung">
-                    {formatNumber(request.consumptionLiterPerHour, " L/jam")}
+                    {formatOptionalNumber(
+                      request.consumptionLiterPerHour,
+                      " L/jam",
+                    )}
                   </DetailItem>
                   <DetailItem label="Ditinjau">
-                    {formatDate(request.adminReviewedAt)}
+                    {formatDateTimeOrDash(request.adminReviewedAt)}
                   </DetailItem>
                 </dl>
               </section>
@@ -303,12 +304,22 @@ function RequestDetailModal({
                   <DetailItem label="Nama profil">
                     {profile?.name ?? "Profil hardware tidak ditemukan"}
                   </DetailItem>
-                  <DetailItem label="Kode profil">{profile?.code ?? "-"}</DetailItem>
-                  <DetailItem label="Board">{profile?.boardLabel ?? "-"}</DetailItem>
-                  <DetailItem label="Pin trigger">{profile?.triggerPin ?? "-"}</DetailItem>
-                  <DetailItem label="Pin echo">{profile?.echoPin ?? "-"}</DetailItem>
+                  <DetailItem label="Kode profil">
+                    {profile?.code ?? "-"}
+                  </DetailItem>
+                  <DetailItem label="Board">
+                    {profile?.boardLabel ?? "-"}
+                  </DetailItem>
+                  <DetailItem label="Pin trigger">
+                    {profile?.triggerPin ?? "-"}
+                  </DetailItem>
+                  <DetailItem label="Pin echo">
+                    {profile?.echoPin ?? "-"}
+                  </DetailItem>
                   <DetailItem label="Dukungan tangki">
-                    {profile ? getSupportedTankShapeLabel(profile.supportedTankShape) : "-"}
+                    {profile
+                      ? getSupportedTankShapeLabel(profile.supportedTankShape)
+                      : "-"}
                   </DetailItem>
                 </dl>
               </section>
@@ -492,7 +503,9 @@ export function AdminDeviceRequestsPanel({
                     key={request.id}
                   >
                     <td className="rounded-l-lg border-y border-l border-zinc-200 px-3 py-3">
-                      <p className="font-semibold text-zinc-950">{request.siteName}</p>
+                      <p className="font-semibold text-zinc-950">
+                        {request.siteName}
+                      </p>
                       <p className="mt-1 text-xs text-zinc-500">
                         {request.siteCode} / {request.regionalLabel} /{" "}
                         {request.wilayahLabel}
@@ -513,7 +526,7 @@ export function AdminDeviceRequestsPanel({
                       <RequestStatusBadge status={request.status} />
                     </td>
                     <td className="border-y border-zinc-200 px-3 py-3 text-zinc-600">
-                      {formatDate(request.createdAt)}
+                      {formatDateTimeOrDash(request.createdAt)}
                     </td>
                     <td className="rounded-r-lg border-y border-r border-zinc-200 px-3 py-3 text-right">
                       <button

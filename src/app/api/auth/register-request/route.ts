@@ -1,25 +1,23 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
-import { verifyCaptchaToken } from "@/features/auth/lib/auth-captcha";
-import { isAccessRequestEnabled } from "@/features/auth/lib/auth-config";
-import { submitAccessRequest } from "@/features/auth/lib/auth-service";
-import { parseRegisterAccessPayload } from "@/features/auth/lib/auth-validation";
-import { checkRateLimit } from "@/features/auth/lib/rate-limit";
+import { verifyCaptchaToken } from "@/features/auth/server/auth-captcha";
+import { isAccessRequestEnabled } from "@/features/auth/server/auth-config";
+import { submitAccessRequest } from "@/features/auth/server/auth-service";
+import { parseRegisterAccessPayload } from "@/features/auth/domain/auth-validation";
+import { checkRateLimit } from "@/features/auth/server/rate-limit";
 import {
   getSafeErrorMessage,
   getSafeErrorStatus,
 } from "@/lib/safe-error-message";
+import {
+  jsonError,
+  jsonOk,
+  jsonTooManyRequests,
+} from "@/lib/http/json-response";
+import { getClientKey } from "@/lib/http/request";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-
-function getClientKey(request: NextRequest) {
-  return (
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    "unknown-ip"
-  );
-}
 
 function getCaptchaToken(payload: unknown): string | null {
   const token = String(
@@ -45,10 +43,7 @@ function getRegisterErrorResponse(error: unknown): {
 
 export async function POST(request: NextRequest) {
   if (!isAccessRequestEnabled()) {
-    return NextResponse.json(
-      { ok: false, error: "Pengajuan akses sedang ditutup." },
-      { status: 403 },
-    );
+    return jsonError("Pengajuan akses sedang ditutup.", 403);
   }
 
   try {
@@ -59,17 +54,9 @@ export async function POST(request: NextRequest) {
     });
 
     if (!rateLimit.allowed) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: "Terlalu banyak pengajuan. Coba lagi nanti.",
-        },
-        {
-          status: 429,
-          headers: {
-            "Retry-After": String(rateLimit.retryAfterSeconds),
-          },
-        },
+      return jsonTooManyRequests(
+        "Terlalu banyak pengajuan. Coba lagi nanti.",
+        rateLimit.retryAfterSeconds,
       );
     }
 
@@ -80,10 +67,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!captcha.ok) {
-      return NextResponse.json(
-        { ok: false, error: captcha.error },
-        { status: 400 },
-      );
+      return jsonError(captcha.error, 400);
     }
 
     const payload = {
@@ -92,23 +76,14 @@ export async function POST(request: NextRequest) {
     };
     await submitAccessRequest(payload, request);
 
-    return NextResponse.json({
-      ok: true,
-      data: {
-        status: "pending",
-        message:
-          "Pengajuan akses diterima. Administrator akan meninjau sebelum akun aktif.",
-      },
+    return jsonOk({
+      status: "pending",
+      message:
+        "Pengajuan akses diterima. Administrator akan meninjau sebelum akun aktif.",
     });
   } catch (error) {
     const response = getRegisterErrorResponse(error);
 
-    return NextResponse.json(
-      {
-        ok: false,
-        error: response.message,
-      },
-      { status: response.status },
-    );
+    return jsonError(response.message, response.status);
   }
 }

@@ -2,15 +2,26 @@
 
 /* eslint-disable @next/next/no-img-element -- Map tiles are external slippy-map tiles; routing them through next/image would add unnecessary proxying. */
 
-import {
-  useMemo,
-  useRef,
-  useState,
-  type PointerEvent,
-} from "react";
+import { useMemo, useRef, useState, type PointerEvent } from "react";
 import { Crosshair, MapPin, Minus, Plus, Search } from "lucide-react";
 
-import type { DashboardSiteStatus } from "../lib/dashboard-view-model";
+import type { DashboardSiteStatus } from "../domain/dashboard-view-model";
+import {
+  STATUS_BADGE_CLASS,
+  STATUS_DOT_CLASS,
+} from "@/components/ui/status-tone";
+import { StatusPill } from "@/components/ui/status-pill";
+import { clamp } from "@/lib/math";
+import {
+  type DragState,
+  getWorldSize,
+  type LatLng,
+  type Tile,
+  TILE_SIZE,
+  type WorldPixel,
+  worldPixelToLatLng,
+  wrapTileX,
+} from "./map-tiles";
 
 export type OperationalMapSite = {
   code: string;
@@ -37,32 +48,6 @@ type OperationalMapProps = {
   onSitePreview?: (site: OperationalMapSite) => void;
   onSiteSelect?: (site: OperationalMapSite) => void;
 };
-
-type LatLng = {
-  latitude: number;
-  longitude: number;
-};
-
-type Tile = {
-  key: string;
-  url: string;
-  left: number;
-  top: number;
-};
-
-type DragState = {
-  pointerId: number;
-  startX: number;
-  startY: number;
-  startCenterPixel: WorldPixel;
-};
-
-type WorldPixel = {
-  x: number;
-  y: number;
-};
-
-const TILE_SIZE = 256;
 const MAP_WIDTH = 1024;
 const MAP_HEIGHT = 540;
 const MIN_ZOOM = 9;
@@ -80,27 +65,27 @@ const statusMeta: Record<
 > = {
   online: {
     label: "Online",
-    dot: "bg-emerald-500",
+    dot: STATUS_DOT_CLASS.success,
     pin: "text-emerald-500",
-    chip: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+    chip: STATUS_BADGE_CLASS.success,
   },
   warning: {
     label: "Waspada",
-    dot: "bg-amber-500",
+    dot: STATUS_DOT_CLASS.warning,
     pin: "text-amber-500",
-    chip: "bg-amber-50 text-amber-700 ring-amber-100",
+    chip: STATUS_BADGE_CLASS.warning,
   },
   critical: {
     label: "Kritis",
     dot: "bg-red-600",
     pin: "text-red-600",
-    chip: "bg-red-50 text-red-700 ring-red-100",
+    chip: STATUS_BADGE_CLASS.danger,
   },
   offline: {
     label: "Offline",
     dot: "bg-zinc-600",
     pin: "text-zinc-700",
-    chip: "bg-zinc-100 text-zinc-700 ring-zinc-200",
+    chip: STATUS_BADGE_CLASS.neutral,
   },
 };
 
@@ -112,7 +97,9 @@ const statusFilters: Array<DashboardSiteStatus | "all"> = [
   "offline",
 ];
 
-function isValidCoordinate(site: OperationalMapSite): site is OperationalMapSite &
+function isValidCoordinate(
+  site: OperationalMapSite,
+): site is OperationalMapSite &
   Required<Pick<OperationalMapSite, "latitude" | "longitude">> {
   return (
     typeof site.latitude === "number" &&
@@ -122,44 +109,16 @@ function isValidCoordinate(site: OperationalMapSite): site is OperationalMapSite
   );
 }
 
-function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value));
-}
-
-function wrapTileX(tileX: number, tilesPerAxis: number) {
-  return ((tileX % tilesPerAxis) + tilesPerAxis) % tilesPerAxis;
-}
-
-function getWorldSize(zoom: number) {
-  return TILE_SIZE * 2 ** zoom;
-}
-
 function latLngToWorldPixel(point: LatLng, zoom: number): WorldPixel {
   const sinLatitude = Math.sin((point.latitude * Math.PI) / 180);
   const normalizedX = (point.longitude + 180) / 360;
   const normalizedY =
-    0.5 -
-    Math.log((1 + sinLatitude) / (1 - sinLatitude)) / (4 * Math.PI);
+    0.5 - Math.log((1 + sinLatitude) / (1 - sinLatitude)) / (4 * Math.PI);
   const worldSize = getWorldSize(zoom);
 
   return {
     x: normalizedX * worldSize,
     y: normalizedY * worldSize,
-  };
-}
-
-function worldPixelToLatLng(pixel: WorldPixel, zoom: number): LatLng {
-  const worldSize = getWorldSize(zoom);
-  const normalizedX = pixel.x / worldSize - 0.5;
-  const normalizedY = 0.5 - pixel.y / worldSize;
-  const longitude = normalizedX * 360;
-  const latitude =
-    (90 -
-      (360 * Math.atan(Math.exp(-normalizedY * 2 * Math.PI))) / Math.PI);
-
-  return {
-    latitude: clamp(latitude, -85, 85),
-    longitude: ((longitude + 540) % 360) - 180,
   };
 }
 
@@ -211,7 +170,11 @@ function buildTiles(center: LatLng, zoom: number): Tile[] {
   return tiles;
 }
 
-function getMarkerPosition(site: OperationalMapSite, center: LatLng, zoom: number) {
+function getMarkerPosition(
+  site: OperationalMapSite,
+  center: LatLng,
+  zoom: number,
+) {
   if (!isValidCoordinate(site)) {
     return null;
   }
@@ -229,12 +192,9 @@ function StatusChip({ status }: { status: DashboardSiteStatus }) {
   const meta = statusMeta[status];
 
   return (
-    <span
-      className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ring-1 ${meta.chip}`}
-    >
-      <span className={`size-2 rounded-full ${meta.dot}`} />
+    <StatusPill badgeClass={meta.chip} dotClass={meta.dot}>
       {meta.label}
-    </span>
+    </StatusPill>
   );
 }
 
@@ -257,7 +217,10 @@ export function OperationalMap({
   );
   const dragState = useRef<DragState | null>(null);
 
-  const coordinateSites = useMemo(() => sites.filter(isValidCoordinate), [sites]);
+  const coordinateSites = useMemo(
+    () => sites.filter(isValidCoordinate),
+    [sites],
+  );
   const hasCoordinates = coordinateSites.length > 0;
   const tiles = useMemo(() => buildTiles(center, zoom), [center, zoom]);
   const normalizedQuery = query.trim().toLowerCase();

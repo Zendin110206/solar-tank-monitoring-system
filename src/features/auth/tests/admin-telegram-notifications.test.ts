@@ -7,18 +7,18 @@ const mocks = vi.hoisted(() => ({
   sendTelegramMessage: vi.fn(),
 }));
 
-vi.mock("@/features/monitoring/lib/mysql-connection", () => ({
+vi.mock("@/lib/database/mysql-connection", () => ({
   getMysqlPool: () => mocks.pool,
 }));
 
-vi.mock("../lib/auth-telegram", () => ({
+vi.mock("../server/auth-telegram", () => ({
   sendTelegramMessage: mocks.sendTelegramMessage,
 }));
 
 import {
   notifyAdminsAccessRequestSubmitted,
   sendAdminTelegramNotification,
-} from "../lib/admin-telegram-notifications";
+} from "../server/admin-telegram-notifications";
 
 describe("admin telegram notifications", () => {
   beforeEach(() => {
@@ -69,8 +69,7 @@ describe("admin telegram notifications", () => {
       }),
     );
 
-    const message = mocks.sendTelegramMessage.mock.calls[0]?.[0]
-      .text as string;
+    const message = mocks.sendTelegramMessage.mock.calls[0]?.[0].text as string;
 
     expect(message).toContain("Nama: Operator STO");
     expect(message).toContain("Email: operator@example.com");

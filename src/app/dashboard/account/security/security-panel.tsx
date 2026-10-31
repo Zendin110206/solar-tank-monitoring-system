@@ -5,7 +5,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { KeyRound, Link2, LogOut, RefreshCcw, Send } from "lucide-react";
 
-import type { AuthSessionSummary, AuthSessionUser } from "@/features/auth/types";
+import type {
+  AuthSessionSummary,
+  AuthSessionUser,
+} from "@/features/auth/types/auth";
+import { STATUS_BADGE_CLASS } from "@/components/ui/status-tone";
+import { Card } from "@/components/ui/card";
+import { FormErrorMessage } from "@/components/ui/message";
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("id-ID", {
@@ -18,9 +24,11 @@ function formatDate(value: string) {
 }
 
 async function readJson(response: Response) {
-  return (await response.json().catch(() => null)) as
-    | { ok?: boolean; error?: string; data?: Record<string, unknown> }
-    | null;
+  return (await response.json().catch(() => null)) as {
+    ok?: boolean;
+    error?: string;
+    data?: Record<string, unknown>;
+  } | null;
 }
 
 export default function AccountSecurityPanel({
@@ -46,12 +54,10 @@ export default function AccountSecurityPanel({
 
   async function refreshSessions() {
     const response = await fetch("/api/auth/sessions", { cache: "no-store" });
-    const result = (await readJson(response)) as
-      | {
-          ok?: boolean;
-          data?: { sessions?: AuthSessionSummary[] };
-        }
-      | null;
+    const result = (await readJson(response)) as {
+      ok?: boolean;
+      data?: { sessions?: AuthSessionSummary[] };
+    } | null;
 
     if (response.ok && result?.ok && Array.isArray(result.data?.sessions)) {
       setSessions(result.data.sessions);
@@ -140,16 +146,16 @@ export default function AccountSecurityPanel({
       const response = await fetch("/api/auth/telegram/bind/start", {
         method: "POST",
       });
-      const result = (await readJson(response)) as
-        | {
-            ok?: boolean;
-            error?: string;
-            data?: { deepLink?: string | null; token?: string };
-          }
-        | null;
+      const result = (await readJson(response)) as {
+        ok?: boolean;
+        error?: string;
+        data?: { deepLink?: string | null; token?: string };
+      } | null;
 
       if (!response.ok || !result?.ok) {
-        throw new Error(result?.error ?? "Binding Telegram belum bisa dimulai.");
+        throw new Error(
+          result?.error ?? "Binding Telegram belum bisa dimulai.",
+        );
       }
 
       setTelegramLink(result.data?.deepLink ?? null);
@@ -175,13 +181,11 @@ export default function AccountSecurityPanel({
 
     try {
       const response = await fetch("/api/auth/me", { cache: "no-store" });
-      const result = (await readJson(response)) as
-        | {
-            ok?: boolean;
-            error?: string;
-            data?: { user?: AuthSessionUser };
-          }
-        | null;
+      const result = (await readJson(response)) as {
+        ok?: boolean;
+        error?: string;
+        data?: { user?: AuthSessionUser };
+      } | null;
 
       if (!response.ok || !result?.ok || !result.data?.user) {
         throw new Error(result?.error ?? "Status Telegram belum bisa dicek.");
@@ -213,7 +217,7 @@ export default function AccountSecurityPanel({
 
   return (
     <div className="grid gap-5 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-      <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+      <Card>
         <div className="flex items-center gap-3">
           <span className="grid size-10 place-items-center rounded-lg bg-blue-50 text-blue-700 ring-1 ring-blue-100">
             <KeyRound className="size-5" aria-hidden="true" />
@@ -323,9 +327,9 @@ export default function AccountSecurityPanel({
             </div>
           ) : null}
         </div>
-      </section>
+      </Card>
 
-      <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+      <Card>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-sm font-semibold uppercase text-zinc-500">
@@ -345,7 +349,8 @@ export default function AccountSecurityPanel({
 
         <div className="mt-5 grid gap-3">
           {sessions.map((session) => {
-            const active = !session.revokedAt && new Date(session.expiresAt) > new Date();
+            const active =
+              !session.revokedAt && new Date(session.expiresAt) > new Date();
 
             return (
               <article
@@ -360,7 +365,7 @@ export default function AccountSecurityPanel({
                     <span
                       className={`rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ${
                         active
-                          ? "bg-emerald-50 text-emerald-700 ring-emerald-100"
+                          ? STATUS_BADGE_CLASS.success
                           : "bg-zinc-100 text-zinc-600 ring-zinc-200"
                       }`}
                     >
@@ -392,11 +397,9 @@ export default function AccountSecurityPanel({
           </div>
         ) : null}
         {error ? (
-          <div className="mt-4 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm leading-6 text-red-800">
-            {error}
-          </div>
+          <FormErrorMessage className="mt-4">{error}</FormErrorMessage>
         ) : null}
-      </section>
+      </Card>
     </div>
   );
 }

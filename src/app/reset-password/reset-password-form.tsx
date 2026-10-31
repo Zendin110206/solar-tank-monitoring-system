@@ -4,6 +4,8 @@ import type { FormEvent } from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Eye, EyeOff, LockKeyhole } from "lucide-react";
+import { PRIMARY_BLOCK_BUTTON_CLASS } from "@/components/ui/button-class";
+import { FormErrorMessage } from "@/components/ui/message";
 
 function PasswordInput({
   id,
@@ -39,7 +41,9 @@ function PasswordInput({
           type={visible ? "text" : "password"}
         />
         <button
-          aria-label={visible ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"}
+          aria-label={
+            visible ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"
+          }
           className="absolute inset-y-0 right-0 grid w-12 place-items-center text-zinc-400 transition hover:text-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-600"
           onClick={() => setVisible((current) => !current)}
           type="button"
@@ -81,9 +85,11 @@ export default function ResetPasswordForm({ token }: { token: string }) {
           confirmPassword: formData.get("confirmPassword"),
         }),
       });
-      const result = (await response.json().catch(() => null)) as
-        | { ok?: boolean; error?: string; data?: { message?: string } }
-        | null;
+      const result = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+        error?: string;
+        data?: { message?: string };
+      } | null;
 
       if (!response.ok || !result?.ok) {
         throw new Error(result?.error ?? "Reset kata sandi gagal.");
@@ -121,14 +127,10 @@ export default function ResetPasswordForm({ token }: { token: string }) {
         </div>
       ) : null}
 
-      {error ? (
-        <div className="rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm leading-6 text-red-800">
-          {error}
-        </div>
-      ) : null}
+      {error ? <FormErrorMessage>{error}</FormErrorMessage> : null}
 
       <button
-        className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20 disabled:cursor-not-allowed disabled:opacity-70"
+        className={PRIMARY_BLOCK_BUTTON_CLASS}
         disabled={pending || !token}
         type="submit"
       >

@@ -4,17 +4,18 @@ import {
   buildSimpleTankDetail,
   sampleSimpleTankDetailChartPoints,
   type SimpleTankDetailChartPoint,
-} from "../lib/simple-tank-detail-model";
-import { buildTankDetail } from "../lib/tank-detail-view-model";
-import type { TankReadingPoint } from "../lib/tank-detail-view-model";
+} from "../domain/simple-tank-detail-model";
+import { buildTankDetail } from "../domain/tank-detail-view-model";
+import type { TankReadingPoint } from "../domain/tank-detail-view-model";
 import type { Reading } from "../types/monitoring";
 
 const WIB_OFFSET_MS = 7 * 60 * 60 * 1000;
 
-function createReadingPoint(minute: number, volumeLiter: number): TankReadingPoint {
-  const receivedAt = new Date(
-    Date.UTC(2026, 6, 2, 8, minute, 0),
-  ).toISOString();
+function createReadingPoint(
+  minute: number,
+  volumeLiter: number,
+): TankReadingPoint {
+  const receivedAt = new Date(Date.UTC(2026, 6, 2, 8, minute, 0)).toISOString();
 
   return {
     measuredAt: receivedAt,
@@ -81,11 +82,11 @@ describe("simple tank detail model", () => {
     });
 
     if (!detail) {
-      throw new Error("Expected TPH tank detail.");
+      throw new Error("Expected tank-tph-main detail.");
     }
 
     expect(buildSimpleTankDetail(detail)).toMatchObject({
-      siteCode: "TPH",
+      siteCode: "CONTOH-A",
       deviceCode: "demo-tph-01",
       deviceStatusLabel: "Online",
       volumeLiter: 3900,
@@ -104,7 +105,7 @@ describe("simple tank detail model", () => {
     });
 
     if (!detail) {
-      throw new Error("Expected TPH tank detail.");
+      throw new Error("Expected tank-tph-main detail.");
     }
 
     const history = Array.from({ length: 36 }, (_, index) =>
@@ -242,8 +243,7 @@ describe("simple tank detail model", () => {
     expect(trend.gapThresholdMinutes).toBe(15);
     expect(trend.segments).toHaveLength(2);
     expect(trend.segments.map((segment) => segment.points.length)).toEqual([
-      2,
-      1,
+      2, 1,
     ]);
     expect(trend.gaps).toHaveLength(1);
     expect(trend.gaps[0]).toMatchObject({

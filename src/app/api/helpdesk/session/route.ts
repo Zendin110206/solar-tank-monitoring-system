@@ -1,27 +1,18 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
-import { getRequestSessionUser } from "@/features/auth/lib/auth-session";
-import { checkRateLimit } from "@/features/auth/lib/rate-limit";
-import { getOrCreateHelpdeskSession } from "@/features/helpdesk/lib/helpdesk-repository";
+import { getRequestSessionUser } from "@/features/auth/server/auth-session";
+import { checkRateLimit } from "@/features/auth/server/rate-limit";
+import { getOrCreateHelpdeskSession } from "@/features/helpdesk/server/helpdesk-service";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
+import {
+  jsonError,
+  jsonOk,
+  jsonTooManyRequests,
+} from "@/lib/http/json-response";
+import { getClientKey, getStringPayloadValue } from "@/lib/http/request";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-
-function getClientKey(request: NextRequest) {
-  return (
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    "unknown-ip"
-  );
-}
-
-function getStringPayloadValue(payload: unknown, key: string): string | null {
-  const value = String(((payload ?? {}) as Record<string, unknown>)[key] ?? "")
-    .trim();
-
-  return value || null;
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,12 +23,9 @@ export async function POST(request: NextRequest) {
     });
 
     if (!rateLimit.allowed) {
-      return NextResponse.json(
-        { ok: false, error: "Terlalu banyak permintaan helpdesk." },
-        {
-          status: 429,
-          headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
-        },
+      return jsonTooManyRequests(
+        "Terlalu banyak permintaan helpdesk.",
+        rateLimit.retryAfterSeconds,
       );
     }
 
@@ -49,21 +37,15 @@ export async function POST(request: NextRequest) {
       user,
     });
 
-    return NextResponse.json({
-      ok: true,
-      data: bundle,
-    });
+    return jsonOk(bundle);
   } catch (error) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: getSafeErrorMessage(error, {
-          fallbackMessage: "Sesi helpdesk belum bisa dibuka.",
-          internalMessage:
-            "Sesi helpdesk belum bisa dibuka karena layanan database belum siap.",
-        }),
-      },
-      { status: 500 },
+    return jsonError(
+      getSafeErrorMessage(error, {
+        fallbackMessage: "Sesi helpdesk belum bisa dibuka.",
+        internalMessage:
+          "Sesi helpdesk belum bisa dibuka karena layanan database belum siap.",
+      }),
+      500,
     );
   }
 }

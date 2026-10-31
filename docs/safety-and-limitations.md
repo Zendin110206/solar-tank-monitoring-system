@@ -1,5 +1,8 @@
 # Batasan dan Keselamatan
 
+> **Status dokumen:** daftar kemampuan dicocokkan dengan kode pada 31 Oktober 2026. Ringkasan
+> kondisi operasional terkini ada di `docs/current-operational-truth.md`.
+
 Dokumen ini menjelaskan batas sistem dan hal keselamatan yang harus diperhatikan.
 
 ## Status Keamanan Saat Ini
@@ -46,7 +49,9 @@ Yang belum ada:
 - kalibrasi serta persetujuan keselamatan hardware untuk setiap lokasi;
 - halaman admin untuk mengelola registry device, hardware profile, dan firmware template secara penuh;
 - keputusan deployment production final dan proteksi perimeter environment final;
-- approval/reject device lewat Telegram.
+- approval/reject device lewat Telegram (bot Telegram saat ini hanya menerima perintah akun
+  `/start`, `/help`, `/status`, dan `/dashboard`, perintah helpdesk `/reply` dan `/close`, serta
+  mengirim notifikasi ke admin).
 
 ## Batas Data
 
@@ -117,19 +122,19 @@ Dashboard tidak menggantikan:
 - SOP operasional;
 - keputusan teknisi;
 - prosedur keselamatan;
-- validasi mentor atau penanggung jawab.
+- validasi penanggung jawab operasional.
 
 ## Sebelum Production-Hardened
 
 Checklist minimum:
 
 - data model disetujui;
-- payload device disepakati;
+- payload device disepakati (sudah: kontrak perangkat v1 dibekukan);
 - security review;
 - database dan backup;
 - HTTPS;
 - proteksi perimeter pada environment final;
-- rate limit aplikasi dan proteksi request di proxy;
+- proteksi request di proxy atau jaringan (batas jumlah permintaan di aplikasi sudah ada);
 - role user;
 - audit log;
 - rotasi key device;

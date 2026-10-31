@@ -3,22 +3,22 @@
 import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
-import { isAuthRole } from "@/features/auth/types";
-import { verifyAdminActionCsrfToken } from "@/features/auth/lib/auth-csrf";
-import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
+import { isAuthRole } from "@/features/auth/types/auth";
+import { verifyAdminActionCsrfToken } from "@/features/auth/server/auth-csrf";
+import { requirePageAdmin } from "@/features/auth/server/auth-guards";
 import {
   sendEmailVerificationForUserId,
   sendPasswordResetForUserId,
-} from "@/features/auth/lib/auth-service";
+} from "@/features/auth/server/auth-service";
+import { recordAuthAuditEvent } from "@/features/auth/server/audit-service";
 import {
   approveAccessRequest,
   deleteAuthUser,
-  recordAuthAuditEvent,
   rejectAccessRequest,
   revokeAllUserSessions,
   setAuthUserStatus,
   updateAuthUserRole,
-} from "@/features/auth/lib/mysql-auth-repository";
+} from "@/features/auth/server/user-admin-service";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
 
 const ADMIN_USERS_PATH = "/dashboard/admin/users";
@@ -71,7 +71,9 @@ function assertValidAdminActionCsrf({
       token: csrfToken,
     })
   ) {
-    throw new Error("Sesi admin tidak valid. Muat ulang halaman lalu coba lagi.");
+    throw new Error(
+      "Sesi admin tidak valid. Muat ulang halaman lalu coba lagi.",
+    );
   }
 }
 
@@ -297,7 +299,9 @@ export async function sendUserPasswordResetAction(
     const targetUserId = getRequiredFormValue(formData, "targetUserId");
 
     if (targetUserId === admin.id) {
-      throw new Error("Reset password akun sendiri dilakukan dari keamanan akun.");
+      throw new Error(
+        "Reset password akun sendiri dilakukan dari keamanan akun.",
+      );
     }
 
     await sendPasswordResetForUserId({

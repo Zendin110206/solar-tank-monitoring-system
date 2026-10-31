@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
-import { downloadDevicePackageByTokenFromMysql } from "@/features/monitoring/lib/mysql-device-request-repository";
-import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
+import { downloadDevicePackage } from "@/features/devices/server/device-request-service";
+import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
 
 export const runtime = "nodejs";
 
@@ -38,7 +38,7 @@ export async function GET(request: Request) {
   }
 
   const token = new URL(request.url).searchParams.get("token") ?? "";
-  const result = await downloadDevicePackageByTokenFromMysql(token);
+  const result = await downloadDevicePackage(token);
 
   if (!result.ok) {
     return createErrorResponse(result.message, result.status);

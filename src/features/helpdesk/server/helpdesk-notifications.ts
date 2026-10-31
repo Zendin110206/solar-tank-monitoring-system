@@ -1,0 +1,30 @@
+import "server-only";
+
+import {
+  sendAdminTelegramNotification,
+  type AdminTelegramNotifyResult,
+} from "@/features/auth/server/admin-telegram-notifications";
+import type { HelpdeskMessage, HelpdeskSession } from "../types/helpdesk";
+import { summarizeHelpdeskSession } from "./repositories/mysql-helpdesk-repository";
+
+export async function notifyAdminsHelpdeskMessageCreated({
+  message,
+  session,
+}: {
+  message: HelpdeskMessage;
+  session: HelpdeskSession;
+}): Promise<AdminTelegramNotifyResult> {
+  const text = [
+    "Web Chat Service",
+    "",
+    summarizeHelpdeskSession(session),
+    "",
+    "Pesan user:",
+    message.body,
+    "",
+    `Balas: /reply ${session.sessionCode} isi balasan`,
+    `Tutup: /close ${session.sessionCode}`,
+  ].join("\n");
+
+  return sendAdminTelegramNotification(text, { topic: "live-chat" });
+}

@@ -1,12 +1,28 @@
 # Status Operasional Saat Ini
 
-Tanggal status: 2026-07-14
+Tanggal status: 2026-10-31 (bagian "Status per Oktober 2026"). Bagian lain di
+bawahnya berasal dari pemeriksaan 14 Juli 2026 dan disimpan sebagai riwayat.
 
 Dokumen ini menjadi acuan status operasional FTM. Informasi bertanggal
 merepresentasikan kondisi pada saat verifikasi dan diperbarui ketika cakupan,
 deployment, atau tingkat kesiapan sistem berubah.
 
-## Status Produk Saat Ini
+## Status per Oktober 2026
+
+| Butir                          | Keadaan                                                                                                                                    | Sumber dan tanggal                                         |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------- |
+| Tahap                          | Pilot operasional aktif; belum dikeraskan untuk produksi penuh, tanpa SLA dan tanpa dukungan 24 jam                                        | Kondisi kode dan operasi per 25 Oktober 2026               |
+| Cakupan                        | 9 lokasi terdaftar, 8 perangkat aktif, masing-masing mengirim data ±20 detik sekali                                                        | Snapshot database baca-saja 11 Oktober 2026                |
+| Kode yang berjalan di produksi | Commit `4bda023` (2 Agustus 2026) di branch `main`                                                                                         | Riwayat deployment GitHub, 25 Oktober 2026                 |
+| Alur kerja repositori          | Perubahan masuk lewat pull request ke `dev`; `main` hanya menerima rilis yang disetujui                                                    | Sejak 25 Oktober 2026                                      |
+| Backup                         | Belum otomatis; pemulihan belum diuji berkala                                                                                              | Kondisi per 25 Oktober 2026                                |
+| Alarm otomatis                 | Belum ada                                                                                                                                  | Kondisi kode per 25 Oktober 2026                           |
+| Akses per lokasi               | Belum ada; semua akun aktif melihat semua lokasi                                                                                           | Kondisi kode per 25 Oktober 2026                           |
+| Dependensi                     | Versi yang berjalan di produksi masih memakai pustaka dengan kerentanan yang diketahui. Pembaruannya sudah ada di `dev` dan menunggu rilis | `pnpm audit --prod` pada `main` dan `dev`, 31 Oktober 2026 |
+
+Arah perbaikan dicatat di [catatan keputusan arsitektur](decisions/README.md).
+
+## Status Produk (riwayat, 14 Juli 2026)
 
 FTM adalah **pilot operasional internal yang aktif**. Sistem menerima telemetry
 perangkat fisik melalui deployment Vercel, menyimpannya di Aiven MySQL, dan
@@ -22,18 +38,18 @@ Sistem belum boleh disebut production-ready penuh karena hardening firmware,
 restore drill, kalibrasi device lapangan, alerting, pembatasan akses per lokasi,
 dan SOP operasional belum selesai diuji.
 
-## Snapshot Terverifikasi 13–14 Juli 2026
+## Snapshot Terverifikasi 13–14 Juli 2026 (riwayat)
 
-| Indikator | Hasil |
-|---|---|
-| Halaman utama dan pemeriksaan kesehatan Vercel | HTTP 200 |
-| Pemeriksaan kesiapan tanpa akses admin | HTTP 401, sesuai desain |
-| Penyimpanan operasional | Aiven MySQL aktif |
-| Registri MySQL | 3 lokasi, 3 tangki, 3 perangkat |
-| Riwayat telemetri pada snapshot 13 Juli | 9.272 pembacaan |
-| Kesegaran perangkat pada snapshot | 2 perangkat mengirim data terbaru, 1 perangkat terlambat |
-| Snapshot langsung dan agregat 5 menit | Siap digunakan |
-| Regional, Wilayah, Area, dan STO | Skema siap digunakan |
+| Indikator                                      | Hasil                                                    |
+| ---------------------------------------------- | -------------------------------------------------------- |
+| Halaman utama dan pemeriksaan kesehatan Vercel | HTTP 200                                                 |
+| Pemeriksaan kesiapan tanpa akses admin         | HTTP 401, sesuai desain                                  |
+| Penyimpanan operasional                        | Aiven MySQL aktif                                        |
+| Registri MySQL                                 | 3 lokasi, 3 tangki, 3 perangkat                          |
+| Riwayat telemetri pada snapshot 13 Juli        | 9.272 pembacaan                                          |
+| Kesegaran perangkat pada snapshot              | 2 perangkat mengirim data terbaru, 1 perangkat terlambat |
+| Snapshot langsung dan agregat 5 menit          | Siap digunakan                                           |
+| Regional, Wilayah, Area, dan STO               | Skema siap digunakan                                     |
 
 Angka tersebut adalah snapshot bertanggal, bukan janji bahwa semua perangkat
 selalu online. Target awal 5 STO dan arah ekspansi hingga 29 STO harus dibaca

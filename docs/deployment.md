@@ -1,5 +1,10 @@
 # Deployment
 
+> **Status dokumen:** perintah dan pengaturan dicocokkan dengan kode pada 31 Oktober 2026.
+> Angka operasional di bagian "Status Saat Ini" adalah pemeriksaan bertanggal 14 Juli 2026;
+> snapshot terbaru ada di README dan `docs/current-operational-truth.md`. Cara menjalankan lokal
+> yang lengkap ada di README.
+
 Dokumen ini menjelaskan deployment yang aktif, cara menyiapkan environment lain,
 dan batas klaim operasionalnya.
 
@@ -168,10 +173,10 @@ pnpm db:setup:mysql
 pnpm pilot:hash-key
 Copy-Item config/pilot-registry.example.json config/pilot-registry.local.json
 # edit config/pilot-registry.local.json sampai koordinat dan hash device sudah real/approved
-pnpm pilot:registry -- --dry-run
+pnpm pilot:registry --dry-run
 pnpm pilot:registry
 $env:PILOT_API_BASE_URL="https://solar-tank-monitoring-system.vercel.app"
-$env:PILOT_DEVICE_ID="pilot-tph-01"
+$env:PILOT_DEVICE_ID="pilot-contoh-a-01"
 $env:PILOT_DEVICE_KEY="key-asli-device"
 pnpm pilot:smoke
 ```
@@ -186,6 +191,7 @@ pnpm db:migrate:auth
 pnpm db:migrate:auth-recovery
 pnpm db:migrate:device-provisioning
 pnpm db:migrate:device-request-fields
+pnpm db:migrate:helpdesk
 pnpm db:migrate:reading-rollup
 pnpm db:migrate:auth-telegram
 pnpm db:migrate:site-taxonomy
@@ -235,48 +241,30 @@ Jangan upload `.env.local`.
 
 Gunakan `.env.example` sebagai referensi nama variabel.
 
-Variabel utama saat ini:
+Daftar lengkap variabel beserta penjelasan dan nilai bawaannya ada di dua tempat yang selalu
+sejalan:
 
-```text
-NEXT_PUBLIC_APP_NAME
-NEXT_PUBLIC_APP_ENV
-NEXT_PUBLIC_MONITORING_REFRESH_INTERVAL_MS
-SOLAR_TANK_STORAGE_DRIVER
-SOLAR_TANK_LOCAL_DEVICE_KEY
-SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK
-SOLAR_TANK_DEVICE_KEY
-MYSQL_DATABASE_URL
-MYSQL_CONNECTION_LIMIT
-MYSQL_SSL_MODE
-MYSQL_SSL_CA
-DEVICE_PACKAGE_ENCRYPTION_KEY
-DEVICE_PACKAGE_DOWNLOAD_TTL_DAYS
-DEVICE_PACKAGE_MAX_DOWNLOADS
-AUTH_SESSION_COOKIE_NAME
-AUTH_SECRET
-AUTH_REQUIRE_ADMIN_OTP
-AUTH_ENABLE_REGISTER
-AUTH_ALLOW_PASSWORD_RESET
-AUTH_REQUIRE_EMAIL_VERIFICATION_FOR_APPROVAL
-AUTH_COOKIE_SECURE
-APP_BASE_URL
-AUTH_BOOTSTRAP_ADMIN_EMAIL
-AUTH_BOOTSTRAP_ADMIN_USERNAME
-AUTH_BOOTSTRAP_ADMIN_FULL_NAME
-AUTH_BOOTSTRAP_ADMIN_PASSWORD
-SMTP_HOST
-SMTP_PORT
-SMTP_USER
-SMTP_PASS
-SMTP_FROM
-SMTP_SECURE
-AUTH_CAPTCHA_PROVIDER
-NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY
-AUTH_CAPTCHA_SECRET_KEY
-TELEGRAM_BOT_TOKEN
-TELEGRAM_WEBHOOK_SECRET
-TELEGRAM_BOT_USERNAME
-```
+- `.env.example`: nama variabel dan contoh nilai kosong/placeholder;
+- katalog pengaturan `src/lib/config/server-env.ts` (khusus server) dan
+  `src/lib/config/public-env.ts` (`NEXT_PUBLIC_*`, ikut ke browser). Kode hanya membaca pengaturan
+  lewat katalog ini, dan ESLint menolak `process.env` di tempat lain.
+
+Kelompok utama:
+
+| Kelompok             | Contoh variabel                                                                                                          |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Aplikasi             | `APP_BASE_URL`, `NEXT_PUBLIC_APP_ENV`, `NEXT_PUBLIC_MONITORING_REFRESH_INTERVAL_MS`                                      |
+| Storage dan database | `SOLAR_TANK_STORAGE_DRIVER`, `MYSQL_DATABASE_URL`, `MYSQL_SSL_MODE`, `MYSQL_SSL_CA`                                      |
+| Perangkat            | `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK`, `SOLAR_TANK_AUTO_PROVISION_DEVICES`, `SOLAR_TANK_DEVICE_PROVISIONING_KEY` |
+| Paket firmware       | `DEVICE_PACKAGE_ENCRYPTION_KEY`, `DEVICE_PACKAGE_DOWNLOAD_TTL_DAYS`, `DEVICE_PACKAGE_MAX_DOWNLOADS`                      |
+| Akun dan sesi        | `AUTH_SECRET`, `AUTH_REQUIRE_ADMIN_OTP`, `AUTH_ENABLE_REGISTER`, `AUTH_COOKIE_SECURE`, `AUTH_*_TTL_SECONDS`              |
+| Email                | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`, `SMTP_SECURE`                                           |
+| Captcha              | `AUTH_CAPTCHA_PROVIDER`, `NEXT_PUBLIC_AUTH_CAPTCHA_SITE_KEY`, `AUTH_CAPTCHA_SECRET_KEY`                                  |
+| Telegram             | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_WEBHOOK_SECRET`, `TELEGRAM_ADMIN_GROUP_CHAT_ID`, `TELEGRAM_TOPIC_*_THREAD_ID`            |
+| Pemeriksaan kesiapan | `READINESS_CHECK_TOKEN`                                                                                                  |
+| Backup               | `MYSQL_BACKUP_OUTPUT_DIR`, `MYSQL_BACKUP_RETENTION_DAYS`                                                                 |
+
+Variabel `PILOT_*` hanya dipakai skrip operasional pilot.
 
 ## Checklist Sebelum Production
 
@@ -289,7 +277,8 @@ TELEGRAM_BOT_USERNAME
 - API key device tidak memakai key development/contoh.
 - Fallback global device key dimatikan.
 - HTTPS aktif.
-- Endpoint ingest punya rate limit.
+- Batas kiriman ingest aplikasi (120 per menit per perangkat dan alamat) sudah aktif; perlindungan
+  jaringan tambahan di luar aplikasi belum ada.
 - User login, role, approval admin, dan deaktivasi akun sudah diuji.
 - Backup database disiapkan.
 - Registry site, tank, device, dan key berasal dari database yang dikelola.
@@ -301,8 +290,10 @@ TELEGRAM_BOT_USERNAME
 
 ## Catatan Penting
 
+Setelah deployment baru, tab yang masih terbuka membawa kode lama. Bila formulir dikirim dari tab itu, server tidak mengenali aksinya, isi formulir tidak tersimpan, dan dashboard menampilkan halaman error sampai halaman dimuat ulang. Ini terjadi pada setiap deployment, jadi beri tahu pengguna untuk memuat ulang halaman setelah rilis.
+
 Memory store saat ini hanya untuk development.
 
 Jika server restart, data hasil simulator hilang.
 
-Untuk deployment yang perlu history, storage harus memakai database. Fondasi MySQL sudah tersedia untuk registry monitoring, reading, dan auth. Production tetap membutuhkan SMTP, Turnstile, HTTPS, backup/restore, rate limit ingest, rotasi key device, monitoring server, dan prosedur operasional. Detail deployment pilihan akhir ditunda sampai keputusan tim berikutnya.
+Untuk deployment yang perlu history, storage harus memakai database. Fondasi MySQL sudah tersedia untuk registry monitoring, reading, dan auth. Production tetap membutuhkan SMTP, Turnstile, HTTPS, backup/restore, rotasi key device, monitoring server, dan prosedur operasional. Detail deployment pilihan akhir ditunda sampai keputusan tim berikutnya.

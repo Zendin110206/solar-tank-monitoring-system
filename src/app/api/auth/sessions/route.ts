@@ -1,7 +1,8 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
-import { requireApiUser } from "@/features/auth/lib/auth-guards";
-import { listCurrentUserSessions } from "@/features/auth/lib/auth-service";
+import { requireApiUser } from "@/features/auth/server/auth-guards";
+import { listCurrentUserSessions } from "@/features/auth/server/auth-service";
+import { jsonOk } from "@/lib/http/json-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -15,8 +16,5 @@ export async function GET(request: NextRequest) {
 
   const sessions = await listCurrentUserSessions({ user: auth.user });
 
-  return NextResponse.json({
-    ok: true,
-    data: { sessions },
-  });
+  return jsonOk({ sessions });
 }

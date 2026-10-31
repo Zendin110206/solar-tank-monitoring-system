@@ -10,7 +10,7 @@ const mocks = vi.hoisted(() => ({
   rollback: vi.fn(),
 }));
 
-vi.mock("../../monitoring/lib/mysql-connection", () => ({
+vi.mock("@/lib/database/mysql-connection", () => ({
   getMysqlPool: () => ({
     execute: mocks.execute,
     getConnection: mocks.getConnection,
@@ -20,7 +20,7 @@ vi.mock("../../monitoring/lib/mysql-connection", () => ({
 import {
   completeTelegramBindingInMysql,
   findAuthUserByVerifiedTelegramChatId,
-} from "../lib/mysql-auth-repository";
+} from "../server/repositories/mysql-auth-repository";
 
 describe("mysql auth Telegram binding", () => {
   beforeEach(() => {

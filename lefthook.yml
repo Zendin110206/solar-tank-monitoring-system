@@ -1,0 +1,26 @@
+# Hook git yang dipasang otomatis saat `pnpm install`.
+# Pasang ulang secara manual: pnpm exec lefthook install
+
+pre-commit:
+  parallel: true
+  commands:
+    format:
+      glob: "*.{ts,tsx,js,mjs,cjs,json,md,yml,yaml,css}"
+      run: pnpm exec prettier --check {staged_files}
+    lint:
+      glob: "*.{ts,tsx,js,mjs,cjs}"
+      run: pnpm exec eslint {staged_files}
+
+commit-msg:
+  commands:
+    commitlint:
+      # Tanpa argumen, commitlint membaca COMMIT_EDITMSG di folder git aktif
+      # (juga untuk worktree). Path tidak diteruskan agar folder berspasi aman.
+      run: node node_modules/@commitlint/cli/cli.js --edit
+
+pre-push:
+  commands:
+    typecheck:
+      run: pnpm typecheck
+    test:
+      run: pnpm test

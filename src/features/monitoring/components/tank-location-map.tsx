@@ -4,14 +4,15 @@ import type { CSSProperties } from "react";
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { MapPin } from "lucide-react";
+import {
+  STATUS_BADGE_CLASS,
+  STATUS_DOT_CLASS,
+} from "@/components/ui/status-tone";
+import { StatusPill } from "@/components/ui/status-pill";
 
-export type TankLocationMapStatus =
-  | "online"
-  | "warning"
-  | "critical"
-  | "offline";
+type TankLocationMapStatus = "online" | "warning" | "critical" | "offline";
 
-export type TankLocationMapSite = {
+type TankLocationMapSite = {
   tankId: string;
   code: string;
   name: string;
@@ -40,31 +41,31 @@ const statusMeta: Record<
 > = {
   online: {
     label: "Online",
-    dot: "bg-emerald-500",
+    dot: STATUS_DOT_CLASS.success,
     pin: "text-emerald-500",
     ring: "ring-emerald-100",
-    badge: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+    badge: STATUS_BADGE_CLASS.success,
   },
   warning: {
     label: "Waspada",
-    dot: "bg-amber-500",
+    dot: STATUS_DOT_CLASS.warning,
     pin: "text-amber-500",
     ring: "ring-amber-100",
-    badge: "bg-amber-50 text-amber-700 ring-amber-100",
+    badge: STATUS_BADGE_CLASS.warning,
   },
   critical: {
     label: "Kritis",
     dot: "bg-red-600",
     pin: "text-red-600",
     ring: "ring-red-100",
-    badge: "bg-red-50 text-red-700 ring-red-100",
+    badge: STATUS_BADGE_CLASS.danger,
   },
   offline: {
     label: "Offline",
     dot: "bg-zinc-600",
     pin: "text-zinc-700",
     ring: "ring-zinc-200",
-    badge: "bg-zinc-100 text-zinc-700 ring-zinc-200",
+    badge: STATUS_BADGE_CLASS.neutral,
   },
 };
 
@@ -72,12 +73,9 @@ function StatusBadge({ status }: { status: TankLocationMapStatus }) {
   const meta = statusMeta[status];
 
   return (
-    <span
-      className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-semibold ring-1 ${meta.badge}`}
-    >
-      <span className={`size-2 rounded-full ${meta.dot}`} />
+    <StatusPill badgeClass={meta.badge} dotClass={meta.dot}>
       {meta.label}
-    </span>
+    </StatusPill>
   );
 }
 
@@ -269,7 +267,9 @@ export function TankLocationMap({
         style={activeMarkerStyle}
         aria-hidden="true"
       >
-        <div className={`size-3.5 rounded-full ${statusMeta[activeSite.status].dot}`} />
+        <div
+          className={`size-3.5 rounded-full ${statusMeta[activeSite.status].dot}`}
+        />
       </div>
     </div>
   );

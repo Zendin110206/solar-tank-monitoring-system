@@ -4,13 +4,8 @@ import type { FormEvent } from "react";
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  ArrowRight,
-  Eye,
-  EyeOff,
-  LockKeyhole,
-  Mail,
-} from "lucide-react";
+import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
+import { PRIMARY_BLOCK_BUTTON_CLASS } from "@/components/ui/button-class";
 
 export default function SignInForm({
   redirectTo = "/dashboard",
@@ -65,18 +60,16 @@ export default function SignInForm({
           body: JSON.stringify(body),
         },
       );
-      const result = (await response.json().catch(() => null)) as
-        | {
-            ok?: boolean;
-            error?: string;
-            data?: {
-              requiresOtp?: boolean;
-              challengeId?: string;
-              delivery?: "email" | "log";
-              redirectTo?: string;
-            };
-          }
-        | null;
+      const result = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+        error?: string;
+        data?: {
+          requiresOtp?: boolean;
+          challengeId?: string;
+          delivery?: "email" | "log";
+          redirectTo?: string;
+        };
+      } | null;
 
       if (!response.ok || !result?.ok) {
         throw new Error(result?.error ?? "Login gagal.");
@@ -254,7 +247,7 @@ export default function SignInForm({
       ) : null}
 
       <button
-        className="group inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20 disabled:cursor-not-allowed disabled:opacity-70"
+        className={PRIMARY_BLOCK_BUTTON_CLASS}
         disabled={busy}
         type="submit"
       >

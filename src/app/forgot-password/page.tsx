@@ -5,8 +5,7 @@ import ForgotPasswordForm from "./forgot-password-form";
 
 export const metadata: Metadata = {
   title: "Lupa Password | FTM",
-  description:
-    "Permintaan reset kata sandi akun FTM melalui email terdaftar.",
+  description: "Permintaan reset kata sandi akun FTM melalui email terdaftar.",
 };
 
 export default function ForgotPasswordPage() {

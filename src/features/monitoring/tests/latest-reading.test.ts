@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import { mockDevices } from "../data/mock-devices";
-import { buildDashboardOverview } from "../lib/dashboard-view-model";
+import { buildDashboardOverview } from "../domain/dashboard-view-model";
 import {
   mergeMonitoringReadingsById,
   selectLatestReadingPerTank,
-} from "../lib/latest-reading";
+} from "../domain/latest-reading";
 import type { Reading } from "../types/monitoring";
 
 function createReading({
@@ -75,7 +75,7 @@ describe("latest reading selection", () => {
       devices,
       readings: selectLatestReadingPerTank([staleSnapshot, freshRaw]),
     });
-    const tph = overview.rows.find((row) => row.code === "TPH");
+    const tph = overview.rows.find((row) => row.code === "CONTOH-A");
 
     expect(tph).toMatchObject({
       deviceStatus: "online",

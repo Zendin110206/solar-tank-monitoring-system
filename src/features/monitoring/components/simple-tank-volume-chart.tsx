@@ -7,7 +7,9 @@ import {
   SIMPLE_TANK_CHART_RANGES,
   type SimpleTankChartRangeKey,
   type SimpleTankTrendByRange,
-} from "@/features/monitoring/lib/simple-tank-detail-model";
+} from "../domain/simple-tank-detail-model";
+import { formatNumber } from "@/lib/format";
+import { clamp } from "@/lib/math";
 
 type SimpleTankVolumeChartProps = {
   trends: SimpleTankTrendByRange;
@@ -20,16 +22,6 @@ const FALLBACK_CHART_SIZE = {
   height: 288,
 };
 
-function formatLiter(value: number) {
-  return new Intl.NumberFormat("id-ID", {
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(Math.max(value, min), max);
-}
-
 function isDefined<T>(value: T | undefined): value is T {
   return value !== undefined;
 }
@@ -40,7 +32,10 @@ function buildLinePath(points: Array<{ x: number; y: number }>) {
     .join(" ");
 }
 
-function buildAreaPath(points: Array<{ x: number; y: number }>, bottom: number) {
+function buildAreaPath(
+  points: Array<{ x: number; y: number }>,
+  bottom: number,
+) {
   if (points.length < 2) {
     return "";
   }
@@ -240,7 +235,7 @@ export function SimpleTankVolumeChart({
   ]);
 
   const activePoint =
-    activeIndex === null ? null : chart.coordinates[activeIndex] ?? null;
+    activeIndex === null ? null : (chart.coordinates[activeIndex] ?? null);
 
   function handlePointerMove(event: PointerEvent<SVGSVGElement>) {
     const svg = svgRef.current;
@@ -252,17 +247,12 @@ export function SimpleTankVolumeChart({
     const rect = svg.getBoundingClientRect();
     const pointerX =
       ((event.clientX - rect.left) / rect.width) * chartSize.width;
-    const nearestIndex = chart.coordinates.reduce(
-      (nearest, point, index) => {
-        const nearestDistance = Math.abs(
-          chart.coordinates[nearest].x - pointerX,
-        );
-        const pointDistance = Math.abs(point.x - pointerX);
+    const nearestIndex = chart.coordinates.reduce((nearest, point, index) => {
+      const nearestDistance = Math.abs(chart.coordinates[nearest].x - pointerX);
+      const pointDistance = Math.abs(point.x - pointerX);
 
-        return pointDistance < nearestDistance ? index : nearest;
-      },
-      0,
-    );
+      return pointDistance < nearestDistance ? index : nearest;
+    }, 0);
 
     setActiveIndex(nearestIndex);
   }
@@ -423,7 +413,7 @@ export function SimpleTankVolumeChart({
                 x={padding.left - 12}
                 y={tick.y + 4}
               >
-                {formatLiter(tick.value)} L
+                {formatNumber(tick.value, 0)} L
               </text>
             </g>
           ))}
@@ -531,8 +521,8 @@ export function SimpleTankVolumeChart({
             }}
           >
             <p className="font-semibold text-zinc-950">
-              {formatLiter(activePoint.volumeLiter)} /{" "}
-              {formatLiter(capacityLiter)} L
+              {formatNumber(activePoint.volumeLiter, 0)} /{" "}
+              {formatNumber(capacityLiter, 0)} L
             </p>
             <p className="mt-1 text-xs font-medium text-zinc-500">
               {activePoint.fullTimeLabel}

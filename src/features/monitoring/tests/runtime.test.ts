@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateRuntimeHours } from "../lib/runtime";
+import { calculateRuntimeHours } from "../domain/runtime";
 
 describe("runtime calculation", () => {
   it("calculates runtime from volume and hourly consumption", () => {

@@ -1,11 +1,12 @@
+import { serverEnv } from "@/lib/config/server-env";
 import { NextResponse, type NextRequest } from "next/server";
 import {
   buildDashboardNextPath,
   buildLoginRedirectPath,
-} from "@/features/auth/lib/auth-redirect";
+} from "@/features/auth/domain/auth-redirect";
 
 const AUTH_COOKIE_NAME =
-  process.env.AUTH_SESSION_COOKIE_NAME?.trim() || "solar_tank_session";
+  serverEnv.AUTH_SESSION_COOKIE_NAME?.trim() || "solar_tank_session";
 
 export function proxy(request: NextRequest) {
   const sessionCookie = request.cookies.get(AUTH_COOKIE_NAME)?.value;

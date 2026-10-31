@@ -1,10 +1,10 @@
 INSERT INTO monitoring_sites
   (id, code, name, area_label, regional_label, wilayah_label, latitude, longitude, is_active)
 VALUES
-  ('site-tph', 'TPH', 'STO TPH', 'Area demo', 'TREG 5', 'TIF 3', -7.6500000, 112.9000000, TRUE),
-  ('site-nja', 'NJA', 'STO NJA', 'Area demo', 'TREG 5', 'TIF 3', -7.6800000, 112.8600000, TRUE),
-  ('site-jto', 'JTO', 'STO JTO', 'Area demo', 'TREG 5', 'TIF 3', -7.7200000, 112.8800000, TRUE),
-  ('site-skp', 'SKP', 'STO SKP', 'Area demo', 'TREG 5', 'TIF 3', -7.7000000, 112.9400000, TRUE)
+  ('site-tph', 'CONTOH-A', 'STO Contoh A', 'Area Contoh', 'TREG 5', 'TIF 3', NULL, NULL, TRUE),
+  ('site-nja', 'CONTOH-B', 'STO Contoh B', 'Area Contoh', 'TREG 5', 'TIF 3', NULL, NULL, TRUE),
+  ('site-jto', 'CONTOH-C', 'STO Contoh C', 'Area Contoh', 'TREG 5', 'TIF 3', NULL, NULL, TRUE),
+  ('site-skp', 'CONTOH-D', 'STO Contoh D', 'Area Contoh', 'TREG 5', 'TIF 3', NULL, NULL, TRUE)
 ON DUPLICATE KEY UPDATE
   code = VALUES(code),
   name = VALUES(name),

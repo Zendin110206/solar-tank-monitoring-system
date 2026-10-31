@@ -2,89 +2,39 @@
 
 import { revalidatePath } from "next/cache";
 
-import { getAppBaseUrl } from "@/features/auth/lib/auth-config";
-import { verifyAdminActionCsrfToken } from "@/features/auth/lib/auth-csrf";
-import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
-import { sendDevicePackageReadyEmail } from "@/features/monitoring/lib/device-package-email";
+import { getAppBaseUrl } from "@/features/auth/server/auth-config";
+import { assertValidAdminActionCsrf } from "@/features/auth/server/auth-csrf";
+import { requirePageAdmin } from "@/features/auth/server/auth-guards";
+import { sendDevicePackageReadyEmail } from "@/features/devices/server/device-package-email";
 import {
-  approveDeviceRequestInMysql,
-  recordFirmwarePackageEmailDeliveryInMysql,
-  refreshDevicePackageDownloadTokenInMysql,
-  rejectDeviceRequestInMysql,
-  reissueDevicePackageInMysql,
-  revokeDeviceProvisioningInMysql,
-} from "@/features/monitoring/lib/mysql-device-request-repository";
+  approveDeviceRequest,
+  recordDevicePackageEmailDelivery,
+  refreshDevicePackageDownload,
+  rejectDeviceRequest,
+  reissueDevicePackage,
+  revokeDeviceProvisioning,
+} from "@/features/devices/server/device-request-service";
 import {
-  cleanupMonitoringDeviceRequestsInMysql,
-  resetMonitoringDeviceDataInMysql,
-} from "@/features/monitoring/lib/mysql-maintenance-repository";
-import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
+  cleanupMonitoringDeviceRequests,
+  resetMonitoringDeviceData,
+} from "@/features/admin/server/maintenance-service";
+import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
-
-const ADMIN_DEVICE_REQUEST_PATH = "/dashboard/admin/device-requests";
-const USER_DEVICE_REQUEST_PATH = "/dashboard/devices/request";
+import { getRequiredFormValue } from "@/lib/http/form-data";
+import { isDeviceRequestSchemaError } from "@/features/devices/server/device-request-schema-error";
+import {
+  ADMIN_DEVICE_REQUEST_PATH,
+  CLEANUP_SINGLE_CONFIRMATION,
+  USER_DEVICE_REQUEST_PATH,
+} from "@/features/devices/domain/device-request-constants";
 const CLEANUP_SELECTED_CONFIRMATION = "BERSIHKAN PILIHAN DEVICE";
-const CLEANUP_SINGLE_CONFIRMATION = "BERSIHKAN ITEM DEVICE";
 const RESET_DEVICE_DATA_CONFIRMATION = "BERSIHKAN SEMUA DATA DEVICE";
-const DEVICE_REQUEST_SCHEMA_COLUMNS = [
-  "device_sensor_type",
-  "regional_label",
-  "wilayah_label",
-  "load_value",
-  "load_unit",
-  "diesel_engine_capacity_kva",
-  "cos_phi",
-] as const;
 
 export type DeviceRequestAdminActionState = {
   status: "idle" | "success" | "error";
   message: string;
   downloadUrl?: string;
 };
-
-function getRequiredFormValue(formData: FormData, key: string): string {
-  const value = String(formData.get(key) ?? "").trim();
-
-  if (!value) {
-    throw new Error("Data aksi admin belum lengkap.");
-  }
-
-  return value;
-}
-
-function assertValidAdminActionCsrf({
-  formData,
-  sessionId,
-}: {
-  formData: FormData;
-  sessionId: string;
-}) {
-  const csrfToken = String(formData.get("csrfToken") ?? "");
-
-  if (
-    !verifyAdminActionCsrfToken({
-      sessionId,
-      token: csrfToken,
-    })
-  ) {
-    throw new Error("Sesi admin tidak valid. Muat ulang halaman lalu coba lagi.");
-  }
-}
-
-function isDeviceRequestSchemaError(error: unknown): boolean {
-  if (!(error instanceof Error)) {
-    return false;
-  }
-
-  const message = error.message.toLowerCase();
-
-  return (
-    message.includes("unknown column") &&
-    DEVICE_REQUEST_SCHEMA_COLUMNS.some((columnName) =>
-      message.includes(columnName),
-    )
-  );
-}
 
 function getActionError(error: unknown): DeviceRequestAdminActionState {
   if (isDeviceRequestSchemaError(error)) {
@@ -174,7 +124,7 @@ export async function approveDeviceRequestAction(
     assertMysqlStorageIsReady();
 
     const requestId = getRequiredFormValue(formData, "requestId");
-    const approval = await approveDeviceRequestInMysql({
+    const approval = await approveDeviceRequest({
       adminUserId: admin.id,
       appBaseUrl: getAppBaseUrl(),
       requestId,
@@ -189,7 +139,7 @@ export async function approveDeviceRequestAction(
       siteName: approval.request.siteName,
     });
 
-    await recordFirmwarePackageEmailDeliveryInMysql({
+    await recordDevicePackageEmailDelivery({
       adminUserId: admin.id,
       delivered: delivery.delivered,
       delivery: delivery.delivery,
@@ -227,7 +177,7 @@ export async function rejectDeviceRequestAction(
     const requestId = getRequiredFormValue(formData, "requestId");
     const rejectionReason = getRequiredFormValue(formData, "rejectionReason");
 
-    await rejectDeviceRequestInMysql({
+    await rejectDeviceRequest({
       adminUserId: admin.id,
       rejectionReason,
       requestId,
@@ -274,7 +224,7 @@ async function sendPackageEmailAndRecord({
     siteName: request.siteName,
   });
 
-  await recordFirmwarePackageEmailDeliveryInMysql({
+  await recordDevicePackageEmailDelivery({
     adminUserId,
     delivered: delivery.delivered,
     delivery: delivery.delivery,
@@ -300,7 +250,7 @@ export async function resendDevicePackageAction(
     assertMysqlStorageIsReady();
 
     const requestId = getRequiredFormValue(formData, "requestId");
-    const refresh = await refreshDevicePackageDownloadTokenInMysql({
+    const refresh = await refreshDevicePackageDownload({
       adminUserId: admin.id,
       requestId,
     });
@@ -339,7 +289,7 @@ export async function reissueDevicePackageAction(
     assertMysqlStorageIsReady();
 
     const requestId = getRequiredFormValue(formData, "requestId");
-    const reissue = await reissueDevicePackageInMysql({
+    const reissue = await reissueDevicePackage({
       adminUserId: admin.id,
       appBaseUrl: getAppBaseUrl(),
       requestId,
@@ -380,7 +330,7 @@ export async function revokeDeviceProvisioningAction(
 
     const requestId = getRequiredFormValue(formData, "requestId");
 
-    await revokeDeviceProvisioningInMysql({
+    await revokeDeviceProvisioning({
       adminUserId: admin.id,
       requestId,
     });
@@ -413,7 +363,7 @@ export async function resetMonitoringDeviceDataAction(
       );
     }
 
-    const result = await resetMonitoringDeviceDataInMysql();
+    const result = await resetMonitoringDeviceData();
 
     revalidateMonitoringDevicePages();
 
@@ -437,7 +387,9 @@ export async function cleanupDeviceRequestsAction(
     const requestIds = getRequestIdsFromForm(formData);
 
     if (requestIds.length === 0) {
-      throw new Error("Pilih minimal satu pengajuan perangkat untuk dibersihkan.");
+      throw new Error(
+        "Pilih minimal satu pengajuan perangkat untuk dibersihkan.",
+      );
     }
 
     if (cleanupMode === "single") {
@@ -461,7 +413,7 @@ export async function cleanupDeviceRequestsAction(
       throw new Error("Mode pembersihan perangkat tidak valid.");
     }
 
-    const result = await cleanupMonitoringDeviceRequestsInMysql({ requestIds });
+    const result = await cleanupMonitoringDeviceRequests({ requestIds });
 
     revalidateMonitoringDevicePages();
 
