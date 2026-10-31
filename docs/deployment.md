@@ -290,6 +290,8 @@ Variabel `PILOT_*` hanya dipakai skrip operasional pilot.
 
 ## Catatan Penting
 
+Setelah deployment baru, tab yang masih terbuka membawa kode lama. Bila formulir dikirim dari tab itu, server tidak mengenali aksinya, isi formulir tidak tersimpan, dan dashboard menampilkan halaman error sampai halaman dimuat ulang. Ini terjadi pada setiap deployment, jadi beri tahu pengguna untuk memuat ulang halaman setelah rilis.
+
 Memory store saat ini hanya untuk development.
 
 Jika server restart, data hasil simulator hilang.

@@ -57,6 +57,8 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Panduan deployment kini menjelaskan apa yang terjadi pada tab yang masih terbuka saat deployment
+  baru.
 - Tanggal periksa di kepala dokumen dan di indeks `docs/README.md` disamakan: semua dokumen acuan sudah dibaca
   ulang dan dicocokkan dengan kode pada 31 Oktober 2026.
 - README, CONTRIBUTING, dan panduan pemeriksaan lokal menjelaskan pemasangan pnpm bila `corepack enable`
@@ -234,8 +236,10 @@ dirilis ke `main`.
   tinggi (antara lain eksekusi kode jarak jauh di optimasi gambar dan DoS pada server
   action). Perubahan perilaku yang terlihat: halaman alias `/dashboard/ringkasan` dan
   `/dashboard/locations` kini membalas pengalihan HTTP 307/308, bukan halaman 200 yang
-  mengalihkan di browser; halaman tujuannya tetap sama. `AGENTS.md` memuat blok
-  aturan bawaan Next.js.
+  mengalihkan di browser; halaman tujuannya tetap sama. Di tingkat HTTP, server action
+  yang mengalihkan kini membalas 200 dengan header `x-action-redirect` (sebelumnya 303),
+  dan ID action yang tidak dikenal membalas 409 (sebelumnya 404); hasil di browser tetap
+  sama. `AGENTS.md` memuat blok aturan bawaan Next.js.
 - mysql2 dinaikkan dari 3.22.5 ke 3.23.4 untuk menutup kerentanan dekompresi paket
   tanpa batas; tidak ada perubahan data atau perilaku yang terlihat.
 - nodemailer dinaikkan dari 9.0.3 ke 10.1.7 untuk menutup 2 kerentanan tinggi dan 9
