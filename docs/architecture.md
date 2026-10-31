@@ -1,6 +1,6 @@
 # Arsitektur Sistem
 
-Status: **terkini**, diperiksa terhadap kode pada 25 Oktober 2026.
+Status: **terkini**, diperiksa terhadap kode pada 31 Oktober 2026.
 Arah jangka panjang dicatat di [catatan keputusan](decisions/README.md). Versi tanpa
 istilah pemrograman: [cara kerja FTM](cara-kerja-ftm.md).
 

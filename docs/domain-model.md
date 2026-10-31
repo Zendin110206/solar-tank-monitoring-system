@@ -1,6 +1,6 @@
 # Model Domain dan Perhitungan
 
-> **Status dokumen:** dicocokkan dengan kode `src/features/monitoring/domain/` pada 28 Oktober 2026.
+> **Status dokumen:** dicocokkan dengan kode `src/features/monitoring/domain/` pada 31 Oktober 2026.
 > Rumus dan ambang di bawah dikunci tes karakterisasi; perilaku yang dicatat apa adanya ditandai.
 
 Dokumen ini menjelaskan rumus dan status yang menjadi inti sistem monitoring.

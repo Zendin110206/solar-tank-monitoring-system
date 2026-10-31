@@ -1,6 +1,6 @@
 # Cara Kerja FTM dalam Bahasa Sehari-hari
 
-Status: **terkini**, dicocokkan dengan kode pada 28 Oktober 2026.
+Status: **terkini**, dicocokkan dengan kode pada 31 Oktober 2026.
 
 Dokumen ini untuk pembaca yang tidak menulis kode: pengelola, peninjau, atau anggota
 tim baru. Isinya menjelaskan apa yang dikerjakan FTM, bagian-bagiannya, dan pagar
