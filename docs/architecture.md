@@ -297,6 +297,10 @@ karena merapikannya mengubah tampilan atau perilaku:
 - `pnpm pilot:smoke` memakai kode perangkat bawaan yang berkode STO pilot bila `--device` dan
   `PILOT_DEVICE_ID` kosong, dan teks bantuannya memakai kode yang sama. Menggantinya mengubah
   perilaku skrip;
+- teks `--help` `pnpm pilot:smoke` dan `pnpm pilot:registry` masih menulis contoh
+  `pnpm <skrip> -- --opsi`. Bentuk itu ditolak skripnya ("Argumen tidak dikenal: --") karena
+  pnpm 9 ikut meneruskan tanda `--`; yang benar `pnpm <skrip> --opsi`. Teks bantuan sengaja
+  belum diubah karena termasuk keluaran skrip;
 - formulir admin "Bersihkan semua data perangkat" dan "Bersihkan pengajuan terpilih"
   dicabut dari halaman pada Juli 2026, tetapi server action `resetMonitoringDeviceDataAction`,
   layanan, dan kueri SQL di belakangnya masih ada tanpa pemakai. Komponen formulirnya sudah

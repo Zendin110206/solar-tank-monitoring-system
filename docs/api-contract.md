@@ -1,6 +1,6 @@
 # Kontrak API
 
-> **Status dokumen:** dicocokkan dengan kode dan balasan API lokal pada 28 Oktober 2026.
+> **Status dokumen:** dicocokkan dengan kode dan balasan API lokal pada 31 Oktober 2026.
 
 Dokumen ini menjelaskan endpoint yang tersedia dan bentuk data yang diharapkan.
 
@@ -45,7 +45,7 @@ Endpoint auth (semua di bawah `/api/auth/`):
 | `GET`  | `/api/auth/sessions`                  | sesi     | Melihat sesi aktif milik user               |
 | `POST` | `/api/auth/sessions/revoke`           | sesi     | Mencabut sesi lain milik user               |
 | `POST` | `/api/auth/telegram/bind/start`       | sesi     | Membuat token binding Telegram              |
-| `POST` | `/api/auth/telegram/webhook`          | Telegram | Webhook Telegram untuk binding              |
+| `POST` | `/api/auth/telegram/webhook`          | Telegram | Binding, perintah bot, dan balasan helpdesk |
 
 ## GET /api/health
 

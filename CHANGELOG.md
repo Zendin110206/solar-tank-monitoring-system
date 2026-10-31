@@ -55,6 +55,11 @@ dirilis ke `main`.
 
 ### Diubah
 
+- Perintah `pnpm <skrip> -- --opsi` di dokumen diganti `pnpm <skrip> --opsi` karena bentuk lama
+  ditolak skrip di pnpm 9. Contoh smoke test di `device-ingestion.md` dan panduan lapangan kini
+  mengarah ke alamat lokal, bukan alamat pilot. Kode balasan saat penyimpanan gagal ditulis `500`,
+  daftar perintah bot Telegram dilengkapi, jumlah rute di ADR 0001 dibetulkan, dan kontrol yang
+  sudah dicabut di `pilot-readiness.md` diberi catatan.
 - Dokumen dicocokkan lagi dengan kode: alasan berkas di atas 400 baris dicatat di
   `docs/architecture.md`, diagram README memuat modul admin, `NEXT_PUBLIC_APP_NAME` yang tidak dibaca
   kode dibuang dari `.env.example`, dan daftar migrasi di `docs/deployment.md` memuat migrasi helpdesk.
