@@ -11,6 +11,8 @@ dirilis ke `main`.
 
 ### Ditambahkan
 
+- Tes rata-rata berjalan ringkasan 5 menit dengan tiga sampel, dan tes batas tinggi tangki balok saat
+  kapasitas tercatat lebih besar dari dimensinya.
 - Job CI `Release source branch`: pull request ke `main` yang tidak berasal dari branch `dev` di
   repositori ini dibuat gagal, termasuk pembaruan keamanan Dependabot yang selalu dibuka ke branch
   bawaan. CONTRIBUTING menjelaskan cara membuat ulang pembaruan seperti itu lewat `dev`.

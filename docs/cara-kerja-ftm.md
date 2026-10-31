@@ -110,7 +110,7 @@ diubah. Kalau ada yang melanggar, perubahan ditolak sebelum sampai ke pengguna.
 | Aturan impor modul (ESLint)              | Batas antar-modul kabur karena impor di dalam modul memakai jalur modul lain |
 | Prettier                                 | Gaya penulisan kode yang tidak seragam                                       |
 | TypeScript                               | Data yang salah bentuk, misalnya teks dikirim ke tempat yang meminta angka   |
-| Tes otomatis (250 unit, 24 dengan MySQL) | Rumus, kontrak perangkat, dan alur penting berubah tanpa disadari            |
+| Tes otomatis (251 unit, 25 dengan MySQL) | Rumus, kontrak perangkat, dan alur penting berubah tanpa disadari            |
 | Audit dependensi                         | Pustaka dengan celah keamanan yang sudah diketahui                           |
 | Format pesan commit                      | Riwayat perubahan yang sulit dibaca                                          |
 | Sumber pull request ke `main`            | Perubahan selain rilis dari `dev` tergabung langsung ke produksi             |

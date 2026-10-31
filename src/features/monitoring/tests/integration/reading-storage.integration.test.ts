@@ -232,4 +232,40 @@ describe("penyimpanan pembacaan di MySQL (integrasi)", () => {
 
     expect(counts).toEqual({ latest: 0, rollup: 0 });
   });
+
+  it("menghitung rata-rata berjalan dengan bobot jumlah sampel sebelumnya", async () => {
+    const samples = [
+      { id: "b1", second: "05", volumeLiter: 600 },
+      { id: "b2", second: "25", volumeLiter: 660 },
+      { id: "b3", second: "45", volumeLiter: 720 },
+    ];
+
+    for (const { id, second, volumeLiter } of samples) {
+      await saveMonitoringReadingToMysql(
+        reading({
+          id,
+          measuredAt: `2026-10-25T03:15:${second}.000Z`,
+          receivedAt: `2026-10-25T03:15:${second}.000Z`,
+          volumeLiter,
+        }),
+      );
+    }
+
+    const [bucket] = await rows<Record<string, string | number>>(
+      `SELECT sample_count, sensor_distance_cm, fuel_height_cm, volume_liter,
+              fill_percent, runtime_hour, volume_liter_min, volume_liter_max
+       FROM monitoring_readings WHERE id = 'rollup-5m-device-a-1792898100000'`,
+    );
+
+    expect(bucket).toEqual({
+      sample_count: 3,
+      sensor_distance_cm: "45.00",
+      fuel_height_cm: "55.00",
+      volume_liter: "660.00",
+      fill_percent: "55.00",
+      runtime_hour: "125.71",
+      volume_liter_min: "600.00",
+      volume_liter_max: "720.00",
+    });
+  });
 });
