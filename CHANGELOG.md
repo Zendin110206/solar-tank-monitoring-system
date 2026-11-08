@@ -9,7 +9,7 @@ dirilis ke `main`.
 
 ## [Belum dirilis]
 
-## [0.2.0] - 2026-11-01
+## [0.2.0] - 2026-11-08
 
 Rilis pertama dari branch `dev`. Isinya fondasi kerja (struktur modul, tes, dokumen, dan pemeriksaan
 otomatis) dan pembaruan keamanan dependensi. Tidak ada fitur baru, migrasi database, perubahan firmware,
