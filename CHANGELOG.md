@@ -12,6 +12,7 @@ dirilis ke `main`.
 ### Diubah
 
 - Dokumen status operasional dan kebijakan keamanan mencatat keadaan pilot setelah rilis 0.2.0.
+- Action `actions/setup-node` di CI dinaikkan dari v6 ke v7.
 
 ## [0.2.0] - 2026-11-08
 
