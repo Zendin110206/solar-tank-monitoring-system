@@ -223,6 +223,11 @@ Sebelum menambah paket:
 Pembaruan dependensi dikerjakan per kelompok, satu pull request per kelompok,
 dan setiap pembaruan versi besar membaca catatan perubahan paketnya terlebih dulu.
 
+Dependabot membuka pembaruan minor dan patch dalam dua kelompok: dependensi pengembangan
+(`dev-minor-and-patch`) dan dependensi produksi (`prod-minor-and-patch`). Kelompok produksi mengubah
+aplikasi yang berjalan di pilot, jadi baru digabung setelah perilakunya dibuktikan sama. Dependabot
+membaca pengaturan ini dari branch `main`, jadi perubahannya berlaku setelah dirilis.
+
 `pnpm.overrides` di `package.json` memaksa versi aman paket turunan (paket yang ditarik paket lain):
 
 - Paket turunan Next.js: `browserslist`, `baseline-browser-mapping`, `source-map-js`. Per 31 Oktober

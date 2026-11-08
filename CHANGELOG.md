@@ -18,6 +18,8 @@ dirilis ke `main`.
 - Dependabot tidak lagi mengusulkan versi mayor `@types/node`, karena versinya harus mengikuti Node.js yang dipakai.
 - TypeScript dinaikkan dari 5.9 ke 6.0. Kode tidak perlu diubah; pemeriksaan tipe, lint, tes, dan build lulus.
 - commitlint dinaikkan ke 21.2.4 dan lefthook ke 2.2.2.
+- Dependabot memisahkan pembaruan minor dan patch untuk dependensi pengembangan dan dependensi produksi, supaya pembaruan
+  alat pengembangan tidak tertahan oleh dependensi produksi yang masih perlu pembuktian perilaku.
 
 ### Keamanan
 
