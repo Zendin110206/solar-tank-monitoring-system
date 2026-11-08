@@ -56,7 +56,11 @@ src/app → layanan modul → repositori (SQL) → koneksi database
   repositori modul lain diakses lewat layanan modul itu. Aturan ini dicek ESLint.
 - Client component tidak mengimpor kode khusus server.
 - Tampilan baru memakai kit UI di `src/components/ui/` (`Card`, `StatusPill`,
-  `FormErrorMessage`, `ActionMessage`, kelas tombol) sebelum menulis markup sendiri.
+  `FormErrorMessage`, `ActionMessage`, `SelectField`, kelas tombol) sebelum menulis markup sendiri.
+- Setiap pilihan (dropdown) memakai `SelectField`, bukan `<select>` polos, agar ikon panahnya
+  selalu di posisi yang sama.
+- Halaman akun (masuk, lupa dan atur ulang kata sandi, pengajuan akses) memakai kerangka dan teks
+  bersama di `src/components/auth/`; teksnya diubah di `auth-content.ts`.
 - Warna status memakai `STATUS_BADGE_CLASS` / `STATUS_DOT_CLASS` dari
   `src/components/ui/status-tone.ts`, bukan kelas warna yang ditulis ulang.
 - Angka dan tanggal yang dilihat pengguna ditulis lewat `src/lib/format.ts`; jangan membuat
