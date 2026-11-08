@@ -1,14 +1,19 @@
-import AuthShell from "@/components/auth/auth-shell";
-import { getCurrentSessionUser } from "@/features/auth/server/auth-session";
 import type { Metadata } from "next";
-import Link from "next/link";
+import { LogIn } from "lucide-react";
 import { redirect } from "next/navigation";
+
+import { AUTH_CONTENT } from "@/components/auth/auth-content";
+import { AuthLayout } from "@/components/auth/auth-layout";
+import { AuthTextLink, AuthTextLinks } from "@/components/auth/auth-text-link";
+import { getCurrentSessionUser } from "@/features/auth/server/auth-session";
 import SignUpForm from "./sign-up-form";
+
+const copy = AUTH_CONTENT.register;
 
 export const metadata: Metadata = {
   title: "Ajukan Akses | FTM",
   description:
-    "Tampilan pengajuan akses FTM untuk operator lapangan dan reviewer operasional.",
+    "Pengajuan akses FTM untuk petugas operasional; akun aktif setelah disetujui administrator.",
 };
 
 export default async function RegisterPage() {
@@ -19,29 +24,13 @@ export default async function RegisterPage() {
   }
 
   return (
-    <AuthShell
-      contentWidth="wide"
-      contextNote={{
-        title: "Pengajuan akses",
-        description:
-          "Akun baru masuk sebagai pengajuan dan harus disetujui administrator sebelum bisa membuka dashboard.",
-      }}
-      description="Lengkapi identitas kerja untuk mengajukan akses sistem manajemen tangki."
-      footerPrompt={
-        <>
-          Sudah memiliki akun?{" "}
-          <Link
-            className="font-semibold text-blue-600 transition hover:text-blue-700"
-            href="/login"
-          >
-            Masuk di sini
-          </Link>
-          .
-        </>
-      }
-      heading="Ajukan akses pengguna"
-    >
+    <AuthLayout description={copy.description} heading={copy.heading} wide>
       <SignUpForm />
-    </AuthShell>
+      <AuthTextLinks>
+        <AuthTextLink href="/login" icon={LogIn}>
+          {copy.haveAccount}
+        </AuthTextLink>
+      </AuthTextLinks>
+    </AuthLayout>
   );
 }

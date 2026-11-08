@@ -1,11 +1,16 @@
-import AuthShell from "@/components/auth/auth-shell";
 import type { Metadata } from "next";
-import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+
+import { AUTH_CONTENT } from "@/components/auth/auth-content";
+import { AuthLayout } from "@/components/auth/auth-layout";
+import { AuthTextLink, AuthTextLinks } from "@/components/auth/auth-text-link";
 import ResetPasswordForm from "./reset-password-form";
 
+const copy = AUTH_CONTENT.resetPassword;
+
 export const metadata: Metadata = {
-  title: "Buat Password Baru | FTM",
-  description: "Buat kata sandi baru dari link reset akun FTM.",
+  title: "Buat Kata Sandi Baru | FTM",
+  description: "Buat kata sandi baru dari tautan atur ulang akun FTM.",
 };
 
 export default async function ResetPasswordPage({
@@ -16,23 +21,13 @@ export default async function ResetPasswordPage({
   const token = (await searchParams).token ?? "";
 
   return (
-    <AuthShell
-      description="Buat kata sandi baru. Setelah berhasil, semua sesi lama akan dicabut dan Anda perlu masuk ulang."
-      footerPrompt={
-        <>
-          Kembali ke{" "}
-          <Link
-            className="font-semibold text-blue-600 transition hover:text-blue-700"
-            href="/login"
-          >
-            halaman masuk
-          </Link>
-          .
-        </>
-      }
-      heading="Buat password baru"
-    >
+    <AuthLayout description={copy.description} heading={copy.heading}>
       <ResetPasswordForm token={token} />
-    </AuthShell>
+      <AuthTextLinks>
+        <AuthTextLink href="/login" icon={ArrowLeft}>
+          {AUTH_CONTENT.backToSignIn}
+        </AuthTextLink>
+      </AuthTextLinks>
+    </AuthLayout>
   );
 }

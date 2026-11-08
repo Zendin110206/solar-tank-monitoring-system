@@ -1,8 +1,9 @@
 // Gaya tombol bersama. Berupa kelas (bukan komponen) karena dipakai di <button> maupun <Link>.
 
-// Tombol utama selebar formulir (masuk, daftar, atur ulang kata sandi).
-export const PRIMARY_BLOCK_BUTTON_CLASS =
-  "group inline-flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20 disabled:cursor-not-allowed disabled:opacity-70";
+// Tombol utama merah merek Telkom/Infranexia selebar formulir. Tinggi dan ukuran
+// huruf ditentukan halaman pemakainya. Sejauh ini hanya dipakai halaman akun.
+export const BRAND_BLOCK_BUTTON_CLASS =
+  "group inline-flex w-full items-center justify-center gap-2 rounded-lg bg-brand-red px-5 font-semibold text-white transition hover:bg-brand-red-strong focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-red/25 disabled:cursor-not-allowed disabled:opacity-70";
 
 // Tombol kedua (misalnya "Batal") berlatar putih dengan tepi abu-abu.
 export const SECONDARY_BUTTON_CLASS =
