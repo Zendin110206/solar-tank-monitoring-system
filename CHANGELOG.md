@@ -9,6 +9,10 @@ dirilis ke `main`.
 
 ## [Belum dirilis]
 
+### Diubah
+
+- Dokumen status operasional mencatat keadaan pilot setelah rilis 0.2.1.
+
 ## [0.2.1] - 2026-11-08
 
 Rilis pemeliharaan. Isinya alat pengembangan, CI, dan dokumen. Kode aplikasi, database, firmware, dan kontrak
