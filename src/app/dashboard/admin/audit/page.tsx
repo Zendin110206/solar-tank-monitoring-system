@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { ClipboardList } from "lucide-react";
 
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
-import { listAuthAuditEvents } from "@/features/auth/lib/mysql-auth-repository";
+import { requirePageAdmin } from "@/features/auth/server/auth-guards";
+import { listAuthAuditEvents } from "@/features/auth/server/audit-service";
+import { formatDateTimeJakarta } from "@/lib/format";
+import { Card } from "@/components/ui/card";
 
 export const metadata: Metadata = {
   title: "Audit Keamanan | FTM",
@@ -12,17 +14,6 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
-
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("id-ID", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "Asia/Jakarta",
-  }).format(new Date(value));
-}
 
 function formatMetadata(metadata: Record<string, unknown> | null) {
   if (!metadata || Object.keys(metadata).length === 0) {
@@ -48,7 +39,7 @@ export default async function AdminAuditPage() {
       />
 
       <div className="mx-auto flex max-w-[1540px] flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
-        <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+        <Card>
           <div className="flex items-start gap-3">
             <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-700 ring-1 ring-blue-100">
               <ClipboardList className="size-5" aria-hidden="true" />
@@ -66,9 +57,9 @@ export default async function AdminAuditPage() {
               </p>
             </div>
           </div>
-        </section>
+        </Card>
 
-        <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+        <Card>
           <div className="overflow-x-auto">
             <table className="w-full min-w-[980px] border-separate border-spacing-y-2 text-left text-sm">
               <thead className="text-xs uppercase text-zinc-500">
@@ -84,7 +75,7 @@ export default async function AdminAuditPage() {
                 {events.map((event) => (
                   <tr className="bg-zinc-50" key={event.id}>
                     <td className="rounded-l-lg px-3 py-3 text-zinc-600">
-                      {formatDate(event.createdAt)}
+                      {formatDateTimeJakarta(event.createdAt)}
                     </td>
                     <td className="px-3 py-3 font-semibold text-zinc-950">
                       {event.eventType}
@@ -105,7 +96,7 @@ export default async function AdminAuditPage() {
               </tbody>
             </table>
           </div>
-        </section>
+        </Card>
       </div>
     </main>
   );

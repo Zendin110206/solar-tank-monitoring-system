@@ -48,6 +48,7 @@ config/*.private.json
 !config/*.example.json
 private/
 local/
+!/deploy/local/
 tmp/
 .tmp-*/
 

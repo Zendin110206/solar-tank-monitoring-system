@@ -3,59 +3,35 @@
 /* eslint-disable @next/next/no-img-element -- Map tiles use OpenStreetMap's slippy-tile URLs directly. */
 
 import Link from "next/link";
+import { Crosshair, MapPin, Minus, Plus } from "lucide-react";
+import { useMemo, useRef, useState, type PointerEvent } from "react";
+import { formatCoordinatePair } from "../domain/number";
+import type { SimpleDashboardSite } from "../domain/simple-dashboard-model";
+import { formatNumber } from "@/lib/format";
 import {
-  Crosshair,
-  MapPin,
-  Minus,
-  Plus,
-} from "lucide-react";
+  STATUS_BADGE_CLASS,
+  STATUS_DOT_CLASS,
+} from "@/components/ui/status-tone";
+import { clamp } from "@/lib/math";
 import {
-  useMemo,
-  useRef,
-  useState,
-  type PointerEvent,
-} from "react";
-import { formatCoordinatePair } from "@/features/monitoring/lib/number";
-import type { SimpleDashboardSite } from "@/features/monitoring/lib/simple-dashboard-model";
-
-type LatLng = {
-  latitude: number;
-  longitude: number;
-};
-
-type WorldPixel = {
-  x: number;
-  y: number;
-};
-
-type Tile = {
-  key: string;
-  url: string;
-  left: number;
-  top: number;
-};
-
-type DragState = {
-  pointerId: number;
-  startX: number;
-  startY: number;
-  startCenterPixel: WorldPixel;
-};
-
-const TILE_SIZE = 256;
+  type DragState,
+  getWorldSize,
+  type LatLng,
+  type Tile,
+  TILE_SIZE,
+  type WorldPixel,
+  worldPixelToLatLng,
+  wrapTileX,
+} from "./map-tiles";
 const MAP_WIDTH = 1024;
 const MAP_HEIGHT = 560;
 const MIN_ZOOM = 9;
 const MAX_ZOOM = 16;
 const DEFAULT_ZOOM = 12;
 
-function formatLiter(value: number) {
-  return new Intl.NumberFormat("id-ID", {
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
-function isValidCoordinate(site: SimpleDashboardSite): site is SimpleDashboardSite &
+function isValidCoordinate(
+  site: SimpleDashboardSite,
+): site is SimpleDashboardSite &
   Required<Pick<SimpleDashboardSite, "latitude" | "longitude">> {
   return (
     typeof site.latitude === "number" &&
@@ -65,45 +41,17 @@ function isValidCoordinate(site: SimpleDashboardSite): site is SimpleDashboardSi
   );
 }
 
-function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value));
-}
-
-function wrapTileX(tileX: number, tilesPerAxis: number) {
-  return ((tileX % tilesPerAxis) + tilesPerAxis) % tilesPerAxis;
-}
-
-function getWorldSize(zoom: number) {
-  return TILE_SIZE * 2 ** zoom;
-}
-
 function latLngToWorldPixel(point: LatLng, zoom: number): WorldPixel {
   const latitude = clamp(point.latitude, -85, 85);
   const sinLatitude = Math.sin((latitude * Math.PI) / 180);
   const normalizedX = (point.longitude + 180) / 360;
   const normalizedY =
-    0.5 -
-    Math.log((1 + sinLatitude) / (1 - sinLatitude)) / (4 * Math.PI);
+    0.5 - Math.log((1 + sinLatitude) / (1 - sinLatitude)) / (4 * Math.PI);
   const worldSize = getWorldSize(zoom);
 
   return {
     x: normalizedX * worldSize,
     y: normalizedY * worldSize,
-  };
-}
-
-function worldPixelToLatLng(pixel: WorldPixel, zoom: number): LatLng {
-  const worldSize = getWorldSize(zoom);
-  const normalizedX = pixel.x / worldSize - 0.5;
-  const normalizedY = 0.5 - pixel.y / worldSize;
-  const longitude = normalizedX * 360;
-  const latitude =
-    90 -
-    (360 * Math.atan(Math.exp(-normalizedY * 2 * Math.PI))) / Math.PI;
-
-  return {
-    latitude: clamp(latitude, -85, 85),
-    longitude: ((longitude + 540) % 360) - 180,
   };
 }
 
@@ -181,14 +129,14 @@ function getStatusClasses(site: SimpleDashboardSite) {
   return site.isOnline
     ? {
         pin: "text-emerald-500",
-        badge: "bg-emerald-50 text-emerald-700 ring-emerald-100",
-        bar: "bg-emerald-500",
+        badge: STATUS_BADGE_CLASS.success,
+        bar: STATUS_DOT_CLASS.success,
         row: "border-emerald-200 bg-emerald-50/70",
       }
     : {
         pin: "text-red-500",
-        badge: "bg-red-50 text-red-700 ring-red-100",
-        bar: "bg-red-500",
+        badge: STATUS_BADGE_CLASS.danger,
+        bar: STATUS_DOT_CLASS.danger,
         row: "border-red-200 bg-red-50/70",
       };
 }
@@ -223,8 +171,15 @@ function MapEmptyState({ hasSites }: { hasSites: boolean }) {
   );
 }
 
-export function SimpleDashboardMap({ sites }: { sites: SimpleDashboardSite[] }) {
-  const coordinateSites = useMemo(() => sites.filter(isValidCoordinate), [sites]);
+export function SimpleDashboardMap({
+  sites,
+}: {
+  sites: SimpleDashboardSite[];
+}) {
+  const coordinateSites = useMemo(
+    () => sites.filter(isValidCoordinate),
+    [sites],
+  );
   const initialCenter = useMemo(() => getAverageCenter(sites), [sites]);
   const [center, setCenter] = useState<LatLng>(initialCenter);
   const [zoom, setZoom] = useState(DEFAULT_ZOOM);
@@ -350,7 +305,7 @@ export function SimpleDashboardMap({ sites }: { sites: SimpleDashboardSite[] }) 
 
               return (
                 <button
-                  aria-label={`${site.name}, ${formatLiter(site.volumeLiter)} dari ${formatLiter(site.capacityLiter)} liter, ${getStatusLabel(site)}`}
+                  aria-label={`${site.name}, ${formatNumber(site.volumeLiter, 0)} dari ${formatNumber(site.capacityLiter, 0)} liter, ${getStatusLabel(site)}`}
                   className="group absolute z-20 -translate-x-1/2 -translate-y-full text-left outline-none"
                   key={site.tankId}
                   onClick={(event) => {
@@ -391,8 +346,8 @@ export function SimpleDashboardMap({ sites }: { sites: SimpleDashboardSite[] }) 
                         {site.name}
                       </p>
                       <p className="mt-1 text-sm font-semibold tracking-normal text-zinc-950">
-                        {formatLiter(site.volumeLiter)} /{" "}
-                        {formatLiter(site.capacityLiter)} L
+                        {formatNumber(site.volumeLiter, 0)} /{" "}
+                        {formatNumber(site.capacityLiter, 0)} L
                       </p>
                     </div>
                   </div>
@@ -442,8 +397,8 @@ export function SimpleDashboardMap({ sites }: { sites: SimpleDashboardSite[] }) 
               target="_blank"
             >
               OpenStreetMap
-            </a>
-            {" "}contributors
+            </a>{" "}
+            contributors
           </div>
         </div>
       </div>
@@ -470,8 +425,8 @@ export function SimpleDashboardMap({ sites }: { sites: SimpleDashboardSite[] }) 
             <div className="mt-5 rounded-lg border border-zinc-100 bg-zinc-50 p-4">
               <p className="text-sm font-medium text-zinc-500">Isi tangki</p>
               <p className="mt-2 text-2xl font-semibold tracking-normal text-zinc-950">
-                {formatLiter(activeSite.volumeLiter)} /{" "}
-                {formatLiter(activeSite.capacityLiter)} L
+                {formatNumber(activeSite.volumeLiter, 0)} /{" "}
+                {formatNumber(activeSite.capacityLiter, 0)} L
               </p>
               <p className="mt-1 text-sm text-zinc-500">
                 saat ini / kapasitas maksimal
@@ -511,7 +466,6 @@ export function SimpleDashboardMap({ sites }: { sites: SimpleDashboardSite[] }) 
               Detail
               <MapPin className="size-4" aria-hidden="true" />
             </Link>
-
           </div>
         ) : (
           <p className="text-sm text-zinc-500">Belum ada STO yang dipilih.</p>

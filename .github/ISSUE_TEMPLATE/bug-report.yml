@@ -1,0 +1,85 @@
+name: Laporan bug
+description: Laporkan perilaku FTM yang tidak berjalan sebagaimana mestinya.
+title: "fix(scope): "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Terima kasih sudah melaporkan masalah. Jangan cantumkan kata sandi, token,
+        kunci perangkat, data pribadi, kode lokasi, atau data operasional lain.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Ringkasan masalah
+      description: Jelaskan masalah yang terjadi dengan singkat dan jelas.
+      placeholder: Saat membuka ..., aplikasi menampilkan ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Langkah untuk mengulang masalah
+      placeholder: |
+        1. Buka ...
+        2. Pilih ...
+        3. Lihat ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Hasil yang diharapkan
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Hasil yang terjadi
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Bagian yang terdampak
+      options:
+        - Dashboard dan detail tangki
+        - Penerimaan data perangkat
+        - Pengajuan perangkat dan paket firmware
+        - Akun, login, dan akses
+        - Helpdesk dan Telegram
+        - Lainnya
+    validations:
+      required: true
+
+  - type: input
+    id: environment
+    attributes:
+      label: Browser dan perangkat
+      description: "Contoh: Chrome di Windows 11 atau Safari di iPhone."
+    validations:
+      required: false
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Bukti pendukung
+      description: Tangkapan layar atau potongan log yang sudah dibersihkan dari data rahasia.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Pemeriksaan awal
+      options:
+        - label: Saya sudah memastikan masalah serupa belum dilaporkan.
+          required: true
+        - label: Laporan ini tidak memuat data rahasia, data pribadi, atau data operasional lokasi.
+          required: true

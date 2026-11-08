@@ -2,13 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requirePageUser } from "@/features/auth/lib/auth-guards";
+import { requirePageUser } from "@/features/auth/server/auth-guards";
 import {
-  createDeviceRequestInMysql,
-  type CreateDeviceRequestFromMysqlResult,
-} from "@/features/monitoring/lib/mysql-device-request-repository";
-import { notifyAdminsDeviceRequestCreated } from "@/features/monitoring/lib/device-request-notifications";
-import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
+  submitDeviceRequest,
+  type SubmitDeviceRequestResult,
+} from "@/features/devices/server/device-request-service";
+import { notifyAdminsDeviceRequestCreated } from "@/features/devices/server/device-request-notifications";
+import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
 import type {
   DeviceSensorType,
@@ -17,18 +17,11 @@ import type {
   LoadPowerUnit,
   TankShape,
 } from "@/features/monitoring/types/monitoring";
-
-const USER_DEVICE_REQUEST_PATH = "/dashboard/devices/request";
-const ADMIN_DEVICE_REQUEST_PATH = "/dashboard/admin/device-requests";
-const DEVICE_REQUEST_SCHEMA_COLUMNS = [
-  "device_sensor_type",
-  "regional_label",
-  "wilayah_label",
-  "load_value",
-  "load_unit",
-  "diesel_engine_capacity_kva",
-  "cos_phi",
-] as const;
+import { isDeviceRequestSchemaError } from "@/features/devices/server/device-request-schema-error";
+import {
+  ADMIN_DEVICE_REQUEST_PATH,
+  USER_DEVICE_REQUEST_PATH,
+} from "@/features/devices/domain/device-request-constants";
 
 export type DeviceRequestFormState = {
   status: "idle" | "success" | "error";
@@ -123,7 +116,7 @@ function buildDeviceRequestDraft(formData: FormData): DeviceRequestDraft {
 }
 
 function getResultState(
-  result: CreateDeviceRequestFromMysqlResult,
+  result: SubmitDeviceRequestResult,
 ): DeviceRequestFormState {
   if (!result.ok) {
     return {
@@ -140,21 +133,6 @@ function getResultState(
     requestCode: result.request.requestCode,
     issues: result.warnings,
   };
-}
-
-function isDeviceRequestSchemaError(error: unknown): boolean {
-  if (!(error instanceof Error)) {
-    return false;
-  }
-
-  const message = error.message.toLowerCase();
-
-  return (
-    message.includes("unknown column") &&
-    DEVICE_REQUEST_SCHEMA_COLUMNS.some((columnName) =>
-      message.includes(columnName),
-    )
-  );
 }
 
 function getErrorState(error: unknown): DeviceRequestFormState {
@@ -189,14 +167,16 @@ export async function createDeviceRequestAction(
       );
     }
 
-    const result = await createDeviceRequestInMysql({
+    const result = await submitDeviceRequest({
       draft: buildDeviceRequestDraft(formData),
       requesterEmail: user.email,
       requesterUserId: user.id,
     });
 
     if (result.ok) {
-      await notifyAdminsDeviceRequestCreated(result.request).catch(() => undefined);
+      await notifyAdminsDeviceRequestCreated(result.request).catch(
+        () => undefined,
+      );
     }
 
     revalidatePath(USER_DEVICE_REQUEST_PATH);

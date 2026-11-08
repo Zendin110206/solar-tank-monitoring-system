@@ -17,7 +17,7 @@ const INTERNAL_SERVICE_ERROR_PATTERNS = [
   /ETIMEDOUT/i,
 ] as const;
 
-export function isInternalServiceError(error: unknown): boolean {
+function isInternalServiceError(error: unknown): boolean {
   if (!(error instanceof Error)) {
     return false;
   }

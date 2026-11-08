@@ -199,7 +199,9 @@ function normalizeOptions(options) {
   }
 
   if (normalized.minPercent > normalized.startPercent) {
-    throw new Error("--min-percent tidak boleh lebih besar dari --start-percent.");
+    throw new Error(
+      "--min-percent tidak boleh lebih besar dari --start-percent.",
+    );
   }
 
   return normalized;
@@ -208,9 +210,7 @@ function normalizeOptions(options) {
 function createPayload(options, percent) {
   const fillPercent = round(percent);
   const volumeLiter = round((options.capacityLiter * fillPercent) / 100);
-  const fuelHeightCm = round(
-    (options.sensorMountHeightCm * fillPercent) / 100,
-  );
+  const fuelHeightCm = round((options.sensorMountHeightCm * fillPercent) / 100);
   const sensorDistanceCm = round(options.sensorMountHeightCm - fuelHeightCm);
 
   return {
@@ -286,7 +286,9 @@ function nextPercent(currentPercent, options) {
 
 async function run(options) {
   if (typeof globalThis.fetch !== "function") {
-    throw new Error("Fetch tidak tersedia. Gunakan Node.js 18 atau lebih baru.");
+    throw new Error(
+      "Fetch tidak tersedia. Gunakan Node.js 18 atau lebih baru.",
+    );
   }
 
   let currentPercent = options.startPercent;

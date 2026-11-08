@@ -5,8 +5,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   applicationName: "FTM",
   title: "FTM - Fuel Tank Management",
-  description:
-    "Fondasi aplikasi manajemen telemetri tangki bahan bakar.",
+  description: "Fondasi aplikasi manajemen telemetri tangki bahan bakar.",
   icons: {
     apple: [
       {
@@ -53,7 +52,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className="h-full antialiased" data-scroll-behavior="smooth">
+    <html
+      lang="id"
+      className="h-full antialiased"
+      data-scroll-behavior="smooth"
+    >
       <body className="flex min-h-full flex-col" suppressHydrationWarning>
         {children}
         <HelpdeskWidget />

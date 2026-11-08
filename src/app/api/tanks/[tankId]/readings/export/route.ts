@@ -1,16 +1,17 @@
-import { requireApiUser } from "@/features/auth/lib/auth-guards";
-import { getMonitoringReferenceData } from "@/features/monitoring/lib/monitoring-registry";
+import { requireApiUser } from "@/features/auth/server/auth-guards";
+import { getMonitoringReferenceData } from "@/features/monitoring/server/monitoring-registry";
 import {
   listMonitoringReadingsForTank,
   listMonitoringReadingsForTankInRange,
-} from "@/features/monitoring/lib/monitoring-storage";
+} from "@/features/monitoring/server/monitoring-storage";
 import {
   buildReadingExportPeriod,
   createTankReadingsCsv,
   createTankReadingsCsvFilename,
   parseReadingExportRange,
-} from "@/features/monitoring/lib/readings-export";
+} from "@/features/monitoring/domain/readings-export";
 import type { NextRequest } from "next/server";
+import { jsonError } from "@/lib/http/json-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -31,12 +32,9 @@ export async function GET(
   );
 
   if (rangeKey === null) {
-    return Response.json(
-      {
-        ok: false,
-        error: "Range export tidak dikenal. Gunakan day, week, atau month.",
-      },
-      { status: 400 },
+    return jsonError(
+      "Range export tidak dikenal. Gunakan day, week, atau month.",
+      400,
     );
   }
 
@@ -47,13 +45,7 @@ export async function GET(
   const tank = referenceData.tanks.find((item) => item.id === tankId);
 
   if (!tank) {
-    return Response.json(
-      {
-        ok: false,
-        error: "Tangki tidak ditemukan.",
-      },
-      { status: 404 },
-    );
+    return jsonError("Tangki tidak ditemukan.", 404);
   }
 
   const site = referenceData.sites.find((item) => item.id === tank.siteId);

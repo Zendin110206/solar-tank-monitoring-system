@@ -1,5 +1,9 @@
 # Panduan Perluasan Pilot Menuju 5 STO
 
+> **Status dokumen:** riwayat per 14 Juli 2026. Isinya tidak lagi diperbarui. Kondisi
+> terkini ada di [status operasional](current-operational-truth.md) dan arah
+> pengembangan di [catatan keputusan](decisions/README.md).
+
 Dokumen ini menjelaskan cara memperluas uji lapangan menuju target awal 5 STO
 dari awal sampai data tampil di dashboard. Per 13–14 Juli 2026, kondisi yang
 terverifikasi adalah 3 site, 3 tangki, dan 3 perangkat terdaftar. Bahasa sengaja
@@ -25,28 +29,28 @@ Dashboard memakai peta berbasis koordinat. Titik peta tidak berasal dari GPS dev
 
 Siapkan tabel sederhana seperti ini sebelum menyentuh kode atau device.
 
-| Data | Contoh | Catatan |
-|---|---|---|
-| Kode STO | `TPH` | Kode pendek yang mudah dibaca |
-| Nama lokasi | `STO TPH` | Nama yang tampil di dashboard |
-| Regional | `TREG 5` | Kelompok lokasi paling besar |
-| Wilayah | `TIF 3` | Kelompok di bawah Regional |
-| Area | `Pasuruan` | Label area kerja |
-| Latitude | `-7.6500000` | Harus angka koordinat yang disetujui |
-| Longitude | `112.9000000` | Harus angka koordinat yang disetujui |
-| ID tangki | `tank-tph-main` | Gunakan format konsisten |
-| Bentuk tangki | `rectangular` | Contoh awal memakai tangki balok |
-| Kapasitas | `540` | Liter |
-| Panjang | `150` | cm |
-| Lebar | `60` | cm |
-| Tinggi | `60` | cm |
-| Tinggi sensor | `60` | cm dari dasar referensi |
-| Batas rendah | `30` | persen |
-| Batas kritis | `15` | persen |
-| Konsumsi | `25` | liter per jam |
-| Kode device | `pilot-tph-01` | Harus sama dengan firmware |
-| Interval kirim | `20` | detik untuk monitoring live; history tetap diringkas per 5 menit |
-| Hash key | `sha256:...` | Bukan key asli |
+| Data           | Contoh              | Catatan                                                          |
+| -------------- | ------------------- | ---------------------------------------------------------------- |
+| Kode STO       | `CONTOH-A`          | Kode pendek yang mudah dibaca                                    |
+| Nama lokasi    | `STO Contoh A`      | Nama yang tampil di dashboard                                    |
+| Regional       | `TREG 5`            | Kelompok lokasi paling besar                                     |
+| Wilayah        | `TIF 3`             | Kelompok di bawah Regional                                       |
+| Area           | `Area Contoh`       | Label area kerja                                                 |
+| Latitude       | `0.0000000`         | Ganti dengan angka koordinat yang disetujui                      |
+| Longitude      | `0.0000000`         | Ganti dengan angka koordinat yang disetujui                      |
+| ID tangki      | `tank-tph-main`     | Gunakan format konsisten                                         |
+| Bentuk tangki  | `rectangular`       | Contoh awal memakai tangki balok                                 |
+| Kapasitas      | `540`               | Liter                                                            |
+| Panjang        | `150`               | cm                                                               |
+| Lebar          | `60`                | cm                                                               |
+| Tinggi         | `60`                | cm                                                               |
+| Tinggi sensor  | `60`                | cm dari dasar referensi                                          |
+| Batas rendah   | `30`                | persen                                                           |
+| Batas kritis   | `15`                | persen                                                           |
+| Konsumsi       | `25`                | liter per jam                                                    |
+| Kode device    | `pilot-contoh-a-01` | Harus sama dengan firmware                                       |
+| Interval kirim | `20`                | detik untuk monitoring live; history tetap diringkas per 5 menit |
+| Hash key       | `sha256:...`        | Bukan key asli                                                   |
 
 ## Cara Mengambil Koordinat
 
@@ -61,7 +65,7 @@ Cara umum di browser:
 5. Pastikan formatnya seperti:
 
 ```text
--7.650000, 112.900000
+-0.123456, 100.123456
 ```
 
 Angka pertama adalah latitude. Angka kedua adalah longitude.
@@ -70,8 +74,8 @@ Masukkan ke registry:
 
 ```json
 {
-  "latitude": -7.6500000,
-  "longitude": 112.9000000,
+  "latitude": -0.123456,
+  "longitude": 100.123456,
   "coordinateStatus": "approved"
 }
 ```
@@ -144,7 +148,7 @@ Jangan membalik dua nilai ini.
 Validasi tanpa menulis database:
 
 ```powershell
-pnpm pilot:registry -- --dry-run
+pnpm pilot:registry --dry-run
 ```
 
 Jika masih error, berhenti dulu dan perbaiki file registry lokal.
@@ -223,7 +227,7 @@ Header:
 
 ```http
 Content-Type: application/json
-X-Device-Id: pilot-tph-01
+X-Device-Id: pilot-contoh-a-01
 X-Device-Key: key-asli-device
 ```
 
@@ -237,7 +241,7 @@ Payload minimal:
 
 ```json
 {
-  "device": "pilot-tph-01",
+  "device": "pilot-contoh-a-01",
   "ts": 1780000000,
   "tank_shape": "rectangular",
   "capacity_liter": 540,
@@ -297,13 +301,13 @@ X-Device-Key: key-asli-device
 
 Arti response umum:
 
-| Response | Arti |
-|---|---|
-| `201` | data diterima |
-| `400` | payload rusak atau field kurang |
-| `401` | key salah |
-| `404` | device tidak ada di registry |
-| `503` | database/storage belum siap |
+| Response | Arti                            |
+| -------- | ------------------------------- |
+| `201`    | data diterima                   |
+| `400`    | payload rusak atau field kurang |
+| `401`    | key salah                       |
+| `404`    | device tidak ada di registry    |
+| `500`    | gagal menyimpan ke database     |
 
 Catatan HTTPS:
 
@@ -317,8 +321,8 @@ Catatan HTTPS:
 Smoke test lokal:
 
 ```powershell
-$env:PILOT_API_BASE_URL="https://solar-tank-monitoring-system.vercel.app"
-$env:PILOT_DEVICE_ID="pilot-tph-01"
+$env:PILOT_API_BASE_URL="http://localhost:3000"
+$env:PILOT_DEVICE_ID="pilot-contoh-a-01"
 $env:PILOT_DEVICE_KEY="key-asli-device"
 pnpm pilot:smoke
 ```

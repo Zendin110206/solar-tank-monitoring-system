@@ -3,14 +3,14 @@ import type { Metadata } from "next";
 import { Clock3, Database, Search, ShieldCheck } from "lucide-react";
 
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { createAdminActionCsrfToken } from "@/features/auth/lib/auth-csrf";
-import { requirePageAdmin } from "@/features/auth/lib/auth-guards";
-import { getDeviceRequestStatusLabel } from "@/features/monitoring/lib/device-request";
+import { createAdminActionCsrfToken } from "@/features/auth/server/auth-csrf";
+import { requirePageAdmin } from "@/features/auth/server/auth-guards";
+import { getDeviceRequestStatusLabel } from "@/features/devices/domain/device-request";
 import {
-  listDeviceRequestsForAdminFromMysql,
-  listHardwareProfilesFromMysql,
-} from "@/features/monitoring/lib/mysql-device-request-repository";
-import { getMonitoringStorageDriver } from "@/features/monitoring/lib/monitoring-storage";
+  listDeviceRequestsForAdmin,
+  listDeviceHardwareProfiles,
+} from "@/features/devices/server/device-request-service";
+import { getMonitoringStorageDriver } from "@/features/monitoring/server/monitoring-storage";
 import type {
   DeviceRequestStatus,
   MonitoringDeviceRequest,
@@ -111,8 +111,8 @@ export default async function AdminDeviceRequestsPage({
   const isMysqlEnabled = getMonitoringStorageDriver() === "mysql";
   const [requests, hardwareProfiles] = isMysqlEnabled
     ? await Promise.all([
-        listDeviceRequestsForAdminFromMysql(),
-        listHardwareProfilesFromMysql(),
+        listDeviceRequestsForAdmin(),
+        listDeviceHardwareProfiles(),
       ])
     : [[], []];
   const pendingCount = requests.filter(
@@ -147,9 +147,9 @@ export default async function AdminDeviceRequestsPage({
                 Pengajuan perangkat sebelum paket firmware dibuat
               </h1>
               <p className="mt-2 max-w-4xl text-sm leading-6 text-zinc-500">
-                Admin cukup melihat daftar ringkas terlebih dahulu. Detail teknis,
-                validasi, dan aksi keputusan dibuka dari tombol tinjau agar halaman
-                tetap bersih.
+                Admin cukup melihat daftar ringkas terlebih dahulu. Detail
+                teknis, validasi, dan aksi keputusan dibuka dari tombol tinjau
+                agar halaman tetap bersih.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-3">

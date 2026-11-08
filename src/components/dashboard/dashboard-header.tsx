@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { BrandLogo } from "@/components/brand-logo";
-import type { AuthSafeUser } from "@/features/auth/types";
+import type { AuthSafeUser } from "@/features/auth/types/auth";
 import { DashboardMobileNav } from "./dashboard-mobile-nav";
 import { DashboardUserMenu } from "./dashboard-user-menu";
 

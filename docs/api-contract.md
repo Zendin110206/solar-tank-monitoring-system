@@ -1,5 +1,7 @@
 # Kontrak API
 
+> **Status dokumen:** dicocokkan dengan kode dan balasan API lokal pada 31 Oktober 2026.
+
 Dokumen ini menjelaskan endpoint yang tersedia dan bentuk data yang diharapkan.
 
 Base URL lokal:
@@ -10,29 +12,40 @@ http://localhost:3000
 
 ## Ringkasan Endpoint
 
-| Method | Endpoint | Fungsi |
-|---|---|---|
-| `GET` | `/api/health` | Mengecek aplikasi hidup tanpa mengecek database |
-| `GET` | `/api/ready` | Mengecek kesiapan storage aktif |
-| `GET` | `/api/dashboard/overview` | Ringkasan semua lokasi/tangki |
-| `GET` | `/api/tanks/[tankId]` | Detail satu tangki |
-| `GET` | `/api/tanks/[tankId]/readings` | Riwayat pembacaan satu tangki |
-| `GET` | `/api/tanks/[tankId]/readings/export` | Download CSV reading satu tangki |
-| `POST` | `/api/ingest` | Menerima data device atau simulator |
-| `POST` | `/api/auth/login` | Login dengan email/username dan password |
-| `POST` | `/api/auth/login/verify-otp` | Verifikasi OTP login admin |
-| `POST` | `/api/auth/logout` | Keluar dan mencabut session aktif |
-| `GET` | `/api/auth/me` | Membaca user session aktif |
-| `POST` | `/api/auth/register-request` | Mengajukan akses pengguna baru |
-| `GET` | `/api/auth/email/verify` | Verifikasi email dari link token |
-| `POST` | `/api/auth/email/resend-verification` | Kirim ulang email verifikasi |
-| `POST` | `/api/auth/password/forgot` | Meminta link reset kata sandi |
-| `POST` | `/api/auth/password/reset` | Mengganti kata sandi memakai token reset |
-| `POST` | `/api/auth/password/change` | Mengganti kata sandi user yang sedang login |
-| `GET` | `/api/auth/sessions` | Melihat sesi aktif milik user |
-| `POST` | `/api/auth/sessions/revoke` | Mencabut sesi lain milik user |
-| `POST` | `/api/auth/telegram/bind/start` | Membuat token binding Telegram |
-| `POST` | `/api/auth/telegram/webhook` | Webhook Telegram untuk binding |
+Kolom "Akses": **publik** (tanpa sesi), **sesi** (user atau admin yang login), **admin**,
+**perangkat** (kunci perangkat), **token** (token sekali pakai di alamat).
+
+| Method        | Endpoint                              | Akses     | Fungsi                                          |
+| ------------- | ------------------------------------- | --------- | ----------------------------------------------- |
+| `GET`         | `/api/health`                         | publik    | Mengecek aplikasi hidup tanpa mengecek database |
+| `GET`         | `/api/ready`                          | admin     | Mengecek kesiapan storage dan konfigurasi       |
+| `GET`         | `/api/dashboard/overview`             | sesi      | Ringkasan semua lokasi/tangki                   |
+| `GET`         | `/api/tanks/[tankId]`                 | sesi      | Detail satu tangki                              |
+| `GET`         | `/api/tanks/[tankId]/readings`        | sesi      | Riwayat pembacaan satu tangki                   |
+| `GET`         | `/api/tanks/[tankId]/readings/export` | sesi      | Download CSV reading satu tangki                |
+| `POST`        | `/api/ingest`                         | perangkat | Menerima data device atau simulator             |
+| `GET`         | `/api/device-packages/download`       | token     | Mengunduh paket firmware (ZIP) dari email       |
+| `POST`        | `/api/helpdesk/session`               | publik    | Membuka atau melanjutkan sesi helpdesk          |
+| `GET`, `POST` | `/api/helpdesk/messages`              | publik    | Membaca dan mengirim pesan helpdesk             |
+
+Endpoint auth (semua di bawah `/api/auth/`):
+
+| Method | Endpoint                              | Akses    | Fungsi                                      |
+| ------ | ------------------------------------- | -------- | ------------------------------------------- |
+| `POST` | `/api/auth/login`                     | publik   | Login dengan email/username dan password    |
+| `POST` | `/api/auth/login/verify-otp`          | publik   | Verifikasi OTP login admin                  |
+| `POST` | `/api/auth/logout`                    | publik   | Keluar dan mencabut session aktif           |
+| `GET`  | `/api/auth/me`                        | sesi     | Membaca user session aktif                  |
+| `POST` | `/api/auth/register-request`          | publik   | Mengajukan akses pengguna baru              |
+| `GET`  | `/api/auth/email/verify`              | token    | Verifikasi email dari link token            |
+| `POST` | `/api/auth/email/resend-verification` | publik   | Kirim ulang email verifikasi                |
+| `POST` | `/api/auth/password/forgot`           | publik   | Meminta link reset kata sandi               |
+| `POST` | `/api/auth/password/reset`            | token    | Mengganti kata sandi memakai token reset    |
+| `POST` | `/api/auth/password/change`           | sesi     | Mengganti kata sandi user yang sedang login |
+| `GET`  | `/api/auth/sessions`                  | sesi     | Melihat sesi aktif milik user               |
+| `POST` | `/api/auth/sessions/revoke`           | sesi     | Mencabut sesi lain milik user               |
+| `POST` | `/api/auth/telegram/bind/start`       | sesi     | Membuat token binding Telegram              |
+| `POST` | `/api/auth/telegram/webhook`          | Telegram | Binding, perintah bot, dan balasan helpdesk |
 
 ## GET /api/health
 
@@ -69,25 +82,31 @@ Response sukses:
 Fungsi:
 
 ```text
-Mengecek apakah storage aktif siap dipakai dashboard dan API baca.
+Mengecek apakah storage aktif dan konfigurasi penting siap dipakai.
 ```
 
-Endpoint ini berisi detail operasional dan di production hanya boleh dibuka
-dengan session admin atau token readiness.
+Endpoint ini berisi detail operasional, jadi aksesnya dibatasi:
 
-Jika `SOLAR_TANK_STORAGE_DRIVER="memory"`, endpoint ini tetap sukses tetapi
-statusnya `degraded` karena data memory tidak permanen.
+- dengan token: header `x-solar-tank-readiness-token` atau `Authorization: Bearer <token>` yang
+  cocok dengan `READINESS_CHECK_TOKEN`;
+- atau dengan sesi **admin**;
+- di lingkungan non-produksi yang tidak mengatur `READINESS_CHECK_TOKEN`, endpoint ini terbuka.
 
-Jika `SOLAR_TANK_STORAGE_DRIVER="mysql"`, endpoint ini mengetes koneksi MySQL
-langsung. Jika MySQL gagal, response memakai HTTP `503`.
+Tanpa akses yang sah, balasannya HTTP `401` dengan pesan
+`"Readiness operasional hanya tersedia untuk admin."`.
 
-Contoh:
+Balasan berisi `ok`, `status` (`ready`, `degraded`, atau `not_ready`), `service`, `timestamp`,
+`appEnv`, `nodeEnv`, `storageDriver`, dan daftar `checks`. HTTP `200` bila `ok` bernilai
+`true`, HTTP `503` bila ada pemeriksaan yang gagal. Setiap pemeriksaan berisi `name`, `ok`,
+`status` (`ok`, `degraded`, `error`), `message`, dan kadang `latencyMs`.
 
-```powershell
-curl.exe http://localhost:3000/api/ready
-```
+Pemeriksaan yang ada (per Oktober 2026): `mysql` (atau `memory-storage` bila memakai storage
+memory), `auth-secret`, `app-base-url`, `admin-otp`, `auth-email-flow`, `auth-captcha`,
+`auth-telegram`, `device-key-policy`, `device-auto-provisioning`, `device-package-encryption`,
+`database-backup`, `mysql-reference-registry`, `mysql-reading-rollup`, `mysql-auth-telegram`,
+dan `mysql-location-taxonomy`.
 
-Response MySQL siap:
+Contoh (dipotong):
 
 ```json
 {
@@ -101,58 +120,25 @@ Response MySQL siap:
         "name": "mysql",
         "ok": true,
         "status": "ok",
-        "message": "Koneksi MySQL aktif."
-      },
-      {
-        "name": "mysql-reference-registry",
-        "ok": true,
-        "status": "ok",
-        "message": "Registry MySQL berisi site, tangki, dan device aktif."
-      },
-      {
-        "name": "mysql-reading-rollup",
-        "ok": true,
-        "status": "ok",
-        "message": "Snapshot live dan rollup reading 5 menit siap digunakan."
+        "message": "Koneksi MySQL aktif.",
+        "latencyMs": 3
       }
     ]
   }
 }
 ```
 
-Response MySQL belum siap:
-
-```json
-{
-  "ok": false,
-  "data": {
-    "ok": false,
-    "status": "not_ready",
-    "storageDriver": "mysql",
-    "checks": [
-      {
-        "name": "mysql",
-        "ok": false,
-        "status": "error",
-        "message": "Koneksi MySQL gagal. Cek MYSQL_DATABASE_URL, status database, SSL, network, dan allowlist provider."
-      }
-    ]
-  }
-}
-```
-
-Catatan:
-
-```text
-Jika baru mengubah .env.local, restart dev server. Tombol retry di dashboard tidak memuat ulang env.
-```
+Bila koneksi MySQL gagal, pemeriksaan `mysql` berisi pesan "Koneksi MySQL gagal. Cek
+MYSQL_DATABASE_URL, status database, SSL, network, dan allowlist provider." dan balasannya
+HTTP `503`.
 
 ## GET /api/dashboard/overview
 
 Fungsi:
 
 ```text
-Mengambil ringkasan dashboard.
+Mengambil ringkasan dashboard. Wajib sesi user atau admin; tanpa sesi balasannya HTTP `401`
+(`"Autentikasi diperlukan."`).
 ```
 
 Contoh:
@@ -167,15 +153,24 @@ Response sukses:
 {
   "ok": true,
   "data": {
+    "generatedAt": "2026-10-28T10:24:05.000Z",
     "summary": {
-      "totalSites": 4,
-      "totalTanks": 4,
-      "onlineDevices": 1,
-      "delayedDevices": 0,
-      "offlineDevices": 3,
-      "criticalTanks": 1
+      "totalSites": 10,
+      "totalTanks": 10,
+      "criticalTanks": 0,
+      "warningTanks": 2,
+      "onlineDevices": 0,
+      "delayedDevices": 2,
+      "offlineDevices": 8,
+      "averageIntervalLabel": "2 mnt",
+      "syncLabel": "Sinkron 16 mnt lalu"
     },
-    "rows": []
+    "rows": [],
+    "priorityRows": [],
+    "latestRow": null,
+    "healthCards": [],
+    "healthSegments": [],
+    "trendBars": []
   },
   "meta": {
     "storage": {
@@ -205,7 +200,7 @@ Field data berisi isi dashboard. Field meta.storage membantu melihat apakah read
 Fungsi:
 
 ```text
-Mengambil detail satu tangki.
+Mengambil detail satu tangki. Wajib sesi user atau admin.
 ```
 
 Contoh:
@@ -249,6 +244,10 @@ Catatan:
 - `measuredAt` dan `receivedAt` adalah ISO UTC.
 - UI boleh menampilkan label WIB, tetapi API tetap mengirim waktu standar UTC.
 - Endpoint ini membaca history tank terkait, bukan daftar global dashboard.
+- Wajib sesi user atau admin. Bila tangki tidak punya riwayat, balasannya HTTP `404`
+  (`"Riwayat tangki tidak ditemukan."`).
+- Parameter `range` (bawaan `24h`) saat ini hanya dikembalikan apa adanya di balasan dan
+  **tidak** menyaring data.
 - Setelah migration rollup, item history baru mewakili bucket 5 menit dan dapat membawa `resolution`, `bucketStart`, `bucketEnd`, `sampleCount`, nilai mean, min, dan max.
 
 Contoh:
@@ -267,11 +266,15 @@ Response sukses:
     "range": "24h",
     "items": [
       {
-        "measuredAt": "2026-06-25T07:40:00.000Z",
-        "receivedAt": "2026-06-25T07:40:03.000Z",
-        "volumeLiter": 3900,
-        "fillPercent": 78,
-        "runtimeHour": 156
+        "measuredAt": "2026-10-25T04:54:33.000Z",
+        "receivedAt": "2026-10-25T04:54:33.502Z",
+        "timeLabel": "11.54",
+        "sensorDistanceCm": 24,
+        "fuelHeightCm": 126,
+        "volumeLiter": 4200,
+        "fillPercent": 84,
+        "runtimeHour": 168,
+        "status": "received"
       }
     ]
   }
@@ -286,7 +289,7 @@ Fungsi:
 Mengunduh CSV reading satu tangki sesuai periode yang dipilih.
 ```
 
-Endpoint ini wajib memakai session user/admin aktif. Data CSV memakai header
+Endpoint ini wajib memakai session user/admin aktif (tanpa sesi: HTTP `401`). Data CSV memakai header
 bahasa Indonesia, menyertakan waktu UTC dan WIB, dan nama file otomatis memuat
 site, tangki, rentang, serta tanggal periode.
 
@@ -296,9 +299,9 @@ dapat diekspor berdampingan dengan row rollup.
 
 Query:
 
-| Parameter | Nilai | Default | Keterangan |
-|---|---|---|---|
-| `range` | `day`, `week`, `month` | `day` | Periode 1 hari, 7 hari, atau 30 hari berbasis kalender WIB |
+| Parameter | Nilai                  | Default | Keterangan                                                 |
+| --------- | ---------------------- | ------- | ---------------------------------------------------------- |
+| `range`   | `day`, `week`, `month` | `day`   | Periode 1 hari, 7 hari, atau 30 hari berbasis kalender WIB |
 
 Alias yang juga diterima:
 
@@ -315,7 +318,7 @@ curl.exe -L "http://localhost:3000/api/tanks/tank-tph-main/readings/export?range
 Contoh nama file:
 
 ```text
-solartank_tph_tangki-utama_reading_7-hari_2026-07-01_sampai_2026-07-07.csv
+solartank_contoh-a_tangki-utama_reading_7-hari_2026-07-01_sampai_2026-07-07.csv
 ```
 
 Jika `range` tidak dikenal:
@@ -376,7 +379,7 @@ Payload pilot real-format juga didukung. Payload ini dapat membawa config tangki
 
 ```json
 {
-  "device": "pilot-tph-01",
+  "device": "pilot-contoh-a-01",
   "tank_shape": "rectangular",
   "capacity_liter": 540,
   "length_cm": 150,
@@ -410,51 +413,68 @@ curl.exe -X POST http://localhost:3000/api/ingest `
   -d "{\"device\":\"demo-tph-01\",\"ts\":0,\"distance\":40.5,\"voltage\":3.86,\"raw\":{\"H_cm\":109.5,\"volume\":3650,\"percent\":73,\"wifi_rssi\":-55}}"
 ```
 
-Response sukses:
+Response sukses (HTTP `201`):
 
 ```json
 {
   "ok": true,
   "data": {
-    "deviceId": "demo-tph-01",
-    "tankId": "tank-tph-main",
-    "volumeLiter": 3650,
-    "fillPercent": 73,
-    "runtimeHour": 146,
-    "storage": "memory",
-    "configStatus": "no_payload_config",
+    "readingId": "reading-device-jto-main-1793183045269",
+    "deviceId": "demo-jto-01",
+    "deviceInternalId": "device-jto-main",
+    "tankId": "tank-jto-main",
+    "receivedAt": "2026-10-28T10:24:05.269Z",
+    "measuredAt": "2026-10-28T10:24:05.269Z",
+    "sensorDistanceCm": 40,
+    "fuelHeightCm": 110,
+    "volumeLiter": 3930.42,
+    "fillPercent": 78.61,
+    "runtimeHour": 157.22,
+    "batteryVolt": null,
+    "rssiDbm": -60,
+    "configStatus": "normal",
     "needsReview": false,
-    "warnings": []
+    "warnings": [],
+    "storage": "mysql",
+    "provisioned": false,
+    "activated": false
   }
 }
 ```
 
+`provisioned` bernilai `true` bila kiriman ini membuat perangkat baru secara otomatis, dan
+`activated` bernilai `true` bila kiriman ini mengaktifkan perangkat hasil pengajuan (kiriman
+valid pertama).
+
 Nilai `storage` bisa berisi:
 
-| Nilai | Arti |
-|---|---|
+| Nilai    | Arti                                                   |
+| -------- | ------------------------------------------------------ |
 | `memory` | Reading disimpan sementara di memory store development |
-| `mysql` | Reading disimpan ke MySQL sesuai `MYSQL_DATABASE_URL` |
+| `mysql`  | Reading disimpan ke MySQL sesuai `MYSQL_DATABASE_URL`  |
 
 Nilai `configStatus` membantu melihat apakah config payload cocok dengan registry:
 
-| Nilai | Arti |
-|---|---|
-| `no_payload_config` | Payload tidak membawa config tangki |
-| `config_match` | Config payload dan registry cocok |
-| `config_minor_difference` | Ada beda kecil yang perlu diketahui |
-| `config_mismatch` | Ada beda besar dan perlu review |
-| `invalid_payload_config` | Config payload tidak valid |
+| Nilai                     | Arti                                                                                         |
+| ------------------------- | -------------------------------------------------------------------------------------------- |
+| `normal`                  | Payload tidak membawa config tangki, atau config-nya cocok dengan registry                   |
+| `minor_config_difference` | Ada beda kecil; config payload tetap boleh dipakai                                           |
+| `config_mismatch`         | Ada beda besar; server memakai config registry dan `needsReview` bernilai `true`             |
+| `invalid_config`          | Config payload tidak valid; server memakai config registry dan `needsReview` bernilai `true` |
+
+Nilai `needs_review` ada di tipe data, tetapi saat ini tidak pernah dihasilkan server.
 
 ## Error yang Mungkin Muncul
 
-| Status | Penyebab |
-|---|---|
-| `400` | Body bukan JSON valid atau payload tidak sesuai |
-| `401` | Key kosong atau salah |
-| `403` | Device tidak aktif |
-| `404` | Device atau tangki tidak ditemukan |
-| `503` | Storage aktif belum siap, terutama MySQL belum bisa dikoneksi |
+| Status | Penyebab                                                                                  |
+| ------ | ----------------------------------------------------------------------------------------- |
+| `400`  | `X-Device-Id` kosong, body bukan JSON valid/bukan object, atau identitas payload ≠ header |
+| `401`  | Kunci perangkat kosong atau salah, atau kunci provisioning salah                          |
+| `403`  | Perangkat tidak aktif, atau paket/akses perangkat sudah tidak berlaku                     |
+| `404`  | Perangkat tidak terdaftar, atau konfigurasi tangki untuk perangkat tidak ditemukan        |
+| `405`  | Method selain `POST`                                                                      |
+| `429`  | Lebih dari 120 kiriman per menit per perangkat dan alamat (hanya storage MySQL)           |
+| `500`  | Gagal menyimpan data ke storage aktif, atau gagal membuat perangkat otomatis              |
 
 Contoh response error:
 
@@ -464,6 +484,29 @@ Contoh response error:
   "error": "Device key tidak valid."
 }
 ```
+
+## GET /api/device-packages/download
+
+Mengunduh paket firmware (ZIP) memakai token dari email "Firmware FTM siap":
+
+```text
+/api/device-packages/download?token=<token>
+```
+
+- Hanya berjalan dengan storage MySQL (memory: HTTP `503`).
+- Sukses: HTTP `200`, `Content-Type: application/zip`, `Cache-Control: no-store`, dan
+  `X-Content-Type-Options: nosniff`.
+- Gagal (balasan `{ "error": "..." }`): `400` token tidak valid, `404` paket tidak ditemukan,
+  `410` tautan sudah tidak berlaku atau kedaluwarsa, `429` batas unduh habis, `500` paket
+  belum bisa dibuka.
+
+## Helpdesk
+
+- `POST /api/helpdesk/session` membuka atau melanjutkan sesi helpdesk dari widget bantuan.
+- `GET /api/helpdesk/messages` membaca pesan sesi; `POST /api/helpdesk/messages` mengirim
+  pesan baru. Token sesi dikirim dari widget; tanpa token balasannya HTTP `400`.
+- Ketiganya publik. Pembukaan sesi dan pengiriman pesan dibatasi jumlah permintaannya per
+  alamat (HTTP `429` bila terlampaui).
 
 ## Endpoint Auth
 
@@ -491,7 +534,8 @@ Catatan keamanan auth:
   `/api/auth/email/resend-verification` dapat dilindungi Turnstile jika
   `AUTH_CAPTCHA_PROVIDER="turnstile"`;
 - token verifikasi keamanan dikirim sebagai `captchaToken`;
-- login admin dapat mengembalikan status `otp_required` jika OTP admin aktif;
+- login admin membalas `{ "requiresOtp": true }` bila OTP admin aktif; kode OTP dikirim
+  lewat email lalu diverifikasi di `/api/auth/login/verify-otp`;
 - session dikirim sebagai cookie `httpOnly`;
 - halaman admin tetap divalidasi server-side memakai role admin, bukan hanya
   disembunyikan dari UI;
@@ -511,7 +555,7 @@ Contoh pengajuan akses:
 ```powershell
 curl.exe -X POST http://localhost:3000/api/auth/register-request `
   -H "Content-Type: application/json" `
-  -d "{\"fullName\":\"Operator Monitoring\",\"username\":\"operator_1\",\"email\":\"operator@example.com\",\"phone\":\"081234567890\",\"password\":\"Password12345\",\"confirmPassword\":\"Password12345\",\"requestedRole\":\"user\",\"accessReason\":\"Perlu memantau STO area Pasuruan\",\"captchaToken\":\"token-turnstile\"}"
+  -d "{\"fullName\":\"Operator Monitoring\",\"username\":\"operator_1\",\"email\":\"operator@example.com\",\"phone\":\"081234567890\",\"password\":\"Password12345\",\"confirmPassword\":\"Password12345\",\"requestedRole\":\"user\",\"accessReason\":\"Perlu memantau STO area contoh\",\"captchaToken\":\"token-turnstile\"}"
 ```
 
 ## Catatan Versi

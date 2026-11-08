@@ -1,21 +1,43 @@
 import { describe, expect, it } from "vitest";
-import { buildDashboardOverview } from "../lib/dashboard-view-model";
+import { mockSites } from "../data/mock-sites";
+import { buildDashboardOverview } from "../domain/dashboard-view-model";
 
 describe("dashboard overview view model", () => {
   it("builds dashboard rows from monitoring mock data", () => {
     const overview = buildDashboardOverview({
       now: new Date("2026-06-25T07:45:00.000Z"),
     });
-    const tph = overview.rows.find((row) => row.code === "TPH");
+    const tph = overview.rows.find((row) => row.code === "CONTOH-A");
 
     expect(overview.summary.totalSites).toBe(5);
     expect(overview.summary.totalTanks).toBe(5);
     expect(overview.rows).toHaveLength(5);
-    expect(overview.rows.some((row) => row.code === "PSN")).toBe(true);
+    expect(overview.rows.some((row) => row.code === "CONTOH-E")).toBe(true);
     expect(tph).toMatchObject({
-      latitude: -7.65,
-      longitude: 112.9,
+      latitude: undefined,
+      longitude: undefined,
     });
+  });
+
+  it("preserves explicitly supplied coordinates independently of example locations", () => {
+    const overview = buildDashboardOverview({
+      now: new Date("2026-06-25T07:45:00.000Z"),
+      sites: mockSites.map((site) => ({
+        ...site,
+        latitude: 10,
+        longitude: 20,
+      })),
+    });
+
+    expect(overview.rows).toHaveLength(5);
+    for (const row of overview.rows) {
+      expect(row).toMatchObject({
+        latitude: 10,
+        longitude: 20,
+        left: "50%",
+        top: "50%",
+      });
+    }
   });
 
   it("calculates status from runtime, level, and device freshness", () => {
@@ -23,9 +45,9 @@ describe("dashboard overview view model", () => {
       now: new Date("2026-06-25T07:45:00.000Z"),
     });
 
-    const tph = overview.rows.find((row) => row.code === "TPH");
-    const jto = overview.rows.find((row) => row.code === "JTO");
-    const skp = overview.rows.find((row) => row.code === "SKP");
+    const tph = overview.rows.find((row) => row.code === "CONTOH-A");
+    const jto = overview.rows.find((row) => row.code === "CONTOH-C");
+    const skp = overview.rows.find((row) => row.code === "CONTOH-D");
 
     expect(tph?.status).toBe("online");
     expect(jto?.status).toBe("critical");
@@ -84,7 +106,7 @@ describe("dashboard overview view model", () => {
       ],
     });
 
-    expect(overview.latestRow.code).toBe("JTO");
+    expect(overview.latestRow.code).toBe("CONTOH-C");
   });
 
   it("keeps registered tanks visible even before their first reading arrives", () => {
@@ -106,7 +128,7 @@ describe("dashboard overview view model", () => {
       ],
     });
 
-    const noDataSite = overview.rows.find((row) => row.code === "NJA");
+    const noDataSite = overview.rows.find((row) => row.code === "CONTOH-B");
 
     expect(overview.rows).toHaveLength(5);
     expect(noDataSite).toMatchObject({
@@ -145,7 +167,7 @@ describe("dashboard overview view model", () => {
       ],
     });
 
-    const tph = overview.rows.find((row) => row.code === "TPH");
+    const tph = overview.rows.find((row) => row.code === "CONTOH-A");
 
     expect(tph).toMatchObject({
       status: "warning",

@@ -1,12 +1,13 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
-import { resetPasswordWithToken } from "@/features/auth/lib/auth-service";
-import { parseResetPasswordPayload } from "@/features/auth/lib/auth-validation";
-import { checkRateLimit } from "@/features/auth/lib/rate-limit";
+import { resetPasswordWithToken } from "@/features/auth/server/auth-service";
+import { parseResetPasswordPayload } from "@/features/auth/domain/auth-validation";
+import { checkRateLimit } from "@/features/auth/server/rate-limit";
 import {
-  getSafeErrorMessage,
-  getSafeErrorStatus,
-} from "@/lib/safe-error-message";
+  jsonCaughtError,
+  jsonOk,
+  jsonTooManyRequests,
+} from "@/lib/http/json-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -29,38 +30,23 @@ export async function POST(request: NextRequest) {
     });
 
     if (!rateLimit.allowed) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: "Terlalu banyak percobaan reset. Coba lagi nanti.",
-        },
-        {
-          status: 429,
-          headers: { "Retry-After": String(rateLimit.retryAfterSeconds) },
-        },
+      return jsonTooManyRequests(
+        "Terlalu banyak percobaan reset. Coba lagi nanti.",
+        rateLimit.retryAfterSeconds,
       );
     }
 
     await resetPasswordWithToken({ payload, request });
 
-    return NextResponse.json({
-      ok: true,
-      data: {
-        message:
-          "Kata sandi berhasil diganti. Silakan masuk ulang dengan kata sandi baru.",
-      },
+    return jsonOk({
+      message:
+        "Kata sandi berhasil diganti. Silakan masuk ulang dengan kata sandi baru.",
     });
   } catch (error) {
-    return NextResponse.json(
-      {
-        ok: false,
-        error: getSafeErrorMessage(error, {
-          fallbackMessage: "Reset kata sandi belum bisa diproses.",
-          internalMessage:
-            "Reset kata sandi belum bisa diproses karena layanan sedang disiapkan. Coba lagi nanti.",
-        }),
-      },
-      { status: getSafeErrorStatus(error) },
-    );
+    return jsonCaughtError(error, {
+      fallbackMessage: "Reset kata sandi belum bisa diproses.",
+      internalMessage:
+        "Reset kata sandi belum bisa diproses karena layanan sedang disiapkan. Coba lagi nanti.",
+    });
   }
 }

@@ -1,5 +1,5 @@
 import AuthShell from "@/components/auth/auth-shell";
-import { getCurrentSessionUser } from "@/features/auth/lib/auth-session";
+import { getCurrentSessionUser } from "@/features/auth/server/auth-session";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";

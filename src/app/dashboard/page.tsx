@@ -1,14 +1,14 @@
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { createAdminActionCsrfToken } from "@/features/auth/lib/auth-csrf";
-import { requirePageUser } from "@/features/auth/lib/auth-guards";
+import { createAdminActionCsrfToken } from "@/features/auth/server/auth-csrf";
+import { requirePageUser } from "@/features/auth/server/auth-guards";
 import { SimpleDashboardView } from "@/features/monitoring/components/simple-dashboard-view";
-import { buildDashboardOverview } from "@/features/monitoring/lib/dashboard-view-model";
-import { getMonitoringReferenceDataWithSource } from "@/features/monitoring/lib/monitoring-registry";
-import { listLatestMonitoringReadingsByTankWithSource } from "@/features/monitoring/lib/monitoring-storage";
+import { buildDashboardOverview } from "@/features/monitoring/domain/dashboard-view-model";
+import { getMonitoringReferenceDataWithSource } from "@/features/monitoring/server/monitoring-registry";
+import { listLatestMonitoringReadingsByTankWithSource } from "@/features/monitoring/server/monitoring-storage";
 import {
   createSimpleDashboardSites,
   type SimpleDashboardSite,
-} from "@/features/monitoring/lib/simple-dashboard-model";
+} from "@/features/monitoring/domain/simple-dashboard-model";
 import { ClipboardCheck, Plus } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";

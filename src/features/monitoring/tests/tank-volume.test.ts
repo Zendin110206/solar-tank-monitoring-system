@@ -3,7 +3,7 @@ import {
   calculateFillPercent,
   calculateFuelHeightCm,
   calculateHorizontalCylinderVolumeLiter,
-} from "../lib/tank-volume";
+} from "../domain/tank-volume";
 
 describe("tank volume calculation", () => {
   it("calculates full horizontal cylinder volume in liter", () => {

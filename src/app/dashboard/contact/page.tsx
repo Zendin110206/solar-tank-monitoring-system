@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Mail, MapPin, Send, ShieldCheck } from "lucide-react";
 
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { requirePageUser } from "@/features/auth/lib/auth-guards";
+import { requirePageUser } from "@/features/auth/server/auth-guards";
 import { ContactMessageTemplate } from "./contact-message-template";
 
 export const metadata: Metadata = {

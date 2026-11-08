@@ -1,13 +1,14 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
-import { checkRateLimit } from "@/features/auth/lib/rate-limit";
-import { loginWithPassword } from "@/features/auth/lib/auth-service";
-import { parseLoginPayload } from "@/features/auth/lib/auth-validation";
-import { setSessionCookie } from "@/features/auth/lib/auth-session";
+import { checkRateLimit } from "@/features/auth/server/rate-limit";
+import { loginWithPassword } from "@/features/auth/server/auth-service";
+import { parseLoginPayload } from "@/features/auth/domain/auth-validation";
+import { setSessionCookie } from "@/features/auth/server/auth-session";
 import {
-  getSafeErrorMessage,
-  getSafeErrorStatus,
-} from "@/lib/safe-error-message";
+  jsonCaughtError,
+  jsonOk,
+  jsonTooManyRequests,
+} from "@/lib/http/json-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -31,17 +32,9 @@ export async function POST(request: NextRequest) {
     });
 
     if (!rateLimit.allowed) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: "Terlalu banyak percobaan masuk. Coba lagi beberapa saat.",
-        },
-        {
-          status: 429,
-          headers: {
-            "Retry-After": String(rateLimit.retryAfterSeconds),
-          },
-        },
+      return jsonTooManyRequests(
+        "Terlalu banyak percobaan masuk. Coba lagi beberapa saat.",
+        rateLimit.retryAfterSeconds,
       );
     }
 
@@ -52,22 +45,16 @@ export async function POST(request: NextRequest) {
     });
 
     if (loginResult.status === "otp_required") {
-      return NextResponse.json({
-        ok: true,
-        data: {
-          requiresOtp: true,
-          challengeId: loginResult.challengeId,
-          delivery: loginResult.delivery,
-        },
+      return jsonOk({
+        requiresOtp: true,
+        challengeId: loginResult.challengeId,
+        delivery: loginResult.delivery,
       });
     }
 
-    const response = NextResponse.json({
-      ok: true,
-      data: {
-        requiresOtp: false,
-        redirectTo: "/dashboard",
-      },
+    const response = jsonOk({
+      requiresOtp: false,
+      redirectTo: "/dashboard",
     });
 
     setSessionCookie({
@@ -78,16 +65,14 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
-    return NextResponse.json(
+    return jsonCaughtError(
+      error,
       {
-        ok: false,
-        error: getSafeErrorMessage(error, {
-          fallbackMessage: "Login gagal. Periksa kembali data masuk Anda.",
-          internalMessage:
-            "Login belum bisa diproses karena layanan sedang disiapkan. Coba lagi nanti.",
-        }),
+        fallbackMessage: "Login gagal. Periksa kembali data masuk Anda.",
+        internalMessage:
+          "Login belum bisa diproses karena layanan sedang disiapkan. Coba lagi nanti.",
       },
-      { status: getSafeErrorStatus(error, { defaultStatus: 401 }) },
+      { defaultStatus: 401 },
     );
   }
 }

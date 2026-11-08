@@ -1,5 +1,9 @@
 # Target Rollout Awal 5 STO
 
+> **Status dokumen:** riwayat per 14 Juli 2026. Isinya tidak lagi diperbarui. Kondisi
+> terkini ada di [status operasional](current-operational-truth.md) dan arah
+> pengembangan di [catatan keputusan](decisions/README.md).
+
 Dokumen ini menjelaskan cara memperluas pilot operasional menuju target awal 5
 STO dengan data yang sudah disetujui. Per 13–14 Juli 2026, kondisi yang
 terverifikasi adalah 3 site, 3 tangki, dan 3 perangkat terdaftar; angka 5 pada
@@ -64,14 +68,14 @@ config/pilot-registry.example.json
 
 ## File Penting
 
-| File | Fungsi |
-|---|---|
-| `config/pilot-registry.example.json` | contoh format registry pilot |
-| `config/pilot-registry.local.json` | file real lokal, harus dibuat sendiri dan tidak boleh di-commit |
-| `scripts/generate-device-key.mjs` | membuat key dan hash device |
-| `scripts/apply-pilot-registry.mjs` | validasi dan apply registry ke MySQL |
-| `scripts/smoke-pilot-ingest.mjs` | mengirim payload real-format untuk uji cepat |
-| `docs/field-pilot-5-sto-guide.md` | panduan lapangan 5 STO dari koordinat sampai device mengirim data |
+| File                                 | Fungsi                                                            |
+| ------------------------------------ | ----------------------------------------------------------------- |
+| `config/pilot-registry.example.json` | contoh format registry pilot                                      |
+| `config/pilot-registry.local.json`   | file real lokal, harus dibuat sendiri dan tidak boleh di-commit   |
+| `scripts/generate-device-key.mjs`    | membuat key dan hash device                                       |
+| `scripts/apply-pilot-registry.mjs`   | validasi dan apply registry ke MySQL                              |
+| `scripts/smoke-pilot-ingest.mjs`     | mengirim payload real-format untuk uji cepat                      |
+| `docs/field-pilot-5-sto-guide.md`    | panduan lapangan 5 STO dari koordinat sampai device mengirim data |
 
 ## Alur Besar
 
@@ -159,6 +163,12 @@ Jika gagal, cek:
 Gunakan langkah ini ketika tim ingin menghapus data device sementara, misalnya
 setelah uji template firmware dan sebelum memasukkan data perangkat real.
 
+> **Catatan 31 Oktober 2026:** langkah 3, 6, dan 7 di bawah sudah tidak sesuai tampilan.
+> Centang massal dan opsi reset semua dicabut dari halaman **Tinjau Pengajuan** pada Juli 2026.
+> Yang tersedia sekarang: **Hapus data** per pengajuan, lalu di kartu dashboard admin ikon
+> **Reset reading** dan **Hapus data monitoring** per STO, serta **Reset semua reading**. Lihat
+> [model data](data-model.md#maintenance-data-deviceuji).
+
 Langkah aman:
 
 1. Login sebagai admin.
@@ -185,8 +195,8 @@ atau domain deployment yang sedang dipakai.
 8. Baca konfirmasi browser sebelum menyetujui aksi.
 9. Cek pesan sukses.
 10. Buka dashboard untuk memastikan aplikasi tetap hidup. Jika memakai reset
-   semua, `/api/ready` wajar melaporkan registry belum lengkap sampai data
-   device dibuat lagi.
+    semua, `/api/ready` wajar melaporkan registry belum lengkap sampai data
+    device dibuat lagi.
 
 Yang dibersihkan:
 
@@ -275,13 +285,13 @@ Contoh bagian penting:
 ```json
 {
   "id": "site-tph",
-  "code": "TPH",
-  "name": "STO TPH",
+  "code": "CONTOH-A",
+  "name": "STO Contoh A",
   "regionalLabel": "TREG 5",
   "wilayahLabel": "TIF 3",
-  "areaLabel": "Pasuruan",
-  "latitude": -7.6500000,
-  "longitude": 112.9000000,
+  "areaLabel": "Area Contoh",
+  "latitude": -0.123456,
+  "longitude": 100.123456,
   "coordinateStatus": "approved",
   "tank": {
     "shape": "rectangular",
@@ -295,7 +305,7 @@ Contoh bagian penting:
     "consumptionLiterPerHour": 25
   },
   "device": {
-    "code": "pilot-tph-01",
+    "code": "pilot-contoh-a-01",
     "expectedReportIntervalSec": 20,
     "apiKeyHash": "sha256:hasil_hash_di_sini"
   }
@@ -307,19 +317,19 @@ Contoh bagian penting:
 Jalankan:
 
 ```powershell
-pnpm pilot:registry -- --dry-run
+pnpm pilot:registry --dry-run
 ```
 
 Jika sukses, script menampilkan ringkasan 5 STO.
 
 Jika gagal, ikuti pesan error. Contoh:
 
-| Error | Arti |
-|---|---|
-| `coordinateStatus harus approved` | koordinat belum ditandai boleh dipakai |
-| `apiKeyHash masih hash placeholder` | belum generate hash key real |
-| `criticalLevelPercent harus lebih kecil` | batas kritis tidak boleh lebih tinggi dari batas low |
-| `Registry pilot wajib berisi minimal 5 site aktif` | jumlah STO kurang |
+| Error                                              | Arti                                                 |
+| -------------------------------------------------- | ---------------------------------------------------- |
+| `coordinateStatus harus approved`                  | koordinat belum ditandai boleh dipakai               |
+| `apiKeyHash masih hash placeholder`                | belum generate hash key real                         |
+| `criticalLevelPercent harus lebih kecil`           | batas kritis tidak boleh lebih tinggi dari batas low |
+| `Registry pilot wajib berisi minimal 5 site aktif` | jumlah STO kurang                                    |
 
 ## 6. Apply Registry ke MySQL
 
@@ -378,8 +388,8 @@ Lokal:
 
 ```powershell
 $env:PILOT_API_BASE_URL="http://localhost:3000"
-$env:PILOT_DEVICE_ID="pilot-tph-01"
-$env:PILOT_DEVICE_KEY="key-asli-device-tph"
+$env:PILOT_DEVICE_ID="pilot-contoh-a-01"
+$env:PILOT_DEVICE_KEY="key-asli-device-contoh-a"
 pnpm pilot:smoke
 ```
 
@@ -387,8 +397,8 @@ Vercel:
 
 ```powershell
 $env:PILOT_API_BASE_URL="https://solar-tank-monitoring-system.vercel.app"
-$env:PILOT_DEVICE_ID="pilot-tph-01"
-$env:PILOT_DEVICE_KEY="key-asli-device-tph"
+$env:PILOT_DEVICE_ID="pilot-contoh-a-01"
+$env:PILOT_DEVICE_KEY="key-asli-device-contoh-a"
 pnpm pilot:smoke
 ```
 
@@ -408,13 +418,13 @@ runtime 17,93 jam
 Untuk melihat payload tanpa mengirim:
 
 ```powershell
-pnpm pilot:smoke -- --dry-run
+pnpm pilot:smoke --dry-run
 ```
 
 Untuk mengubah distance:
 
 ```powershell
-pnpm pilot:smoke -- --distance-cm 18.5
+pnpm pilot:smoke --distance-cm 18.5
 ```
 
 Jika response `401`:
@@ -429,10 +439,10 @@ Jika response `404`:
 Device belum ada di registry MySQL.
 ```
 
-Jika response `503`:
+Jika response `500`:
 
 ```text
-Database/storage belum siap. Cek /api/ready.
+Gagal menyimpan ke database. Cek /api/ready.
 ```
 
 Jika response sukses tetapi `needsReview=true`:
@@ -477,7 +487,7 @@ Header:
 
 ```http
 Content-Type: application/json
-X-Device-Id: pilot-tph-01
+X-Device-Id: pilot-contoh-a-01
 X-Device-Key: key-asli-device
 ```
 
@@ -485,7 +495,7 @@ Payload minimal yang disarankan:
 
 ```json
 {
-  "device": "pilot-tph-01",
+  "device": "pilot-contoh-a-01",
   "ts": 1780000000,
   "tank_shape": "rectangular",
   "capacity_liter": 540,

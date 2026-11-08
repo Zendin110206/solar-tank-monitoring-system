@@ -15,7 +15,7 @@ import {
   X,
 } from "lucide-react";
 
-import type { AuthRole } from "@/features/auth/types";
+import type { AuthRole } from "@/features/auth/types/auth";
 import {
   AdminConfirmationDialog,
   type AdminConfirmationContent,
@@ -33,21 +33,10 @@ const INITIAL_ACTION_STATE: AdminActionState = {
 };
 
 type ButtonVariant =
-  | "danger"
-  | "primary"
-  | "dangerOutline"
-  | "success"
-  | "neutralOutline";
+  "danger" | "primary" | "dangerOutline" | "success" | "neutralOutline";
 
 type ButtonIcon =
-  | "check"
-  | "x"
-  | "ban"
-  | "refresh"
-  | "logout"
-  | "send"
-  | "key"
-  | "trash";
+  "check" | "x" | "ban" | "refresh" | "logout" | "send" | "key" | "trash";
 
 const buttonVariantClass: Record<ButtonVariant, string> = {
   danger:
@@ -146,11 +135,7 @@ function SubmitButton({
       type="submit"
     >
       {getIcon(icon)}
-      {compact ? (
-        <span className="sr-only">{label}</span>
-      ) : (
-        label
-      )}
+      {compact ? <span className="sr-only">{label}</span> : label}
     </button>
   );
 }

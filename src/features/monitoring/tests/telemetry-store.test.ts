@@ -3,12 +3,12 @@ import { mockReadings } from "../data/mock-readings";
 import {
   getMonitoringReadings,
   resetMonitoringReadings,
-} from "../lib/telemetry-store";
-import { ingestTelemetry } from "../lib/ingest-telemetry";
+} from "../server/telemetry-store";
+import { ingestTelemetry } from "../server/ingest-telemetry";
 import {
   listMonitoringReadings,
   listMonitoringReadingsWithSource,
-} from "../lib/monitoring-storage";
+} from "../server/monitoring-storage";
 
 describe("telemetry store", () => {
   afterEach(() => {
@@ -149,8 +149,8 @@ describe("telemetry store", () => {
         width_cm: 60,
         height_cm: 60,
         sensor_mount_height_cm: 60,
-        lat: -7.65,
-        lng: 112.9,
+        lat: -0.65,
+        lng: 100.9,
       },
     });
 
@@ -173,8 +173,8 @@ describe("telemetry store", () => {
         width_cm: 60,
         height_cm: 60,
         sensor_mount_height_cm: 60,
-        lat: -7.65,
-        lng: 112.9,
+        lat: -0.65,
+        lng: 100.9,
       },
     });
 
@@ -197,9 +197,9 @@ describe("telemetry store", () => {
         device: "demo-auto-01",
         site_code: "AUTO",
         site_name: "STO Auto",
-        area_label: "Pasuruan",
-        lat: -7.651,
-        lng: 112.901,
+        area_label: "Area Contoh",
+        lat: -0.651,
+        lng: 100.901,
         tank_shape: "rectangular",
         capacity_liter: 540,
         length_cm: 150,

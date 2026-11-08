@@ -1,4 +1,5 @@
 import { BrandLogo } from "@/components/brand-logo";
+import { Card } from "@/components/ui/card";
 
 type DashboardRouteLoadingProps = {
   label?: string;
@@ -28,7 +29,7 @@ export function DashboardRouteLoading({
       </header>
 
       <div className="mx-auto max-w-[1540px] px-4 py-5 sm:px-6 lg:px-8">
-        <section className="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+        <Card>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-red-600">
             {label}
           </p>
@@ -45,7 +46,7 @@ export function DashboardRouteLoading({
             <span className="h-24 animate-pulse rounded-lg bg-zinc-50" />
           </div>
           <div className="mt-4 h-72 animate-pulse rounded-lg bg-zinc-50" />
-        </section>
+        </Card>
       </div>
     </main>
   );

@@ -1,0 +1,146 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`paket firmware v1 (dibekukan) > memakai nilai acak hanya untuk enkripsi dan token unduh, dengan format tetap 1`] = `
+[
+  "authTag",
+  "ciphertext",
+  "iv",
+]
+`;
+
+exports[`paket firmware v1 (dibekukan) > menghasilkan ZIP yang identik byte demi byte untuk masukan dan waktu yang sama 1`] = `
+{
+  "templateSha256": "ac813bec620843d350611e94dd9e78d9c24ee3cf3e46300bd6e5cd4bda9c6a2c",
+  "zipSha256": "4d8bbf18bded7d125f64228a63b34d9d80f41390b5a79cb1c93cf07523daffad",
+}
+`;
+
+exports[`paket firmware v1 (dibekukan) > menghasilkan berkas konfigurasi, profil, panduan, dan manifest yang sama untuk masukan yang sama > README_LANGKAH_UPLOAD.md 1`] = `
+"# Langkah Upload Firmware FTM
+
+Paket ini dibuat untuk:
+
+- STO: STO Contoh Satu (CONTOH-SATU)
+- Regional: TREG 5
+- Wilayah: TIF 3
+- Area: Area Contoh
+- Device: device-contoh-satu-000001
+- Mode sensor: fuel
+- Hardware: NodeMCU ESP8266 + HC-SR04 untuk tangki balok
+- Tangki: balok
+- Kapasitas: 1200 liter
+- Beban lokasi: 20 KW
+- Diesel engine: 40 kVA
+- Cos phi: 0.8
+- Estimasi konsumsi: 5.25 liter/jam
+
+## Isi Paket
+
+1. solar_tank_firmware.ino
+2. device_config.h
+3. hardware_profile.h
+4. README_LANGKAH_UPLOAD.md
+5. manifest.json
+
+## Cara Upload
+
+1. Ekstrak ZIP ini ke folder lokal.
+2. Buka Arduino IDE.
+3. Buka file solar_tank_firmware.ino.
+4. Isi SOLARTANK_WIFI_SSID dan SOLARTANK_WIFI_PASSWORD di bagian atas file firmware, atau gunakan command serial WIFI/PASS untuk uji sementara.
+5. Pilih board sesuai hardware profile: NodeMCU 1.0 ESP-12E.
+6. Pilih port board.
+7. Klik Upload.
+8. Setelah upload selesai, buka Serial Monitor untuk mengecek koneksi, sensor, dan status POST.
+9. Jangan membagikan file device_config.h karena file itu berisi device key.
+
+## Catatan Keamanan
+
+Device key hanya boleh dipakai untuk device ini. Jika file ini salah kirim atau hilang, hubungi admin agar key dicabut dan paket baru dibuat.
+"
+`;
+
+exports[`paket firmware v1 (dibekukan) > menghasilkan berkas konfigurasi, profil, panduan, dan manifest yang sama untuk masukan yang sama > device_config.h 1`] = `
+"#pragma once
+
+// File ini dibuat otomatis oleh FTM.
+// Jangan membagikan isi file ini karena berisi device key.
+
+#define SOLARTANK_API_BASE_URL "https://ftm.example.test"
+#define SOLARTANK_DEVICE_CODE "device-contoh-satu-000001"
+#define SOLARTANK_DEVICE_LABEL "Sensor fuel STO Contoh Satu"
+#define SOLARTANK_DEVICE_SENSOR_TYPE "fuel"
+#define SOLARTANK_DEVICE_KEY "kunci-perangkat-uji-tetap"
+
+#define SOLARTANK_SITE_CODE "CONTOH-SATU"
+#define SOLARTANK_SITE_NAME "STO Contoh Satu"
+#define SOLARTANK_AREA_LABEL "Area Contoh"
+#define SOLARTANK_REGIONAL_LABEL "TREG 5"
+#define SOLARTANK_WILAYAH_LABEL "TIF 3"
+#define SOLARTANK_SITE_LATITUDE 0.0000000
+#define SOLARTANK_SITE_LONGITUDE 0.0000000
+#define SOLARTANK_TANK_SHAPE "rectangular"
+#define SOLARTANK_TANK_CAPACITY_LITER 1200
+#define SOLARTANK_TANK_LENGTH_CM 150
+#define SOLARTANK_TANK_WIDTH_CM 80
+#define SOLARTANK_TANK_HEIGHT_CM 100
+#define SOLARTANK_TANK_DIAMETER_CM 0
+#define SOLARTANK_SENSOR_MOUNT_HEIGHT_CM 110
+#define SOLARTANK_LOW_LEVEL_PERCENT 30
+#define SOLARTANK_CRITICAL_LEVEL_PERCENT 15
+#define SOLARTANK_CONSUMPTION_LITER_PER_HOUR 5.25
+#define SOLARTANK_LOAD_VALUE 20
+#define SOLARTANK_LOAD_UNIT "kw"
+#define SOLARTANK_DIESEL_ENGINE_CAPACITY_KVA 40
+#define SOLARTANK_COS_PHI 0.80
+"
+`;
+
+exports[`paket firmware v1 (dibekukan) > menghasilkan berkas konfigurasi, profil, panduan, dan manifest yang sama untuk masukan yang sama > hardware_profile.h 1`] = `
+"#pragma once
+
+// Hardware profile resmi yang dipilih saat pengajuan device.
+
+#define SOLARTANK_HARDWARE_PROFILE_CODE "nodemcu-hcsr04-rectangular-v1"
+#define SOLARTANK_BOARD_FAMILY "esp8266"
+#define SOLARTANK_BOARD_LABEL "NodeMCU 1.0 ESP-12E"
+#define SOLARTANK_SENSOR_TYPE "HC-SR04"
+#define SOLARTANK_TRIGGER_PIN D5
+#define SOLARTANK_ECHO_PIN D6
+#define SOLARTANK_REPORT_INTERVAL_MS 20000
+"
+`;
+
+exports[`paket firmware v1 (dibekukan) > menghasilkan berkas konfigurasi, profil, panduan, dan manifest yang sama untuk masukan yang sama > manifest.json 1`] = `
+"{
+  "capacityLiter": 1200,
+  "cosPhi": 0.8,
+  "dieselEngineCapacityKva": 40,
+  "deviceCode": "device-contoh-satu-000001",
+  "deviceSensorType": "fuel",
+  "firmwareTemplate": {
+    "key": "solartank-esp8266-ultrasonic",
+    "version": "v1"
+  },
+  "generatedAt": "2026-10-25T03:00:00.000Z",
+  "hardwareProfile": {
+    "code": "nodemcu-hcsr04-rectangular-v1",
+    "name": "NodeMCU ESP8266 + HC-SR04 untuk tangki balok"
+  },
+  "packageVersion": 1,
+  "requestCode": "REQ-CONTOH-SATU-20261025-000001",
+  "siteCode": "CONTOH-SATU",
+  "siteRegional": "TREG 5",
+  "siteWilayah": "TIF 3",
+  "siteLocation": {
+    "area": "Area Contoh",
+    "latitude": null,
+    "longitude": null
+  },
+  "tankShape": "rectangular",
+  "operationalLoad": {
+    "unit": "kw",
+    "value": 20
+  }
+}"
+`;

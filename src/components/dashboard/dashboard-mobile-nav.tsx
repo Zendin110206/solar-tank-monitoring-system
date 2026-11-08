@@ -105,9 +105,7 @@ export function DashboardMobileNav({ navItems }: DashboardMobileNavProps) {
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">
               Navigasi
             </p>
-            <p className="mt-1 text-sm font-semibold text-zinc-950">
-              FTM
-            </p>
+            <p className="mt-1 text-sm font-semibold text-zinc-950">FTM</p>
           </div>
           <nav className="mt-2 grid gap-1" aria-label="Navigasi mobile">
             {navItems.map((item) => (

@@ -1,126 +1,95 @@
-# Kebijakan Keamanan
+# Kebijakan Keamanan FTM
 
-Repositori ini bersifat public-safe. Artinya, semua contoh data, payload, konfigurasi, dan dokumentasi harus aman jika dibaca publik.
+FTM dipakai sebagai pilot operasional dan repositori ini bersifat publik. Semua
+isi repositori harus aman dibaca siapa pun.
 
-## Jangan Commit Data Rahasia
+## Versi yang didukung
 
-Jangan pernah commit:
+| Branch      | Peran                        | Dukungan keamanan                                       |
+| ----------- | ---------------------------- | ------------------------------------------------------- |
+| `main`      | Versi yang berjalan di pilot | Ya                                                      |
+| `dev`       | Integrasi sebelum rilis      | Ya, perbaikan dikerjakan di sini lalu dirilis ke `main` |
+| branch lain | Pekerjaan sementara          | Tidak                                                   |
 
-- API key asli;
-- token deployment;
-- password database;
-- file `.env.local`;
-- credential WiFi;
-- private key;
-- domain produksi;
-- alamat IP internal;
-- payload telemetry real;
-- data lokasi sensitif;
-- backup database;
-- konfigurasi server privat;
-- screenshot yang berisi informasi internal.
+Belum ada rilis bernomor yang didukung terpisah. Riwayat perubahan ada di
+[CHANGELOG.md](CHANGELOG.md).
 
-Gunakan `.env.example` hanya untuk nama variabel dan nilai dummy.
+## Melaporkan kerentanan
 
-## Key Device Lokal
+**Jangan membuat issue publik** untuk dugaan kerentanan.
 
-Untuk development lokal, API ingest dapat memakai key demo per device. Contoh:
+Gunakan **Report a vulnerability** pada tab **Security** repositori ini
+(_private vulnerability reporting_). Bila fitur itu belum tersedia, hubungi
+pemilik repositori melalui kanal internal tim yang sudah disepakati.
 
-```text
-demo-tph-01 -> demo-tph-key
-demo-nja-01 -> demo-nja-key
-demo-jto-01 -> demo-jto-key
-demo-skp-01 -> demo-skp-key
-```
+Laporan sebaiknya memuat:
 
-Key tersebut hanya contoh. Jangan gunakan untuk production.
+- ringkasan masalah dan bagian yang terdampak;
+- langkah reproduksi minimal;
+- kemungkinan dampaknya;
+- bukti yang sudah dibersihkan dari informasi rahasia.
 
-Fallback global `local-development-key` masih tersedia untuk latihan awal jika belum dimatikan. Jika ingin mengganti key fallback lokal:
+Jangan mengirim kata sandi, token aktif, kunci perangkat, data pribadi, atau
+data operasional sebagai bukti. Uji hanya di lingkungan lokal; jangan menguji
+celah pada aplikasi pilot atau perangkat lapangan.
 
-```powershell
-$env:SOLAR_TANK_LOCAL_DEVICE_KEY="ganti-dengan-key-lokal"
-pnpm dev
-```
+Target penanganan: konfirmasi penerimaan dalam dua hari kerja dan penilaian awal
+dalam lima hari kerja. Rincian kerentanan tidak dipublikasikan sebelum perbaikan
+tersedia.
 
-Lalu simulator dijalankan dengan key yang sama:
+## Menangani rahasia
 
-```powershell
-pnpm simulate:device --key ganti-dengan-key-lokal --once
-```
+- Rahasia (URL database, kata sandi, token bot, kunci SMTP, kunci enkripsi paket,
+  kunci perangkat) hanya disimpan di pengaturan lingkungan hosting atau di file
+  `.env.local` di mesin masing-masing. File `.env*` selain `.env.example` sudah
+  diabaikan Git.
+- `.env.example` hanya berisi nama variabel dan nilai contoh.
+- Rahasia tidak boleh dibagikan lewat chat, issue, pull request, atau tangkapan
+  layar. Rahasia yang pernah tersebar dianggap bocor dan harus diganti pada
+  layanan penerbitnya.
+- Kunci perangkat disimpan di database sebagai hash, bukan nilai asli.
+- Backup database, ekspor CSV, dan registry operasional tidak pernah di-commit.
 
-## Batas Keamanan Saat Ini
+Bila rahasia terlanjur masuk Git:
 
-Yang sudah ada:
+1. cabut atau ganti rahasia itu pada layanan penerbitnya;
+2. beri tahu pemilik repositori lewat kanal privat;
+3. periksa kemungkinan penyalahgunaan;
+4. tentukan perlu tidaknya pembersihan riwayat Git;
+5. catat penyebab dan pencegahannya tanpa menuliskan nilai rahasianya.
 
-- API ingest mengecek `X-Device-Id`;
-- API ingest mengecek `X-Api-Key` atau `X-Device-Key`;
-- device harus terdaftar di data contoh development;
-- device tidak aktif ditolak;
-- payload device yang tidak sesuai header ditolak;
-- hash key per device pada data contoh development;
-- fallback key global bisa dimatikan lewat `SOLAR_TANK_ALLOW_GLOBAL_DEVICE_KEY_FALLBACK="false"`;
-- data bisa disimpan di memory store lokal atau MySQL reading repository.
-- login pengguna berbasis database MySQL;
-- session disimpan sebagai token hash di database dan cookie browser memakai `httpOnly`, `sameSite=lax`, serta `secure` saat environment production;
-- role `admin` dan `user` dipakai untuk membatasi halaman admin;
-- password memakai Argon2id dan hash legacy ditandai untuk upgrade;
-- login admin dapat diwajibkan memakai OTP email;
-- pengajuan akses publik masuk status pending dan harus direview admin;
-- verifikasi email, reset password, dan perubahan password memakai token sekali pakai berbasis hash;
-- form publik bisa dilindungi Cloudflare Turnstile melalui `AUTH_CAPTCHA_PROVIDER="turnstile"`;
-- rate limit tersedia untuk login, pengajuan akses, lupa password, dan pengiriman ulang verifikasi email;
-- endpoint ingest memiliki rate limit saat storage MySQL aktif;
-- audit event auth mencatat login, OTP, reset password, verifikasi email, perubahan role, aktivasi/nonaktif akun, dan aksi sesi;
-- halaman keamanan akun tersedia untuk ganti kata sandi, melihat sesi aktif, mencabut sesi lain, dan binding Telegram.
-- alur pengajuan perangkat membuat device key dan firmware package setelah admin approve;
-- paket firmware disimpan terenkripsi dan didownload lewat token terbatas;
-- device baru tidak aktif sebelum first valid ping dengan key yang cocok;
-- admin cleanup data device/uji tidak menghapus akun user/admin, template firmware, atau hardware profile.
+Menghapus rahasia dari commit terbaru tidak menghapusnya dari riwayat.
 
-Yang belum ada:
+## Perlindungan yang sudah ada (per Oktober 2026)
 
-- proteksi request tambahan di perimeter/CDN pada deployment final;
-- rotasi key device dari UI admin;
-- manajemen registry site/tangki/device yang menulis database dari UI;
-- database production dengan backup;
-- HTTPS produksi;
-- monitoring server.
-- prosedur recovery akun dan database yang sudah diuji berkala;
-- hardening perimeter deployment final.
-- approval/reject device request lewat Telegram.
+- Kata sandi disimpan sebagai hash Argon2id.
+- Sesi memakai cookie `httpOnly`; peran `admin` dan `user` membatasi halaman.
+- Admin dapat diwajibkan memakai OTP lewat email.
+- Token sekali pakai (verifikasi email, reset kata sandi) disimpan sebagai hash.
+- Aksi admin dilindungi token CSRF.
+- Pembatas jumlah permintaan untuk login, pendaftaran, lupa kata sandi, dan
+  penerimaan data perangkat.
+- Setiap perangkat memakai kunci sendiri; perangkat baru belum aktif sebelum
+  kiriman valid pertama.
+- Paket firmware disimpan terenkripsi dan diunduh lewat token berbatas waktu dan
+  jumlah unduhan.
+- Webhook Telegram diverifikasi dengan _secret header_.
+- Log audit untuk aktivitas akun dan admin.
 
-## Pelaporan Masalah Keamanan
+## Keterbatasan yang diketahui (per Oktober 2026)
 
-Jika menemukan masalah keamanan:
+Ringkasan berikut sengaja tidak memuat rincian teknis yang bisa disalahgunakan.
 
-1. Jangan membuka issue publik yang berisi secret atau cara eksploitasi detail.
-2. Hubungi pemelihara secara privat.
-3. Sertakan langkah reproduksi tanpa membagikan credential asli.
-4. Jika ada file sensitif terlanjur masuk Git, hentikan push tambahan dan lakukan pembersihan history dengan hati-hati.
+- Pilot belum dikeraskan untuk produksi penuh dan belum diuji penetrasi.
+- Pada branch `dev`, audit `pnpm audit --prod` tanggal 31 Oktober 2026 tidak
+  menemukan kerentanan yang diketahui pada dependensi produksi yang terkunci.
+  Pembaruannya tercatat di [CHANGELOG.md](CHANGELOG.md). Hasil ini berlaku untuk
+  kode di `dev`; penerapannya pada pilot menunggu rilis yang disetujui ke `main`.
+  Audit dependensi tidak menggantikan pengujian keamanan aplikasi.
+- Backup otomatis dan uji pemulihan berkala belum berjalan.
+- Akses data belum dibatasi per lokasi.
+- Firmware perangkat v1 memerlukan penguatan keamanan komunikasi dan pembaruan
+  jarak jauh; penguatannya direncanakan untuk firmware versi berikutnya.
+- Header keamanan browser belum lengkap.
 
-## Checklist Sebelum Deployment
-
-Sebelum deployment nyata:
-
-- ganti key contoh;
-- simpan secret di environment;
-- matikan fallback global device key;
-- jalankan semua migration database monitoring dan auth;
-- buat admin awal lewat `pnpm auth:create-admin`;
-- isi `AUTH_SECRET` minimal 32 karakter;
-- aktifkan SMTP untuk OTP admin, verifikasi email, dan reset password;
-- aktifkan Turnstile untuk form publik dan pastikan site key serta secret key berasal dari widget yang sama;
-- set `AUTH_COOKIE_SECURE="true"` pada domain HTTPS;
-- aktifkan HTTPS;
-- batasi akses halaman admin hanya untuk role admin;
-- pastikan endpoint ingest berjalan pada mode MySQL sehingga rate limit aplikasi aktif;
-- pastikan environment final memiliki TLS, timeout, payload limit, dan logging pada perimeter yang disepakati;
-- gunakan database dengan backup;
-- uji restore backup database;
-- review audit log keamanan secara berkala;
-- validasi payload device;
-- review konfigurasi server.
-
-## Branch yang Didukung
-
-Untuk fase saat ini, perbaikan keamanan diarahkan ke branch `main`.
+Arah perbaikannya dicatat di [catatan keputusan](docs/decisions/README.md).

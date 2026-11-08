@@ -1,10 +1,11 @@
-import { NextResponse, type NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 import {
   clearSessionCookie,
   getRequestSessionUser,
-} from "@/features/auth/lib/auth-session";
-import { logoutSession } from "@/features/auth/lib/auth-service";
+} from "@/features/auth/server/auth-session";
+import { logoutSession } from "@/features/auth/server/auth-service";
+import { jsonOk } from "@/lib/http/json-response";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -16,7 +17,7 @@ export async function POST(request: NextRequest) {
     await logoutSession(user.sessionId);
   }
 
-  const response = NextResponse.json({ ok: true });
+  const response = jsonOk();
   clearSessionCookie(response);
 
   return response;

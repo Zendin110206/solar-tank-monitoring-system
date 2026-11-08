@@ -4,6 +4,8 @@ import type { KeyboardEvent, ReactNode } from "react";
 import { useEffect, useId, useRef } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
+import { STATUS_BADGE_CLASS } from "@/components/ui/status-tone";
+import { SECONDARY_BUTTON_CLASS } from "@/components/ui/button-class";
 
 export type AdminConfirmationTone = "danger" | "primary" | "warning";
 
@@ -23,21 +25,18 @@ type AdminConfirmationDialogBaseProps = {
   pending: boolean;
 };
 
-type AdminConfirmationDialogFormProps =
-  AdminConfirmationDialogBaseProps & {
-    formAction: (formData: FormData) => void;
-    onConfirm?: never;
-  };
+type AdminConfirmationDialogFormProps = AdminConfirmationDialogBaseProps & {
+  formAction: (formData: FormData) => void;
+  onConfirm?: never;
+};
 
-type AdminConfirmationDialogCallbackProps =
-  AdminConfirmationDialogBaseProps & {
-    formAction?: never;
-    onConfirm: () => void;
-  };
+type AdminConfirmationDialogCallbackProps = AdminConfirmationDialogBaseProps & {
+  formAction?: never;
+  onConfirm: () => void;
+};
 
-export type AdminConfirmationDialogProps =
-  | AdminConfirmationDialogFormProps
-  | AdminConfirmationDialogCallbackProps;
+type AdminConfirmationDialogProps =
+  AdminConfirmationDialogFormProps | AdminConfirmationDialogCallbackProps;
 
 const toneClasses: Record<
   AdminConfirmationTone,
@@ -47,13 +46,13 @@ const toneClasses: Record<
     button:
       "bg-red-600 text-white shadow-red-600/15 hover:bg-red-700 focus-visible:ring-red-600/20 disabled:bg-red-300",
     eyebrow: "text-red-600",
-    icon: "bg-red-50 text-red-700 ring-red-100",
+    icon: STATUS_BADGE_CLASS.danger,
   },
   primary: {
     button:
       "bg-blue-600 text-white shadow-blue-600/15 hover:bg-blue-700 focus-visible:ring-blue-600/20 disabled:bg-blue-300",
     eyebrow: "text-blue-600",
-    icon: "bg-blue-50 text-blue-700 ring-blue-100",
+    icon: STATUS_BADGE_CLASS.info,
   },
   warning: {
     button:
@@ -63,16 +62,8 @@ const toneClasses: Record<
   },
 };
 
-export function AdminConfirmationDialog(
-  props: AdminConfirmationDialogProps,
-) {
-  const {
-    children,
-    confirmation,
-    confirmIcon,
-    onClose,
-    pending,
-  } = props;
+export function AdminConfirmationDialog(props: AdminConfirmationDialogProps) {
+  const { children, confirmation, confirmIcon, onClose, pending } = props;
   const titleId = useId();
   const descriptionId = useId();
   const dialogRef = useRef<HTMLElement>(null);
@@ -134,7 +125,7 @@ export function AdminConfirmationDialog(
       {children}
       <div className="grid gap-2 sm:grid-cols-2">
         <button
-          className="inline-flex h-11 items-center justify-center rounded-lg border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-50 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-zinc-600/15 disabled:cursor-not-allowed disabled:opacity-60"
+          className={SECONDARY_BUTTON_CLASS}
           disabled={pending}
           onClick={onClose}
           ref={cancelButtonRef}
@@ -211,10 +202,7 @@ export function AdminConfirmationDialog(
           </button>
         </div>
 
-        <p
-          className="mt-4 text-sm leading-6 text-zinc-600"
-          id={descriptionId}
-        >
+        <p className="mt-4 text-sm leading-6 text-zinc-600" id={descriptionId}>
           {confirmation.description}
         </p>
 

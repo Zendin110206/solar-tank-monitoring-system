@@ -24,7 +24,10 @@ function fail(message) {
 }
 
 function getTimestamp() {
-  return new Date().toISOString().replace(/[-:]/g, "").replace(/\.\d{3}Z$/, "Z");
+  return new Date()
+    .toISOString()
+    .replace(/[-:]/g, "")
+    .replace(/\.\d{3}Z$/, "Z");
 }
 
 function parseRetentionDays() {
@@ -167,7 +170,9 @@ async function runMysqlDump({ args, outputPath, password }) {
     await rm(outputPath, { force: true });
 
     if (error.code === "ENOENT") {
-      fail("perintah mysqldump tidak ditemukan. Install MySQL client dan pastikan PATH benar.");
+      fail(
+        "perintah mysqldump tidak ditemukan. Install MySQL client dan pastikan PATH benar.",
+      );
     }
 
     throw error;
@@ -183,7 +188,10 @@ async function runMysqlDump({ args, outputPath, password }) {
 
 async function main() {
   const { database, url } = getDatabaseUrl();
-  const outputDir = path.resolve(projectDir, getEnv("MYSQL_BACKUP_OUTPUT_DIR") || "backups/mysql");
+  const outputDir = path.resolve(
+    projectDir,
+    getEnv("MYSQL_BACKUP_OUTPUT_DIR") || "backups/mysql",
+  );
   const retentionDays = parseRetentionDays();
   const outputPath = path.join(
     outputDir,
@@ -201,7 +209,9 @@ async function main() {
 
   console.log(`Backup MySQL selesai: ${outputPath}`);
   console.log(`Ukuran file: ${fileStat.size} bytes`);
-  console.log(`Retention: ${retentionDays} hari, file lama dihapus: ${deleted}`);
+  console.log(
+    `Retention: ${retentionDays} hari, file lama dihapus: ${deleted}`,
+  );
 }
 
 main().catch((error) => {

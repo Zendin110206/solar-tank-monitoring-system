@@ -167,7 +167,9 @@ function normalizeOptions(options) {
   const tankShape = String(options.tankShape).trim();
 
   if (tankShape !== "rectangular") {
-    throw new Error("Smoke pilot saat ini hanya mendukung tankShape rectangular.");
+    throw new Error(
+      "Smoke pilot saat ini hanya mendukung tankShape rectangular.",
+    );
   }
 
   const normalized = {
@@ -224,11 +226,15 @@ function normalizeOptions(options) {
   }
 
   if (normalized.criticalLevelPercent >= normalized.lowLevelPercent) {
-    throw new Error("criticalLevelPercent harus lebih kecil dari lowLevelPercent.");
+    throw new Error(
+      "criticalLevelPercent harus lebih kecil dari lowLevelPercent.",
+    );
   }
 
   if (normalized.distanceCm > normalized.sensorMountHeightCm) {
-    throw new Error("distanceCm tidak boleh lebih besar dari sensorMountHeightCm.");
+    throw new Error(
+      "distanceCm tidak boleh lebih besar dari sensorMountHeightCm.",
+    );
   }
 
   return normalized;
@@ -262,7 +268,9 @@ function createPayload(options) {
     rssi: Math.round(options.rssiDbm),
     wifi_rssi: Math.round(options.rssiDbm),
     ...(typeof options.latitude === "number" ? { lat: options.latitude } : {}),
-    ...(typeof options.longitude === "number" ? { lng: options.longitude } : {}),
+    ...(typeof options.longitude === "number"
+      ? { lng: options.longitude }
+      : {}),
     ...(options.deviceIp ? { ip: options.deviceIp } : {}),
     tank: {
       shape: options.tankShape,
@@ -381,7 +389,9 @@ async function main() {
   }
 
   if (typeof globalThis.fetch !== "function") {
-    throw new Error("Fetch tidak tersedia. Gunakan Node.js 18 atau lebih baru.");
+    throw new Error(
+      "Fetch tidak tersedia. Gunakan Node.js 18 atau lebih baru.",
+    );
   }
 
   const result = await postPayload(options, payload);

@@ -17,12 +17,7 @@ export type DeviceRequestStatus =
   | "package_generation_failed";
 
 export type FirmwarePackageStatus =
-  | "ready"
-  | "downloaded"
-  | "expired"
-  | "revoked"
-  | "activated"
-  | "failed";
+  "ready" | "downloaded" | "expired" | "revoked" | "activated" | "failed";
 
 export type HardwareBoardFamily = "esp8266" | "esp32" | "unknown";
 
@@ -162,11 +157,7 @@ export type MonitoringFirmwarePackage = {
 };
 
 export type RuntimeStatus =
-  | "unknown"
-  | "critical"
-  | "warning"
-  | "limited"
-  | "safe";
+  "unknown" | "critical" | "warning" | "limited" | "safe";
 
 export type LevelStatus = "critical" | "low" | "warning" | "safe";
 
@@ -187,7 +178,8 @@ export type TankConfigStatus =
   | "invalid_config"
   | "needs_review";
 
-export type TankConfigIssueSeverity = "info" | "warning" | "mismatch" | "invalid";
+export type TankConfigIssueSeverity =
+  "info" | "warning" | "mismatch" | "invalid";
 
 export type Site = {
   id: string;

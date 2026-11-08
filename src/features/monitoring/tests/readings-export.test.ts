@@ -6,7 +6,7 @@ import {
   createTankReadingsCsvFilename,
   filterReadingsForExportPeriod,
   parseReadingExportRange,
-} from "../lib/readings-export";
+} from "../domain/readings-export";
 import type { Reading } from "../types/monitoring";
 
 const baseReading: Reading = {

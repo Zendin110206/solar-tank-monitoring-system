@@ -10,11 +10,11 @@ import {
   passwordNeedsRehash,
   verifyOtpHash,
   verifyPassword,
-} from "../lib/auth-crypto";
+} from "../server/auth-crypto";
 import {
   createAdminActionCsrfToken,
   verifyAdminActionCsrfToken,
-} from "../lib/auth-csrf";
+} from "../server/auth-csrf";
 import {
   parseLoginPayload,
   parseChangePasswordPayload,
@@ -22,7 +22,7 @@ import {
   normalizeIndonesianMobilePhone,
   parseRegisterAccessPayload,
   parseResetPasswordPayload,
-} from "../lib/auth-validation";
+} from "../domain/auth-validation";
 
 describe("auth crypto", () => {
   it("memverifikasi password hanya untuk input yang benar", async () => {
@@ -37,15 +37,14 @@ describe("auth crypto", () => {
   });
 
   it("tetap bisa membaca hash PBKDF2 lama dan menandainya untuk upgrade", async () => {
-    const legacyHash = await createLegacyPbkdf2PasswordHashForTest(
-      "password-lama-kuat",
-    );
+    const legacyHash =
+      await createLegacyPbkdf2PasswordHashForTest("password-lama-kuat");
 
     expect(legacyHash).toMatch(/^pbkdf2-sha256\$/);
     expect(passwordNeedsRehash(legacyHash)).toBe(true);
-    await expect(verifyPassword("password-lama-kuat", legacyHash)).resolves.toBe(
-      true,
-    );
+    await expect(
+      verifyPassword("password-lama-kuat", legacyHash),
+    ).resolves.toBe(true);
     await expect(verifyPassword("password-salah", legacyHash)).resolves.toBe(
       false,
     );
@@ -99,11 +98,11 @@ describe("auth validation", () => {
   it("menormalisasi payload login", () => {
     expect(
       parseLoginPayload({
-        identity: " ADMIN@CONTOH.CO.ID ",
+        identity: " ADMIN@CONTOH.EXAMPLE ",
         password: "secret",
       }),
     ).toEqual({
-      identity: "admin@contoh.co.id",
+      identity: "admin@contoh.example",
       password: "secret",
     });
   });
@@ -152,13 +151,13 @@ describe("auth validation", () => {
         fullName: "Operator Monitoring",
         username: "operator_1",
         email: "Operator@Example.com",
-        phone: "0822-3163-9644",
+        phone: "0811-0000-0001",
         password: "Password12345",
         confirmPassword: "Password12345",
       }),
     ).toMatchObject({
       email: "operator@example.com",
-      phone: "+6282231639644",
+      phone: "+6281100000001",
       username: "operator_1",
     });
   });
@@ -175,11 +174,11 @@ describe("auth validation", () => {
   it("memvalidasi payload lupa password secara generik", () => {
     expect(
       parseForgotPasswordPayload({
-        identity: " OPERATOR@CONTOH.CO.ID ",
+        identity: " OPERATOR@CONTOH.EXAMPLE ",
         captchaToken: " token ",
       }),
     ).toEqual({
-      identity: "operator@contoh.co.id",
+      identity: "operator@contoh.example",
       captchaToken: "token",
     });
   });

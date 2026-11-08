@@ -1,5 +1,9 @@
 # Roadmap
 
+> **Status dokumen:** riwayat per 14 Juli 2026. Isinya tidak lagi diperbarui. Kondisi
+> terkini ada di [status operasional](current-operational-truth.md) dan arah
+> pengembangan di [catatan keputusan](decisions/README.md).
+
 Roadmap ini menjelaskan rencana pengembangan bertahap.
 
 ## Fase 1 - Fondasi Repositori

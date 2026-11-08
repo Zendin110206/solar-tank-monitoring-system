@@ -1,4 +1,4 @@
-import { requirePageUser } from "@/features/auth/lib/auth-guards";
+import { requirePageUser } from "@/features/auth/server/auth-guards";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -21,20 +21,28 @@ import {
   TankHorizontalCylinderScene3D,
   TankRectangularScene3D,
 } from "@/features/monitoring/components/tank-rectangular-scene-3d";
-import { getMonitoringReferenceData } from "@/features/monitoring/lib/monitoring-registry";
+import { getMonitoringReferenceData } from "@/features/monitoring/server/monitoring-registry";
 import {
   listLatestMonitoringReadingsByTankWithSource,
   listMonitoringReadingsForTank,
-} from "@/features/monitoring/lib/monitoring-storage";
+} from "@/features/monitoring/server/monitoring-storage";
 import { LiveRefreshControl } from "@/features/monitoring/components/live-refresh-control";
-import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/lib/refresh-interval";
+import { getMonitoringRefreshIntervalMs } from "@/features/monitoring/components/refresh-interval";
 import {
   buildSimpleTankDetail,
   type SimpleTankDetail,
-} from "@/features/monitoring/lib/simple-tank-detail-model";
-import { buildTankDetail } from "@/features/monitoring/lib/tank-detail-view-model";
-import { mergeMonitoringReadingsById } from "@/features/monitoring/lib/latest-reading";
+} from "@/features/monitoring/domain/simple-tank-detail-model";
+import { buildTankDetail } from "@/features/monitoring/domain/tank-detail-view-model";
+import { mergeMonitoringReadingsById } from "@/features/monitoring/domain/latest-reading";
 import type { DeviceStatus } from "@/features/monitoring/types/monitoring";
+import { formatNumber, formatRuntimeHour } from "@/lib/format";
+import { STATUS_BADGE_CLASS } from "@/components/ui/status-tone";
+import { Card } from "@/components/ui/card";
+import { clampPercent } from "@/lib/math";
+import {
+  getRuntimeLevelParameter,
+  runtimeLevelParameters,
+} from "./_components/runtime-levels";
 
 export const metadata: Metadata = {
   title: "Detail Operasional Tangki | FTM",
@@ -49,14 +57,6 @@ type InfoItem = {
   value: string;
 };
 
-type RuntimeLevelParameter = {
-  label: string;
-  range: string;
-  description: string;
-  badge: string;
-  card: string;
-};
-
 const deviceStatusTone: Record<
   DeviceStatus,
   {
@@ -66,136 +66,29 @@ const deviceStatusTone: Record<
   }
 > = {
   online: {
-    badge: "bg-emerald-50 text-emerald-700 ring-emerald-100",
+    badge: STATUS_BADGE_CLASS.success,
     border: "border-emerald-200",
     icon: "text-emerald-600 bg-emerald-50 ring-emerald-100",
   },
   delayed: {
-    badge: "bg-amber-50 text-amber-700 ring-amber-100",
+    badge: STATUS_BADGE_CLASS.warning,
     border: "border-amber-200",
     icon: "text-amber-600 bg-amber-50 ring-amber-100",
   },
   offline: {
-    badge: "bg-red-50 text-red-700 ring-red-100",
+    badge: STATUS_BADGE_CLASS.danger,
     border: "border-red-200",
     icon: "text-red-600 bg-red-50 ring-red-100",
   },
   unknown: {
-    badge: "bg-zinc-100 text-zinc-700 ring-zinc-200",
+    badge: STATUS_BADGE_CLASS.neutral,
     border: "border-zinc-200",
     icon: "text-zinc-600 bg-zinc-100 ring-zinc-200",
   },
 };
 
-const runtimeLevelParameters: RuntimeLevelParameter[] = [
-  {
-    label: "Kritis",
-    range: "< 13 jam",
-    description: "Sisa runtime sudah masuk prioritas tindakan cepat.",
-    badge: "bg-red-50 text-red-700 ring-red-100",
-    card: "border-red-200 bg-red-50",
-  },
-  {
-    label: "Threshold Under",
-    range: "13 - <14 jam",
-    description: "Mendekati batas bawah dan perlu dipantau lebih rapat.",
-    badge: "bg-orange-50 text-orange-700 ring-orange-100",
-    card: "border-orange-200 bg-orange-50",
-  },
-  {
-    label: "Under",
-    range: "14 - <16 jam",
-    description: "Masih di bawah zona ideal operasional.",
-    badge: "bg-amber-50 text-amber-700 ring-amber-100",
-    card: "border-amber-200 bg-amber-50",
-  },
-  {
-    label: "Threshold Upper",
-    range: "16 - <19 jam",
-    description: "Sudah melewati batas bawah dan menuju zona atas.",
-    badge: "bg-cyan-50 text-cyan-700 ring-cyan-100",
-    card: "border-cyan-200 bg-cyan-50",
-  },
-  {
-    label: "Upper",
-    range: "19 - <24 jam",
-    description: "Runtime berada di zona atas yang masih normal.",
-    badge: "bg-blue-50 text-blue-700 ring-blue-100",
-    card: "border-blue-200 bg-blue-50",
-  },
-  {
-    label: "Overstock",
-    range: ">= 24 jam",
-    description: "Cadangan runtime sangat panjang dibanding batas parameter.",
-    badge: "bg-emerald-50 text-emerald-700 ring-emerald-100",
-    card: "border-emerald-200 bg-emerald-50",
-  },
-];
-
-const unknownRuntimeLevel: RuntimeLevelParameter = {
-  label: "Belum terbaca",
-  range: "-",
-  description: "Parameter sisa jam menunggu data volume valid.",
-  badge: "bg-zinc-100 text-zinc-700 ring-zinc-200",
-  card: "border-zinc-200 bg-zinc-50",
-};
-
-function formatLiter(value: number) {
-  return new Intl.NumberFormat("id-ID", {
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
-function formatNumber(value: number, maximumFractionDigits = 2) {
-  return new Intl.NumberFormat("id-ID", {
-    maximumFractionDigits,
-  }).format(value);
-}
-
-function formatRuntimeHour(value: number | null) {
-  if (value === null || !Number.isFinite(value)) {
-    return "-";
-  }
-
-  return `${formatNumber(value, 2)} jam`;
-}
-
 function formatMeasurement(value: number | null, unit: string) {
   return value === null || !Number.isFinite(value) ? "-" : `${value} ${unit}`;
-}
-
-function getRuntimeLevelParameter(
-  runtimeHour: number | null,
-): RuntimeLevelParameter {
-  if (runtimeHour === null || !Number.isFinite(runtimeHour)) {
-    return unknownRuntimeLevel;
-  }
-
-  if (runtimeHour < 13) {
-    return runtimeLevelParameters[0];
-  }
-
-  if (runtimeHour < 14) {
-    return runtimeLevelParameters[1];
-  }
-
-  if (runtimeHour < 16) {
-    return runtimeLevelParameters[2];
-  }
-
-  if (runtimeHour < 19) {
-    return runtimeLevelParameters[3];
-  }
-
-  if (runtimeHour < 24) {
-    return runtimeLevelParameters[4];
-  }
-
-  return runtimeLevelParameters[5];
-}
-
-function clampPercent(value: number) {
-  return Math.min(Math.max(value, 0), 100);
 }
 
 function StatusBadge({ tank }: { tank: SimpleTankDetail }) {
@@ -278,7 +171,7 @@ function RuntimeParameterPanel({ tank }: { tank: SimpleTankDetail }) {
   );
 
   return (
-    <article className="min-w-0 rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+    <Card as="article" className="min-w-0">
       <div className="flex items-start gap-3">
         <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-700 ring-1 ring-blue-100">
           <Timer className="size-5" aria-hidden="true" />
@@ -341,7 +234,7 @@ function RuntimeParameterPanel({ tank }: { tank: SimpleTankDetail }) {
           );
         })}
       </div>
-    </article>
+    </Card>
   );
 }
 
@@ -362,7 +255,7 @@ function TankDimensionPanel({ tank }: { tank: SimpleTankDetail }) {
         ];
 
   return (
-    <article className="min-w-0 rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+    <Card as="article" className="min-w-0">
       <div className="flex items-start gap-3">
         <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-700 ring-1 ring-blue-100">
           <Ruler className="size-5" aria-hidden="true" />
@@ -386,7 +279,7 @@ function TankDimensionPanel({ tank }: { tank: SimpleTankDetail }) {
           ...dimensionItems,
           {
             label: "Kapasitas",
-            value: `${formatLiter(tank.capacityLiter)} L`,
+            value: `${formatNumber(tank.capacityLiter, 0)} L`,
           },
           {
             label: "Konsumsi/jam",
@@ -394,7 +287,7 @@ function TankDimensionPanel({ tank }: { tank: SimpleTankDetail }) {
           },
         ]}
       />
-    </article>
+    </Card>
   );
 }
 
@@ -458,7 +351,7 @@ export default async function SimpleTankDetailPage({
     { label: "Area", value: tank.areaLabel },
     { label: "Perangkat", value: tank.deviceCode },
     { label: "Jenis tangki", value: tank.shapeLabel },
-    { label: "Kapasitas", value: `${formatLiter(tank.capacityLiter)} L` },
+    { label: "Kapasitas", value: `${formatNumber(tank.capacityLiter, 0)} L` },
     {
       label: "Sisa jam",
       value: tank.hasReading ? formatRuntimeHour(tank.runtimeHour) : "-",
@@ -527,8 +420,8 @@ export default async function SimpleTankDetailPage({
                   Isi tangki
                 </p>
                 <p className="mt-2 text-4xl font-semibold tracking-normal text-zinc-950 sm:text-5xl">
-                  {formatLiter(tank.volumeLiter)} /{" "}
-                  {formatLiter(tank.capacityLiter)} L
+                  {formatNumber(tank.volumeLiter, 0)} /{" "}
+                  {formatNumber(tank.capacityLiter, 0)} L
                 </p>
                 <p className="mt-2 text-base text-zinc-500">
                   saat ini / kapasitas maksimal
@@ -551,28 +444,30 @@ export default async function SimpleTankDetailPage({
               icon={Activity}
               label="Sisa jam"
               note={`Konsumsi ${formatNumber(tank.consumptionLiterPerHour, 2)} L/jam`}
-              tone="bg-blue-50 text-blue-700 ring-blue-100"
-              value={tank.hasReading ? formatRuntimeHour(tank.runtimeHour) : "-"}
+              tone={STATUS_BADGE_CLASS.info}
+              value={
+                tank.hasReading ? formatRuntimeHour(tank.runtimeHour) : "-"
+              }
             />
             <SummaryCard
               icon={Clock3}
               label="Data diterima"
               note="Waktu terakhir data masuk ke sistem"
-              tone="bg-blue-50 text-blue-700 ring-blue-100"
+              tone={STATUS_BADGE_CLASS.info}
               value={tank.receivedAtLabel}
             />
             <SummaryCard
               icon={Database}
               label="Perangkat"
               note={tank.deviceLabel}
-              tone="bg-zinc-100 text-zinc-700 ring-zinc-200"
+              tone={STATUS_BADGE_CLASS.neutral}
               value={tank.deviceCode}
             />
           </div>
         </section>
 
         <section className="mt-4 grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
-          <article className="min-w-0 rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+          <Card as="article" className="min-w-0">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <p className="text-sm font-semibold uppercase text-zinc-500">
@@ -593,7 +488,7 @@ export default async function SimpleTankDetailPage({
               exportHrefBase={`/api/tanks/${tank.id}/readings/export`}
               trends={tank.chartTrends}
             />
-          </article>
+          </Card>
 
           <RuntimeParameterPanel tank={tank} />
         </section>
@@ -601,7 +496,7 @@ export default async function SimpleTankDetailPage({
         <section className="mt-4 grid min-w-0 gap-4 xl:grid-cols-[minmax(0,1fr)_22rem]">
           <TankDimensionPanel tank={tank} />
 
-          <article className="min-w-0 rounded-lg border border-zinc-200 bg-white p-5 shadow-sm">
+          <Card as="article" className="min-w-0">
             <div className="flex items-start gap-3">
               <span className="grid size-11 shrink-0 place-items-center rounded-lg bg-blue-50 text-blue-700 ring-1 ring-blue-100">
                 <MapPin className="size-5" aria-hidden="true" />
@@ -629,7 +524,7 @@ export default async function SimpleTankDetailPage({
               <Server className="size-4" aria-hidden="true" />
               Lihat semua STO
             </Link>
-          </article>
+          </Card>
         </section>
       </div>
     </main>

@@ -1,0 +1,5 @@
+# Pemilik kode default untuk seluruh repositori.
+* @Zendin110206
+
+# Definisi pemilik kode juga dilindungi.
+/.github/CODEOWNERS @Zendin110206

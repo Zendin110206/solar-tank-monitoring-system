@@ -4,7 +4,7 @@ import {
   getLevelStatus,
   getOperationalStatus,
   getRuntimeStatus,
-} from "../lib/status";
+} from "../domain/status";
 
 describe("monitoring status", () => {
   it("maps runtime hours to operational runtime status", () => {

@@ -17,8 +17,8 @@ export default function UnauthorizedPage() {
         </span>
         <h1 className="mt-5 text-2xl font-semibold">Akses tidak tersedia</h1>
         <p className="mt-3 text-sm leading-6 text-zinc-500">
-          Peran akun Anda belum memiliki izin untuk membuka halaman ini.
-          Hubungi administrator jika membutuhkan akses tambahan.
+          Peran akun Anda belum memiliki izin untuk membuka halaman ini. Hubungi
+          administrator jika membutuhkan akses tambahan.
         </p>
         <Link
           href="/dashboard"

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 
-import { getMonitoringReferenceDataWithSource } from "../lib/monitoring-registry";
+import { getMonitoringReferenceDataWithSource } from "../server/monitoring-registry";
 
 const originalStorageDriver = process.env.SOLAR_TANK_STORAGE_DRIVER;
 

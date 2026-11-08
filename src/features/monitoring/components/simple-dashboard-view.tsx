@@ -14,9 +14,10 @@ import {
   sortSimpleDashboardSites,
   type SimpleDashboardSite,
   type SimpleDashboardStatusFilter,
-} from "@/features/monitoring/lib/simple-dashboard-model";
+} from "../domain/simple-dashboard-model";
 import { SimpleDashboardCards } from "./simple-dashboard-cards";
 import { SimpleDashboardMap } from "./simple-dashboard-map";
+import { STATUS_DOT_CLASS } from "@/components/ui/status-tone";
 
 type SimpleDashboardViewProps = {
   adminCleanupToken?: string;
@@ -51,12 +52,12 @@ const SUMMARY_TONES: Record<
   },
   emerald: {
     border: "border-emerald-100",
-    line: "bg-emerald-500",
+    line: STATUS_DOT_CLASS.success,
     text: "text-emerald-700",
   },
   red: {
     border: "border-red-100",
-    line: "bg-red-500",
+    line: STATUS_DOT_CLASS.danger,
     text: "text-red-700",
   },
 };
@@ -78,9 +79,7 @@ function SummaryValue({
     >
       <span className={`absolute inset-x-0 top-0 h-1 ${toneClass.line}`} />
       <p className="text-xs font-semibold uppercase text-zinc-500">{label}</p>
-      <p className={`mt-1 text-2xl font-semibold ${toneClass.text}`}>
-        {value}
-      </p>
+      <p className={`mt-1 text-2xl font-semibold ${toneClass.text}`}>{value}</p>
     </div>
   );
 }

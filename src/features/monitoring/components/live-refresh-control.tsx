@@ -1,6 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState, useTransition } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  useTransition,
+} from "react";
 import { Pause, Play, RefreshCw } from "lucide-react";
 import { useRouter } from "next/navigation";
 
@@ -8,7 +14,7 @@ import {
   DEFAULT_MONITORING_REFRESH_INTERVAL_MS,
   formatMonitoringRefreshInterval,
   normalizeMonitoringRefreshInterval,
-} from "../lib/refresh-interval";
+} from "./refresh-interval";
 
 type LiveRefreshControlProps = {
   intervalMs?: number;

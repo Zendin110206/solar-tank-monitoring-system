@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { verifyEmailToken } from "@/features/auth/lib/auth-service";
+import { verifyEmailToken } from "@/features/auth/server/auth-service";
 import { getSafeErrorMessage } from "@/lib/safe-error-message";
 
 export const dynamic = "force-dynamic";

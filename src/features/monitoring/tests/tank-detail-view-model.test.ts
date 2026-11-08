@@ -4,8 +4,8 @@ import { mockTanks } from "../data/mock-tanks";
 import {
   buildTankDetail,
   buildTankReadings,
-} from "../lib/tank-detail-view-model";
-import { normalizeCatPayload } from "../lib/normalize-reading";
+} from "../domain/tank-detail-view-model";
+import { normalizeCatPayload } from "../domain/normalize-reading";
 
 describe("tank detail view model", () => {
   const now = new Date("2026-06-25T07:45:00.000Z");
@@ -13,7 +13,7 @@ describe("tank detail view model", () => {
   it("builds tank detail from monitoring mock data", () => {
     const detail = buildTankDetail("tank-tph-main", { now });
 
-    expect(detail?.siteCode).toBe("TPH");
+    expect(detail?.siteCode).toBe("CONTOH-A");
     expect(detail?.deviceCode).toBe("demo-tph-01");
     expect(detail?.volumeLiter).toBe(3900);
     expect(detail?.fillPercent).toBe(78);
@@ -50,7 +50,7 @@ describe("tank detail view model", () => {
 
     expect(detail).not.toBeNull();
     expect(detail).toMatchObject({
-      siteCode: "NJA",
+      siteCode: "CONTOH-B",
       status: "offline",
       fillPercent: 0,
       volumeLiter: 0,
@@ -65,15 +65,15 @@ describe("tank detail view model", () => {
       site.id === "site-tph"
         ? {
             ...site,
-            latitude: -7.7201234,
-            longitude: 112.8809876,
+            latitude: -0.7201234,
+            longitude: 100.8809876,
           }
         : site,
     );
     const detail = buildTankDetail("tank-tph-main", { now, sites });
 
     expect(detail?.coordinate.label).toBe(
-      "-7.7201234, 112.8809876 (koordinat manual)",
+      "-0.7201234, 100.8809876 (koordinat manual)",
     );
   });
 
@@ -81,7 +81,7 @@ describe("tank detail view model", () => {
     const tank = mockTanks.find((item) => item.id === "tank-tph-main");
 
     if (!tank) {
-      throw new Error("Expected TPH tank mock data.");
+      throw new Error("Expected tank-tph-main mock data.");
     }
 
     const reading = normalizeCatPayload({
