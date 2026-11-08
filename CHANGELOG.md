@@ -12,6 +12,7 @@ dirilis ke `main`.
 ### Diubah
 
 - Dokumen status operasional mencatat keadaan pilot setelah rilis 0.2.1.
+- Vitest (alat untuk menjalankan tes) dinaikkan dari 4.1 ke 5.1. Tes dan konfigurasinya tidak perlu diubah.
 
 ## [0.2.1] - 2026-11-08
 
