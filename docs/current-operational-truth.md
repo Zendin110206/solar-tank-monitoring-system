@@ -9,16 +9,16 @@ deployment, atau tingkat kesiapan sistem berubah.
 
 ## Status per November 2026
 
-| Butir                          | Keadaan                                                                                                         | Sumber dan tanggal                               |
-| ------------------------------ | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| Tahap                          | Pilot operasional aktif; belum dikeraskan untuk produksi penuh, tanpa SLA dan tanpa dukungan 24 jam             | Kondisi kode dan operasi per 25 Oktober 2026     |
-| Cakupan                        | 9 lokasi terdaftar, 8 perangkat aktif, masing-masing mengirim data ±20 detik sekali                             | Snapshot database baca-saja 11 Oktober 2026      |
-| Kode yang berjalan di produksi | Rilis 0.2.0 (commit `76c354e`, 8 November 2026) di branch `main`                                                | Riwayat deployment GitHub, 8 November 2026       |
-| Alur kerja repositori          | Perubahan masuk lewat pull request ke `dev`; `main` hanya menerima rilis yang disetujui                         | Sejak 25 Oktober 2026                            |
-| Backup                         | Belum otomatis; pemulihan belum diuji berkala                                                                   | Kondisi per 25 Oktober 2026                      |
-| Alarm otomatis                 | Belum ada                                                                                                       | Kondisi kode per 25 Oktober 2026                 |
-| Akses per lokasi               | Belum ada; semua akun aktif melihat semua lokasi                                                                | Kondisi kode per 25 Oktober 2026                 |
-| Dependensi                     | Rilis 0.2.0 membawa pembaruan keamanan dependensi. Tidak ada kerentanan yang diketahui pada dependensi produksi | `pnpm audit --prod` pada `main`, 8 November 2026 |
+| Butir                          | Keadaan                                                                                             | Sumber dan tanggal                                                              |
+| ------------------------------ | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Tahap                          | Pilot operasional aktif; belum dikeraskan untuk produksi penuh, tanpa SLA dan tanpa dukungan 24 jam | Kondisi kode dan operasi per 25 Oktober 2026                                    |
+| Cakupan                        | 9 lokasi terdaftar, 8 perangkat aktif, masing-masing mengirim data ±20 detik sekali                 | Snapshot database baca-saja 11 Oktober 2026                                     |
+| Kode yang berjalan di produksi | Rilis 0.2.1 (commit `2ac4593`, 8 November 2026) di branch `main`, berjalan di Node.js 24            | Riwayat deployment GitHub dan pengaturan proyek Vercel, 8 November 2026         |
+| Alur kerja repositori          | Perubahan masuk lewat pull request ke `dev`; `main` hanya menerima rilis yang disetujui             | Sejak 25 Oktober 2026                                                           |
+| Backup                         | Belum otomatis; pemulihan belum diuji berkala                                                       | Kondisi per 25 Oktober 2026                                                     |
+| Alarm otomatis                 | Belum ada                                                                                           | Kondisi kode per 25 Oktober 2026                                                |
+| Akses per lokasi               | Belum ada; semua akun aktif melihat semua lokasi                                                    | Kondisi kode per 25 Oktober 2026                                                |
+| Dependensi                     | Tidak ada kerentanan yang diketahui, baik pada dependensi produksi maupun alat pengembangan         | `pnpm audit` pada `main` dan peringatan Dependabot (0 terbuka), 8 November 2026 |
 
 Arah perbaikan dicatat di [catatan keputusan arsitektur](decisions/README.md).
 
