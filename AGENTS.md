@@ -25,7 +25,7 @@ git diff --check
 docker compose -f deploy/local/compose.yaml up -d   # MySQL + email lokal
 ```
 
-Node.js 22 dan pnpm 9.15.3. Dokumentasi Next.js versi yang terpasang ada di
+Node.js 24 dan pnpm 9.15.3. Dokumentasi Next.js versi yang terpasang ada di
 `node_modules/next/dist/docs/`; rujuk dokumen itu, bukan ingatan tentang versi lain.
 
 ## Struktur

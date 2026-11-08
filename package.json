@@ -3,6 +3,9 @@
   "version": "0.2.0",
   "private": true,
   "packageManager": "pnpm@9.15.3",
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "dev": "next dev",
     "dev:lan": "next dev --hostname 0.0.0.0 -p 3000",
@@ -51,7 +54,7 @@
     "@commitlint/config-conventional": "21.2.3",
     "@next/env": "^16.4.3",
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^24",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/three": "^0.185.0",

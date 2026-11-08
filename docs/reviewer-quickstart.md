@@ -6,7 +6,7 @@
 
 ## 1. Siapkan folder pemeriksaan
 
-Gunakan Git, Node.js **22**, pnpm **9.15.3**, dan Docker Desktop yang sedang
+Gunakan Git, Node.js **24**, pnpm **9.15.3**, dan Docker Desktop yang sedang
 berjalan. Versi Node tercatat di `.nvmrc`, sedangkan versi pnpm di `package.json`.
 
 ```powershell

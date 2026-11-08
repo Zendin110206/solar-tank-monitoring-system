@@ -14,7 +14,7 @@
 
 ## Keputusan
 
-FTM tetap memakai Next.js (App Router), React, dan TypeScript dengan mode ketat, serta Node.js 22 sebagai mesin penjalan. Versi Next.js dinaikkan ke rilis 16.x yang sudah ditambal sebagai bagian dari paket kerja dependensi.
+FTM tetap memakai Next.js (App Router), React, dan TypeScript dengan mode ketat, serta Node.js sebagai mesin penjalan (versi 24 sejak 8 November 2026; lihat Pembaruan di bawah). Versi Next.js dinaikkan ke rilis 16.x yang sudah ditambal sebagai bagian dari paket kerja dependensi.
 
 ## Pilihan yang dipertimbangkan
 
@@ -49,3 +49,13 @@ FTM tetap memakai Next.js (App Router), React, dan TypeScript dengan mode ketat,
 ## Cara meninjau ulang
 
 Bila platform pemilik layanan mewajibkan stack lain.
+
+## Pembaruan 8 November 2026
+
+Versi Node.js dinaikkan dari 22 ke 24, sama dengan versi yang dipakai aplikasi pilot di Vercel. Per 8 November 2026,
+pengaturan proyek Vercel memakai Node.js 24, sedangkan tes dan pemeriksaan sebelumnya berjalan di Node.js 22. Menurut
+jadwal resmi Node.js, versi 22 mendapat tambalan keamanan sampai 30 April 2027 dan versi 24 sampai 30 April 2028.
+
+- `.nvmrc` berisi 24, dan CI membaca versinya dari berkas itu.
+- `package.json` mencantumkan `"engines": { "node": "24.x" }`.
+- `@types/node` mengikuti versi mayor yang sama (24).
