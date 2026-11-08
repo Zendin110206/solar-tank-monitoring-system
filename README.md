@@ -121,7 +121,7 @@ mengarahkan laptop ke database atau alamat produksi.
 
 ### Prasyarat
 
-- Node.js 22 (versi yang sama dengan CI);
+- Node.js 24 (versi yang sama dengan CI dan aplikasi pilot di Vercel; tercatat di `.nvmrc`);
 - pnpm 9.15.3 (`corepack enable` akan memakai versi yang tercatat di
   `package.json`). Di Windows perintah itu butuh terminal Administrator; tanpa hak
   itu, pasang dengan `npm install -g pnpm@9.15.3` dan lewati `corepack enable`;

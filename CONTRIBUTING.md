@@ -216,7 +216,7 @@ Sebelum menambah paket:
 
 1. pastikan kebutuhannya belum bisa dipenuhi Next.js, React, atau paket yang ada;
 2. periksa pemeliharaan, lisensi, dan riwayat keamanannya;
-3. pastikan cocok dengan Node.js 22;
+3. pastikan cocok dengan Node.js 24 (versi di `.nvmrc`);
 4. pakai pnpm dan perbarui `pnpm-lock.yaml`;
 5. tulis alasannya di pull request.
 
