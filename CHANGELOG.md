@@ -17,6 +17,13 @@ dirilis ke `main`.
   dari `.nvmrc`, `package.json` mencantumkan `engines`, dan `@types/node` mengikuti versi 24.
 - Dependabot tidak lagi mengusulkan versi mayor `@types/node`, karena versinya harus mengikuti Node.js yang dipakai.
 - TypeScript dinaikkan dari 5.9 ke 6.0. Kode tidak perlu diubah; pemeriksaan tipe, lint, tes, dan build lulus.
+- commitlint dinaikkan ke 21.2.4 dan lefthook ke 2.2.2.
+
+### Keamanan
+
+- Celah yang diketahui pada alat pengembangan ditutup: vitest 4.1.12, `vite` 8.3.6 (kini dicantumkan langsung), dan versi
+  aman `postcss`, `js-yaml`, `brace-expansion`, `minimatch`, serta `zod` lewat `pnpm.overrides`. `pnpm audit` untuk semua
+  dependensi kini bersih. Dependensi produksi tidak berubah, dan CSS hasil build identik per byte.
 
 ## [0.2.0] - 2026-11-08
 
