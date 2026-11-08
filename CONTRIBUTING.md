@@ -216,17 +216,31 @@ Sebelum menambah paket:
 
 1. pastikan kebutuhannya belum bisa dipenuhi Next.js, React, atau paket yang ada;
 2. periksa pemeliharaan, lisensi, dan riwayat keamanannya;
-3. pastikan cocok dengan Node.js 22;
+3. pastikan cocok dengan Node.js 24 (versi di `.nvmrc`);
 4. pakai pnpm dan perbarui `pnpm-lock.yaml`;
 5. tulis alasannya di pull request.
 
 Pembaruan dependensi dikerjakan per kelompok, satu pull request per kelompok,
 dan setiap pembaruan versi besar membaca catatan perubahan paketnya terlebih dulu.
 
-`pnpm.overrides` di `package.json` memaksa versi aman paket turunan Next.js (`browserslist`,
-`baseline-browser-mapping`, `source-map-js`). Per 31 Oktober 2026 rentang versi dari Next.js sudah
-memilih versi aman tanpa paksaan, jadi paksaan ini bisa dilepas saat Next.js diperbarui lagi, setelah
-`pnpm audit --prod` dicek.
+Dependabot membuka pembaruan minor dan patch dalam dua kelompok: dependensi pengembangan
+(`dev-minor-and-patch`) dan dependensi produksi (`prod-minor-and-patch`). Kelompok produksi mengubah
+aplikasi yang berjalan di pilot, jadi baru digabung setelah perilakunya dibuktikan sama. Dependabot
+membaca pengaturan ini dari branch `main`, jadi perubahannya berlaku setelah dirilis.
+
+`pnpm.overrides` di `package.json` memaksa versi aman paket turunan (paket yang ditarik paket lain):
+
+- Paket turunan Next.js: `browserslist`, `baseline-browser-mapping`, `source-map-js`. Per 31 Oktober
+  2026 rentang versi dari Next.js sudah memilih versi aman tanpa paksaan, jadi paksaan ini bisa dilepas
+  saat Next.js diperbarui lagi, setelah `pnpm audit --prod` dicek.
+- Paket turunan alat pengembangan (8 November 2026): `postcss` (dipakai Tailwind saat build), `js-yaml`,
+  `brace-expansion`, `minimatch`, dan `zod`. Setiap kunci hanya mengganti versi yang masih rentan dengan
+  versi pertama yang sudah ditambal, jadi versi yang lebih baru tidak terhalang. `minimatch` 10 dipaksa
+  ke 11 karena tambalannya hanya ada di 11; lint lulus dengan versi itu. Lepaskan paksaan setelah
+  `pnpm audit` tetap bersih tanpa paksaan tersebut.
+
+`vite` dicantumkan langsung di `devDependencies` karena vitest memakainya sebagai _peer dependency_
+(paket yang harus disediakan proyek). Dengan begitu versinya bisa dijaga di versi yang aman.
 
 ## Menjaga riwayat
 

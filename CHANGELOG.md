@@ -9,6 +9,29 @@ dirilis ke `main`.
 
 ## [Belum dirilis]
 
+## [0.2.1] - 2026-11-08
+
+Rilis pemeliharaan. Isinya alat pengembangan, CI, dan dokumen. Kode aplikasi, database, firmware, dan kontrak
+perangkat tidak berubah, dan dependensi produksi tetap sama dengan 0.2.0.
+
+### Diubah
+
+- Dokumen status operasional dan kebijakan keamanan mencatat keadaan pilot setelah rilis 0.2.0.
+- Action `actions/setup-node` di CI dinaikkan dari v6 ke v7.
+- Node.js untuk pengembangan dan CI dinaikkan dari 22 ke 24, sama dengan aplikasi pilot di Vercel. CI membaca versinya
+  dari `.nvmrc`, `package.json` mencantumkan `engines`, dan `@types/node` mengikuti versi 24.
+- Dependabot tidak lagi mengusulkan versi mayor `@types/node`, karena versinya harus mengikuti Node.js yang dipakai.
+- TypeScript dinaikkan dari 5.9 ke 6.0. Kode tidak perlu diubah; pemeriksaan tipe, lint, tes, dan build lulus.
+- commitlint dinaikkan ke 21.2.4 dan lefthook ke 2.2.2.
+- Dependabot memisahkan pembaruan minor dan patch untuk dependensi pengembangan dan dependensi produksi, supaya pembaruan
+  alat pengembangan tidak tertahan oleh dependensi produksi yang masih perlu pembuktian perilaku.
+
+### Keamanan
+
+- Celah yang diketahui pada alat pengembangan ditutup: vitest 4.1.12, `vite` 8.3.6 (kini dicantumkan langsung), dan versi
+  aman `postcss`, `js-yaml`, `brace-expansion`, `minimatch`, serta `zod` lewat `pnpm.overrides`. `pnpm audit` untuk semua
+  dependensi kini bersih. Dependensi produksi tidak berubah, dan CSS hasil build identik per byte.
+
 ## [0.2.0] - 2026-11-08
 
 Rilis pertama dari branch `dev`. Isinya fondasi kerja (struktur modul, tes, dokumen, dan pemeriksaan
@@ -267,6 +290,7 @@ Regional/Wilayah/Area/STO, detail tangki dengan grafik dan ekspor CSV, pengajuan
 perangkat sampai paket firmware dan aktivasi kiriman pertama, akun dengan
 verifikasi email, persetujuan admin, OTP admin, integrasi Telegram, dan helpdesk.
 
-[Belum dirilis]: https://github.com/Zendin110206/solar-tank-monitoring-system/compare/v0.2.0...dev
+[Belum dirilis]: https://github.com/Zendin110206/solar-tank-monitoring-system/compare/v0.2.1...dev
+[0.2.1]: https://github.com/Zendin110206/solar-tank-monitoring-system/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/Zendin110206/solar-tank-monitoring-system/compare/4bda023...v0.2.0
 [0.1.0]: https://github.com/Zendin110206/solar-tank-monitoring-system/tree/4bda023

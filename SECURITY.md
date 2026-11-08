@@ -76,16 +76,16 @@ Menghapus rahasia dari commit terbaru tidak menghapusnya dari riwayat.
 - Webhook Telegram diverifikasi dengan _secret header_.
 - Log audit untuk aktivitas akun dan admin.
 
-## Keterbatasan yang diketahui (per Oktober 2026)
+## Keterbatasan yang diketahui (per November 2026)
 
 Ringkasan berikut sengaja tidak memuat rincian teknis yang bisa disalahgunakan.
 
 - Pilot belum dikeraskan untuk produksi penuh dan belum diuji penetrasi.
-- Pada branch `dev`, audit `pnpm audit --prod` tanggal 31 Oktober 2026 tidak
+- Sejak rilis 0.2.0 (8 November 2026), pilot memakai dependensi yang sudah
+  diperbarui. Audit `pnpm audit --prod` pada `main` tanggal 8 November 2026 tidak
   menemukan kerentanan yang diketahui pada dependensi produksi yang terkunci.
-  Pembaruannya tercatat di [CHANGELOG.md](CHANGELOG.md). Hasil ini berlaku untuk
-  kode di `dev`; penerapannya pada pilot menunggu rilis yang disetujui ke `main`.
-  Audit dependensi tidak menggantikan pengujian keamanan aplikasi.
+  Pembaruannya tercatat di [CHANGELOG.md](CHANGELOG.md). Audit dependensi tidak
+  menggantikan pengujian keamanan aplikasi.
 - Backup otomatis dan uji pemulihan berkala belum berjalan.
 - Akses data belum dibatasi per lokasi.
 - Firmware perangkat v1 memerlukan penguatan keamanan komunikasi dan pembaruan
