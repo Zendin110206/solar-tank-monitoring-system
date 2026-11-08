@@ -4,13 +4,23 @@ import type { FormEvent } from "react";
 import { useState } from "react";
 import { ArrowRight, Mail } from "lucide-react";
 
+import { AUTH_CONTENT } from "@/components/auth/auth-content";
+import {
+  AUTH_FIELD_ICON_CLASS,
+  AUTH_INPUT_CLASS,
+  AUTH_LABEL_CLASS,
+  AUTH_SUBMIT_SIZE_CLASS,
+} from "@/components/auth/auth-form-classes";
+import { AuthError, AuthNotice } from "@/components/auth/auth-notice";
+import { BRAND_BLOCK_BUTTON_CLASS } from "@/components/ui/button-class";
 import { TurnstileWidget } from "@/features/auth/components/turnstile-widget";
-import { PRIMARY_BLOCK_BUTTON_CLASS } from "@/components/ui/button-class";
-import { FormErrorMessage } from "@/components/ui/message";
 import {
   captchaRequiredMessage,
   isCaptchaEnabled,
 } from "@/features/auth/components/captcha-settings";
+
+const copy = AUTH_CONTENT.forgotPassword;
+const ERROR_ID = "forgot-password-error";
 
 export default function ForgotPasswordForm() {
   const [pending, setPending] = useState(false);
@@ -50,19 +60,16 @@ export default function ForgotPasswordForm() {
       } | null;
 
       if (!response.ok || !result?.ok) {
-        throw new Error(result?.error ?? "Permintaan reset gagal.");
+        throw new Error(result?.error ?? copy.requestFailed);
       }
 
-      setMessage(
-        result.data?.message ??
-          "Jika akun ditemukan, link reset akan dikirim ke email terdaftar.",
-      );
+      setMessage(result.data?.message ?? copy.requestAccepted);
       form.reset();
     } catch (caughtError) {
       setError(
         caughtError instanceof Error
           ? caughtError.message
-          : "Permintaan reset belum bisa diproses.",
+          : copy.requestFailedFallback,
       );
     } finally {
       if (isCaptchaEnabled) {
@@ -73,52 +80,47 @@ export default function ForgotPasswordForm() {
   }
 
   return (
-    <form className="mt-7 space-y-4" noValidate onSubmit={handleSubmit}>
-      <div>
-        <label
-          className="mb-2 block text-sm font-semibold text-zinc-800"
-          htmlFor="identity"
-        >
-          Email atau nama pengguna
-        </label>
-        <div className="relative">
-          <Mail
-            aria-hidden="true"
-            className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-zinc-400"
-          />
-          <input
-            autoComplete="username"
-            autoFocus
-            className="h-12 w-full rounded-lg border border-zinc-300 bg-white pl-11 pr-4 text-[0.95rem] text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
-            id="identity"
-            inputMode="email"
-            name="identity"
-            placeholder="nama@perusahaan.co.id"
-            required
-            type="text"
-          />
-        </div>
+    <form
+      className="mt-[calc(32*var(--auth-u))]"
+      noValidate
+      onSubmit={handleSubmit}
+    >
+      <label className={AUTH_LABEL_CLASS} htmlFor="identity">
+        {copy.identityLabel}
+      </label>
+      <div className="relative">
+        <Mail aria-hidden="true" className={AUTH_FIELD_ICON_CLASS} />
+        <input
+          aria-describedby={error ? ERROR_ID : undefined}
+          aria-invalid={error ? true : undefined}
+          autoComplete="username"
+          autoFocus
+          className={AUTH_INPUT_CLASS}
+          id="identity"
+          inputMode="email"
+          name="identity"
+          placeholder={copy.identityPlaceholder}
+          required
+          type="text"
+        />
       </div>
 
-      <TurnstileWidget key={captchaRenderKey} />
+      <div className="mt-[calc(20*var(--auth-u))] empty:hidden">
+        <TurnstileWidget key={captchaRenderKey} />
+      </div>
 
-      {message ? (
-        <div className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
-          {message}
-        </div>
-      ) : null}
-
-      {error ? <FormErrorMessage>{error}</FormErrorMessage> : null}
+      <AuthNotice>{message}</AuthNotice>
+      {error ? <AuthError id={ERROR_ID}>{error}</AuthError> : null}
 
       <button
-        className={PRIMARY_BLOCK_BUTTON_CLASS}
+        className={`${BRAND_BLOCK_BUTTON_CLASS} ${AUTH_SUBMIT_SIZE_CLASS} mt-[calc(25*var(--auth-u))]`}
         disabled={pending}
         type="submit"
       >
-        {pending ? "Mengirim..." : "Kirim link reset"}
+        {pending ? copy.sending : copy.submit}
         <ArrowRight
           aria-hidden="true"
-          className="size-4 transition group-hover:translate-x-0.5"
+          className="size-[calc(22*var(--auth-u))] transition group-hover:translate-x-0.5"
         />
       </button>
     </form>

@@ -5,72 +5,35 @@ import { useState } from "react";
 import {
   ArrowRight,
   BriefcaseBusiness,
-  Eye,
-  EyeOff,
   Mail,
   Phone,
   UserRound,
 } from "lucide-react";
 
+import { AUTH_CONTENT } from "@/components/auth/auth-content";
+import {
+  AUTH_FIELD_ICON_CLASS,
+  AUTH_HINT_CLASS,
+  AUTH_INPUT_CLASS,
+  AUTH_LABEL_CLASS,
+  AUTH_PLAIN_INPUT_CLASS,
+  AUTH_SUBMIT_SIZE_CLASS,
+} from "@/components/auth/auth-form-classes";
+import { AuthError, AuthNotice } from "@/components/auth/auth-notice";
+import { AuthPasswordInput } from "@/components/auth/auth-password-input";
+import { BRAND_BLOCK_BUTTON_CLASS } from "@/components/ui/button-class";
+import { SelectField } from "@/components/ui/select-field";
 import { TurnstileWidget } from "@/features/auth/components/turnstile-widget";
-import { PRIMARY_BLOCK_BUTTON_CLASS } from "@/components/ui/button-class";
-import { FormErrorMessage } from "@/components/ui/message";
 import {
   captchaRequiredMessage,
   isCaptchaEnabled,
 } from "@/features/auth/components/captcha-settings";
 
-const inputClassName =
-  "h-11 w-full rounded-lg border border-zinc-300 bg-white px-3.5 text-sm text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10";
-const labelClassName =
-  "mb-1.5 block text-[0.82rem] font-semibold text-zinc-800";
-
-function PasswordField({
-  id,
-  label,
-  name,
-  placeholder,
-}: {
-  id: string;
-  label: string;
-  name: string;
-  placeholder: string;
-}) {
-  const [showPassword, setShowPassword] = useState(false);
-
-  return (
-    <div>
-      <label className={labelClassName} htmlFor={id}>
-        {label}
-      </label>
-      <div className="relative">
-        <input
-          autoComplete="new-password"
-          className={`${inputClassName} pr-11`}
-          id={id}
-          name={name}
-          placeholder={placeholder}
-          required
-          type={showPassword ? "text" : "password"}
-        />
-        <button
-          aria-label={
-            showPassword ? `Sembunyikan ${label}` : `Tampilkan ${label}`
-          }
-          className="absolute inset-y-0 right-0 grid w-11 place-items-center text-zinc-400 transition hover:text-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-600"
-          onClick={() => setShowPassword((visible) => !visible)}
-          type="button"
-        >
-          {showPassword ? (
-            <EyeOff aria-hidden="true" className="size-5" />
-          ) : (
-            <Eye aria-hidden="true" className="size-5" />
-          )}
-        </button>
-      </div>
-    </div>
-  );
-}
+const copy = AUTH_CONTENT.register;
+const ERROR_ID = "register-error";
+const FIELD_HEIGHT_CLASS = "h-[max(44px,calc(58*var(--auth-u)))]";
+const GRID_CLASS =
+  "grid gap-[calc(18*var(--auth-u))] sm:grid-cols-2 [&>*]:min-w-0";
 
 function buildAccessReason(formData: FormData): string {
   const position = String(formData.get("position") ?? "").trim();
@@ -125,18 +88,14 @@ export default function SignUpForm() {
       } | null;
 
       if (!response.ok || !result?.ok) {
-        throw new Error(
-          result?.error ?? "Pengajuan akses belum bisa diproses.",
-        );
+        throw new Error(result?.error ?? copy.failed);
       }
 
       setSubmitted(true);
       form.reset();
     } catch (caughtError) {
       setError(
-        caughtError instanceof Error
-          ? caughtError.message
-          : "Pengajuan akses belum bisa diproses.",
+        caughtError instanceof Error ? caughtError.message : copy.failed,
       );
     } finally {
       if (isCaptchaEnabled) {
@@ -146,40 +105,45 @@ export default function SignUpForm() {
     }
   }
 
+  const errorProps = error ? { "aria-describedby": ERROR_ID } : {};
+
   return (
-    <form className="mt-5 space-y-3.5" noValidate onSubmit={handleSubmit}>
-      <div className="grid gap-3 sm:grid-cols-2">
+    <form
+      className="mt-[calc(32*var(--auth-u))] space-y-[calc(18*var(--auth-u))]"
+      noValidate
+      onSubmit={handleSubmit}
+    >
+      <div className={GRID_CLASS}>
         <div>
-          <label className={labelClassName} htmlFor="fullName">
-            Nama lengkap
+          <label className={AUTH_LABEL_CLASS} htmlFor="fullName">
+            {copy.fullNameLabel}
           </label>
           <div className="relative">
-            <UserRound
-              aria-hidden="true"
-              className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-zinc-400"
-            />
+            <UserRound aria-hidden="true" className={AUTH_FIELD_ICON_CLASS} />
             <input
+              {...errorProps}
               autoComplete="name"
               autoFocus
-              className={`${inputClassName} pl-10`}
+              className={AUTH_INPUT_CLASS}
               id="fullName"
               name="fullName"
-              placeholder="Nama sesuai identitas"
+              placeholder={copy.fullNamePlaceholder}
               required
               type="text"
             />
           </div>
         </div>
         <div>
-          <label className={labelClassName} htmlFor="username">
-            Nama pengguna
+          <label className={AUTH_LABEL_CLASS} htmlFor="username">
+            {copy.usernameLabel}
           </label>
           <input
+            {...errorProps}
             autoComplete="username"
-            className={inputClassName}
+            className={`${AUTH_PLAIN_INPUT_CLASS} ${FIELD_HEIGHT_CLASS}`}
             id="username"
             name="username"
-            placeholder="Contoh: operator.pasuruan"
+            placeholder={copy.usernamePlaceholder}
             required
             type="text"
           />
@@ -187,131 +151,131 @@ export default function SignUpForm() {
       </div>
 
       <div>
-        <label className={labelClassName} htmlFor="email">
-          Email kerja
+        <label className={AUTH_LABEL_CLASS} htmlFor="email">
+          {copy.emailLabel}
         </label>
         <div className="relative">
-          <Mail
-            aria-hidden="true"
-            className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-zinc-400"
-          />
+          <Mail aria-hidden="true" className={AUTH_FIELD_ICON_CLASS} />
           <input
+            aria-describedby={error ? `email-hint ${ERROR_ID}` : "email-hint"}
             autoComplete="email"
-            className={`${inputClassName} pl-10`}
+            className={AUTH_INPUT_CLASS}
             id="email"
             inputMode="email"
             name="email"
-            placeholder="nama@perusahaan.co.id"
+            placeholder={copy.emailPlaceholder}
             required
             type="email"
           />
         </div>
-        <p className="mt-1 text-[0.72rem] leading-5 text-zinc-500">
-          Email ini dipakai admin untuk meninjau dan mengaktifkan akses.
+        <p className={AUTH_HINT_CLASS} id="email-hint">
+          {copy.emailHint}
         </p>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className={GRID_CLASS}>
         <div>
-          <label className={labelClassName} htmlFor="phone">
-            Nomor telepon
+          <label className={AUTH_LABEL_CLASS} htmlFor="phone">
+            {copy.phoneLabel}
           </label>
           <div className="relative">
-            <Phone
-              aria-hidden="true"
-              className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-zinc-400"
-            />
+            <Phone aria-hidden="true" className={AUTH_FIELD_ICON_CLASS} />
             <input
+              aria-describedby={error ? `phone-hint ${ERROR_ID}` : "phone-hint"}
               autoComplete="tel"
-              className={`${inputClassName} pl-10`}
+              className={AUTH_INPUT_CLASS}
               id="phone"
               inputMode="tel"
               pattern="(?:[+]?62|0|8)[0-9 .()-]{7,16}"
               name="phone"
-              placeholder="08xxxxxxxxxx atau +628xxxxxxxxxx"
+              placeholder={copy.phonePlaceholder}
               required
-              title="Gunakan nomor seluler Indonesia, contoh 081234567890 atau +6281234567890."
+              title={copy.phoneTitle}
               type="tel"
             />
           </div>
-          <p className="mt-1 text-[0.72rem] leading-5 text-zinc-500">
-            Nomor akan disimpan konsisten dalam format +62.
+          <p className={AUTH_HINT_CLASS} id="phone-hint">
+            {copy.phoneHint}
           </p>
         </div>
         <div>
-          <label className={labelClassName} htmlFor="position">
-            Peran kerja
+          <label className={AUTH_LABEL_CLASS} htmlFor="position">
+            {copy.positionLabel}
           </label>
-          <div className="relative">
-            <BriefcaseBusiness
-              aria-hidden="true"
-              className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-zinc-400"
-            />
-            <select
-              className={`${inputClassName} pl-10`}
-              defaultValue=""
-              id="position"
-              name="position"
-              required
-            >
-              <option disabled value="">
-                Pilih peran
-              </option>
-              <option>Operator operasional</option>
-              <option>Teknisi lapangan</option>
-              <option>Reviewer operasional</option>
-            </select>
-          </div>
+          <SelectField
+            {...errorProps}
+            className={AUTH_INPUT_CLASS}
+            defaultValue=""
+            id="position"
+            leadingIcon={
+              <BriefcaseBusiness
+                aria-hidden="true"
+                className={AUTH_FIELD_ICON_CLASS}
+              />
+            }
+            name="position"
+            required
+          >
+            <option disabled value="">
+              {copy.positionPlaceholder}
+            </option>
+            {copy.positions.map((position) => (
+              <option key={position}>{position}</option>
+            ))}
+          </SelectField>
         </div>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <PasswordField
+      <div className={GRID_CLASS}>
+        <AuthPasswordInput
+          {...errorProps}
+          autoComplete="new-password"
+          hint={copy.passwordHint}
           id="password"
-          label="Kata sandi"
+          label={copy.passwordLabel}
           name="password"
-          placeholder="Minimal 10 karakter"
+          placeholder={copy.passwordPlaceholder}
+          required
         />
-        <PasswordField
+        <AuthPasswordInput
+          {...errorProps}
+          autoComplete="new-password"
           id="confirmPassword"
-          label="Konfirmasi sandi"
+          label={copy.confirmLabel}
           name="confirmPassword"
-          placeholder="Ulangi kata sandi"
+          placeholder={copy.confirmPlaceholder}
+          required
         />
       </div>
 
       <div>
-        <label className={labelClassName} htmlFor="accessReason">
-          Catatan akses
+        <label className={AUTH_LABEL_CLASS} htmlFor="accessReason">
+          {copy.reasonLabel}
         </label>
         <textarea
-          className="min-h-24 w-full rounded-lg border border-zinc-300 bg-white px-3.5 py-3 text-sm text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+          className={`${AUTH_PLAIN_INPUT_CLASS} min-h-[calc(110*var(--auth-u))] py-[calc(14*var(--auth-u))]`}
           id="accessReason"
           name="accessReason"
-          placeholder="Contoh: perlu memantau status tangki STO area Pasuruan."
+          placeholder={copy.reasonPlaceholder}
         />
       </div>
 
-      <TurnstileWidget key={captchaRenderKey} />
+      <div className="empty:hidden">
+        <TurnstileWidget key={captchaRenderKey} />
+      </div>
 
-      {submitted ? (
-        <div className="rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-800">
-          Pengajuan akses diterima. Cek email kerja untuk verifikasi, lalu
-          administrator akan meninjau sebelum akun aktif.
-        </div>
-      ) : null}
-
-      {error ? <FormErrorMessage>{error}</FormErrorMessage> : null}
+      <AuthNotice>{submitted ? copy.submitted : null}</AuthNotice>
+      {error ? <AuthError id={ERROR_ID}>{error}</AuthError> : null}
 
       <button
-        className={PRIMARY_BLOCK_BUTTON_CLASS}
+        className={`${BRAND_BLOCK_BUTTON_CLASS} ${AUTH_SUBMIT_SIZE_CLASS} !mt-[calc(25*var(--auth-u))]`}
         disabled={pending}
         type="submit"
       >
-        {pending ? "Mengirim..." : "Ajukan akses"}
+        {pending ? copy.sending : copy.submit}
         <ArrowRight
           aria-hidden="true"
-          className="size-4 transition group-hover:translate-x-0.5"
+          className="size-[calc(22*var(--auth-u))] transition group-hover:translate-x-0.5"
         />
       </button>
     </form>

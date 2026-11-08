@@ -1,7 +1,8 @@
-import AuthShell from "@/components/auth/auth-shell";
+import { AUTH_CONTENT } from "@/components/auth/auth-content";
+import { AuthLayout, AuthNote } from "@/components/auth/auth-layout";
+import { isAccessRequestEnabled } from "@/features/auth/server/auth-config";
 import { getCurrentSessionUser } from "@/features/auth/server/auth-session";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import SignInForm from "./sign-in-form";
 import { getSafeLoginRedirectPath } from "@/features/auth/domain/auth-redirect";
@@ -56,28 +57,30 @@ export default async function LoginPage({
   const verified =
     params.verified === "1" ? "1" : params.verified === "0" ? "0" : undefined;
 
+  const copy = AUTH_CONTENT.signIn;
+  // Pengajuan akses mandiri masih dibuka sementara; tautannya mengikuti
+  // saklar AUTH_ENABLE_REGISTER yang sama dengan halaman /register.
+  const showAccessRequest = isAccessRequestEnabled();
+
   return (
-    <AuthShell
-      description="Masuk dengan akun yang sudah disetujui administrator untuk membuka dashboard FTM sesuai peran akses."
-      footerPrompt={
-        <>
-          Belum memiliki akses?{" "}
-          <Link
-            className="font-semibold text-blue-600 transition hover:text-blue-700"
-            href="/register"
-          >
-            Ajukan akses
-          </Link>
-          .
-        </>
+    <AuthLayout
+      description={copy.description}
+      heading={copy.heading}
+      note={
+        <AuthNote
+          lines={[
+            copy.accessNote,
+            showAccessRequest ? copy.accessNoteRequest : copy.accessNoteContact,
+          ]}
+        />
       }
-      heading="Masuk ke FTM"
     >
       <SignInForm
         redirectTo={nextPath}
+        showAccessRequest={showAccessRequest}
         verificationReason={params.reason}
         verified={verified}
       />
-    </AuthShell>
+    </AuthLayout>
   );
 }

@@ -9,9 +9,35 @@ dirilis ke `main`.
 
 ## [Belum dirilis]
 
+### Ditambahkan
+
+- Kerangka bersama halaman akun di `src/components/auth/`: panel formulir di kiri, panel merek di kanan (foto
+  tangki, gelombang merah, logo dan nama FTM, tagline), logo Telkom Indonesia dan Infranexia, serta semua teks
+  halaman akun dalam satu objek.
+- Warna merek Telkom/Infranexia sebagai token `brand-*`, tombol merah `BRAND_BLOCK_BUTTON_CLASS`, dan huruf
+  Figtree lewat `next/font` (disajikan dari server FTM sendiri). Semuanya baru dipakai halaman akun.
+- Komponen `SelectField` di kit UI: pilihan (dropdown) dengan ikon panah di posisi tetap.
+
 ### Diubah
 
+- Tampilan baru untuk halaman masuk, lupa kata sandi, buat kata sandi baru, dan pengajuan akses, bergaya korporat
+  Telkom/Infranexia dan bisa dipakai di ponsel, tablet, maupun desktop. Cara masuk, OTP admin, batas percobaan,
+  cookie, dan pesan dari server tidak berubah.
+- Halaman masuk kini menampilkan kotak keterangan bahwa akun dikelola administrator. Tautan "Belum punya akun?
+  Ajukan akses" hanya tampil selama pengajuan akses dibuka (`AUTH_ENABLE_REGISTER`).
+- Teks halaman akun dirapikan: "kata sandi" dipakai di semua tempat, contoh email `nama@infranexia.co.id`, dan
+  contoh isian formulir pengajuan tidak lagi memuat nama lokasi.
+- Langkah OTP admin kini punya label "Kode OTP" dan fokus langsung ke kolom kode; tombol tampil/sembunyi kata sandi
+  memberi tahu keadaannya ke pembaca layar; pesan galat dihubungkan ke kolom isian.
+- Warna sorot teks (saat teks diblok) kembali ke warna bawaan browser di seluruh aplikasi.
+- `PRIMARY_BLOCK_BUTTON_CLASS` dan `AuthShell` dihapus karena tidak dipakai lagi.
 - Dokumen status operasional mencatat keadaan pilot setelah rilis 0.2.1.
+
+### Diperbaiki
+
+- Setelah masuk lewat tautan dengan `?next=` (misalnya `/login?next=/dashboard/devices/request`), halaman tujuan
+  kini langsung tampil. Sebelumnya layar bisa kosong sampai dimuat ulang, karena halaman tujuan sudah diambil
+  lebih dulu sebelum sesi aktif.
 - Vitest (alat untuk menjalankan tes) dinaikkan dari 4.1 ke 5.1. Tes dan konfigurasinya tidak perlu diubah.
 
 ## [0.2.1] - 2026-11-08
