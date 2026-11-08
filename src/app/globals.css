@@ -12,6 +12,43 @@
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 
+/*
+ * Warna merek Telkom/Infranexia. Sejauh ini hanya dipakai halaman akun
+ * (masuk, lupa dan atur ulang kata sandi, pengajuan akses); halaman lain
+ * tetap memakai warna lamanya.
+ */
+@theme {
+  --color-brand-red: #ab0000;
+  --color-brand-red-strong: #8f0000;
+  --color-brand-accent: #fd081d;
+  --color-brand-navy: #151e2f;
+  --color-brand-ink: #01040f;
+  --color-brand-mist: #f5f7fb;
+  --color-brand-line: #8a919c;
+  --color-brand-muted: #4d5058;
+}
+
+/*
+ * Skala halaman akun. Kelas seperti `h-[calc(58*var(--auth-u))]` memakai
+ * ukuran piksel rancangan 1672 x 941; di layar lebar skalanya mengikuti ukuran
+ * jendela, di tablet dan ponsel ukurannya tetap.
+ */
+.auth-scale {
+  --auth-u: 0.8px;
+}
+
+@media (min-width: 48rem) {
+  .auth-scale {
+    --auth-u: 0.9px;
+  }
+}
+
+@media (min-width: 64rem) {
+  .auth-scale {
+    --auth-u: clamp(0.78px, min(100vw / 1672, 100dvh / 941), 1.2px);
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #ffffff;
@@ -34,11 +71,6 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
-}
-
-::selection {
-  background: #fee2e2;
-  color: #991b1b;
 }
 
 @keyframes soft-fade-up {

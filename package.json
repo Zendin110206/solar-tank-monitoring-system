@@ -1,6 +1,6 @@
 {
   "name": "solar-tank-monitoring-system",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "private": true,
   "packageManager": "pnpm@9.15.3",
   "engines": {
@@ -66,7 +66,7 @@
     "tailwindcss": "^4",
     "typescript": "^6.0.3",
     "vite": "^8.1.6",
-    "vitest": "^4.1.12"
+    "vitest": "^5.1.0"
   },
   "pnpm": {
     "overrides": {

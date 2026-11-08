@@ -1,23 +1,36 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useEffect, useState, useTransition } from "react";
-import Link from "next/link";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
-import { PRIMARY_BLOCK_BUTTON_CLASS } from "@/components/ui/button-class";
+import { ArrowRight, LockKeyhole, Mail, UserPlus } from "lucide-react";
+import { AUTH_CONTENT } from "@/components/auth/auth-content";
+import {
+  AUTH_FIELD_ICON_CLASS,
+  AUTH_INPUT_CLASS,
+  AUTH_LABEL_CLASS,
+  AUTH_SUBMIT_SIZE_CLASS,
+} from "@/components/auth/auth-form-classes";
+import { AuthError, AuthNotice } from "@/components/auth/auth-notice";
+import { AuthPasswordInput } from "@/components/auth/auth-password-input";
+import { AuthTextLink, AuthTextLinks } from "@/components/auth/auth-text-link";
+import { BRAND_BLOCK_BUTTON_CLASS } from "@/components/ui/button-class";
+
+const copy = AUTH_CONTENT.signIn;
+const ERROR_ID = "sign-in-error";
 
 export default function SignInForm({
   redirectTo = "/dashboard",
+  showAccessRequest = false,
   verificationReason,
   verified,
 }: {
   redirectTo?: string;
+  showAccessRequest?: boolean;
   verificationReason?: string;
   verified?: "0" | "1";
 }) {
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState(false);
   const [pending, setPending] = useState(false);
   const [navigating, setNavigating] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -25,10 +38,6 @@ export default function SignInForm({
   const [challengeId, setChallengeId] = useState<string | null>(null);
   const [routePending, startRouteTransition] = useTransition();
   const busy = pending || navigating || routePending;
-
-  useEffect(() => {
-    router.prefetch(redirectTo || "/dashboard");
-  }, [redirectTo, router]);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -72,24 +81,27 @@ export default function SignInForm({
       } | null;
 
       if (!response.ok || !result?.ok) {
-        throw new Error(result?.error ?? "Login gagal.");
+        throw new Error(result?.error ?? copy.loginFailed);
       }
 
       if (result.data?.requiresOtp && result.data.challengeId) {
         setChallengeId(result.data.challengeId);
         setMessage(
           result.data.delivery === "log"
-            ? "Kode OTP admin dicetak di log server development."
-            : "Kode OTP admin sudah dikirim ke email.",
+            ? copy.otpSentToLog
+            : copy.otpSentToEmail,
         );
         return;
       }
 
       const nextPath = redirectTo || result.data?.redirectTo || "/dashboard";
 
-      setMessage("Login berhasil. Membuka dashboard...");
+      setMessage(copy.loginSucceeded);
       setNavigating(true);
       shouldResetPending = false;
+      // Halaman tujuan baru diminta setelah sesi aktif. Halaman ini sengaja
+      // tidak memuat tujuan lebih awal: muatan yang diambil sebelum masuk
+      // berisi pengalihan ke /login dan membuat layar kosong setelah masuk.
       startRouteTransition(() => {
         router.replace(nextPath);
         router.refresh();
@@ -99,7 +111,7 @@ export default function SignInForm({
       setError(
         caughtError instanceof Error
           ? caughtError.message
-          : "Login gagal. Periksa kembali data masuk Anda.",
+          : copy.loginFailedFallback,
       );
     } finally {
       if (shouldResetPending) {
@@ -109,160 +121,124 @@ export default function SignInForm({
   }
 
   const notice = error
-    ? {
-        className: "border-red-100 bg-red-50 text-red-800",
-        text: error,
-      }
+    ? null
     : message
-      ? {
-          className: "border-blue-100 bg-blue-50 text-blue-800",
-          text: message,
-        }
+      ? { tone: "info" as const, text: message }
       : verified === "1"
-        ? {
-            className: "border-emerald-100 bg-emerald-50 text-emerald-800",
-            text: "Email berhasil diverifikasi. Jika admin sudah menyetujui akses, Anda bisa masuk.",
-          }
+        ? { tone: "success" as const, text: copy.emailVerified }
         : verified === "0"
           ? {
-              className: "border-amber-100 bg-amber-50 text-amber-800",
-              text: verificationReason || "Verifikasi email belum berhasil.",
+              tone: "warning" as const,
+              text: verificationReason || copy.emailNotVerified,
             }
           : null;
+  const fieldErrorProps = error
+    ? { "aria-describedby": ERROR_ID, "aria-invalid": true as const }
+    : {};
 
   return (
     <form
-      className="mt-7 space-y-4"
+      className="mt-[calc(32*var(--auth-u))]"
       method="post"
       noValidate
       onSubmit={handleSubmit}
     >
-      {challengeId ? null : (
+      {challengeId ? (
         <div>
-          <label
-            className="mb-2 block text-sm font-semibold text-zinc-800"
-            htmlFor="identity"
-          >
-            Email atau nama pengguna
+          <label className={AUTH_LABEL_CLASS} htmlFor="otp">
+            {copy.otpLabel}
           </label>
           <div className="relative">
-            <Mail
-              aria-hidden="true"
-              className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-zinc-400"
-            />
+            <LockKeyhole aria-hidden="true" className={AUTH_FIELD_ICON_CLASS} />
             <input
-              autoComplete="username"
+              {...fieldErrorProps}
+              autoComplete="one-time-code"
               autoFocus
-              className="h-12 w-full rounded-lg border border-zinc-300 bg-white pl-11 pr-4 text-[0.95rem] text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
+              className={`${AUTH_INPUT_CLASS} text-center font-semibold tracking-[0.3em]`}
               disabled={busy}
-              id="identity"
-              inputMode="email"
-              name="identity"
-              placeholder="nama@perusahaan.co.id"
+              id="otp"
+              inputMode="numeric"
+              maxLength={6}
+              name="otp"
+              pattern="[0-9]{6}"
+              placeholder={copy.otpPlaceholder}
               required
               type="text"
             />
           </div>
         </div>
-      )}
-
-      {challengeId ? null : (
-        <div>
-          <div className="mb-2 flex items-center justify-between gap-4">
-            <label
-              className="text-sm font-semibold text-zinc-800"
-              htmlFor="password"
-            >
-              Kata sandi
+      ) : (
+        <>
+          <div>
+            <label className={AUTH_LABEL_CLASS} htmlFor="identity">
+              {copy.identityLabel}
             </label>
-            <Link
-              className="text-xs font-semibold text-blue-600 transition hover:text-blue-700"
-              href="/forgot-password"
-            >
-              Lupa password?
-            </Link>
+            <div className="relative">
+              <Mail aria-hidden="true" className={AUTH_FIELD_ICON_CLASS} />
+              <input
+                {...fieldErrorProps}
+                autoComplete="username"
+                autoFocus
+                className={AUTH_INPUT_CLASS}
+                disabled={busy}
+                id="identity"
+                inputMode="email"
+                name="identity"
+                placeholder={copy.identityPlaceholder}
+                required
+                type="text"
+              />
+            </div>
           </div>
-          <div className="relative">
-            <LockKeyhole
-              aria-hidden="true"
-              className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-zinc-400"
-            />
-            <input
+
+          <div className="mt-[calc(15*var(--auth-u))]">
+            <AuthPasswordInput
+              {...fieldErrorProps}
               autoComplete="current-password"
-              className="h-12 w-full rounded-lg border border-zinc-300 bg-white pl-11 pr-12 text-[0.95rem] text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
               disabled={busy}
               id="password"
+              label={copy.passwordLabel}
               name="password"
-              placeholder="Masukkan kata sandi"
+              placeholder={copy.passwordPlaceholder}
               required
-              type={showPassword ? "text" : "password"}
             />
-            <button
-              aria-label={
-                showPassword ? "Sembunyikan kata sandi" : "Tampilkan kata sandi"
-              }
-              className="absolute inset-y-0 right-0 grid w-12 place-items-center text-zinc-400 transition hover:text-zinc-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-600"
-              disabled={busy}
-              onClick={() => setShowPassword((visible) => !visible)}
-              type="button"
-            >
-              {showPassword ? (
-                <EyeOff aria-hidden="true" className="size-5" />
-              ) : (
-                <Eye aria-hidden="true" className="size-5" />
-              )}
-            </button>
           </div>
-        </div>
+        </>
       )}
 
-      {challengeId ? (
-        <div className="relative">
-          <LockKeyhole
-            aria-hidden="true"
-            className="absolute left-4 top-1/2 size-4 -translate-y-1/2 text-zinc-400"
-          />
-          <input
-            autoComplete="one-time-code"
-            className="h-12 w-full rounded-lg border border-zinc-300 bg-white pl-11 pr-4 text-center text-[1.05rem] font-semibold text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
-            disabled={busy}
-            id="otp"
-            inputMode="numeric"
-            maxLength={6}
-            name="otp"
-            pattern="[0-9]{6}"
-            placeholder="000000"
-            required
-            type="text"
-          />
-        </div>
-      ) : null}
-
-      {notice ? (
-        <div
-          className={`rounded-lg border px-4 py-3 text-sm leading-6 ${notice.className}`}
-        >
-          {notice.text}
-        </div>
-      ) : null}
+      <AuthNotice tone={notice?.tone}>{notice?.text}</AuthNotice>
+      {error ? <AuthError id={ERROR_ID}>{error}</AuthError> : null}
 
       <button
-        className={PRIMARY_BLOCK_BUTTON_CLASS}
+        className={`${BRAND_BLOCK_BUTTON_CLASS} ${AUTH_SUBMIT_SIZE_CLASS} mt-[calc(25*var(--auth-u))]`}
         disabled={busy}
         type="submit"
       >
         {navigating || routePending
-          ? "Membuka dashboard..."
+          ? copy.openingDashboard
           : pending
-            ? "Memproses..."
+            ? copy.processing
             : challengeId
-              ? "Verifikasi kode"
-              : "Masuk"}
+              ? copy.submitOtp
+              : copy.submit}
         <ArrowRight
           aria-hidden="true"
-          className="size-4 transition group-hover:translate-x-0.5"
+          className="size-[calc(22*var(--auth-u))] transition group-hover:translate-x-0.5"
         />
       </button>
+
+      {challengeId ? null : (
+        <AuthTextLinks>
+          <AuthTextLink href="/forgot-password" icon={LockKeyhole}>
+            {copy.forgotPassword}
+          </AuthTextLink>
+          {showAccessRequest ? (
+            <AuthTextLink href="/register" icon={UserPlus}>
+              {copy.requestAccess}
+            </AuthTextLink>
+          ) : null}
+        </AuthTextLinks>
+      )}
     </form>
   );
 }

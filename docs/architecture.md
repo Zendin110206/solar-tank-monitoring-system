@@ -232,11 +232,40 @@ Kit UI bersama ada di `src/components/ui/`:
 | `status-pill.tsx`    | `StatusPill`: lencana status berbentuk pil dengan titik warna                                                      |
 | `section-header.tsx` | `SectionHeader`: judul bagian (label merah, judul, penjelasan); `limitDescriptionWidth` membatasi lebar penjelasan |
 | `message.tsx`        | `FormErrorMessage` (kotak error formulir), `ActionMessage` (hasil aksi di dialog)                                  |
-| `button-class.ts`    | `PRIMARY_BLOCK_BUTTON_CLASS`, `SECONDARY_BUTTON_CLASS` untuk `<button>` maupun `<Link>`                            |
+| `button-class.ts`    | `BRAND_BLOCK_BUTTON_CLASS` (tombol merah halaman akun), `SECONDARY_BUTTON_CLASS` untuk `<button>` maupun `<Link>`  |
+| `select-field.tsx`   | `SelectField`: pilihan (dropdown) standar dengan satu ikon panah di posisi tetap                                   |
 | `status-tone.ts`     | peta warna status                                                                                                  |
 
 Tes `ui-kit.test.tsx` memastikan setiap komponen menghasilkan HTML yang sama persis
 dengan markup lama.
+
+Setiap pilihan (dropdown) baru memakai `SelectField`, bukan `<select>` polos. Panah bawaan
+browser disembunyikan (`appearance-none`) dan diganti satu ikon panah 16 px dari tepi kanan,
+tepat di tengah secara vertikal, sehingga posisinya sama di semua browser. Per November 2026
+baru formulir pengajuan akses yang memakainya; pilihan di halaman dashboard dipindahkan saat
+halaman itu ikut dirapikan.
+
+Halaman akun (`/login`, `/forgot-password`, `/reset-password`, `/register`) memakai kerangka
+bersama di `src/components/auth/`:
+
+| Berkas                    | Isi                                                                                     |
+| ------------------------- | --------------------------------------------------------------------------------------- |
+| `auth-layout.tsx`         | `AuthLayout` (panel formulir kiri, panel merek kanan) dan `AuthNote` (kotak keterangan) |
+| `auth-content.ts`         | semua teks keempat halaman dalam satu objek                                             |
+| `auth-brand-row.tsx`      | logo Telkom Indonesia dan Infranexia, sekaligus tautan ke beranda                       |
+| `auth-brand-panel.tsx`    | foto, gelombang merah, logo dan nama FTM, serta tagline                                 |
+| `auth-photo.tsx`          | foto latar; hanya diunduh di layar ≥ 1024 px                                            |
+| `auth-font.ts`            | huruf Figtree lewat `next/font`, disajikan dari server FTM sendiri                      |
+| `auth-form-classes.ts`    | kelas label, input, petunjuk, tombol, dan tautan formulir                               |
+| `auth-password-input.tsx` | input kata sandi dengan tombol tampil/sembunyi                                          |
+| `auth-notice.tsx`         | `AuthNotice` (pemberitahuan, `aria-live`) dan `AuthError` (galat, `role="alert"`)       |
+| `auth-text-link.tsx`      | tautan teks merah di bawah tombol formulir                                              |
+
+Warna merek (`brand-*`) ada di `src/app/globals.css`. Ukuran halaman akun memakai satu skala
+(`--auth-u` dari kelas `.auth-scale`): angka di kelas seperti `h-[calc(58*var(--auth-u))]`
+adalah piksel pada rancangan 1672 × 941, dan di layar lebar skalanya mengikuti ukuran jendela.
+Warna merek, skala, dan huruf Figtree sejauh ini hanya dipakai halaman akun; halaman lain tetap
+memakai tampilan lamanya.
 
 Warna status (lencana dan titik penanda) diambil dari satu peta,
 `src/components/ui/status-tone.ts`: `success` hijau, `warning` kuning, `danger` merah,
@@ -288,9 +317,9 @@ karena merapikannya mengubah tampilan atau perilaku:
 - halaman depan memuat tiga kode STO pilot, dan formulir pengajuan perangkat memakai contoh
   isian nama STO, nama kota, serta koordinat di sekitar lokasi pilot. Keduanya teks yang
   dilihat pengguna; menggantinya dengan contoh fiktif adalah perubahan tampilan (FTM-028);
-- teks layar lain juga memuat lokasi sungguhan: label kantor di halaman profil, kartu contoh
-  berkode STO pilot di layar masuk/daftar (`auth-shell.tsx`), serta contoh nama pengguna dan
-  contoh alasan di formulir daftar. Titik tengah bawaan kedua peta (dipakai bila belum ada lokasi
+- teks layar lain juga memuat lokasi sungguhan: label kantor di halaman profil. (Kartu contoh
+  berkode STO pilot di layar masuk dan daftar, serta contoh isian berlokasi di formulir daftar,
+  sudah dihapus saat halaman akun dirapikan pada November 2026.) Titik tengah bawaan kedua peta (dipakai bila belum ada lokasi
   berkoordinat) juga berada di sekitar lokasi pilot. Alias teknis data contoh (`site-tph`,
   `tank-tph-main`, `demo-tph-01`) dipakai seed, penyimpanan memori, dan tes; menggantinya ikut
   mengubah alamat halaman contoh (FTM-028);
