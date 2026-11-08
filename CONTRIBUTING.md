@@ -223,10 +223,19 @@ Sebelum menambah paket:
 Pembaruan dependensi dikerjakan per kelompok, satu pull request per kelompok,
 dan setiap pembaruan versi besar membaca catatan perubahan paketnya terlebih dulu.
 
-`pnpm.overrides` di `package.json` memaksa versi aman paket turunan Next.js (`browserslist`,
-`baseline-browser-mapping`, `source-map-js`). Per 31 Oktober 2026 rentang versi dari Next.js sudah
-memilih versi aman tanpa paksaan, jadi paksaan ini bisa dilepas saat Next.js diperbarui lagi, setelah
-`pnpm audit --prod` dicek.
+`pnpm.overrides` di `package.json` memaksa versi aman paket turunan (paket yang ditarik paket lain):
+
+- Paket turunan Next.js: `browserslist`, `baseline-browser-mapping`, `source-map-js`. Per 31 Oktober
+  2026 rentang versi dari Next.js sudah memilih versi aman tanpa paksaan, jadi paksaan ini bisa dilepas
+  saat Next.js diperbarui lagi, setelah `pnpm audit --prod` dicek.
+- Paket turunan alat pengembangan (8 November 2026): `postcss` (dipakai Tailwind saat build), `js-yaml`,
+  `brace-expansion`, `minimatch`, dan `zod`. Setiap kunci hanya mengganti versi yang masih rentan dengan
+  versi pertama yang sudah ditambal, jadi versi yang lebih baru tidak terhalang. `minimatch` 10 dipaksa
+  ke 11 karena tambalannya hanya ada di 11; lint lulus dengan versi itu. Lepaskan paksaan setelah
+  `pnpm audit` tetap bersih tanpa paksaan tersebut.
+
+`vite` dicantumkan langsung di `devDependencies` karena vitest memakainya sebagai _peer dependency_
+(paket yang harus disediakan proyek). Dengan begitu versinya bisa dijaga di versi yang aman.
 
 ## Menjaga riwayat
 
