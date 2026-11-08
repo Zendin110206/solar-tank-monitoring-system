@@ -16,6 +16,7 @@ dirilis ke `main`.
 - Node.js untuk pengembangan dan CI dinaikkan dari 22 ke 24, sama dengan aplikasi pilot di Vercel. CI membaca versinya
   dari `.nvmrc`, `package.json` mencantumkan `engines`, dan `@types/node` mengikuti versi 24.
 - Dependabot tidak lagi mengusulkan versi mayor `@types/node`, karena versinya harus mengikuti Node.js yang dipakai.
+- TypeScript dinaikkan dari 5.9 ke 6.0. Kode tidak perlu diubah; pemeriksaan tipe, lint, tes, dan build lulus.
 
 ## [0.2.0] - 2026-11-08
 
