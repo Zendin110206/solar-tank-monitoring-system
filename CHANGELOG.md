@@ -9,6 +9,10 @@ dirilis ke `main`.
 
 ## [Belum dirilis]
 
+### Diubah
+
+- Dokumen status operasional dan kebijakan keamanan mencatat keadaan pilot setelah rilis 0.2.0.
+
 ## [0.2.0] - 2026-11-08
 
 Rilis pertama dari branch `dev`. Isinya fondasi kerja (struktur modul, tes, dokumen, dan pemeriksaan
