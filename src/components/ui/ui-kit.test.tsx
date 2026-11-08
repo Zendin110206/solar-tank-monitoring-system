@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import { Card } from "./card";
 import { ActionMessage, FormErrorMessage } from "./message";
 import { SectionHeader } from "./section-header";
+import { SelectField } from "./select-field";
 import { StatusPill } from "./status-pill";
 
 // Setiap komponen harus menghasilkan HTML yang sama persis dengan markup yang dulu
@@ -119,5 +120,26 @@ describe("kit UI", () => {
         />,
       ),
     ).toBe(oldHeader("mt-2 max-w-3xl text-sm leading-6 text-zinc-500"));
+  });
+  it("SelectField menyembunyikan panah bawaan dan memasang satu ikon panah di kanan", () => {
+    const markup = html(
+      <SelectField
+        className="h-11 border"
+        defaultValue=""
+        id="peran"
+        name="peran"
+      >
+        <option value="">Pilih</option>
+      </SelectField>,
+    );
+
+    expect(markup).toContain(
+      'class="h-11 border cursor-pointer appearance-none !pr-11',
+    );
+    expect(markup).toContain('id="peran"');
+    expect(markup.match(/<svg/g)).toHaveLength(1);
+    expect(markup).toMatch(
+      /<\/select><svg[^>]*class="[^"]*pointer-events-none absolute right-4 top-1\/2/,
+    );
   });
 });
