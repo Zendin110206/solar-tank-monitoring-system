@@ -9,6 +9,8 @@ dirilis ke `main`.
 
 ## [Belum dirilis]
 
+## [0.4.0] - 2026-11-10
+
 Rilis tampilan dashboard. Semua halaman dashboard kini memakai satu kerangka bergaya korporat yang sama dengan
 halaman masuk: menu di kiri dan header di atas. Isi halaman, hak akses, data, database, firmware, kontrak perangkat,
 dan dependensi tidak berubah, kecuali bagian atas halaman Manajemen Tangki yang dirapikan.
@@ -372,7 +374,8 @@ Regional/Wilayah/Area/STO, detail tangki dengan grafik dan ekspor CSV, pengajuan
 perangkat sampai paket firmware dan aktivasi kiriman pertama, akun dengan
 verifikasi email, persetujuan admin, OTP admin, integrasi Telegram, dan helpdesk.
 
-[Belum dirilis]: https://github.com/Zendin110206/solar-tank-monitoring-system/compare/v0.3.0...dev
+[Belum dirilis]: https://github.com/Zendin110206/solar-tank-monitoring-system/compare/v0.4.0...dev
+[0.4.0]: https://github.com/Zendin110206/solar-tank-monitoring-system/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/Zendin110206/solar-tank-monitoring-system/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/Zendin110206/solar-tank-monitoring-system/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/Zendin110206/solar-tank-monitoring-system/compare/4bda023...v0.2.0
