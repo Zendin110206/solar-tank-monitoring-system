@@ -15,7 +15,6 @@ import {
   Wifi,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { SimpleTankVolumeChart } from "@/features/monitoring/components/simple-tank-volume-chart";
 import {
   TankHorizontalCylinderScene3D,
@@ -317,8 +316,7 @@ export default async function SimpleTankDetailPage({
   const { tankId } = await params;
 
   await connection();
-  const user = await requirePageUser();
-  const isAdmin = user.role === "admin";
+  await requirePageUser();
 
   const now = new Date();
   const refreshIntervalMs = getMonitoringRefreshIntervalMs();
@@ -360,18 +358,7 @@ export default async function SimpleTankDetailPage({
   ];
 
   return (
-    <main className="min-h-screen w-full min-w-0 overflow-x-hidden bg-[#f5faf8] text-zinc-950">
-      <DashboardHeader
-        navItems={[
-          { href: "/dashboard", label: "Manajemen Tangki" },
-          { current: true, label: "Detail Operasional" },
-          ...(isAdmin
-            ? [{ href: "/dashboard/detail", label: "Analisis Teknis" }]
-            : []),
-        ]}
-        user={user}
-      />
-
+    <div className="w-full min-w-0 overflow-x-hidden bg-[#f5faf8] text-zinc-950">
       <div className="mx-auto w-full max-w-[1540px] px-4 py-5 sm:px-6 lg:px-8">
         <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <Link
@@ -527,6 +514,6 @@ export default async function SimpleTankDetailPage({
           </Card>
         </section>
       </div>
-    </main>
+    </div>
   );
 }

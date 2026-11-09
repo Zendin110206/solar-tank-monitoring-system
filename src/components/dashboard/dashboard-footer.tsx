@@ -5,7 +5,8 @@ import { BrandLogo } from "@/components/brand-logo";
 export function DashboardFooter() {
   return (
     <footer className="border-t border-zinc-200/70 bg-white/95 text-sm text-zinc-500">
-      <div className="mx-auto flex w-full max-w-[1540px] flex-col gap-4 px-4 py-6 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
+      {/* Ruang kanan bawah dikosongkan untuk tombol helpdesk yang mengambang. */}
+      <div className="mx-auto flex w-full max-w-[1540px] flex-col gap-4 px-4 pb-24 pt-6 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:pb-6 lg:pl-8 lg:pr-24">
         <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-center">
           <BrandLogo
             className="gap-2"

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { HelpdeskWidget } from "@/features/helpdesk/components/helpdesk-widget";
+import { appFont } from "./app-font";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -54,7 +55,7 @@ export default function RootLayout({
   return (
     <html
       lang="id"
-      className="h-full antialiased"
+      className={`${appFont.variable} h-full antialiased`}
       data-scroll-behavior="smooth"
     >
       <body className="flex min-h-full flex-col" suppressHydrationWarning>

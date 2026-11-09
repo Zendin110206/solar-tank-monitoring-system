@@ -226,15 +226,16 @@ dan `jsonCaughtError` (pesan aman untuk error yang ditangkap). Hanya `/api/ready
 
 Kit UI bersama ada di `src/components/ui/`:
 
-| Berkas               | Isi                                                                                                                |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| `card.tsx`           | `Card`: kartu putih standar (`as` untuk `section`/`article`/`div`)                                                 |
-| `status-pill.tsx`    | `StatusPill`: lencana status berbentuk pil dengan titik warna                                                      |
-| `section-header.tsx` | `SectionHeader`: judul bagian (label merah, judul, penjelasan); `limitDescriptionWidth` membatasi lebar penjelasan |
-| `message.tsx`        | `FormErrorMessage` (kotak error formulir), `ActionMessage` (hasil aksi di dialog)                                  |
-| `button-class.ts`    | `BRAND_BLOCK_BUTTON_CLASS` (tombol merah halaman akun), `SECONDARY_BUTTON_CLASS` untuk `<button>` maupun `<Link>`  |
-| `select-field.tsx`   | `SelectField`: pilihan (dropdown) standar dengan satu ikon panah di posisi tetap                                   |
-| `status-tone.ts`     | peta warna status                                                                                                  |
+| Berkas                  | Isi                                                                                                                |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `card.tsx`              | `Card`: kartu putih standar (`as` untuk `section`/`article`/`div`)                                                 |
+| `status-pill.tsx`       | `StatusPill`: lencana status berbentuk pil dengan titik warna                                                      |
+| `section-header.tsx`    | `SectionHeader`: judul bagian (label merah, judul, penjelasan); `limitDescriptionWidth` membatasi lebar penjelasan |
+| `message.tsx`           | `FormErrorMessage` (kotak error formulir), `ActionMessage` (hasil aksi di dialog)                                  |
+| `button-class.ts`       | `BRAND_BLOCK_BUTTON_CLASS` (tombol merah halaman akun), `SECONDARY_BUTTON_CLASS` untuk `<button>` maupun `<Link>`  |
+| `select-field.tsx`      | `SelectField`: pilihan (dropdown) standar dengan satu ikon panah di posisi tetap                                   |
+| `segmented-control.tsx` | `SegmentedControl`: deretan tombol pilihan dengan penanda biru yang bergeser                                       |
+| `status-tone.ts`        | peta warna status                                                                                                  |
 
 Tes `ui-kit.test.tsx` memastikan setiap komponen menghasilkan HTML yang sama persis
 dengan markup lama.
@@ -242,8 +243,8 @@ dengan markup lama.
 Setiap pilihan (dropdown) baru memakai `SelectField`, bukan `<select>` polos. Panah bawaan
 browser disembunyikan (`appearance-none`) dan diganti satu ikon panah 16 px dari tepi kanan,
 tepat di tengah secara vertikal, sehingga posisinya sama di semua browser. Per November 2026
-baru formulir pengajuan akses yang memakainya; pilihan di halaman dashboard dipindahkan saat
-halaman itu ikut dirapikan.
+formulir pengajuan akses dan bar filter halaman Manajemen Tangki memakainya; pilihan di halaman
+dashboard lain dipindahkan saat halaman itu ikut dirapikan.
 
 Halaman akun (`/login`, `/forgot-password`, `/reset-password`, `/register`) memakai kerangka
 bersama di `src/components/auth/`:
@@ -255,7 +256,6 @@ bersama di `src/components/auth/`:
 | `auth-brand-row.tsx`      | logo Telkom Indonesia dan Infranexia, sekaligus tautan ke beranda                       |
 | `auth-brand-panel.tsx`    | foto, gelombang merah, logo dan nama FTM, serta tagline                                 |
 | `auth-photo.tsx`          | foto latar; hanya diunduh di layar ≥ 1024 px                                            |
-| `auth-font.ts`            | huruf Figtree lewat `next/font`, disajikan dari server FTM sendiri                      |
 | `auth-form-classes.ts`    | kelas label, input, petunjuk, tombol, dan tautan formulir                               |
 | `auth-password-input.tsx` | input kata sandi dengan tombol tampil/sembunyi                                          |
 | `auth-notice.tsx`         | `AuthNotice` (pemberitahuan, `aria-live`) dan `AuthError` (galat, `role="alert"`)       |
@@ -264,8 +264,34 @@ bersama di `src/components/auth/`:
 Warna merek (`brand-*`) ada di `src/app/globals.css`. Ukuran halaman akun memakai satu skala
 (`--auth-u` dari kelas `.auth-scale`): angka di kelas seperti `h-[calc(58*var(--auth-u))]`
 adalah piksel pada rancangan 1672 × 941, dan di layar lebar skalanya mengikuti ukuran jendela.
-Warna merek, skala, dan huruf Figtree sejauh ini hanya dipakai halaman akun; halaman lain tetap
-memakai tampilan lamanya.
+Huruf Figtree dimuat sekali untuk seluruh aplikasi di `src/app/app-font.ts` (lewat `next/font`,
+disajikan dari server FTM sendiri) dan dipasang di `src/app/layout.tsx`. Skala `--auth-u` hanya
+dipakai halaman akun.
+
+Semua halaman `/dashboard/*` memakai satu kerangka (sidebar kiri dan header atas) yang dipasang
+sekali di `src/app/dashboard/layout.tsx`. Halaman tidak lagi membuat header atau menunya sendiri.
+
+| Berkas di `src/components/dashboard/` | Isi                                                                                      |
+| ------------------------------------- | ---------------------------------------------------------------------------------------- |
+| `dashboard-navigation.ts`             | satu-satunya daftar menu: kelompok, item, ikon, peran, dan awalan alamat halaman anak    |
+| `dashboard-shell.tsx`                 | kerangka: sidebar, header, isi; ciut/perluas di layar lebar, panel geser di layar sempit |
+| `dashboard-sidebar.tsx`               | logo FTM, menu per kelompok, tombol ciut, kartu bantuan                                  |
+| `dashboard-sidebar-waves.tsx`         | hiasan gelombang merah (SVG)                                                             |
+| `dashboard-topbar.tsx`                | header: tombol menu, pencarian, bendera, notifikasi, menu akun                           |
+| `dashboard-search.tsx`                | pencarian menu dan halaman sesuai peran                                                  |
+| `dashboard-notifications.tsx`         | lonceng: pengingat Telegram dan keterangan pusat notifikasi yang masih dikembangkan      |
+| `dashboard-user-menu.tsx`             | tombol dan panel akun (profil, keamanan akun, keluar)                                    |
+| `dashboard-language-switch.tsx`       | bendera Bahasa Indonesia (aktif) dan Inggris (belum tersedia)                            |
+| `dashboard-page-nav.tsx`              | bilah tautan lompat di dalam halaman dan kontrol khusus halaman                          |
+| `dashboard-shell-content.ts`          | semua teks kerangka dalam satu objek                                                     |
+| `use-dashboard-popover.ts`            | perilaku bersama panel tarik-turun header (klik di luar, Escape, pindah halaman)         |
+
+Peran di setiap item menu harus sama dengan pengaman halamannya di server (`requirePageUser` atau
+`requirePageAdmin`). Menu hanya menyembunyikan tautan yang tidak boleh dibuka; pengamannya tetap di
+server. Item aktif ditentukan dari alamat halaman: sama persis dengan `href`, atau diawali salah satu
+`matchPrefixes` (misalnya `/dashboard/tanks/` menyorot Manajemen Tangki). Pencarian di header membaca
+daftar yang sama ditambah halaman Profil dan Keamanan Akun. Tinggi header disimpan di variabel CSS
+`--dashboard-header-height` (`globals.css`), dipakai juga oleh halaman yang mengisi tinggi layar.
 
 Warna status (lencana dan titik penanda) diambil dari satu peta,
 `src/components/ui/status-tone.ts`: `success` hijau, `warning` kuning, `danger` merah,

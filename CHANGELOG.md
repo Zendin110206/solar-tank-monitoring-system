@@ -9,6 +9,53 @@ dirilis ke `main`.
 
 ## [Belum dirilis]
 
+## [0.4.0] - 2026-11-10
+
+Rilis tampilan dashboard. Semua halaman dashboard kini memakai satu kerangka bergaya korporat yang sama dengan
+halaman masuk: menu di kiri dan header di atas. Isi halaman, hak akses, data, database, firmware, kontrak perangkat,
+dan dependensi tidak berubah, kecuali bagian atas halaman Manajemen Tangki yang dirapikan.
+
+### Ditambahkan
+
+- Sidebar (menu kiri) untuk semua halaman dashboard: logo FTM, menu yang dikelompokkan (Utama, Perangkat,
+  Administrasi, Bantuan), gelombang merah, dan kartu "Butuh bantuan?" yang membuka obrolan layanan bantuan. Di
+  layar lebar sidebar bisa diciutkan menjadi deretan ikon; di tablet dan ponsel sidebar menjadi panel geser yang
+  dibuka lewat tombol menu dan ditutup dengan tombol tutup, klik di luar panel, atau tombol Escape.
+- Header yang sama di semua halaman dashboard:
+  - pencarian menu dan halaman (juga lewat Ctrl+K); hanya menampilkan halaman yang boleh dibuka peran pengguna;
+  - bendera bahasa: Bahasa Indonesia aktif, bahasa Inggris tampil dengan keterangan "belum tersedia";
+  - lonceng notifikasi: menampilkan pengingat bila Telegram belum terhubung, dan menjelaskan bahwa pusat
+    notifikasi masih dikembangkan;
+  - menu akun dengan nama, email, peran, Profil Saya, Keamanan Akun, dan Keluar.
+- Banner "Ringkasan Operasional" di halaman Manajemen Tangki, dengan tombol Tambah Perangkat dan (untuk admin)
+  Tinjau Pengajuan. Banner ini menggantikan kotak "Operasional perangkat"; tujuan kedua tombol tetap sama.
+- Komponen `SegmentedControl` di kit UI: deretan tombol pilihan dengan penanda biru yang bergeser.
+
+### Diubah
+
+- Menu dashboard kini diatur di satu tempat (`src/components/dashboard/dashboard-navigation.ts`), sehingga menunjukkan
+  menu yang sama di setiap halaman untuk peran yang sama. Menu yang sedang dibuka ditandai dari alamat halaman,
+  termasuk halaman detail tangki.
+- Tautan lompat di dalam halaman (Peta STO, Prioritas, Log Perangkat, Riwayat, Lokasi, Konfigurasi, Data perangkat)
+  dan kontrol pembaruan otomatis pindah dari header lama ke bilah di atas isi halaman Analisis Teknis dan detail
+  tangki.
+- Huruf Figtree kini dipakai di seluruh aplikasi. Tampilan halaman akun tidak berubah.
+- Bar filter halaman Manajemen Tangki menyesuaikan susunannya dengan ruang yang tersedia, sehingga tetap lega saat
+  sidebar dibuka. Pilihan Status dan Kartu/Peta memakai `SegmentedControl`, dan keempat pilihan filter memakai
+  `SelectField`.
+- Data sesi pengguna dibaca sekali per permintaan halaman, karena kerangka dashboard dan halamannya sama-sama
+  membutuhkannya.
+
+### Diperbaiki
+
+- Halaman Manajemen Pengguna tidak lagi melebar ke samping di layar laptop. Tabel pengguna tetap bisa digulir di
+  dalam kotaknya sendiri, dan baris filter menyesuaikan diri dengan ruang yang tersedia.
+
+### Dihapus
+
+- Header dan menu ponsel lama yang dibuat terpisah di setiap halaman dashboard.
+- Pemuat huruf khusus halaman akun (`auth-font.ts`), karena hurufnya kini dimuat sekali untuk seluruh aplikasi.
+
 ## [0.3.0] - 2026-11-09
 
 Rilis tampilan. Halaman masuk, lupa kata sandi, buat kata sandi baru, dan pengajuan akses kini bergaya korporat
@@ -327,7 +374,8 @@ Regional/Wilayah/Area/STO, detail tangki dengan grafik dan ekspor CSV, pengajuan
 perangkat sampai paket firmware dan aktivasi kiriman pertama, akun dengan
 verifikasi email, persetujuan admin, OTP admin, integrasi Telegram, dan helpdesk.
 
-[Belum dirilis]: https://github.com/Zendin110206/solar-tank-monitoring-system/compare/v0.3.0...dev
+[Belum dirilis]: https://github.com/Zendin110206/solar-tank-monitoring-system/compare/v0.4.0...dev
+[0.4.0]: https://github.com/Zendin110206/solar-tank-monitoring-system/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/Zendin110206/solar-tank-monitoring-system/compare/v0.2.1...v0.3.0
 [0.2.1]: https://github.com/Zendin110206/solar-tank-monitoring-system/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/Zendin110206/solar-tank-monitoring-system/compare/4bda023...v0.2.0

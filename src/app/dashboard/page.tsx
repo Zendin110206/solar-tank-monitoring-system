@@ -1,4 +1,3 @@
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { createAdminActionCsrfToken } from "@/features/auth/server/auth-csrf";
 import { requirePageUser } from "@/features/auth/server/auth-guards";
 import { SimpleDashboardView } from "@/features/monitoring/components/simple-dashboard-view";
@@ -9,10 +8,10 @@ import {
   createSimpleDashboardSites,
   type SimpleDashboardSite,
 } from "@/features/monitoring/domain/simple-dashboard-model";
-import { ClipboardCheck, Plus } from "lucide-react";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { connection } from "next/server";
+
+import { DashboardOverviewHero } from "./dashboard-overview-hero";
 
 export const metadata: Metadata = {
   title: "Manajemen Tangki Bahan Bakar | FTM",
@@ -63,58 +62,14 @@ export default async function SimpleDashboardPage() {
   );
 
   return (
-    <main className="min-h-screen w-full min-w-0 overflow-x-hidden bg-[#f5faf8] text-zinc-950">
-      <DashboardHeader
-        navItems={[
-          { current: true, label: "Manajemen Tangki" },
-          ...(isAdmin
-            ? [
-                { href: "/dashboard/detail", label: "Analisis Teknis" },
-                {
-                  href: "/dashboard/admin/users",
-                  label: "Manajemen Pengguna",
-                },
-              ]
-            : []),
-        ]}
-        user={user}
-      />
-
-      <div className="mx-auto flex w-full max-w-[1540px] min-w-0 flex-col px-4 py-5 sm:px-6 lg:px-8">
-        <section className="mb-4 flex flex-col gap-3 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-          <div className="min-w-0">
-            <p className="text-sm font-semibold uppercase text-zinc-500">
-              Operasional perangkat
-            </p>
-            <p className="mt-1 text-sm leading-6 text-zinc-600">
-              Ajukan perangkat baru atau tinjau pengajuan yang menunggu
-              persetujuan.
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <Link
-              href="/dashboard/devices/request"
-              className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 text-sm font-semibold text-white shadow-lg shadow-blue-600/15 transition hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/20"
-            >
-              <Plus className="size-4" aria-hidden="true" />
-              Tambah perangkat
-            </Link>
-            {isAdmin ? (
-              <Link
-                href="/dashboard/admin/device-requests"
-                className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 text-sm font-semibold text-zinc-700 transition hover:bg-blue-50 hover:text-blue-700 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15"
-              >
-                <ClipboardCheck className="size-4" aria-hidden="true" />
-                Tinjau pengajuan
-              </Link>
-            ) : null}
-          </div>
-        </section>
+    <div className="w-full min-w-0 overflow-x-hidden bg-[#f5faf8] text-zinc-950">
+      <DashboardOverviewHero isAdmin={isAdmin} />
+      <div className="mx-auto flex w-full max-w-[1540px] min-w-0 flex-col px-4 pb-5 pt-2 sm:px-6 lg:px-8">
         <SimpleDashboardView
           adminCleanupToken={adminCleanupToken}
           sites={simpleSites}
         />
       </div>
-    </main>
+    </div>
   );
 }
