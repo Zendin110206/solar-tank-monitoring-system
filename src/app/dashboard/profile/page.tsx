@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { MapPin, Pencil, UserRound } from "lucide-react";
 
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { requirePageUser } from "@/features/auth/server/auth-guards";
 import type { AuthSafeUser } from "@/features/auth/types/auth";
 import { ProfileForm } from "./profile-form";
@@ -65,12 +64,7 @@ export default async function ProfilePage() {
   const avatarLabel = getAvatarLabel(user);
 
   return (
-    <main className="min-h-screen bg-[#f5faf8] text-zinc-950">
-      <DashboardHeader
-        navItems={[{ href: "/dashboard", label: "Manajemen Tangki" }]}
-        user={user}
-      />
-
+    <div className="bg-[#f5faf8] text-zinc-950">
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
         {/* Profile summary card */}
         <section className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-sm sm:p-6">
@@ -117,6 +111,6 @@ export default async function ProfilePage() {
           </dl>
         </section>
       </div>
-    </main>
+    </div>
   );
 }

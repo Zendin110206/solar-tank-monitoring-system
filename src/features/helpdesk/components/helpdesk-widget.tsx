@@ -3,6 +3,8 @@
 import { FormEvent, useCallback, useEffect, useRef, useState } from "react";
 import { MessageCircle, Send, X } from "lucide-react";
 
+import { HELPDESK_OPEN_EVENT } from "./helpdesk-events";
+
 type HelpdeskMessage = {
   id: string;
   senderType: "visitor" | "user" | "admin" | "system";
@@ -126,6 +128,28 @@ export function HelpdeskWidget() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isOpen]);
 
+  // Kartu bantuan di sidebar dashboard membuka obrolan yang sama.
+  useEffect(() => {
+    function handleOpenRequest() {
+      setIsOpen(true);
+
+      if (!sessionToken) {
+        openSession().catch((openError: unknown) => {
+          setError(
+            openError instanceof Error
+              ? openError.message
+              : "Helpdesk belum tersedia.",
+          );
+        });
+      }
+    }
+
+    window.addEventListener(HELPDESK_OPEN_EVENT, handleOpenRequest);
+
+    return () =>
+      window.removeEventListener(HELPDESK_OPEN_EVENT, handleOpenRequest);
+  }, [openSession, sessionToken]);
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const message = draft.trim();
@@ -203,6 +227,7 @@ export function HelpdeskWidget() {
 
   return (
     <div
+      data-helpdesk-widget=""
       className={isOpen ? openWidgetFrameClassName : closedWidgetFrameClassName}
     >
       {isOpen ? (

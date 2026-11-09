@@ -1,18 +1,23 @@
 import "server-only";
 
 import { cookies } from "next/headers";
+import { cache } from "react";
 import type { NextRequest, NextResponse } from "next/server";
 
 import type { AuthSessionUser } from "../types/auth";
 import { getAuthCookieName, shouldUseSecureCookies } from "./auth-config";
 import { getSessionUserFromToken } from "./auth-service";
 
-export async function getCurrentSessionUser(): Promise<AuthSessionUser | null> {
-  const cookieStore = await cookies();
-  const sessionToken = cookieStore.get(getAuthCookieName())?.value;
+// Dibagi dalam satu permintaan (React cache): layout dashboard dan halaman
+// yang sama-sama membaca sesi hanya memeriksa database sekali.
+export const getCurrentSessionUser = cache(
+  async (): Promise<AuthSessionUser | null> => {
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get(getAuthCookieName())?.value;
 
-  return getSessionUserFromToken(sessionToken);
-}
+    return getSessionUserFromToken(sessionToken);
+  },
+);
 
 export async function getRequestSessionUser(
   request: NextRequest,

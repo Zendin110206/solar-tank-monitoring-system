@@ -16,7 +16,7 @@ export function DashboardRouteError({
   title: string;
 }) {
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#f5faf8] px-4 py-8 text-zinc-950 sm:px-6 lg:px-8">
+    <div className="overflow-x-hidden px-4 py-8 text-zinc-950 sm:px-6 lg:px-8">
       <section className="mx-auto w-full max-w-3xl rounded-lg border border-red-100 bg-white p-6 shadow-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-red-600">
           {label}
@@ -57,6 +57,6 @@ export function DashboardRouteError({
           </a>
         </div>
       </section>
-    </main>
+    </div>
   );
 }

@@ -1,6 +1,5 @@
 import { changeAuthUserRoleAction } from "./actions";
 import { AdminRoleForm } from "./admin-action-controls";
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { createAdminActionCsrfToken } from "@/features/auth/server/auth-csrf";
 import { requirePageAdmin } from "@/features/auth/server/auth-guards";
 import {
@@ -125,20 +124,7 @@ export default async function AdminUsersPage({
   ].filter(Boolean).length;
 
   return (
-    <main className="min-h-screen bg-[#f5faf8] text-zinc-950">
-      <DashboardHeader
-        navItems={[
-          { href: "/dashboard", label: "Manajemen Tangki" },
-          { current: true, label: "Manajemen Pengguna" },
-          {
-            href: "/dashboard/admin/device-requests",
-            label: "Tinjau Pengajuan",
-          },
-          { href: "/dashboard/admin/audit", label: "Audit Keamanan" },
-        ]}
-        user={admin}
-      />
-
+    <div className="bg-[#f5faf8] text-zinc-950">
       <div className="mx-auto flex max-w-[1540px] flex-col gap-3 px-4 py-3 pb-20 sm:px-6 lg:px-8 lg:pb-6">
         <section className="rounded-lg border border-zinc-200 bg-white p-3 shadow-sm">
           <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
@@ -207,10 +193,10 @@ export default async function AdminUsersPage({
           csrfToken={csrfToken}
         />
 
-        <section className="rounded-lg border border-zinc-200 bg-white p-2 shadow-sm">
+        <section className="@container rounded-lg border border-zinc-200 bg-white p-2 shadow-sm">
           <form
             action="/dashboard/admin/users"
-            className="grid gap-2 xl:hidden"
+            className="grid gap-2 @min-[80rem]:hidden"
             method="get"
           >
             <input name="page" type="hidden" value="1" />
@@ -255,7 +241,7 @@ export default async function AdminUsersPage({
 
           <form
             action="/dashboard/admin/users"
-            className="hidden gap-2 xl:grid xl:grid-cols-[minmax(16rem,1fr)_10rem_9rem_11rem_10rem_8rem_auto_auto] xl:items-center"
+            className="hidden gap-2 @min-[80rem]:grid @min-[80rem]:grid-cols-[minmax(16rem,1fr)_10rem_9rem_11rem_10rem_8rem_auto_auto] @min-[80rem]:items-center"
             method="get"
           >
             <input name="page" type="hidden" value="1" />
@@ -305,7 +291,7 @@ export default async function AdminUsersPage({
             </div>
           ) : (
             <>
-              <div className="hidden overflow-x-auto lg:block">
+              <div className="relative hidden overflow-x-auto lg:block">
                 <table className="w-full min-w-[1180px] text-left text-sm">
                   <thead className="border-b border-zinc-200 bg-zinc-50 text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-400">
                     <tr>
@@ -523,6 +509,6 @@ export default async function AdminUsersPage({
           </div>
         </section>
       </div>
-    </main>
+    </div>
   );
 }

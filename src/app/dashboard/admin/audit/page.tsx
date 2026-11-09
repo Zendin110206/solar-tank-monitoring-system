@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { ClipboardList } from "lucide-react";
 
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { requirePageAdmin } from "@/features/auth/server/auth-guards";
 import { listAuthAuditEvents } from "@/features/auth/server/audit-service";
 import { formatDateTimeJakarta } from "@/lib/format";
@@ -24,20 +23,11 @@ function formatMetadata(metadata: Record<string, unknown> | null) {
 }
 
 export default async function AdminAuditPage() {
-  const admin = await requirePageAdmin();
+  await requirePageAdmin();
   const events = await listAuthAuditEvents();
 
   return (
-    <main className="min-h-screen bg-[#f5faf8] text-zinc-950">
-      <DashboardHeader
-        navItems={[
-          { href: "/dashboard", label: "Manajemen Tangki" },
-          { href: "/dashboard/admin/users", label: "Manajemen Pengguna" },
-          { current: true, label: "Audit Keamanan" },
-        ]}
-        user={admin}
-      />
-
+    <div className="bg-[#f5faf8] text-zinc-950">
       <div className="mx-auto flex max-w-[1540px] flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
         <Card>
           <div className="flex items-start gap-3">
@@ -98,6 +88,6 @@ export default async function AdminAuditPage() {
           </div>
         </Card>
       </div>
-    </main>
+    </div>
   );
 }

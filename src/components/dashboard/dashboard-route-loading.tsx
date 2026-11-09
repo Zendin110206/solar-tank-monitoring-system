@@ -1,4 +1,3 @@
-import { BrandLogo } from "@/components/brand-logo";
 import { Card } from "@/components/ui/card";
 
 type DashboardRouteLoadingProps = {
@@ -13,21 +12,7 @@ export function DashboardRouteLoading({
   description = "Sistem sedang membaca data dan menyiapkan tampilan. Halaman akan terbuka otomatis setelah siap.",
 }: DashboardRouteLoadingProps) {
   return (
-    <main className="min-h-screen w-full overflow-x-hidden bg-[#f5faf8] text-zinc-950">
-      <header className="border-b border-zinc-200/70 bg-white/90">
-        <div className="mx-auto flex h-16 max-w-[1540px] items-center justify-between px-4 sm:px-6 lg:px-8">
-          <BrandLogo
-            markClassName="size-9"
-            priority
-            textClassName="text-lg font-semibold"
-          />
-          <div className="hidden items-center gap-2 sm:flex">
-            <span className="h-9 w-32 animate-pulse rounded-lg bg-zinc-100" />
-            <span className="h-9 w-24 animate-pulse rounded-lg bg-zinc-100" />
-          </div>
-        </div>
-      </header>
-
+    <div className="w-full overflow-x-hidden text-zinc-950">
       <div className="mx-auto max-w-[1540px] px-4 py-5 sm:px-6 lg:px-8">
         <Card>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-red-600">
@@ -48,6 +33,6 @@ export function DashboardRouteLoading({
           <div className="mt-4 h-72 animate-pulse rounded-lg bg-zinc-50" />
         </Card>
       </div>
-    </main>
+    </div>
   );
 }

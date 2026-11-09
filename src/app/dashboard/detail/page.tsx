@@ -14,7 +14,6 @@ import {
   Wifi,
 } from "lucide-react";
 
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { SectionHeader } from "@/components/ui/section-header";
 import { DashboardMapOverview } from "@/features/monitoring/components/dashboard-map-overview";
 import { LiveClock } from "@/features/monitoring/components/live-clock";
@@ -34,6 +33,7 @@ import {
 } from "@/components/ui/status-tone";
 import { Card } from "@/components/ui/card";
 import { StatusPill } from "@/components/ui/status-pill";
+import { DashboardPageNav } from "@/components/dashboard/dashboard-page-nav";
 
 export const metadata: Metadata = {
   title: "Analisis Teknis Tangki Bahan Bakar | FTM",
@@ -169,7 +169,7 @@ function StatusBadge({ status }: { status: SiteStatus }) {
 
 export default async function DashboardPage() {
   await connection();
-  const admin = await requirePageAdmin();
+  await requirePageAdmin();
 
   const now = new Date();
   const refreshIntervalMs = getMonitoringRefreshIntervalMs();
@@ -198,26 +198,22 @@ export default async function DashboardPage() {
   const localTimeLabel = formatJakartaTime(now);
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#f5faf8] text-zinc-950">
-      <DashboardHeader
-        navItems={[
-          { href: "/dashboard", label: "Manajemen Tangki" },
-          { current: true, label: "Analisis Teknis" },
-          { href: "#peta", label: "Peta STO" },
-          { href: "#prioritas", label: "Prioritas" },
-          { href: "#log", label: "Log Perangkat" },
-        ]}
-        rightSlot={
-          <LiveRefreshControl
-            intervalMs={refreshIntervalMs}
-            lastSyncedLabel={dashboardOverview.summary.syncLabel}
-            className="hidden md:inline-flex"
-          />
-        }
-        user={admin}
-      />
-
+    <div className="overflow-x-hidden bg-[#f5faf8] text-zinc-950">
       <div className="mx-auto max-w-[1540px] px-4 py-5 sm:px-6 lg:px-8">
+        <DashboardPageNav
+          controls={
+            <LiveRefreshControl
+              intervalMs={refreshIntervalMs}
+              lastSyncedLabel={dashboardOverview.summary.syncLabel}
+              className="hidden md:inline-flex"
+            />
+          }
+          items={[
+            { href: "#peta", label: "Peta STO" },
+            { href: "#prioritas", label: "Prioritas" },
+            { href: "#log", label: "Log Perangkat" },
+          ]}
+        />
         {/* Dashboard Toolbar */}
         <section
           id="ringkasan"
@@ -575,6 +571,6 @@ export default async function DashboardPage() {
           </div>
         </Card>
       </div>
-    </main>
+    </div>
   );
 }

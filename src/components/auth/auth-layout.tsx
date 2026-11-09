@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 import { AuthBrandPanel } from "./auth-brand-panel";
 import { AuthBrandRow } from "./auth-brand-row";
 import { AUTH_CONTENT } from "./auth-content";
-import { authFont } from "./auth-font";
 
 // Kotak keterangan abu-abu di bawah formulir.
 export function AuthNote({ lines }: { lines: readonly string[] }) {
@@ -54,7 +53,7 @@ export function AuthLayout({
 
   return (
     <main
-      className={`${authFont.variable} auth-scale grid min-h-dvh bg-white font-[family-name:var(--font-auth)] text-brand-ink ${columns}`}
+      className={`auth-scale grid min-h-dvh bg-white text-brand-ink ${columns}`}
     >
       <div className="flex min-w-0 flex-col px-6 pb-8 pt-6 sm:px-10 md:mx-auto md:w-full md:max-w-[38rem] md:pt-10 lg:mx-0 lg:max-w-none lg:border-r lg:border-zinc-200 lg:pb-[calc(39*var(--auth-u))] lg:pl-[calc(84*var(--auth-u))] lg:pr-[calc(50*var(--auth-u))] lg:pt-[calc(29*var(--auth-u))]">
         <header className="flex min-h-[calc(102*var(--auth-u))] items-center">
