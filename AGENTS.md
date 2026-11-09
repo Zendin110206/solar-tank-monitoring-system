@@ -61,6 +61,9 @@ src/app → layanan modul → repositori (SQL) → koneksi database
   selalu di posisi yang sama.
 - Halaman akun (masuk, lupa dan atur ulang kata sandi, pengajuan akses) memakai kerangka dan teks
   bersama di `src/components/auth/`; teksnya diubah di `auth-content.ts`.
+- Halaman dashboard tidak membuat header atau menu sendiri. Menu baru ditambahkan di
+  `src/components/dashboard/dashboard-navigation.ts`, dengan peran yang sama seperti pengaman
+  halamannya di server.
 - Warna status memakai `STATUS_BADGE_CLASS` / `STATUS_DOT_CLASS` dari
   `src/components/ui/status-tone.ts`, bukan kelas warna yang ditulis ulang.
 - Angka dan tanggal yang dilihat pengguna ditulis lewat `src/lib/format.ts`; jangan membuat
