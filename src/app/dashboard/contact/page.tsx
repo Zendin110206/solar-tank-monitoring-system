@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Mail, MapPin, Send, ShieldCheck } from "lucide-react";
 
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { requirePageUser } from "@/features/auth/server/auth-guards";
 import { ContactMessageTemplate } from "./contact-message-template";
 
@@ -82,16 +81,8 @@ export default async function DashboardContactPage() {
   });
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#f5faf8] text-zinc-950">
-      <DashboardHeader
-        navItems={[
-          { href: "/dashboard", label: "Manajemen Tangki" },
-          { current: true, label: "Kontak" },
-        ]}
-        user={user}
-      />
-
-      <section className="relative flex min-h-[calc(100dvh-4rem)] items-center justify-center overflow-hidden px-4 py-4 sm:px-6 lg:px-8">
+    <div className="overflow-hidden bg-[#f5faf8] text-zinc-950">
+      <section className="relative flex min-h-[calc(100dvh-var(--dashboard-header-height))] items-center justify-center overflow-hidden px-4 py-4 sm:px-6 lg:px-8">
         <div
           aria-hidden="true"
           className="absolute inset-0 opacity-70"
@@ -169,6 +160,6 @@ export default async function DashboardContactPage() {
           />
         </div>
       </section>
-    </main>
+    </div>
   );
 }

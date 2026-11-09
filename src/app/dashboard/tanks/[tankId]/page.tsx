@@ -1,4 +1,3 @@
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { Card } from "@/components/ui/card";
 import { STATUS_BADGE_CLASS } from "@/components/ui/status-tone";
 import { requirePageAdmin } from "@/features/auth/server/auth-guards";
@@ -53,6 +52,7 @@ import {
   TankConfigurationPanel,
 } from "./_components/tank-panels";
 import { TankVisual } from "./_components/tank-visual";
+import { DashboardPageNav } from "@/components/dashboard/dashboard-page-nav";
 
 export const metadata: Metadata = {
   title: "Detail Tangki Bahan Bakar | FTM",
@@ -81,7 +81,7 @@ export default async function TankDetailPage({
   const { tankId } = await params;
 
   await connection();
-  const admin = await requirePageAdmin();
+  await requirePageAdmin();
 
   const now = new Date();
   const [latestReadingsResult, tankHistoryReadings, referenceData] =
@@ -204,32 +204,28 @@ export default async function TankDetailPage({
   ];
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#f5faf8] text-zinc-950">
-      <DashboardHeader
-        navItems={[
-          { href: "/dashboard", label: "Manajemen Tangki" },
-          { current: true, label: "Detail Tangki" },
-          { href: "#riwayat", label: "Riwayat" },
-          { href: "#lokasi", label: "Lokasi" },
-          { href: "#konfigurasi", label: "Konfigurasi" },
-          { href: "#data-perangkat", label: "Data perangkat" },
-        ]}
-        rightSlot={
-          <>
-            <LiveRefreshControl
-              intervalMs={refreshIntervalMs}
-              lastSyncedLabel={`Update ${tank.lastUpdateLabel}`}
-              className="hidden md:inline-flex"
-            />
-            <div className="hidden sm:block">
-              <StatusBadge status={tank.status} />
-            </div>
-          </>
-        }
-        user={admin}
-      />
-
+    <div className="overflow-x-hidden bg-[#f5faf8] text-zinc-950">
       <div className="mx-auto max-w-[1540px] px-4 py-5 sm:px-6 lg:px-8">
+        <DashboardPageNav
+          controls={
+            <>
+              <LiveRefreshControl
+                intervalMs={refreshIntervalMs}
+                lastSyncedLabel={`Update ${tank.lastUpdateLabel}`}
+                className="hidden md:inline-flex"
+              />
+              <div className="hidden sm:block">
+                <StatusBadge status={tank.status} />
+              </div>
+            </>
+          }
+          items={[
+            { href: "#riwayat", label: "Riwayat" },
+            { href: "#lokasi", label: "Lokasi" },
+            { href: "#konfigurasi", label: "Konfigurasi" },
+            { href: "#data-perangkat", label: "Data perangkat" },
+          ]}
+        />
         {/* Detail Toolbar */}
         <section className="animate-soft-fade mb-5 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
           <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
@@ -504,6 +500,6 @@ export default async function TankDetailPage({
           </Card>
         </div>
       </div>
-    </main>
+    </div>
   );
 }

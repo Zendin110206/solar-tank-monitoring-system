@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { ShieldCheck } from "lucide-react";
 
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { requirePageUser } from "@/features/auth/server/auth-guards";
 import { listCurrentUserSessions } from "@/features/auth/server/auth-service";
 import AccountSecurityPanel from "./security-panel";
@@ -21,12 +20,7 @@ export default async function AccountSecurityPage() {
   const sessions = await listCurrentUserSessions({ user });
 
   return (
-    <main className="min-h-screen bg-[#f5faf8] text-zinc-950">
-      <DashboardHeader
-        navItems={[{ href: "/dashboard", label: "Manajemen Tangki" }]}
-        user={user}
-      />
-
+    <div className="bg-[#f5faf8] text-zinc-950">
       <div className="mx-auto flex max-w-[1540px] flex-col gap-5 px-4 py-5 sm:px-6 lg:px-8">
         <Card>
           <div className="flex items-start gap-3">
@@ -50,6 +44,6 @@ export default async function AccountSecurityPage() {
 
         <AccountSecurityPanel initialSessions={sessions} user={user} />
       </div>
-    </main>
+    </div>
   );
 }

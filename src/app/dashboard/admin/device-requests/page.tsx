@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Clock3, Database, Search, ShieldCheck } from "lucide-react";
 
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { createAdminActionCsrfToken } from "@/features/auth/server/auth-csrf";
 import { requirePageAdmin } from "@/features/auth/server/auth-guards";
 import { getDeviceRequestStatusLabel } from "@/features/devices/domain/device-request";
@@ -125,16 +124,7 @@ export default async function AdminDeviceRequestsPage({
   });
 
   return (
-    <main className="flex min-h-screen flex-col overflow-x-hidden bg-[#f5faf8] text-zinc-950 lg:h-screen lg:overflow-hidden">
-      <DashboardHeader
-        navItems={[
-          { href: "/dashboard", label: "Manajemen Tangki" },
-          { current: true, label: "Tinjau Pengajuan" },
-          { href: "/dashboard/admin/users", label: "Manajemen Pengguna" },
-        ]}
-        user={admin}
-      />
-
+    <div className="flex flex-col overflow-x-hidden bg-[#f5faf8] text-zinc-950 lg:h-[calc(100dvh-var(--dashboard-header-height))] lg:overflow-hidden">
       <div className="mx-auto flex w-full max-w-[1540px] flex-1 flex-col gap-3 px-4 py-3 sm:px-6 lg:min-h-0 lg:px-8">
         {/* Summary section */}
         <section className="shrink-0 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm">
@@ -262,6 +252,6 @@ export default async function AdminDeviceRequestsPage({
           totalRequestCount={requests.length}
         />
       </div>
-    </main>
+    </div>
   );
 }

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Clock3, Cpu, FileCheck2, ShieldCheck } from "lucide-react";
 
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { requirePageUser } from "@/features/auth/server/auth-guards";
 import {
   getDeviceRequestStatusLabel,
@@ -124,22 +123,7 @@ export default async function DeviceRequestPage() {
     : [[], []];
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#f5faf8] text-zinc-950">
-      <DashboardHeader
-        navItems={[
-          { href: "/dashboard", label: "Manajemen Tangki" },
-          ...(user.role === "admin"
-            ? [
-                {
-                  href: "/dashboard/admin/device-requests",
-                  label: "Tinjau Pengajuan",
-                },
-              ]
-            : []),
-        ]}
-        user={user}
-      />
-
+    <div className="overflow-x-hidden bg-[#f5faf8] text-zinc-950">
       <div className="mx-auto flex w-full max-w-[1540px] min-w-0 flex-col gap-5 px-3 py-4 sm:px-6 sm:py-5 lg:px-8">
         <section className="w-full min-w-0 rounded-lg border border-zinc-200 bg-white p-4 shadow-sm sm:p-5">
           <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)] xl:items-center">
@@ -222,6 +206,6 @@ export default async function DeviceRequestPage() {
 
         <RequestHistory requests={requests} />
       </div>
-    </main>
+    </div>
   );
 }
