@@ -1,7 +1,7 @@
 "use client";
 
-import { ChevronDown, LayoutGrid, MapPinned, Search } from "lucide-react";
-import { useMemo, useState } from "react";
+import { LayoutGrid, MapPinned, Search } from "lucide-react";
+import { type ReactNode, useMemo, useState } from "react";
 import {
   filterSimpleDashboardSites,
   getSimpleDashboardAreas,
@@ -17,6 +17,8 @@ import {
 } from "../domain/simple-dashboard-model";
 import { SimpleDashboardCards } from "./simple-dashboard-cards";
 import { SimpleDashboardMap } from "./simple-dashboard-map";
+import { SegmentedControl } from "@/components/ui/segmented-control";
+import { SelectField } from "@/components/ui/select-field";
 import { STATUS_DOT_CLASS } from "@/components/ui/status-tone";
 
 type SimpleDashboardViewProps = {
@@ -38,6 +40,23 @@ const STATUS_FILTERS: StatusFilterOption[] = [
   { value: "online", label: "Online" },
   { value: "offline", label: "Offline" },
 ];
+
+const VIEW_MODES = [
+  {
+    value: "cards",
+    label: "Kartu",
+    icon: <LayoutGrid aria-hidden="true" className="size-4" />,
+  },
+  {
+    value: "map",
+    label: "Peta",
+    icon: <MapPinned aria-hidden="true" className="size-4" />,
+  },
+] as const satisfies readonly {
+  icon: ReactNode;
+  label: string;
+  value: DashboardViewMode;
+}[];
 
 type SummaryTone = "blue" | "emerald" | "red";
 
@@ -152,191 +171,139 @@ export function SimpleDashboardView({
         <SummaryValue label="Offline" tone="red" value={summary.offline} />
       </div>
 
-      <div className="grid min-w-0 grid-cols-1 gap-4 rounded-lg border border-zinc-200 bg-white p-3 shadow-sm md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-6 2xl:items-end">
-        <label className="block min-w-0">
-          <span className="mb-2 block text-xs font-semibold uppercase text-zinc-500">
-            Cari STO
-          </span>
-          <span className="relative block">
-            <Search
-              aria-hidden="true"
-              className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400"
-            />
-            <input
-              className="h-12 w-full rounded-lg border border-zinc-300 bg-white pl-10 pr-3 text-sm font-medium text-zinc-950 outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Cari kode, nama, area, regional, wilayah, atau perangkat"
-              type="search"
-              value={query}
-            />
-          </span>
-        </label>
+      {/* Bar filter. Susunannya mengikuti lebar kotak ini sendiri (container
+          query), jadi tetap lega saat sidebar dibuka maupun diciutkan. */}
+      <div className="@container rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+        <div className="grid min-w-0 gap-4 @xl:grid-cols-[minmax(0,1fr)_auto] @min-[88rem]:grid-cols-[minmax(14rem,1fr)_auto_minmax(0,2.6fr)] @min-[88rem]:items-end">
+          <label className="block min-w-0">
+            <span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.04em] text-zinc-500">
+              Cari STO
+            </span>
+            <span className="relative block">
+              <Search
+                aria-hidden="true"
+                className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-zinc-400"
+              />
+              <input
+                className="h-11 w-full rounded-lg border border-zinc-300 bg-white pl-10 pr-3 text-sm font-medium text-zinc-950 shadow-xs outline-none transition placeholder:text-zinc-400 hover:border-zinc-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-600/10"
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Cari kode, nama, area, regional, wilayah, atau perangkat"
+                type="search"
+                value={query}
+              />
+            </span>
+          </label>
 
-        <div className="min-w-0">
-          <p className="mb-2 text-xs font-semibold uppercase text-zinc-500">
-            Status
-          </p>
-          <div className="grid h-12 min-w-0 grid-cols-3 rounded-lg border border-zinc-300 bg-zinc-50 p-1">
-            {STATUS_FILTERS.map((filter) => (
-              <button
-                aria-pressed={statusFilter === filter.value}
-                className={`h-full rounded-md px-2 text-sm font-semibold transition ${
-                  statusFilter === filter.value
-                    ? "bg-blue-600 text-white shadow-sm"
-                    : "text-zinc-600 hover:bg-white hover:text-blue-700"
-                }`}
-                key={filter.value}
-                onClick={() => setStatusFilter(filter.value)}
-                type="button"
+          <div className="min-w-0">
+            <p className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.04em] text-zinc-500">
+              Status
+            </p>
+            <SegmentedControl
+              className="@xl:w-[16.5rem]"
+              label="Filter status STO"
+              onChange={setStatusFilter}
+              options={STATUS_FILTERS}
+              value={statusFilter}
+            />
+          </div>
+
+          <div className="grid min-w-0 gap-4 @xl:col-span-2 @xl:grid-cols-2 @4xl:grid-cols-4 @min-[88rem]:col-span-1">
+            <label className="block min-w-0">
+              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.04em] text-zinc-500">
+                Regional
+              </span>
+              <SelectField
+                className="h-11 w-full rounded-lg border border-zinc-300 bg-white pl-3 text-sm font-semibold text-zinc-800 shadow-xs outline-none transition hover:border-zinc-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-600/10"
+                onChange={(event) => setRegionalFilter(event.target.value)}
+                value={regionalFilter}
               >
-                {filter.label}
-              </button>
-            ))}
+                <option value={SIMPLE_DASHBOARD_ALL_REGIONALS}>
+                  Semua regional
+                </option>
+                {regionals.map((regional) => (
+                  <option key={regional} value={regional}>
+                    {regional}
+                  </option>
+                ))}
+              </SelectField>
+            </label>
+
+            <label className="block min-w-0">
+              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.04em] text-zinc-500">
+                Wilayah
+              </span>
+              <SelectField
+                className="h-11 w-full rounded-lg border border-zinc-300 bg-white pl-3 text-sm font-semibold text-zinc-800 shadow-xs outline-none transition hover:border-zinc-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-600/10"
+                onChange={(event) => setWilayahFilter(event.target.value)}
+                value={wilayahFilter}
+              >
+                <option value={SIMPLE_DASHBOARD_ALL_WILAYAHS}>
+                  Semua wilayah
+                </option>
+                {wilayahs.map((wilayah) => (
+                  <option key={wilayah} value={wilayah}>
+                    {wilayah}
+                  </option>
+                ))}
+              </SelectField>
+            </label>
+
+            <label className="block min-w-0">
+              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.04em] text-zinc-500">
+                Area
+              </span>
+              <SelectField
+                className="h-11 w-full rounded-lg border border-zinc-300 bg-white pl-3 text-sm font-semibold text-zinc-800 shadow-xs outline-none transition hover:border-zinc-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-600/10"
+                onChange={(event) => setAreaFilter(event.target.value)}
+                value={areaFilter}
+              >
+                <option value={SIMPLE_DASHBOARD_ALL_AREAS}>Semua area</option>
+                {areas.map((area) => (
+                  <option key={area} value={area}>
+                    {area}
+                  </option>
+                ))}
+              </SelectField>
+            </label>
+
+            <label className="block min-w-0">
+              <span className="mb-1.5 block text-xs font-semibold uppercase tracking-[0.04em] text-zinc-500">
+                Pilih STO
+              </span>
+              <SelectField
+                className="h-11 w-full rounded-lg border border-zinc-300 bg-white pl-3 text-sm font-semibold text-zinc-800 shadow-xs outline-none transition hover:border-zinc-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-600/10 truncate"
+                onChange={(event) => setSelectedSto(event.target.value)}
+                value={selectedSto}
+              >
+                <option value={SIMPLE_DASHBOARD_ALL_STOS}>Semua STO</option>
+                {stoOptions.map((site) => (
+                  <option key={site.tankId} value={site.tankId}>
+                    {site.name} ({site.code})
+                  </option>
+                ))}
+              </SelectField>
+            </label>
           </div>
         </div>
-
-        <label className="block min-w-0">
-          <span className="mb-2 block text-xs font-semibold uppercase text-zinc-500">
-            Regional
-          </span>
-          <span className="relative block">
-            <select
-              className="h-12 w-full appearance-none rounded-lg border border-zinc-300 bg-white pl-3 pr-11 text-sm font-semibold text-zinc-800 outline-none transition hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
-              onChange={(event) => setRegionalFilter(event.target.value)}
-              value={regionalFilter}
-            >
-              <option value={SIMPLE_DASHBOARD_ALL_REGIONALS}>
-                Semua regional
-              </option>
-              {regionals.map((regional) => (
-                <option key={regional} value={regional}>
-                  {regional}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              aria-hidden="true"
-              className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-zinc-700"
-            />
-          </span>
-        </label>
-
-        <label className="block min-w-0">
-          <span className="mb-2 block text-xs font-semibold uppercase text-zinc-500">
-            Wilayah
-          </span>
-          <span className="relative block">
-            <select
-              className="h-12 w-full appearance-none rounded-lg border border-zinc-300 bg-white pl-3 pr-11 text-sm font-semibold text-zinc-800 outline-none transition hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
-              onChange={(event) => setWilayahFilter(event.target.value)}
-              value={wilayahFilter}
-            >
-              <option value={SIMPLE_DASHBOARD_ALL_WILAYAHS}>
-                Semua wilayah
-              </option>
-              {wilayahs.map((wilayah) => (
-                <option key={wilayah} value={wilayah}>
-                  {wilayah}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              aria-hidden="true"
-              className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-zinc-700"
-            />
-          </span>
-        </label>
-
-        <label className="block min-w-0">
-          <span className="mb-2 block text-xs font-semibold uppercase text-zinc-500">
-            Area
-          </span>
-          <span className="relative block">
-            <select
-              className="h-12 w-full appearance-none rounded-lg border border-zinc-300 bg-white pl-3 pr-11 text-sm font-semibold text-zinc-800 outline-none transition hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
-              onChange={(event) => setAreaFilter(event.target.value)}
-              value={areaFilter}
-            >
-              <option value={SIMPLE_DASHBOARD_ALL_AREAS}>Semua area</option>
-              {areas.map((area) => (
-                <option key={area} value={area}>
-                  {area}
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              aria-hidden="true"
-              className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-zinc-700"
-            />
-          </span>
-        </label>
-
-        <label className="block min-w-0">
-          <span className="mb-2 block text-xs font-semibold uppercase text-zinc-500">
-            Pilih STO
-          </span>
-          <span className="relative block">
-            <select
-              className="h-12 w-full appearance-none truncate rounded-lg border border-zinc-300 bg-white pl-3 pr-11 text-sm font-semibold text-zinc-800 outline-none transition hover:border-zinc-400 focus:border-blue-600 focus:ring-4 focus:ring-blue-600/10"
-              onChange={(event) => setSelectedSto(event.target.value)}
-              value={selectedSto}
-            >
-              <option value={SIMPLE_DASHBOARD_ALL_STOS}>Semua STO</option>
-              {stoOptions.map((site) => (
-                <option key={site.tankId} value={site.tankId}>
-                  {site.name} ({site.code})
-                </option>
-              ))}
-            </select>
-            <ChevronDown
-              aria-hidden="true"
-              className="pointer-events-none absolute right-4 top-1/2 size-4 -translate-y-1/2 text-zinc-700"
-            />
-          </span>
-        </label>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-xl font-semibold tracking-normal text-zinc-950">
+          <h2 className="text-xl font-semibold tracking-normal text-zinc-950">
             Monitoring Tangki STO
-          </h1>
+          </h2>
           <p className="mt-1 text-sm text-zinc-500">
             {visibleSites.length} dari {sites.length} STO ditampilkan
           </p>
         </div>
 
-        <div
-          className="grid w-full grid-cols-2 rounded-lg border border-zinc-300 bg-zinc-50 p-1 sm:w-auto"
-          aria-label="Pilih tampilan dashboard"
-        >
-          <button
-            aria-pressed={viewMode === "cards"}
-            className={`inline-flex h-10 items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15 ${
-              viewMode === "cards"
-                ? "bg-blue-600 text-white shadow-sm"
-                : "text-zinc-600 hover:bg-white hover:text-blue-700"
-            }`}
-            onClick={() => setViewMode("cards")}
-            type="button"
-          >
-            <LayoutGrid className="size-4" aria-hidden="true" />
-            Kartu
-          </button>
-          <button
-            aria-pressed={viewMode === "map"}
-            className={`inline-flex h-10 items-center justify-center gap-2 rounded-md px-3 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-blue-600/15 ${
-              viewMode === "map"
-                ? "bg-blue-600 text-white shadow-sm"
-                : "text-zinc-600 hover:bg-white hover:text-blue-700"
-            }`}
-            onClick={() => setViewMode("map")}
-            type="button"
-          >
-            <MapPinned className="size-4" aria-hidden="true" />
-            Peta
-          </button>
-        </div>
+        <SegmentedControl
+          className="w-full sm:w-[13rem]"
+          label="Pilih tampilan dashboard"
+          onChange={setViewMode}
+          options={VIEW_MODES}
+          value={viewMode}
+        />
       </div>
 
       {viewMode === "cards" ? (
