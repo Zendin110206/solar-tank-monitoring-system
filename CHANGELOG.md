@@ -9,6 +9,16 @@ dirilis ke `main`.
 
 ## [Belum dirilis]
 
+### Keamanan
+
+- Next.js dinaikkan dari 16.4.3 ke 16.4.6 untuk menutup 7 kerentanan tingkat sedang (moderate) yang diumumkan awal
+  November 2026. Di antaranya kebocoran dan peracunan cache pada fitur `use cache` dan Cache Components, celah penolakan
+  SVG pada optimasi gambar, dan header internal yang bisa membuka cookie HttpOnly pada runtime Edge. FTM tidak memakai
+  `use cache`, Cache Components, maupun runtime Edge, jadi sebagian besar celah itu tidak menyentuh jalur yang dipakai.
+  Meski begitu, versi lama tetap tercatat rentan oleh `pnpm audit --prod`. `@next/env` dan `eslint-config-next` ikut
+  dinaikkan ke 16.4.6 supaya versi satu keluarga Next.js sama. `pnpm audit --prod` kini bersih, dan tampilan serta
+  perilaku aplikasi tidak berubah.
+
 ## [0.4.0] - 2026-11-10
 
 Rilis tampilan dashboard. Semua halaman dashboard kini memakai satu kerangka bergaya korporat yang sama dengan
