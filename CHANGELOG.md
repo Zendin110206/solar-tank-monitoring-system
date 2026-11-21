@@ -9,6 +9,11 @@ dirilis ke `main`.
 
 ## [Belum dirilis]
 
+### Diubah
+
+- Alat pengembangan diperbarui: Prettier 3.9.10 ke 3.10.1 dan Vite (dipakai Vitest untuk menjalankan tes) 8.3.6 ke 8.3.8.
+  Format kode tidak berubah, dan aplikasi yang dipakai pengguna tidak terpengaruh.
+
 ### Keamanan
 
 - Next.js dinaikkan dari 16.4.3 ke 16.4.6 untuk menutup 7 kerentanan tingkat sedang (moderate) yang diumumkan awal
